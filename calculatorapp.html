@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 420px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #667eea;
+            transition: 0.4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #764ba2;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .display {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border-radius: 16px;
+            padding: 25px 20px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.3);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .display-expression {
+            color: #888;
+            font-size: 16px;
+            min-height: 24px;
+            word-wrap: break-word;
+            text-align: right;
+            width: 100%;
+        }
+
+        .display-value {
+            color: #00ff88;
+            font-size: 42px;
+            font-weight: 300;
+            font-family: 'Courier New', monospace;
+            word-wrap: break-word;
+            text-align: right;
+            width: 100%;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .buttons {
+            display: grid;
+            gap: 12px;
+        }
+
+        .simple-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .scientific-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .btn-calc {
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .btn-calc:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-calc:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-number {
+            background: linear-gradient(145deg, #f0f0f0, #ffffff);
+        }
+
+        .btn-operator {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-function {
+            background: linear-gradient(145deg, #ffa07a, #ff6347);
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn-clear {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+        .btn-equals {
+            background: linear-gradient(145deg, #00d2ff, #3a7bd5);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .scientific-mode {
+            display: none;
+        }
+
+        .scientific-mode.active {
+            display: grid;
+        }
+
+        .simple-mode {
+            display: none;
+        }
+
+        .simple-mode.active {
+            display: grid;
+        }
+
+        @media (max-width: 480px) {
+            .calculator-container {
+                padding: 20px;
+            }
+
+            .btn-calc {
+                padding: 16px;
+                font-size: 18px;
+            }
+
+            .btn-function {
+                font-size: 14px;
+                padding: 14px 8px;
+            }
+
+            .display-value {
+                font-size: 32px;
+            }
+
+            .display-expression {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="mode-toggle">
+            <span class="toggle-label">Simple</span>
+            <label class="switch">
+                <input type="checkbox" id="modeToggle">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Scientific</span>
+        </div>
+
+        <div class="display">
+            <div class="display-expression" id="expression"></div>
+            <div class="display-value" id="display">0</div>
+        </div>
+
+        <div class="buttons simple-mode active simple-grid" id="simpleMode">
+            <button class="btn-calc btn-clear" onclick="clearAll()">AC</button>
+            <button class="btn-calc btn-clear" onclick="clearEntry()">CE</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('%')">%</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('÷')">÷</button>
+            
+            <button class="btn-calc btn-number" onclick="appendNumber('7')">7</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('8')">8</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('9')">9</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('×')">×</button>
+            
+            <button class="btn-calc btn-number" onclick="appendNumber('4')">4</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('5')">5</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('6')">6</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('-')">−</button>
+            
+            <button class="btn-calc btn-number" onclick="appendNumber('1')">1</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('2')">2</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('3')">3</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('+')">+</button>
+            
+            <button class="btn-calc btn-number" onclick="appendNumber('0')">0</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('.')">.</button>
+            <button class="btn-calc btn-equals" onclick="calculate()">=</button>
+        </div>
+
+        <div class="buttons scientific-mode scientific-grid mt-3" id="scientificMode">
+            <button class="btn-calc btn-function" onclick="scientificFunc('sin')">sin</button>
+            <button class="btn-calc btn-function" onclick="scientificFunc('cos')">cos</button>
+            <button class="btn-calc btn-function" onclick="scientificFunc('tan')">tan</button>
+            <button class="btn-calc btn-clear" onclick="clearAll()">AC</button>
+            <button class="btn-calc btn-clear" onclick="clearEntry()">CE</button>
+            
+            <button class="btn-calc btn-function" onclick="scientificFunc('log')">log</button>
+            <button class="btn-calc btn-function" onclick="scientificFunc('ln')">ln</button>
+            <button class="btn-calc btn-function" onclick="scientificFunc('sqrt')">√</button>
+            <button class="btn-calc btn-function" onclick="scientificFunc('square')">x²</button>
+            <button class="btn-calc btn-function" onclick="scientificFunc('power')">xʸ</button>
+            
+            <button class="btn-calc btn-number" onclick="appendNumber('7')">7</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('8')">8</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('9')">9</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('÷')">÷</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('%')">%</button>
+            
+            <button class="btn-calc btn-number" onclick="appendNumber('4')">4</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('5')">5</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('6')">6</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('×')">×</button>
+            <button class="btn-calc btn-function" onclick="insertConstant('π')">π</button>
+            
+            <button class="btn-calc btn-number" onclick="appendNumber('1')">1</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('2')">2</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('3')">3</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('-')">−</button>
+            <button class="btn-calc btn-function" onclick="insertConstant('e')">e</button>
+            
+            <button class="btn-calc btn-number" onclick="appendNumber('0')">0</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('.')">.</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('+')">+</button>
+            <button class="btn-calc btn-equals" onclick="calculate()" style="grid-column: span 2">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentValue = '0';
+        let expression = '';
+        let lastResult = null;
+        let waitingForOperand = false;
+
+        const display = document.getElementById('display');
+        const expressionDisplay = document.getElementById('expression');
+        const modeToggle = document.getElementById('modeToggle');
+        const simpleMode = document.getElementById('simpleMode');
+        const scientificMode = document.getElementById('scientificMode');
+
+        modeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                simpleMode.classList.remove('active');
+                scientificMode.classList.add('active');
+            } else {
+                scientificMode.classList.remove('active');
+                simpleMode.classList.add('active');
+            }
+        });
+
+        function updateDisplay() {
+            display.textContent = currentValue;
+            expressionDisplay.textContent = expression;
+        }
+
+        function appendNumber(num) {
+            if (waitingForOperand) {
+                currentValue = num;
+                waitingForOperand = false;
+            } else {
+                if (currentValue === '0' && num !== '.') {
+                    currentValue = num;
+                } else if (num === '.' && currentValue.includes('.')) {
+                    return;
+                } else {
+                    currentValue += num;
+                }
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (expression && !waitingForOperand) {
+                calculate();
+            }
+            expression = currentValue + ' ' + op + ' ';
+            waitingForOperand = true;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentValue = '0';
+            expression = '';
+            lastResult = null;
+            waitingForOperand = false;
+            updateDisplay();
+        }
+
+        function clearEntry() {
+            currentValue = '0';
+            updateDisplay();
+        }
+
+        function calculate() {
+            if (!expression) return;
+
+            try {
+                let fullExpression = expression + currentValue;
+                fullExpression = fullExpression.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+                
+                let result = eval(fullExpression);
+                
+                if (!isFinite(result)) {
+                    currentValue = 'Error';
+                } else {
+                    result = Math.round(result * 100000000) / 100000000;
+                    currentValue = result.toString();
+                    lastResult = result;
+                }
+                
+                expression = '';
+                waitingForOperand = true;
+            } catch (e) {
+                currentValue = 'Error';
+                expression = '';
+            }
+            updateDisplay();
+        }
+
+        function scientificFunc(func) {
+            let value = parseFloat(currentValue);
+            let result;
+
+            try {
+                switch(func) {
+                    case 'sin':
+                        result = Math.sin(value * Math.PI / 180);
+                        break;
+                    case 'cos':
+                        result = Math.cos(value * Math.PI / 180);
+                        break;
+                    case 'tan':
+                        result = Math.tan(value * Math.PI / 180);
+                        break;
+                    case 'log':
+                        result = Math.log10(value);
+                        break;
+                    case 'ln':
+                        result = Math.log(value);
+                        break;
+                    case 'sqrt':
+                        result = Math.sqrt(value);
+                        break;
+                    case 'square':
+                        result = value * value;
+                        break;
+                    case 'power':
+                        expression = currentValue + ' ^ ';
+                        waitingForOperand = true;
+                        updateDisplay();
+                        return;
+                }
+
+                if (!isFinite(result) || isNaN(result)) {
+                    currentValue = 'Error';
+                } else {
+                    result = Math.round(result * 100000000) / 100000000;
+                    currentValue = result.toString();
+                }
+                
+                expression = '';
+                waitingForOperand = true;
+            } catch (e) {
+                currentValue = 'Error';
+            }
+            updateDisplay();
+        }
+
+        function insertConstant(constant) {
+            if (constant === 'π') {
+                currentValue = Math.PI.toString();
+            } else if (constant === 'e') {
+                currentValue = Math.E.toString();
+            }
+            waitingForOperand = true;
+            updateDisplay();
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key >= '0' && e.key <= '9' || e.key === '.') {
+                appendNumber(e.key);
+            } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+                let op = e.key === '*' ? '×' : e.key === '/' ? '÷' : e.key;
+                appendOperator(op);
+            } else if (e.key === 'Enter' || e.key === '=') {
+                e.preventDefault();
+                calculate();
+            } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+                clearAll();
+            } else if (e.key === 'Backspace') {
+                clearEntry();
+            }
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
