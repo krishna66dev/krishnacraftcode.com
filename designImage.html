@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Image Editor - Photoshop Style</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2b2d42;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+
+        .toolbar {
+            background: #1a1b2e;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .toolbar h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            display: inline-block;
+        }
+
+        .toolbar .btn-group {
+            float: right;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #1a1b2e;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .sidebar h5 {
+            color: #8d99ae;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #2b2d42;
+            padding-bottom: 8px;
+        }
+
+        .sidebar h5:first-child {
+            margin-top: 0;
+        }
+
+        .canvas-area {
+            flex: 1;
+            background: #2b2d42;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: auto;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            background: white;
+        }
+
+        #canvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        .properties-panel {
+            width: 280px;
+            background: #1a1b2e;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .form-label {
+            color: #8d99ae;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control, .form-select {
+            background: #2b2d42;
+            border: 1px solid #3a3d5c;
+            color: #fff;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: #2b2d42;
+            border-color: #667eea;
+            color: #fff;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: #6c757d;
+        }
+
+        .btn-tool {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-tool:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .btn-tool i {
+            margin-right: 8px;
+        }
+
+        .btn-danger-tool {
+            background: #ef476f;
+        }
+
+        .btn-danger-tool:hover {
+            background: #d63651;
+        }
+
+        .btn-success-tool {
+            background: #06ffa5;
+            color: #1a1b2e;
+        }
+
+        .btn-success-tool:hover {
+            background: #00e693;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            width: 50px;
+            height: 38px;
+            border: 1px solid #3a3d5c;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #2b2d42;
+        }
+
+        .layer-item {
+            background: #2b2d42;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .layer-item:hover {
+            background: #3a3d5c;
+        }
+
+        .layer-item.active {
+            border-color: #667eea;
+            background: #3a3d5c;
+        }
+
+        .layer-item .layer-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .layer-item .layer-controls {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .layer-item .layer-controls button {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            background: #667eea;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .layer-item .layer-controls button:hover {
+            background: #764ba2;
+        }
+
+        .canvas-size-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .canvas-size-inputs input {
+            width: 50%;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #2b2d42;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: nwse-resize;
+            display: none;
+        }
+
+        .selection-box {
+            position: absolute;
+            border: 2px dashed #667eea;
+            pointer-events: none;
+            display: none;
+        }
+
+        .transform-controls {
+            position: absolute;
+            display: none;
+            pointer-events: none;
+        }
+
+        .transform-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border: 2px solid #667eea;
+            cursor: pointer;
+            pointer-events: all;
+        }
+
+        .rotation-handle {
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            cursor: grab;
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar, .properties-panel {
+                width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar, .properties-panel {
+                width: 100%;
+                max-height: 300px;
+            }
+        }
+
+        .upload-placeholder {
+            text-align: center;
+            color: #8d99ae;
+            padding: 40px;
+        }
+
+        .upload-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <h1><i class="fas fa-layer-group"></i> Advanced Image Editor</h1>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-light" onclick="saveProject()">
+                <i class="fas fa-save"></i> Save
+            </button>
+            <button class="btn btn-sm btn-outline-light" onclick="downloadImage()">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <h5><i class="fas fa-cog"></i> Canvas Settings</h5>
+            <div class="mb-3">
+                <label class="form-label">Canvas Width</label>
+                <input type="number" id="canvasWidth" class="form-control" value="800" min="100" max="4000">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Canvas Height</label>
+                <input type="number" id="canvasHeight" class="form-control" value="600" min="100" max="4000">
+            </div>
+            <button class="btn-tool" onclick="updateCanvasSize()">
+                <i class="fas fa-expand"></i> Apply Canvas Size
+            </button>
+
+            <h5><i class="fas fa-palette"></i> Background</h5>
+            <div class="mb-3">
+                <label class="form-label">Background Color</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="bgColor" value="#ffffff">
+                    <input type="text" class="form-control" id="bgColorHex" value="#ffffff">
+                </div>
+            </div>
+            <button class="btn-tool" onclick="applyBackground()">
+                <i class="fas fa-fill-drip"></i> Apply Background
+            </button>
+
+            <h5><i class="fas fa-plus-circle"></i> Add Elements</h5>
+            <button class="btn-tool" onclick="addImageLayer()">
+                <i class="fas fa-image"></i> Add Image
+            </button>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            
+            <button class="btn-tool" onclick="addTextLayer()">
+                <i class="fas fa-font"></i> Add Text
+            </button>
+        </div>
+
+        <!-- Canvas Area -->
+        <div class="canvas-area" id="canvasArea">
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Right Properties Panel -->
+        <div class="properties-panel">
+            <h5><i class="fas fa-layers"></i> Layers</h5>
+            <div id="layersList"></div>
+
+            <div id="elementProperties" style="display: none;">
+                <h5><i class="fas fa-sliders-h"></i> Properties</h5>
+                
+                <div id="textProperties" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Text Content</label>
+                        <input type="text" id="textContent" class="form-control" placeholder="Enter text...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Font Size: <span id="fontSizeValue">40</span>px</label>
+                        <input type="range" id="textFontSize" min="10" max="200" value="40">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Text Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="textColorPicker" value="#000000">
+                            <input type="text" class="form-control" id="textColorHex" value="#000000">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Font Family</label>
+                        <select id="textFontFamily" class="form-select">
+                            <option value="Arial">Arial</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Impact">Impact</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Font Style</label>
+                        <select id="textFontStyle" class="form-select">
+                            <option value="normal">Normal</option>
+                            <option value="bold">Bold</option>
+                            <option value="italic">Italic</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="imageProperties" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Scale: <span id="scaleValue">100</span>%</label>
+                        <input type="range" id="imageScale" min="10" max="300" value="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rotation: <span id="rotationValue">0</span>°</label>
+                        <input type="range" id="imageRotation" min="0" max="360" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Opacity: <span id="opacityValue">100</span>%</label>
+                        <input type="range" id="imageOpacity" min="0" max="100" value="100">
+                    </div>
+                </div>
+
+                <h5><i class="fas fa-crosshairs"></i> Position</h5>
+                <div class="mb-3">
+                    <div class="canvas-size-inputs">
+                        <div>
+                            <label class="form-label">X</label>
+                            <input type="number" id="elementX" class="form-control" value="0">
+                        </div>
+                        <div>
+                            <label class="form-label">Y</label>
+                            <input type="number" id="elementY" class="form-control" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-tool btn-danger-tool" onclick="deleteSelectedLayer()">
+                    <i class="fas fa-trash"></i> Delete Layer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let layers = [];
+        let selectedLayer = null;
+        let isDragging = false;
+        let isResizing = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let layerIdCounter = 0;
+
+        // Initialize canvas
+        function initCanvas() {
+            canvas.width = parseInt(document.getElementById('canvasWidth').value);
+            canvas.height = parseInt(document.getElementById('canvasHeight').value);
+            drawCanvas();
+        }
+
+        // Update canvas size
+        function updateCanvasSize() {
+            const width = parseInt(document.getElementById('canvasWidth').value);
+            const height = parseInt(document.getElementById('canvasHeight').value);
+            canvas.width = width;
+            canvas.height = height;
+            drawCanvas();
+        }
+
+        // Apply background color
+        function applyBackground() {
+            const color = document.getElementById('bgColor').value;
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            drawCanvas();
+        }
+
+        // Background color picker sync
+        document.getElementById('bgColor').addEventListener('input', function() {
+            document.getElementById('bgColorHex').value = this.value;
+        });
+
+        document.getElementById('bgColorHex').addEventListener('input', function() {
+            document.getElementById('bgColor').value = this.value;
+        });
+
+        // Add image layer
+        function addImageLayer() {
+            document.getElementById('imageInput').click();
+        }
+
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const layer = {
+                            id: layerIdCounter++,
+                            type: 'image',
+                            name: 'Image ' + layerIdCounter,
+                            image: img,
+                            x: 50,
+                            y: 50,
+                            width: img.width,
+                            height: img.height,
+                            scale: 1,
+                            rotation: 0,
+                            opacity: 1
+                        };
+                        layers.push(layer);
+                        updateLayersList();
+                        selectLayer(layer);
+                        drawCanvas();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Add text layer
+        function addTextLayer() {
+            const layer = {
+                id: layerIdCounter++,
+                type: 'text',
+                name: 'Text ' + layerIdCounter,
+                text: 'Double click to edit',
+                x: 100,
+                y: 100,
+                fontSize: 40,
+                fontFamily: 'Arial',
+                fontStyle: 'normal',
+                color: '#000000'
+            };
+            layers.push(layer);
+            updateLayersList();
+            selectLayer(layer);
+            drawCanvas();
+        }
+
+        // Draw canvas
+        function drawCanvas() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            ctx.fillStyle = document.getElementById('bgColor').value;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw all layers
+            layers.forEach(layer => {
+                ctx.save();
+                
+                if (layer.type === 'image') {
+                    const centerX = layer.x + (layer.width * layer.scale) / 2;
+                    const centerY = layer.y + (layer.height * layer.scale) / 2;
+                    
+                    ctx.translate(centerX, centerY);
+                    ctx.rotate((layer.rotation * Math.PI) / 180);
+                    ctx.globalAlpha = layer.opacity;
+                    ctx.drawImage(
+                        layer.image,
+                        -(layer.width * layer.scale) / 2,
+                        -(layer.height * layer.scale) / 2,
+                        layer.width * layer.scale,
+                        layer.height * layer.scale
+                    );
+                } else if (layer.type === 'text') {
+                    ctx.font = `${layer.fontStyle} ${layer.fontSize}px ${layer.fontFamily}`;
+                    ctx.fillStyle = layer.color;
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(layer.text, layer.x, layer.y);
+                }
+                
+                ctx.restore();
+                
+                // Draw selection box
+                if (selectedLayer && selectedLayer.id === layer.id) {
+                    ctx.strokeStyle = '#667eea';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    
+                    if (layer.type === 'image') {
+                        ctx.strokeRect(
+                            layer.x,
+                            layer.y,
+                            layer.width * layer.scale,
+                            layer.height * layer.scale
+                        );
+                        
+                        // Draw resize handles
+                        const handleSize = 8;
+                        ctx.fillStyle = '#667eea';
+                        ctx.setLineDash([]);
+                        
+                        // Corner handles
+                        ctx.fillRect(layer.x - handleSize/2, layer.y - handleSize/2, handleSize, handleSize);
+                        ctx.fillRect(layer.x + layer.width * layer.scale - handleSize/2, layer.y - handleSize/2, handleSize, handleSize);
+                        ctx.fillRect(layer.x - handleSize/2, layer.y + layer.height * layer.scale - handleSize/2, handleSize, handleSize);
+                        ctx.fillRect(layer.x + layer.width * layer.scale - handleSize/2, layer.y + layer.height * layer.scale - handleSize/2, handleSize, handleSize);
+                    } else if (layer.type === 'text') {
+                        const textWidth = ctx.measureText(layer.text).width;
+                        ctx.strokeRect(layer.x - 5, layer.y - 5, textWidth + 10, layer.fontSize + 10);
+                    }
+                    
+                    ctx.setLineDash([]);
+                }
+            });
+        }
+
+        // Update layers list
+        function updateLayersList() {
+            const layersList = document.getElementById('layersList');
+            layersList.innerHTML = '';
+            
+            layers.slice().reverse().forEach((layer, index) => {
+                const layerItem = document.createElement('div');
+                layerItem.className = 'layer-item';
+                if (selectedLayer && selectedLayer.id === layer.id) {
+                    layerItem.classList.add('active');
+                }
+                
+                layerItem.innerHTML = `
+                    <div class="layer-name">
+                        <i class="fas fa-${layer.type === 'image' ? 'image' : 'font'}"></i>
+                        ${layer.name}
+                    </div>
+                    <div class="layer-controls">
+                        <button onclick="moveLayerUp(${layer.id})"><i class="fas fa-arrow-up"></i></button>
+                        <button onclick="moveLayerDown(${layer.id})"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                `;
+                
+                layerItem.addEventListener('click', () => selectLayer(layer));
+                layersList.appendChild(layerItem);
+            });
+        }
+
+        // Select layer
+        function selectLayer(layer) {
+            selectedLayer = layer;
+            updateLayersList();
+            
+            const elementProperties = document.getElementById('elementProperties');
+            const textProperties = document.getElementById('textProperties');
+            const imageProperties = document.getElementById('imageProperties');
+            
+            elementProperties.style.display = 'block';
+            
+            if (layer.type === 'text') {
+                textProperties.style.display = 'block';
+                imageProperties.style.display = 'none';
+                
+                document.getElementById('textContent').value = layer.text;
+                document.getElementById('textFontSize').value = layer.fontSize;
+                document.getElementById('fontSizeValue').textContent = layer.fontSize;
+                document.getElementById('textColorPicker').value = layer.color;
+                document.getElementById('textColorHex').value = layer.color;
+                document.getElementById('textFontFamily').value = layer.fontFamily;
+                document.getElementById('textFontStyle').value = layer.fontStyle;
+                
+                document.getElementById('elementX').value = Math.round(layer.x);
+                document.getElementById('elementY').value = Math.round(layer.y);
+            } else if (layer.type === 'image') {
+                textProperties.style.display = 'none';
+                imageProperties.style.display = 'block';
+                
+                document.getElementById('imageScale').value = layer.scale * 100;
+                document.getElementById('scaleValue').textContent = Math.round(layer.scale * 100);
+                document.getElementById('imageRotation').value = layer.rotation;
+                document.getElementById('rotationValue').textContent = layer.rotation;
+                document.getElementById('imageOpacity').value = layer.opacity * 100;
+                document.getElementById('opacityValue').textContent = Math.round(layer.opacity * 100);
+                
+                document.getElementById('elementX').value = Math.round(layer.x);
+                document.getElementById('elementY').value = Math.round(layer.y);
+            }
+            
+            drawCanvas();
+        }
+
+        // Text properties event listeners
+        document.getElementById('textContent').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.text = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textFontSize').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.fontSize = parseInt(this.value);
+                document.getElementById('fontSizeValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textColorPicker').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.color = this.value;
+                document.getElementById('textColorHex').value = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textFontFamily').addEventListener('change', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.fontFamily = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textFontStyle').addEventListener('change', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.fontStyle = this.value;
+                drawCanvas();
+            }
+        });
+
+        // Image properties event listeners
+        document.getElementById('imageScale').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.scale = parseFloat(this.value) / 100;
+                document.getElementById('scaleValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('imageRotation').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.rotation = parseInt(this.value);
+                document.getElementById('rotationValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('imageOpacity').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.opacity = parseFloat(this.value) / 100;
+                document.getElementById('opacityValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        // Position event listeners
+        document.getElementById('elementX').addEventListener('input', function() {
+            if (selectedLayer) {
+                selectedLayer.x = parseInt(this.value);
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('elementY').addEventListener('input', function() {
+            if (selectedLayer) {
+                selectedLayer.y = parseInt(this.value);
+                drawCanvas();
+            }
+        });
+
+        // Move layer functions
+        function moveLayerUp(layerId) {
+            const index = layers.findIndex(l => l.id === layerId);
+            if (index < layers.length - 1) {
+                [layers[index], layers[index + 1]] = [layers[index + 1], layers[index]];
+                updateLayersList();
+                drawCanvas();
+            }
+        }
+
+        function moveLayerDown(layerId) {
+            const index = layers.findIndex(l => l.id === layerId);
+            if (index > 0) {
+                [layers[index], layers[index - 1]] = [layers[index - 1], layers[index]];
+                updateLayersList();
+                drawCanvas();
+            }
+        }
+
+        // Delete layer
+        function deleteSelectedLayer() {
+            if (selectedLayer) {
+                layers = layers.filter(l => l.id !== selectedLayer.id);
+                selectedLayer = null;
+                document.getElementById('elementProperties').style.display = 'none';
+                updateLayersList();
+                drawCanvas();
+            }
+        }
+
+        // Mouse events for dragging
+        canvas.addEventListener('mousedown', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if clicking on a layer (reverse order to check top layers first)
+            for (let i = layers.length - 1; i >= 0; i--) {
+                const layer = layers[i];
+                
+                if (layer.type === 'image') {
+                    if (x >= layer.x && x <= layer.x + layer.width * layer.scale &&
+                        y >= layer.y && y <= layer.y + layer.height * layer.scale) {
+                        selectLayer(layer);
+                        isDragging = true;
+                        dragStartX = x - layer.x;
+                        dragStartY = y - layer.y;
+                        break;
+                    }
+                } else if (layer.type === 'text') {
+                    ctx.font = `${layer.fontStyle} ${layer.fontSize}px ${layer.fontFamily}`;
+                    const textWidth = ctx.measureText(layer.text).width;
+                    
+                    if (x >= layer.x && x <= layer.x + textWidth &&
+                        y >= layer.y && y <= layer.y + layer.fontSize) {
+                        selectLayer(layer);
+                        isDragging = true;
+                        dragStartX = x - layer.x;
+                        dragStartY = y - layer.y;
+                        break;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (isDragging && selectedLayer) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                selectedLayer.x = x - dragStartX;
+                selectedLayer.y = y - dragStartY;
+                
+                document.getElementById('elementX').value = Math.round(selectedLayer.x);
+                document.getElementById('elementY').value = Math.round(selectedLayer.y);
+                
+                drawCanvas();
+            }
+        });
+
+        canvas.addEventListener('mouseup', function() {
+            isDragging = false;
+            isResizing = false;
+        });
+
+        canvas.addEventListener('mouseleave', function() {
+            isDragging = false;
+            isResizing = false;
+        });
+
+        // Touch support for mobile
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            for (let i = layers.length - 1; i >= 0; i--) {
+                const layer = layers[i];
+                
+                if (layer.type === 'image') {
+                    if (x >= layer.x && x <= layer.x + layer.width * layer.scale &&
+                        y >= layer.y && y <= layer.y + layer.height * layer.scale) {
+                        selectLayer(layer);
+                        isDragging = true;
+                        dragStartX = x - layer.x;
+                        dragStartY = y - layer.y;
+                        break;
+                    }
+                } else if (layer.type === 'text') {
+                    ctx.font = `${layer.fontStyle} ${layer.fontSize}px ${layer.fontFamily}`;
+                    const textWidth = ctx.measureText(layer.text).width;
+                    
+                    if (x >= layer.x && x <= layer.x + textWidth &&
+                        y >= layer.y && y <= layer.y + layer.fontSize) {
+                        selectLayer(layer);
+                        isDragging = true;
+                        dragStartX = x - layer.x;
+                        dragStartY = y - layer.y;
+                        break;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            if (isDragging && selectedLayer) {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                selectedLayer.x = x - dragStartX;
+                selectedLayer.y = y - dragStartY;
+                
+                document.getElementById('elementX').value = Math.round(selectedLayer.x);
+                document.getElementById('elementY').value = Math.round(selectedLayer.y);
+                
+                drawCanvas();
+            }
+        });
+
+        canvas.addEventListener('touchend', function() {
+            isDragging = false;
+            isResizing = false;
+        });
+
+        // Download image
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'edited-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Save project (download as JSON)
+        function saveProject() {
+            const projectData = {
+                canvasWidth: canvas.width,
+                canvasHeight: canvas.height,
+                backgroundColor: document.getElementById('bgColor').value,
+                layers: layers.map(layer => {
+                    if (layer.type === 'image') {
+                        return {
+                            ...layer,
+                            image: layer.image.src
+                        };
+                    }
+                    return layer;
+                })
+            };
+            
+            const dataStr = JSON.stringify(projectData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'project.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Delete key
+            if (e.key === 'Delete' && selectedLayer) {
+                deleteSelectedLayer();
+            }
+            
+            // Arrow keys for moving
+            if (selectedLayer && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || 
+                e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+                e.preventDefault();
+                
+                const step = e.shiftKey ? 10 : 1;
+                
+                switch(e.key) {
+                    case 'ArrowUp':
+                        selectedLayer.y -= step;
+                        break;
+                    case 'ArrowDown':
+                        selectedLayer.y += step;
+                        break;
+                    case 'ArrowLeft':
+                        selectedLayer.x -= step;
+                        break;
+                    case 'ArrowRight':
+                        selectedLayer.x += step;
+                        break;
+                }
+                
+                document.getElementById('elementX').value = Math.round(selectedLayer.x);
+                document.getElementById('elementY').value = Math.round(selectedLayer.y);
+                drawCanvas();
+            }
+        });
+
+        // Initialize
+        initCanvas();
+    </script>
+</body>
+</html>
