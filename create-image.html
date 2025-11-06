@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Image Editor - Full Featured</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2b2d42;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            background: #1a1b2e;
+            padding: 12px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar h1 {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar-actions button {
+            padding: 8px 16px;
+            background: #667eea;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toolbar-actions button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 320px;
+            background: #1a1b2e;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .sidebar h5 {
+            color: #8d99ae;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #2b2d42;
+            padding-bottom: 8px;
+        }
+
+        .sidebar h5:first-child {
+            margin-top: 0;
+        }
+
+        .canvas-area {
+            flex: 1;
+            background: #2b2d42;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: auto;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            background: white;
+        }
+
+        #canvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        .properties-panel {
+            width: 300px;
+            background: #1a1b2e;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .form-label {
+            color: #8d99ae;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control, .form-select {
+            background: #2b2d42;
+            border: 1px solid #3a3d5c;
+            color: #fff;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: #2b2d42;
+            border-color: #667eea;
+            color: #fff;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: #6c757d;
+        }
+
+        .btn-tool {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .btn-tool:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .btn-tool i {
+            margin-right: 8px;
+        }
+
+        .btn-danger-tool {
+            background: #ef476f;
+        }
+
+        .btn-danger-tool:hover {
+            background: #d63651;
+        }
+
+        .btn-success-tool {
+            background: #06ffa5;
+            color: #1a1b2e;
+        }
+
+        .btn-success-tool:hover {
+            background: #00e693;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            width: 50px;
+            height: 38px;
+            border: 1px solid #3a3d5c;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #2b2d42;
+        }
+
+        .layer-item {
+            background: #2b2d42;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .layer-item:hover {
+            background: #3a3d5c;
+        }
+
+        .layer-item.active {
+            border-color: #667eea;
+            background: #3a3d5c;
+        }
+
+        .layer-item .layer-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .layer-item .layer-controls {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .layer-item .layer-controls button {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            background: #667eea;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .layer-item .layer-controls button:hover {
+            background: #764ba2;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #2b2d42;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .shape-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .shape-btn {
+            padding: 15px;
+            background: #2b2d42;
+            border: 2px solid #3a3d5c;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            color: #8d99ae;
+        }
+
+        .shape-btn:hover {
+            border-color: #667eea;
+            background: #3a3d5c;
+        }
+
+        .shape-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .shape-btn i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px;
+            background: #2b2d42;
+            border: 1px solid #3a3d5c;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            background: #3a3d5c;
+        }
+
+        .shadow-controls {
+            background: #2b2d42;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .gradient-preview {
+            height: 40px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #3a3d5c;
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar, .properties-panel {
+                width: 260px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar, .properties-panel {
+                width: 100%;
+                max-height: 300px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1b2e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <h1><i class="fas fa-magic"></i> Pro Image Editor</h1>
+        <div class="toolbar-actions">
+            <button onclick="undoAction()"><i class="fas fa-undo"></i> Undo</button>
+            <button onclick="saveProject()"><i class="fas fa-save"></i> Save</button>
+            <button onclick="downloadImage()"><i class="fas fa-download"></i> Export PNG</button>
+            <button onclick="downloadImageJPG()"><i class="fas fa-file-image"></i> Export JPG</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <h5><i class="fas fa-cog"></i> Canvas Settings</h5>
+            <div class="mb-3">
+                <label class="form-label">Canvas Width</label>
+                <input type="number" id="canvasWidth" class="form-control" value="600" min="100" max="4000">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Canvas Height</label>
+                <input type="number" id="canvasHeight" class="form-control" value="500" min="100" max="4000">
+            </div>
+            <button class="btn-tool" onclick="updateCanvasSize()">
+                <i class="fas fa-expand"></i> Apply Canvas Size
+            </button>
+
+            <h5><i class="fas fa-fill-drip"></i> Background</h5>
+            <div class="mb-3">
+                <label class="form-label">Solid Color</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="bgColor" value="#ffffff">
+                    <input type="text" class="form-control" id="bgColorHex" value="#ffffff">
+                </div>
+            </div>
+            <button class="btn-tool" onclick="applyBackground()">
+                <i class="fas fa-paint-roller"></i> Apply Solid Color
+            </button>
+
+            <div class="mb-3">
+                <label class="form-label">Gradient Background</label>
+                <div class="color-picker-wrapper mb-2">
+                    <input type="color" id="gradColor1" value="#667eea">
+                    <input type="color" id="gradColor2" value="#764ba2">
+                </div>
+                <select id="gradientType" class="form-select mb-2">
+                    <option value="linear">Linear</option>
+                    <option value="radial">Radial</option>
+                </select>
+                <button class="btn-tool" onclick="applyGradient()">
+                    <i class="fas fa-fill"></i> Apply Gradient
+                </button>
+            </div>
+
+            <h5><i class="fas fa-plus-circle"></i> Add Elements</h5>
+            <button class="btn-tool" onclick="addImageLayer()">
+                <i class="fas fa-image"></i> Add Image
+            </button>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            
+            <button class="btn-tool" onclick="addTextLayer()">
+                <i class="fas fa-font"></i> Add Text
+            </button>
+            
+            <button class="btn-tool" onclick="addShapeLayer()">
+                <i class="fas fa-shapes"></i> Add Shape
+            </button>
+
+            <h5><i class="fas fa-border-style"></i> Border & Effects</h5>
+            <div class="mb-3">
+                <label class="form-label">Border Width: <span id="borderWidthValue">0</span>px</label>
+                <input type="range" id="borderWidth" min="0" max="20" value="0">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Border Color</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="borderColor" value="#000000">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Corner Radius: <span id="cornerRadiusValue">0</span>px</label>
+                <input type="range" id="cornerRadius" min="0" max="100" value="0">
+            </div>
+        </div>
+
+        <!-- Canvas Area -->
+        <div class="canvas-area" id="canvasArea">
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Right Properties Panel -->
+        <div class="properties-panel">
+            <h5><i class="fas fa-layers"></i> Layers</h5>
+            <div id="layersList"></div>
+
+            <div id="elementProperties" style="display: none;">
+                <h5><i class="fas fa-sliders-h"></i> Properties</h5>
+                
+                <div id="textProperties" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Text Content</label>
+                        <textarea id="textContent" class="form-control" rows="3" placeholder="Enter text..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Font Size: <span id="fontSizeValue">40</span>px</label>
+                        <input type="range" id="textFontSize" min="10" max="200" value="40">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Text Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="textColorPicker" value="#000000">
+                            <input type="text" class="form-control" id="textColorHex" value="#000000">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Font Family</label>
+                        <select id="textFontFamily" class="form-select">
+                            <option value="Arial">Arial</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Impact">Impact</option>
+                            <option value="Comic Sans MS">Comic Sans MS</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Font Weight</label>
+                        <select id="textFontWeight" class="form-select">
+                            <option value="normal">Normal</option>
+                            <option value="bold">Bold</option>
+                            <option value="lighter">Light</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Text Align</label>
+                        <select id="textAlign" class="form-select">
+                            <option value="left">Left</option>
+                            <option value="center">Center</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Line Height: <span id="lineHeightValue">1.2</span></label>
+                        <input type="range" id="lineHeight" min="0.5" max="3" step="0.1" value="1.2">
+                    </div>
+                </div>
+
+                <div id="imageProperties" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Mask Shape</label>
+                        <div class="shape-selector">
+                            <div class="shape-btn active" data-shape="none" onclick="changeImageShape('none')">
+                                <i class="fas fa-square"></i>
+                                <div>None</div>
+                            </div>
+                            <div class="shape-btn" data-shape="circle" onclick="changeImageShape('circle')">
+                                <i class="fas fa-circle"></i>
+                                <div>Circle</div>
+                            </div>
+                            <div class="shape-btn" data-shape="rounded" onclick="changeImageShape('rounded')">
+                                <i class="fas fa-square"></i>
+                                <div>Rounded</div>
+                            </div>
+                            <div class="shape-btn" data-shape="triangle" onclick="changeImageShape('triangle')">
+                                <i class="fas fa-play"></i>
+                                <div>Triangle</div>
+                            </div>
+                            <div class="shape-btn" data-shape="star" onclick="changeImageShape('star')">
+                                <i class="fas fa-star"></i>
+                                <div>Star</div>
+                            </div>
+                            <div class="shape-btn" data-shape="hexagon" onclick="changeImageShape('hexagon')">
+                                <i class="fas fa-stop"></i>
+                                <div>Hexagon</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Scale: <span id="scaleValue">100</span>%</label>
+                        <input type="range" id="imageScale" min="10" max="300" value="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rotation: <span id="rotationValue">0</span>°</label>
+                        <input type="range" id="imageRotation" min="0" max="360" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Opacity: <span id="opacityValue">100</span>%</label>
+                        <input type="range" id="imageOpacity" min="0" max="100" value="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Brightness: <span id="brightnessValue">100</span>%</label>
+                        <input type="range" id="imageBrightness" min="0" max="200" value="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contrast: <span id="contrastValue">100</span>%</label>
+                        <input type="range" id="imageContrast" min="0" max="200" value="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Blur: <span id="blurValue">0</span>px</label>
+                        <input type="range" id="imageBlur" min="0" max="20" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Saturation: <span id="saturationValue">100</span>%</label>
+                        <input type="range" id="imageSaturation" min="0" max="200" value="100">
+                    </div>
+                </div>
+
+                <div id="shapeProperties" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Shape Type</label>
+                        <select id="shapeType" class="form-select">
+                            <option value="rectangle">Rectangle</option>
+                            <option value="circle">Circle</option>
+                            <option value="triangle">Triangle</option>
+                            <option value="star">Star</option>
+                            <option value="hexagon">Hexagon</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fill Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="shapeFillColor" value="#667eea">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Width: <span id="shapeWidthValue">100</span>px</label>
+                        <input type="range" id="shapeWidth" min="20" max="500" value="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Height: <span id="shapeHeightValue">100</span>px</label>
+                        <input type="range" id="shapeHeight" min="20" max="500" value="100">
+                    </div>
+                </div>
+
+                <h5><i class="fas fa-magic"></i> Shadow</h5>
+                <div class="shadow-controls">
+                    <div class="mb-3">
+                        <label class="form-label">Shadow X: <span id="shadowXValue">0</span>px</label>
+                        <input type="range" id="shadowX" min="-50" max="50" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Shadow Y: <span id="shadowYValue">0</span>px</label>
+                        <input type="range" id="shadowY" min="-50" max="50" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Shadow Blur: <span id="shadowBlurValue">0</span>px</label>
+                        <input type="range" id="shadowBlur" min="0" max="50" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Shadow Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="shadowColor" value="#000000">
+                        </div>
+                    </div>
+                </div>
+
+                <h5><i class="fas fa-crosshairs"></i> Position & Size</h5>
+                <div class="mb-3">
+                    <label class="form-label">X Position</label>
+                    <input type="number" id="elementX" class="form-control" value="0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Y Position</label>
+                    <input type="number" id="elementY" class="form-control" value="0">
+                </div>
+
+                <button class="btn-tool btn-success-tool" onclick="duplicateLayer()">
+                    <i class="fas fa-copy"></i> Duplicate Layer
+                </button>
+                <button class="btn-tool btn-danger-tool" onclick="deleteSelectedLayer()">
+                    <i class="fas fa-trash"></i> Delete Layer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let layers = [];
+        let selectedLayer = null;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let layerIdCounter = 0;
+        let history = [];
+        let historyStep = -1;
+
+        // Initialize canvas
+        function initCanvas() {
+            canvas.width = parseInt(document.getElementById('canvasWidth').value);
+            canvas.height = parseInt(document.getElementById('canvasHeight').value);
+            drawCanvas();
+        }
+
+
+
+
+        // Save history state
+        function saveHistory() {
+            historyStep++;
+            if (historyStep < history.length) {
+                history.length = historyStep;
+            }
+            history.push(JSON.stringify(layers.map(l => {
+                if (l.type === 'image') {
+                    return {...l, image: l.image.src};
+                }
+                return l;
+            })));
+        }
+
+        // Undo action
+        function undoAction() {
+            if (historyStep > 0) {
+                historyStep--;
+                const state = JSON.parse(history[historyStep]);
+                layers = state.map(l => {
+                    if (l.type === 'image') {
+                        const img = new Image();
+                        img.src = l.image;
+                        return {...l, image: img};
+                    }
+                    return l;
+                });
+                updateLayersList();
+                drawCanvas();
+            }
+        }
+
+        // Update canvas size
+        function updateCanvasSize() {
+            const width = parseInt(document.getElementById('canvasWidth').value);
+            const height = parseInt(document.getElementById('canvasHeight').value);
+            canvas.width = width;
+            canvas.height = height;
+            drawCanvas();
+        }
+
+        // Apply background color
+        function applyBackground() {
+            const color = document.getElementById('bgColor').value;
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            drawCanvas();
+        }
+
+        // Apply gradient background
+        function applyGradient() {
+            const color1 = document.getElementById('gradColor1').value;
+            const color2 = document.getElementById('gradColor2').value;
+            const type = document.getElementById('gradientType').value;
+            
+            let gradient;
+            if (type === 'linear') {
+                gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            } else {
+                gradient = ctx.createRadialGradient(
+                    canvas.width/2, canvas.height/2, 0,
+                    canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height)/2
+                );
+            }
+            
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // drawCanvas();
+        }
+
+        // Sync color pickers
+        document.getElementById('bgColor').addEventListener('input', function() {
+            document.getElementById('bgColorHex').value = this.value;
+        });
+
+        // Add image layer
+        function addImageLayer() {
+            document.getElementById('imageInput').click();
+        }
+
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const maxSize = 400;
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > maxSize || height > maxSize) {
+                            if (width > height) {
+                                height = (height / width) * maxSize;
+                                width = maxSize;
+                            } else {
+                                width = (width / height) * maxSize;
+                                height = maxSize;
+                            }
+                        }
+                        
+                        const layer = {
+                            id: layerIdCounter++,
+                            type: 'image',
+                            name: 'Image ' + (layerIdCounter),
+                            image: img,
+                            x: 50,
+                            y: 50,
+                            width: width,
+                            height: height,
+                            scale: 1,
+                            rotation: 0,
+                            opacity: 1,
+                            shape: 'none',
+                            brightness: 100,
+                            contrast: 100,
+                            blur: 0,
+                            saturation: 100,
+                            shadowX: 0,
+                            shadowY: 0,
+                            shadowBlur: 0,
+                            shadowColor: '#000000'
+                        };
+                        layers.push(layer);
+                        saveHistory();
+                        updateLayersList();
+                        selectLayer(layer);
+                        drawCanvas();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+            this.value = '';
+        });
+
+        // Add text layer
+        function addTextLayer() {
+            const layer = {
+                id: layerIdCounter++,
+                type: 'text',
+                name: 'Text ' + (layerIdCounter),
+                text: 'Edit me!',
+                x: 100,
+                y: 100,
+                fontSize: 40,
+                fontFamily: 'Arial',
+                fontWeight: 'normal',
+                color: '#000000',
+                textAlign: 'left',
+                lineHeight: 1.2,
+                shadowX: 0,
+                shadowY: 0,
+                shadowBlur: 0,
+                shadowColor: '#000000'
+            };
+            layers.push(layer);
+            saveHistory();
+            updateLayersList();
+            selectLayer(layer);
+            drawCanvas();
+        }
+
+        // Add shape layer
+        function addShapeLayer() {
+            const layer = {
+                id: layerIdCounter++,
+                type: 'shape',
+                name: 'Shape ' + (layerIdCounter),
+                shapeType: 'rectangle',
+                x: 100,
+                y: 100,
+                width: 100,
+                height: 100,
+                fillColor: '#667eea',
+                rotation: 0,
+                shadowX: 0,
+                shadowY: 0,
+                shadowBlur: 0,
+                shadowColor: '#000000'
+            };
+            layers.push(layer);
+            saveHistory();
+            updateLayersList();
+            selectLayer(layer);
+            drawCanvas();
+        }
+
+        // Change image shape
+        function changeImageShape(shape) {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.shape = shape;
+                document.querySelectorAll('.shape-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.shape === shape) {
+                        btn.classList.add('active');
+                    }
+                });
+                drawCanvas();
+            }
+        }
+
+        // Draw canvas with all layers
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            const bgColor = document.getElementById('bgColor').value;
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw all layers
+            layers.forEach(layer => {
+                ctx.save();
+                
+                // Apply shadow
+                if (layer.shadowBlur > 0) {
+                    ctx.shadowOffsetX = layer.shadowX;
+                    ctx.shadowOffsetY = layer.shadowY;
+                    ctx.shadowBlur = layer.shadowBlur;
+                    ctx.shadowColor = layer.shadowColor;
+                }
+                
+                if (layer.type === 'image') {
+                    drawImageLayer(layer);
+                } else if (layer.type === 'text') {
+                    drawTextLayer(layer);
+                } else if (layer.type === 'shape') {
+                    drawShapeLayer(layer);
+                }
+                
+                ctx.restore();
+                
+                // Draw selection
+                if (selectedLayer && selectedLayer.id === layer.id) {
+                    drawSelection(layer);
+                }
+            });
+        }
+
+        // Draw image layer with effects
+        function drawImageLayer(layer) {
+            const centerX = layer.x + (layer.width * layer.scale) / 2;
+            const centerY = layer.y + (layer.height * layer.scale) / 2;
+            
+            ctx.translate(centerX, centerY);
+            ctx.rotate((layer.rotation * Math.PI) / 180);
+            ctx.globalAlpha = layer.opacity;
+            
+            // Apply filters
+            let filterString = `brightness(${layer.brightness}%) contrast(${layer.contrast}%) saturate(${layer.saturation}%) blur(${layer.blur}px)`;
+            ctx.filter = filterString;
+            
+            const x = -(layer.width * layer.scale) / 2;
+            const y = -(layer.height * layer.scale) / 2;
+            const w = layer.width * layer.scale;
+            const h = layer.height * layer.scale;
+            
+            // Apply shape mask
+            if (layer.shape === 'circle') {
+                ctx.beginPath();
+                ctx.arc(0, 0, Math.min(w, h) / 2, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+            } else if (layer.shape === 'rounded') {
+                const radius = Math.min(w, h) * 0.2;
+                ctx.beginPath();
+                ctx.moveTo(x + radius, y);
+                ctx.lineTo(x + w - radius, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+                ctx.lineTo(x + w, y + h - radius);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+                ctx.lineTo(x + radius, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+                ctx.lineTo(x, y + radius);
+                ctx.quadraticCurveTo(x, y, x + radius, y);
+                ctx.closePath();
+                ctx.clip();
+            } else if (layer.shape === 'triangle') {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(x + w, y + h);
+                ctx.lineTo(x, y + h);
+                ctx.closePath();
+                ctx.clip();
+            } else if (layer.shape === 'star') {
+                drawStarPath(0, 0, 5, w/2, w/4);
+                ctx.clip();
+            } else if (layer.shape === 'hexagon') {
+                drawHexagonPath(0, 0, Math.min(w, h) / 2);
+                ctx.clip();
+            }
+            
+            ctx.drawImage(layer.image, x, y, w, h);
+            ctx.filter = 'none';
+        }
+
+        // Draw text layer
+        function drawTextLayer(layer) {
+            ctx.font = `${layer.fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+            ctx.fillStyle = layer.color;
+            ctx.textBaseline = 'top';
+            ctx.textAlign = layer.textAlign;
+            
+            const lines = layer.text.split('\n');
+            const lineHeightPx = layer.fontSize * layer.lineHeight;
+            
+            lines.forEach((line, index) => {
+                ctx.fillText(line, layer.x, layer.y + (index * lineHeightPx));
+            });
+        }
+
+        // Draw shape layer
+        function drawShapeLayer(layer) {
+            ctx.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
+            ctx.rotate((layer.rotation * Math.PI) / 180);
+            ctx.fillStyle = layer.fillColor;
+            
+            const x = -layer.width / 2;
+            const y = -layer.height / 2;
+            
+            ctx.beginPath();
+            if (layer.shapeType === 'rectangle') {
+                ctx.rect(x, y, layer.width, layer.height);
+            } else if (layer.shapeType === 'circle') {
+                ctx.arc(0, 0, Math.min(layer.width, layer.height) / 2, 0, Math.PI * 2);
+            } else if (layer.shapeType === 'triangle') {
+                ctx.moveTo(0, y);
+                ctx.lineTo(x + layer.width, y + layer.height);
+                ctx.lineTo(x, y + layer.height);
+            } else if (layer.shapeType === 'star') {
+                drawStarPath(0, 0, 5, Math.min(layer.width, layer.height) / 2, Math.min(layer.width, layer.height) / 4);
+            } else if (layer.shapeType === 'hexagon') {
+                drawHexagonPath(0, 0, Math.min(layer.width, layer.height) / 2);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Helper function to draw star
+        function drawStarPath(cx, cy, spikes, outerRadius, innerRadius) {
+            let rot = Math.PI / 2 * 3;
+            let x = cx;
+            let y = cy;
+            const step = Math.PI / spikes;
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius;
+                y = cy + Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+
+                x = cx + Math.cos(rot) * innerRadius;
+                y = cy + Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+        }
+
+        // Helper function to draw hexagon
+        function drawHexagonPath(cx, cy, radius) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i;
+                const x = cx + radius * Math.cos(angle);
+                const y = cy + radius * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.closePath();
+        }
+
+        // Draw selection box
+        function drawSelection(layer) {
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            
+            if (layer.type === 'image') {
+                ctx.strokeRect(layer.x, layer.y, layer.width * layer.scale, layer.height * layer.scale);
+                
+                // Draw handles
+                const handleSize = 10;
+                ctx.fillStyle = '#667eea';
+                ctx.setLineDash([]);
+                
+                ctx.fillRect(layer.x - handleSize/2, layer.y - handleSize/2, handleSize, handleSize);
+                ctx.fillRect(layer.x + layer.width * layer.scale - handleSize/2, layer.y - handleSize/2, handleSize, handleSize);
+                ctx.fillRect(layer.x - handleSize/2, layer.y + layer.height * layer.scale - handleSize/2, handleSize, handleSize);
+                ctx.fillRect(layer.x + layer.width * layer.scale - handleSize/2, layer.y + layer.height * layer.scale - handleSize/2, handleSize, handleSize);
+            } else if (layer.type === 'text') {
+                ctx.font = `${layer.fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+                const lines = layer.text.split('\n');
+                const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+                const totalHeight = layer.fontSize * layer.lineHeight * lines.length;
+                ctx.strokeRect(layer.x - 5, layer.y - 5, maxWidth + 10, totalHeight + 10);
+            } else if (layer.type === 'shape') {
+                ctx.strokeRect(layer.x, layer.y, layer.width, layer.height);
+            }
+            
+            ctx.setLineDash([]);
+        }
+
+        
+
+        // Add this after your existing mouse event listeners
+        canvas.addEventListener('mousedown', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if clicked on any layer
+            let clickedLayer = null;
+            for (let i = layers.length - 1; i >= 0; i--) {
+                const layer = layers[i];
+                if (isPointInLayer(x, y, layer)) {
+                    clickedLayer = layer;
+                    break;
+                }
+            }
+
+            // If clicked outside all layers, deselect
+            if (!clickedLayer) {
+                selectedLayer = null;
+                updateLayersList();
+                drawCanvas();
+                return;
+            }
+
+            // Handle layer selection
+            isDragging = true;
+            dragStartX = x;
+            dragStartY = y;
+            selectLayer(clickedLayer);
+        });
+
+        // Add this helper function to check if point is inside layer
+        function isPointInLayer(x, y, layer) {
+            if (layer.type === 'image' || layer.type === 'shape') {
+                return x >= layer.x && 
+                    x <= layer.x + (layer.width * (layer.scale || 1)) && 
+                    y >= layer.y && 
+                    y <= layer.y + (layer.height * (layer.scale || 1));
+            } else if (layer.type === 'text') {
+                const ctx = canvas.getContext('2d');
+                ctx.font = `${layer.fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+                const lines = layer.text.split('\n');
+                const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+                const totalHeight = layer.fontSize * layer.lineHeight * lines.length;
+                
+                return x >= layer.x - 5 && 
+                    x <= layer.x + maxWidth + 5 && 
+                    y >= layer.y - 5 && 
+                    y <= layer.y + totalHeight + 5;
+            }
+            return false;
+        }
+
+        // Update layers list
+        function updateLayersList() {
+            const layersList = document.getElementById('layersList');
+            layersList.innerHTML = '';
+            
+            layers.slice().reverse().forEach((layer) => {
+                const layerItem = document.createElement('div');
+                layerItem.className = 'layer-item';
+                if (selectedLayer && selectedLayer.id === layer.id) {
+                    layerItem.classList.add('active');
+                }
+                
+                let icon = 'image';
+                if (layer.type === 'text') icon = 'font';
+                if (layer.type === 'shape') icon = 'shapes';
+                
+                layerItem.innerHTML = `
+                    <div class="layer-name">
+                        <i class="fas fa-${icon}"></i>
+                        ${layer.name}
+                    </div>
+                    <div class="layer-controls">
+                        <button onclick="moveLayerUp(${layer.id})"><i class="fas fa-arrow-up"></i></button>
+                        <button onclick="moveLayerDown(${layer.id})"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                `;
+                
+                layerItem.addEventListener('click', () => selectLayer(layer));
+                layersList.appendChild(layerItem);
+            });
+        }
+
+        // Select layer
+        function selectLayer(layer) {
+            selectedLayer = layer;
+            updateLayersList();
+            
+            const elementProperties = document.getElementById('elementProperties');
+            const textProperties = document.getElementById('textProperties');
+            const imageProperties = document.getElementById('imageProperties');
+            const shapeProperties = document.getElementById('shapeProperties');
+            
+            elementProperties.style.display = 'block';
+            textProperties.style.display = 'none';
+            imageProperties.style.display = 'none';
+            shapeProperties.style.display = 'none';
+            
+            if (layer.type === 'text') {
+                textProperties.style.display = 'block';
+                document.getElementById('textContent').value = layer.text;
+                document.getElementById('textFontSize').value = layer.fontSize;
+                document.getElementById('fontSizeValue').textContent = layer.fontSize;
+                document.getElementById('textColorPicker').value = layer.color;
+                document.getElementById('textFontFamily').value = layer.fontFamily;
+                document.getElementById('textFontWeight').value = layer.fontWeight;
+                document.getElementById('textAlign').value = layer.textAlign;
+                document.getElementById('lineHeight').value = layer.lineHeight;
+                document.getElementById('lineHeightValue').textContent = layer.lineHeight;
+            } else if (layer.type === 'image') {
+                imageProperties.style.display = 'block';
+                document.getElementById('imageScale').value = layer.scale * 100;
+                document.getElementById('scaleValue').textContent = Math.round(layer.scale * 100);
+                document.getElementById('imageRotation').value = layer.rotation;
+                document.getElementById('rotationValue').textContent = layer.rotation;
+                document.getElementById('imageOpacity').value = layer.opacity * 100;
+                document.getElementById('opacityValue').textContent = Math.round(layer.opacity * 100);
+                document.getElementById('imageBrightness').value = layer.brightness;
+                document.getElementById('brightnessValue').textContent = layer.brightness;
+                document.getElementById('imageContrast').value = layer.contrast;
+                document.getElementById('contrastValue').textContent = layer.contrast;
+                document.getElementById('imageBlur').value = layer.blur;
+                document.getElementById('blurValue').textContent = layer.blur;
+                document.getElementById('imageSaturation').value = layer.saturation;
+                document.getElementById('saturationValue').textContent = layer.saturation;
+            } else if (layer.type === 'shape') {
+                shapeProperties.style.display = 'block';
+                document.getElementById('shapeType').value = layer.shapeType;
+                document.getElementById('shapeFillColor').value = layer.fillColor;
+                document.getElementById('shapeWidth').value = layer.width;
+                document.getElementById('shapeWidthValue').textContent = layer.width;
+                document.getElementById('shapeHeight').value = layer.height;
+                document.getElementById('shapeHeightValue').textContent = layer.height;
+            }
+            
+            // Shadow properties
+            document.getElementById('shadowX').value = layer.shadowX;
+            document.getElementById('shadowXValue').textContent = layer.shadowX;
+            document.getElementById('shadowY').value = layer.shadowY;
+            document.getElementById('shadowYValue').textContent = layer.shadowY;
+            document.getElementById('shadowBlur').value = layer.shadowBlur;
+            document.getElementById('shadowBlurValue').textContent = layer.shadowBlur;
+            document.getElementById('shadowColor').value = layer.shadowColor;
+            
+            document.getElementById('elementX').value = Math.round(layer.x);
+            document.getElementById('elementY').value = Math.round(layer.y);
+            
+            drawCanvas();
+        }
+
+        // Event listeners for text properties
+        document.getElementById('textContent').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.text = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textFontSize').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.fontSize = parseInt(this.value);
+                document.getElementById('fontSizeValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textColorPicker').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.color = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textFontFamily').addEventListener('change', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.fontFamily = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textFontWeight').addEventListener('change', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.fontWeight = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('textAlign').addEventListener('change', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.textAlign = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('lineHeight').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'text') {
+                selectedLayer.lineHeight = parseFloat(this.value);
+                document.getElementById('lineHeightValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        // Event listeners for image properties
+        document.getElementById('imageScale').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.scale = parseFloat(this.value) / 100;
+                document.getElementById('scaleValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('imageRotation').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.rotation = parseInt(this.value);
+                document.getElementById('rotationValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('imageOpacity').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.opacity = parseFloat(this.value) / 100;
+                document.getElementById('opacityValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('imageBrightness').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.brightness = parseInt(this.value);
+                document.getElementById('brightnessValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('imageContrast').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.contrast = parseInt(this.value);
+                document.getElementById('contrastValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('imageBlur').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.blur = parseInt(this.value);
+                document.getElementById('blurValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('imageSaturation').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'image') {
+                selectedLayer.saturation = parseInt(this.value);
+                document.getElementById('saturationValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        // Event listeners for shape properties
+        document.getElementById('shapeType').addEventListener('change', function() {
+            if (selectedLayer && selectedLayer.type === 'shape') {
+                selectedLayer.shapeType = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('shapeFillColor').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'shape') {
+                selectedLayer.fillColor = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('shapeWidth').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'shape') {
+                selectedLayer.width = parseInt(this.value);
+                document.getElementById('shapeWidthValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('shapeHeight').addEventListener('input', function() {
+            if (selectedLayer && selectedLayer.type === 'shape') {
+                selectedLayer.height = parseInt(this.value);
+                document.getElementById('shapeHeightValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        // Shadow properties
+        document.getElementById('shadowX').addEventListener('input', function() {
+            if (selectedLayer) {
+                selectedLayer.shadowX = parseInt(this.value);
+                document.getElementById('shadowXValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('shadowY').addEventListener('input', function() {
+            if (selectedLayer) {
+                selectedLayer.shadowY = parseInt(this.value);
+                document.getElementById('shadowYValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('shadowBlur').addEventListener('input', function() {
+            if (selectedLayer) {
+                selectedLayer.shadowBlur = parseInt(this.value);
+                document.getElementById('shadowBlurValue').textContent = this.value;
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('shadowColor').addEventListener('input', function() {
+            if (selectedLayer) {
+                selectedLayer.shadowColor = this.value;
+                drawCanvas();
+            }
+        });
+
+        // Position event listeners
+        document.getElementById('elementX').addEventListener('input', function() {
+            if (selectedLayer) {
+                selectedLayer.x = parseInt(this.value);
+                drawCanvas();
+            }
+        });
+
+        document.getElementById('elementY').addEventListener('input', function() {
+            if (selectedLayer) {
+                selectedLayer.y = parseInt(this.value);
+                drawCanvas();
+            }
+        });
+
+        // Layer management
+        function moveLayerUp(layerId) {
+            const index = layers.findIndex(l => l.id === layerId);
+            if (index < layers.length - 1) {
+                [layers[index], layers[index + 1]] = [layers[index + 1], layers[index]];
+                saveHistory();
+                updateLayersList();
+                drawCanvas();
+            }
+        }
+
+        function moveLayerDown(layerId) {
+            const index = layers.findIndex(l => l.id === layerId);
+            if (index > 0) {
+                [layers[index], layers[index - 1]] = [layers[index - 1], layers[index]];
+                saveHistory();
+                updateLayersList();
+                drawCanvas();
+            }
+        }
+
+        function deleteSelectedLayer() {
+            if (selectedLayer) {
+                layers = layers.filter(l => l.id !== selectedLayer.id);
+                selectedLayer = null;
+                document.getElementById('elementProperties').style.display = 'none';
+                saveHistory();
+                updateLayersList();
+                drawCanvas();
+            }
+        }
+
+        function duplicateLayer() {
+            if (selectedLayer) {
+                const newLayer = JSON.parse(JSON.stringify(selectedLayer));
+                if (selectedLayer.type === 'image') {
+                    newLayer.image = selectedLayer.image;
+                }
+                newLayer.id = layerIdCounter++;
+                newLayer.name = selectedLayer.name + ' Copy';
+                newLayer.x += 20;
+                newLayer.y += 20;
+                layers.push(newLayer);
+                saveHistory();
+                updateLayersList();
+                selectLayer(newLayer);
+                drawCanvas();
+            }
+        }
+
+        // Mouse events
+        canvas.addEventListener('mousedown', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            for (let i = layers.length - 1; i >= 0; i--) {
+                const layer = layers[i];
+                
+                if (layer.type === 'image') {
+                    if (x >= layer.x && x <= layer.x + layer.width * layer.scale &&
+                        y >= layer.y && y <= layer.y + layer.height * layer.scale) {
+                        selectLayer(layer);
+                        isDragging = true;
+                        dragStartX = x - layer.x;
+                        dragStartY = y - layer.y;
+                        break;
+                    }
+                } else if (layer.type === 'text') {
+                    ctx.font = `${layer.fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+                    const lines = layer.text.split('\n');
+                    const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+                    const totalHeight = layer.fontSize * layer.lineHeight * lines.length;
+                    
+                    if (x >= layer.x && x <= layer.x + maxWidth &&
+                        y >= layer.y && y <= layer.y + totalHeight) {
+                        selectLayer(layer);
+                        isDragging = true;
+                        dragStartX = x - layer.x;
+                        dragStartY = y - layer.y;
+                        break;
+                    }
+                } else if (layer.type === 'shape') {
+                    if (x >= layer.x && x <= layer.x + layer.width &&
+                        y >= layer.y && y <= layer.y + layer.height) {
+                        selectLayer(layer);
+                        isDragging = true;
+                        dragStartX = x - layer.x;
+                        dragStartY = y - layer.y;
+                        break;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (isDragging && selectedLayer) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                selectedLayer.x = x - dragStartX;
+                selectedLayer.y = y - dragStartY;
+                
+                document.getElementById('elementX').value = Math.round(selectedLayer.x);
+                document.getElementById('elementY').value = Math.round(selectedLayer.y);
+                
+                drawCanvas();
+            }
+        });
+
+        canvas.addEventListener('mouseup', function() {
+            if (isDragging) {
+                saveHistory();
+            }
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', function() {
+            isDragging = false;
+        });
+
+        // Touch events
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            for (let i = layers.length - 1; i >= 0; i--) {
+                const layer = layers[i];
+                
+                if (layer.type === 'image') {
+                    if (x >= layer.x && x <= layer.x + layer.width * layer.scale &&
+                        y >= layer.y && y <= layer.y + layer.height * layer.scale) {
+                        selectLayer(layer);
+                        isDragging = true;
+                        dragStartX = x - layer.x;
+                        dragStartY = y - layer.y;
+                        break;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            if (isDragging && selectedLayer) {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                selectedLayer.x = x - dragStartX;
+                selectedLayer.y = y - dragStartY;
+                
+                drawCanvas();
+            }
+        });
+
+        canvas.addEventListener('touchend', function() {
+            isDragging = false;
+        });
+
+        // Export functions
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'design.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadImageJPG() {
+            const link = document.createElement('a');
+            link.download = 'design.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            link.click();
+        }
+
+        function saveProject() {
+            const projectData = {
+                canvasWidth: canvas.width,
+                canvasHeight: canvas.height,
+                backgroundColor: document.getElementById('bgColor').value,
+                layers: layers.map(layer => {
+                    if (layer.type === 'image') {
+                        return {...layer, image: layer.image.src};
+                    }
+                    return layer;
+                })
+            };
+            
+            const dataStr = JSON.stringify(projectData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'project.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Delete' && selectedLayer) {
+                deleteSelectedLayer();
+            }
+            
+            if (selectedLayer && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || 
+                e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+                e.preventDefault();
+                
+                const step = e.shiftKey ? 10 : 1;
+                
+                switch(e.key) {
+                    case 'ArrowUp': selectedLayer.y -= step; break;
+                    case 'ArrowDown': selectedLayer.y += step; break;
+                    case 'ArrowLeft': selectedLayer.x -= step; break;
+                    case 'ArrowRight': selectedLayer.x += step; break;
+                }
+                
+                document.getElementById('elementX').value = Math.round(selectedLayer.x);
+                document.getElementById('elementY').value = Math.round(selectedLayer.y);
+                drawCanvas();
+            }
+            
+            // Ctrl+D to duplicate
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd' && selectedLayer) {
+                e.preventDefault();
+                duplicateLayer();
+            }
+            
+            // Ctrl+Z to undo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault();
+                undoAction();
+            }
+        });
+
+        // Initialize
+        initCanvas();
+        saveHistory();
+    </script>
+</body>
+</html>
