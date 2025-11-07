@@ -1,0 +1,10 @@
+{
+  "name": "Expense Tracker",
+  "short_name": "ExpenseTracker",
+  "start_url": "https://krishna66dev.github.io/krishnacraftcode.com/expenseTracker.html",
+  "display": "standalone",
+  "icons": [
+    { "src": "Icon-1", "sizes": "192x192", "type": "image/png" },
+    { "src": "Icon-2", "sizes": "512x512", "type": "image/png" }
+  ]
+}
