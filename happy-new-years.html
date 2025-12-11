@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year 2026</title>
+    <meta name="decorations" content="Wishes Happy New Year 2026, Celebrate the new beginning with positive quotes, warm wishes, and inspiring lines to welcome 2026 with joy, hope, and good fortune.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #1a1410 0%, #2d1f15 50%, #1a1410 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated Background Overlay */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(218, 165, 32, 0.1) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #ffd700 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 15s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) scale(1);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-100vh) translateX(50px) scale(1.5);
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Firework Effects */
+        .firework {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+            animation: explode 2s ease-out infinite;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 3;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* Content Section */
+        .content-wrapper {
+            text-align: center;
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Main Title */
+        .main-title {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+            letter-spacing: 2px;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+            }
+            to {
+                filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.9));
+            }
+        }
+
+        /* Subtitle */
+        .subtitle {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: #f5deb3;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 2s ease-out 0.5s both;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Decorative Elements */
+        .decorative-line {
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            margin: 30px auto;
+            animation: expand 2s ease-out 1s both;
+        }
+
+        @keyframes expand {
+            from {
+                width: 0;
+            }
+            to {
+                width: 200px;
+            }
+        }
+
+        /* Message Box */
+        .message-box {
+            background: rgba(255, 215, 0, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 2s ease-out 1s both;
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+        }
+
+        .message-text {
+            color: #f5deb3;
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1a1410;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+            animation: fadeIn 2.5s ease-out 1.5s both;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .cta-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.6);
+        }
+
+        .cta-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Countdown */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+            animation: fadeIn 2s ease-out 1.2s both;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            text-align: center;
+        }
+
+        .countdown-number {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: bold;
+            color: #ffd700;
+            display: block;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .countdown-label {
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+            color: #f5deb3;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            padding: 30px 20px;
+            color: #f5deb3;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            margin-top: auto;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        .footer-icon {
+            color: #ffd700;
+            margin: 0 5px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        /* Leaves Decoration */
+        .leaf {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, transparent 70%);
+            border-radius: 50% 0;
+            pointer-events: none;
+            z-index: 1;
+            animation: falling 10s infinite ease-in;
+        }
+
+        @keyframes falling {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive adjustments */
+        /* Award Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInOverlay 0.3s ease-out;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .award-modal {
+            background: linear-gradient(135deg, #1a1410 0%, #2d1f15 100%);
+            border: 3px solid #ffd700;
+            border-radius: 30px;
+            max-width: 550px;
+            width: 90%;
+            padding: 50px 40px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.5), 
+                        inset 0 0 50px rgba(255, 215, 0, 0.1);
+            animation: modalZoomIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-align: center;
+        }
+
+        @keyframes modalZoomIn {
+            0% {
+                transform: scale(0.3) rotate(-10deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: #ffd700;
+            color: #1a1410;
+            transform: rotate(90deg);
+        }
+
+        .award-icon {
+            font-size: 5rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            animation: awardBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes awardBounce {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.1);
+            }
+        }
+
+        .modal-title {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .modal-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: #f5deb3;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        .modal-divider {
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            margin: 20px auto;
+        }
+
+        .wishes-container {
+            background: rgba(255, 215, 0, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            backdrop-filter: blur(5px);
+        }
+
+        .wish-item {
+            color: #f5deb3;
+            font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+            line-height: 1.8;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .wish-icon {
+            color: #ffd700;
+            font-size: 1.2rem;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(180deg);
+                opacity: 0.7;
+            }
+        }
+
+        .modal-signature {
+            color: #ffd700;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 25px;
+            font-style: italic;
+        }
+
+        .modal-sparkle {
+            position: absolute;
+            font-size: 1.5rem;
+            color: #ffd700;
+            animation: modalSparkle 2s ease-in-out infinite;
+        }
+
+        .sparkle-1 {
+            top: 30px;
+            left: 30px;
+            animation-delay: 0s;
+        }
+
+        .sparkle-2 {
+            top: 30px;
+            right: 30px;
+            animation-delay: 0.5s;
+        }
+
+        .sparkle-3 {
+            bottom: 30px;
+            left: 30px;
+            animation-delay: 1s;
+        }
+
+        .sparkle-4 {
+            bottom: 30px;
+            right: 30px;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes modalSparkle {
+            0%, 100% {
+                transform: scale(0.8) rotate(0deg);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.5) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .message-box {
+                padding: 20px;
+            }
+            
+            .countdown {
+                gap: 20px;
+            }
+            
+            .cta-button {
+                padding: 12px 40px;
+                font-size: 1rem;
+            }
+
+            .award-modal {
+                padding: 40px 25px;
+            }
+
+            .wishes-container {
+                padding: 20px;
+            }
+
+            .wish-item {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Overlay -->
+    <div class="bg-overlay"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="container">
+            <div class="content-wrapper">
+                <!-- Main Title -->
+                <h1 class="main-title">Happy New Year 2026</h1>
+                
+                <!-- Subtitle in Hindi -->
+                <p class="subtitle">नव वर्ष की हार्दिक शुभकामनाएं</p>
+                
+                <!-- Decorative Line -->
+                <div class="decorative-line"></div>
+                
+                <!-- Countdown Timer -->
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="days">00</span>
+                        <span class="countdown-label">Days</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="hours">00</span>
+                        <span class="countdown-label">Hours</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="minutes">00</span>
+                        <span class="countdown-label">Minutes</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="seconds">00</span>
+                        <span class="countdown-label">Seconds</span>
+                    </div>
+                </div>
+                
+                <!-- Message Box -->
+                <div class="message-box">
+                    <p class="message-text">
+                        May this new year bring you endless joy, prosperity, and success. 
+                        Let's celebrate new beginnings, cherish beautiful moments, and create wonderful memories together!
+                    </p>
+                </div>
+                
+                <!-- CTA Button -->
+                <a href="#" class="cta-button" onclick="celebrate(event)">
+                    <span><i class="fas fa-star"></i> Celebrate Now <i class="fas fa-star"></i></span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Award Modal -->
+    <div class="modal-overlay" id="awardModal">
+        <div class="award-modal">
+            <!-- Close Button -->
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            
+            <!-- Sparkle Decorations -->
+            <div class="modal-sparkle sparkle-1">✨</div>
+            <div class="modal-sparkle sparkle-2">✨</div>
+            <div class="modal-sparkle sparkle-3">✨</div>
+            <div class="modal-sparkle sparkle-4">✨</div>
+            
+            <!-- Award Icon -->
+            <div class="award-icon">🏆</div>
+            
+            <!-- Main Title -->
+            <h2 class="modal-title">नव वर्ष की हार्दिक शुभकामनाएं!</h2>
+            <p class="modal-subtitle">Happy New Year 2026</p>
+            
+            <!-- Divider -->
+            <div class="modal-divider"></div>
+            
+            <!-- Best Wishes -->
+            <div class="wishes-container">
+                <div class="wish-item">
+                    <i class="fas fa-star wish-icon"></i>
+                    <span>May success light your path</span>
+                </div>
+                <div class="wish-item">
+                    <i class="fas fa-heart wish-icon"></i>
+                    <span>May happiness fill your heart</span>
+                </div>
+                <div class="wish-item">
+                    <i class="fas fa-gem wish-icon"></i>
+                    <span>May prosperity bless your home</span>
+                </div>
+                <div class="wish-item">
+                    <i class="fas fa-sun wish-icon"></i>
+                    <span>May every day bring new joy</span>
+                </div>
+                <div class="wish-item">
+                    <i class="fas fa-trophy wish-icon"></i>
+                    <span>May your dreams turn into reality</span>
+                </div>
+            </div>
+            
+            <!-- Signature -->
+            <p class="modal-signature">✨ Wishing You A Spectacular 2026! ✨</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            <i class="fas fa-heart footer-icon"></i>
+            Wishing you a year filled with happiness and success
+            <i class="fas fa-heart footer-icon"></i>
+        </p>
+        <p style="margin-top: 10px; opacity: 0.7;">© 2026 | Happy New Year Celebrations</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particleCount = 30;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Create firework effects
+        function createFireworks() {
+            setInterval(() => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight * 0.5;
+                
+                for (let i = 0; i < 24; i++) {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.style.left = x + 'px';
+                    firework.style.top = y + 'px';
+                    
+                    const angle = (i * 30) * Math.PI / 180;
+                    const distance = 100 + Math.random() * 100;
+                    firework.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                    firework.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                    
+                    const colors = ['#ffd700', '#ffed4e', '#fff', '#ffa500'];
+                    firework.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    document.body.appendChild(firework);
+                    
+                    setTimeout(() => firework.remove(), 6000);
+                }
+            }, 500);
+        }
+
+        // Create falling leaves
+        function createLeaves() {
+            setInterval(() => {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.animationDuration = (8 + Math.random() * 4) + 's';
+                document.body.appendChild(leaf);
+                
+                setTimeout(() => leaf.remove(), 12000);
+            }, 2000);
+        }
+
+        // Countdown Timer to New Year 2026
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const newYear = new Date('January 1, 2026 00:00:00').getTime();
+            const distance = newYear - now;
+
+            if (distance > 0) {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            } else {
+                document.getElementById('countdown').innerHTML = '<h2 style="color: #ffd700; font-size: 3rem;">🎉 Happy New Year 2026! 🎉</h2>';
+            }
+        }
+
+        // Celebrate button click handler
+        function celebrate(e) {
+            e.preventDefault();
+            
+            // Show modal
+            document.getElementById('awardModal').classList.add('active');
+            
+            // Create burst of fireworks
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    
+                    for (let j = 0; j < 20; j++) {
+                        const firework = document.createElement('div');
+                        firework.className = 'firework';
+                        firework.style.left = x + 'px';
+                        firework.style.top = y + 'px';
+                        
+                        const angle = (j * 18) * Math.PI / 180;
+                        const distance = 150;
+                        firework.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                        firework.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                        
+                        document.body.appendChild(firework);
+                        setTimeout(() => firework.remove(), 2000);
+                    }
+                }, i * 300);
+            }
+        }
+
+        // Close modal function
+        function closeModal() {
+            document.getElementById('awardModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('awardModal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Initialize everything
+        window.addEventListener('load', () => {
+            createParticles();
+            createFireworks();
+            createLeaves();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        });
+    </script>
+</body>
+</html>
