@@ -677,6 +677,38 @@
             transform: translateY(20px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
+        .whatsapp-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background-color: #25D366;
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 28px;
+    line-height: 46px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    color: #fff;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+.whatsapp-float {
+    animation: pulse 2s infinite;
+}
+
     </style>
 </head>
 <body>
@@ -688,7 +720,7 @@
         <div class="container">
             <div class="content-wrapper">
                 <!-- Main Title -->
-                <h1 class="main-title2 ">हर सेकंड हमें 2026 के करीब ला रहा है - अतीत को पीछे छोड़कर एक उज्जवल भविष्य की ओर बढ़ रहे हैं।</h1>
+                <h1 class="main-title2 mt-3">हर सेकंड हमें 2026 के करीब ला रहा है - अतीत को पीछे छोड़कर एक उज्जवल भविष्य की ओर बढ़ रहे हैं।</h1>
                 
                 <div class="Maindivtitle" style="display: none;">
                     <h1 class="main-title">Happy New Year 2026</h1>
@@ -797,6 +829,12 @@
         </div>
     </div>
 
+    <a href="https://api.whatsapp.com/send?text=https://krishna66dev.github.io/krishnacraftcode.com/happy-new-years.html"
+   class="whatsapp-float"
+   target="_blank"
+   title="Share on WhatsApp">
+   <i class="fab fa-whatsapp"></i>
+</a>
     <!-- Footer -->
     <footer>
     <p>
@@ -810,7 +848,7 @@
     </p>
 
     <p style="margin-top: 5px; color: #ffa34d; text-align: center; font-weight: bold;">
-        Created by <strong>Krishna Rathour</strong> — With warmest wishes for a bright and beautiful Happy New Year 🎉
+        Created by <strong>Krishna </strong> — With warmest wishes for a bright and beautiful Happy New Year 🎉
     </p>
 </footer>
 
@@ -907,14 +945,14 @@
                                 newTitle.style.opacity = '1';
                                 newTitle.style.transform = 'translateY(0)';
                             }, 50);
-                        }, 400); // matches CSS transition time
+                        }, 200); // matches CSS transition time
 
                    
                 celebratenow();
                 document.getElementById('countdown').innerHTML = '<h2 style="color: #ffd700; font-size: 3rem;">🎉 Happy New Year 2026! 🎉</h2>';
                 document.getElementById('popperBtn').classList.remove('d-none');
                 
-                for(let i=0; i<15; i++){
+                for(let i=0; i<20; i++){
                     setTimeout(() => {
                         document.getElementById('popperBtn').click();
                     }, i*1000);
@@ -1126,4 +1164,3 @@
     </script>
 </body>
 </html>
-
