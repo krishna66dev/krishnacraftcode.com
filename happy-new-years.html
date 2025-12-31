@@ -728,8 +728,6 @@
             </div>
         </div>
     </div>
-    <!-- put this somewhere in your HTML -->
-<audio id="bgMusic" src="https://cdn.pixabay.com/audio/2025/12/25/audio_7bac763ebd.mp3" preload="auto"></audio>
 
 
     <!-- Award Modal -->
@@ -858,8 +856,8 @@
 
         // Countdown Timer to New Year 2026
 
-         // const newYear = new Date('January 1, 2026 00:00:00').getTime();
-            const newYear = new Date('December 31, 2025 16:20:00').getTime();
+         const newYear = new Date('January 1, 2026 00:00:00').getTime();
+            // const newYear = new Date('December 31, 2025 16:20:00').getTime();
         function updateCountdown() {
             const now = new Date().getTime();
         
@@ -879,11 +877,8 @@
                 celebratenow();
                 document.getElementById('countdown').innerHTML = '<h2 style="color: #ffd700; font-size: 3rem;">🎉 Happy New Year 2026! 🎉</h2>';
                 document.getElementById('popperBtn').classList.remove('d-none');
-                const bgMusic = document.getElementById('bgMusic');
-                bgMusic.play().catch(err => {
-                console.log("Play failed (autoplay blocked):", err);
-                });
-                for(let i=0; i<8; i++){
+                
+                for(let i=0; i<10; i++){
                     setTimeout(() => {
                         document.getElementById('popperBtn').click();
                     }, i*1000);
@@ -1095,3 +1090,4 @@
     </script>
 </body>
 </html>
+
