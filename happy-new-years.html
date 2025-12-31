@@ -122,7 +122,7 @@
         }
 
         /* Main Title */
-        .main-title {
+        .main-title, .main-title2 {
             font-size: clamp(2.5rem, 8vw, 6rem);
             font-weight: bold;
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
@@ -133,6 +133,9 @@
             margin-bottom: 20px;
             animation: glow 2s ease-in-out infinite alternate;
             letter-spacing: 2px;
+        }
+        .main-title2{
+            font-size: 40px;
         }
 
         @keyframes glow {
@@ -664,6 +667,16 @@
             top: -10px;
             z-index: 21;
         }
+
+        .main-title2 {
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .Maindivtitle {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
     </style>
 </head>
 <body>
@@ -675,10 +688,12 @@
         <div class="container">
             <div class="content-wrapper">
                 <!-- Main Title -->
-                <h1 class="main-title">Happy New Year 2026</h1>
+                <h1 class="main-title2 mt-3">हर सेकंड हमें 2026 के करीब ला रहा है - अतीत को पीछे छोड़कर एक उज्जवल भविष्य की ओर बढ़ रहे हैं।</h1>
                 
-                <!-- Subtitle in Hindi -->
-                <p class="subtitle">नव वर्ष की हार्दिक शुभकामनाएं</p>
+                <div class="Maindivtitle" style="display: none;">
+                    <h1 class="main-title">Happy New Year 2026</h1>
+                    <p class="subtitle">नव वर्ष की हार्दिक शुभकामनाएं</p>
+                </div>
                 
                 <!-- Decorative Line -->
                 <div class="decorative-line"></div>
@@ -728,6 +743,7 @@
             </div>
         </div>
     </div>
+    
 
 
     <!-- Award Modal -->
@@ -856,8 +872,8 @@
 
         // Countdown Timer to New Year 2026
 
-         const newYear = new Date('January 1, 2026 00:00:00').getTime();
-            // const newYear = new Date('December 31, 2025 16:20:00').getTime();
+        //  const newYear = new Date('January 1, 2026 00:00:00').getTime();
+            const newYear = new Date('December 31, 2025 18:15:00').getTime();
         function updateCountdown() {
             const now = new Date().getTime();
         
@@ -874,11 +890,31 @@
                 document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
                 document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
             } else {
+
+                        const oldTitle = document.querySelector('.main-title2');
+                        const newTitle = document.querySelector('.Maindivtitle');
+
+                        // Hide main-title2 smoothly
+                        oldTitle.style.opacity = '0';
+                        oldTitle.style.transform = 'translateY(-20px)';
+
+                        setTimeout(() => {
+                            oldTitle.style.display = 'none';
+
+                            // Show Maindivtitle smoothly
+                            newTitle.style.display = 'block';
+                            setTimeout(() => {
+                                newTitle.style.opacity = '1';
+                                newTitle.style.transform = 'translateY(0)';
+                            }, 50);
+                        }, 400); // matches CSS transition time
+
+                   
                 celebratenow();
                 document.getElementById('countdown').innerHTML = '<h2 style="color: #ffd700; font-size: 3rem;">🎉 Happy New Year 2026! 🎉</h2>';
                 document.getElementById('popperBtn').classList.remove('d-none');
                 
-                for(let i=0; i<10; i++){
+                for(let i=0; i<8; i++){
                     setTimeout(() => {
                         document.getElementById('popperBtn').click();
                     }, i*1000);
@@ -1090,4 +1126,3 @@
     </script>
 </body>
 </html>
-
