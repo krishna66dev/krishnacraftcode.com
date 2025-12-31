@@ -688,7 +688,7 @@
         <div class="container">
             <div class="content-wrapper">
                 <!-- Main Title -->
-                <h1 class="main-title2 mt-3">हर सेकंड हमें 2026 के करीब ला रहा है - अतीत को पीछे छोड़कर एक उज्जवल भविष्य की ओर बढ़ रहे हैं।</h1>
+                <h1 class="main-title2 ">हर सेकंड हमें 2026 के करीब ला रहा है - अतीत को पीछे छोड़कर एक उज्जवल भविष्य की ओर बढ़ रहे हैं।</h1>
                 
                 <div class="Maindivtitle" style="display: none;">
                     <h1 class="main-title">Happy New Year 2026</h1>
@@ -872,8 +872,8 @@
 
         // Countdown Timer to New Year 2026
 
-        //  const newYear = new Date('January 1, 2026 00:00:00').getTime();
-            const newYear = new Date('December 31, 2025 18:15:00').getTime();
+         const newYear = new Date('January 1, 2026 00:00:00').getTime();
+            // const newYear = new Date('December 31, 2025 18:15:00').getTime();
         function updateCountdown() {
             const now = new Date().getTime();
         
@@ -914,7 +914,7 @@
                 document.getElementById('countdown').innerHTML = '<h2 style="color: #ffd700; font-size: 3rem;">🎉 Happy New Year 2026! 🎉</h2>';
                 document.getElementById('popperBtn').classList.remove('d-none');
                 
-                for(let i=0; i<8; i++){
+                for(let i=0; i<15; i++){
                     setTimeout(() => {
                         document.getElementById('popperBtn').click();
                     }, i*1000);
@@ -1126,3 +1126,4 @@
     </script>
 </body>
 </html>
+
