@@ -5,10 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy New Year 2026</title>
     <meta name="decorations" content="Wishes Happy New Year 2026, Celebrate the new beginning with positive quotes, warm wishes, and inspiring lines to welcome 2026 with joy, hope, and good fortune.">
-    <meta property="og:description" content=" Wishes Happy New Year 2026, Celebrate the new beginning with positive quotes, warm wishes, and inspiring lines to welcome 2026 with joy, hope, and good fortune." />
+    <meta property="og:description" content="Wishes Happy New Year 2026, Celebrate the new beginning with positive quotes, warm wishes, and inspiring lines to welcome 2026 with joy, hope, and good fortune." />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --google-blue: #4285F4;
+            --google-red: #EA4335;
+            --google-yellow: #FBBC05;
+            --google-green: #34A853;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -309,10 +315,10 @@
             top: 0%;
             width: 30px;
             height: 30px;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, transparent 70%);
+            background: radial-gradient(circle, rgb(255, 217, 0) 0%, transparent 70%);
             border-radius: 50% 0;
             pointer-events: none;
-            z-index: 1;
+            z-index: 9999;
             animation: falling 10s infinite ease-in;
         }
 
@@ -560,6 +566,104 @@
                 font-size: 0.95rem;
             }
         }
+
+        .particle1 {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: explode1 1s ease-out forwards;
+        }
+        
+        @keyframes explode1 {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--x), var(--y)) scale(0);
+            }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            z-index: 1000;
+            animation: confettiFall 3s linear forwards;
+        }
+        
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+         #celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none; /* Allows clicking "through" to the button */
+            z-index: 10;
+        }
+
+        /* The Popper Button Container */
+        .popper-button {
+            position: relative;
+            width: 80px;
+            height: 100px;
+            cursor: pointer;
+            z-index: 20;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            background: transparent;
+            outline: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: rotate(-15deg);
+            margin-inline: auto;
+        }
+
+        .popper-button:hover {
+            transform: rotate(-10deg) scale(1.1);
+        }
+
+        .popper-button:active {
+            transform: rotate(-15deg) scale(0.9);
+        }
+
+        /* CSS Drawing of the Cone */
+        .cone {
+            position: relative;
+            width: 60px;
+            height: 80px;
+            clip-path: polygon(55% 0%, 55% 0%, 100% 100%, 0% 100%); 
+            transform: rotate(180deg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Color Segments */
+        .segment { width: 100%; }
+        .blue   { height: 40%; background: var(--google-blue); }
+        .yellow { height: 30%; background: var(--google-yellow); }
+        .green  { height: 30%; background: var(--google-green); }
+
+        /* The Red Top (Oval) */
+        .popper-top {
+            width: 70px;
+            height: 25px;
+            background: var(--google-red);
+            border: 4px solid var(--google-yellow);
+            border-radius: 50%;
+            position: absolute;
+            top: -10px;
+            z-index: 21;
+        }
     </style>
 </head>
 <body>
@@ -578,9 +682,19 @@
                 
                 <!-- Decorative Line -->
                 <div class="decorative-line"></div>
-                
+                <canvas id="celebration"></canvas>
+
+                    <button class="popper-button d-none" id="popperBtn">
+                        <div class="popper-top"></div>
+                        <div class="cone">
+                            <div class="segment blue"></div>
+                            <div class="segment yellow"></div>
+                            <div class="segment green"></div>
+                        </div>
+                    </button>
+
                 <!-- Countdown Timer -->
-                <div class="countdown" id="countdown">
+                <div class="countdown mt-0" id="countdown">
                     <div class="countdown-item">
                         <span class="countdown-number" id="days">00</span>
                         <span class="countdown-label">Days</span>
@@ -614,6 +728,9 @@
             </div>
         </div>
     </div>
+    <!-- put this somewhere in your HTML -->
+<audio id="bgMusic" src="https://cdn.pixabay.com/audio/2025/12/25/audio_7bac763ebd.mp3" preload="auto"></audio>
+
 
     <!-- Award Modal -->
     <div class="modal-overlay" id="awardModal">
@@ -668,16 +785,21 @@
 
     <!-- Footer -->
     <footer>
-        <p>
-            <i class="fas fa-heart footer-icon"></i>
-            Wishing you a year filled with happiness and success
-            <i class="fas fa-heart footer-icon"></i>
-        </p>
-        <p style="margin-top: 10px; opacity: 0.7;">© 2026 | Happy New Year Celebrations</p>
-        <p style="margin-top: 5px; color: #ffa34d; text-align: center; font-weight: bold;">
+    <p>
+        <i class="fas fa-heart footer-icon"></i>
+        Wishing you a year filled with happiness and success
+        <i class="fas fa-heart footer-icon"></i>
+    </p>
+
+    <p style="margin-top: 10px; opacity: 0.7;">
+        © 2026 | Happy New Year Celebrations
+    </p>
+
+    <p style="margin-top: 5px; color: #ffa34d; text-align: center; font-weight: bold;">
         Created by <strong>Krishna Rathour</strong> — With warmest wishes for a bright and beautiful Happy New Year 🎉
     </p>
-    </footer>
+</footer>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -735,9 +857,12 @@
         }
 
         // Countdown Timer to New Year 2026
+
+         // const newYear = new Date('January 1, 2026 00:00:00').getTime();
+            const newYear = new Date('December 31, 2025 16:20:00').getTime();
         function updateCountdown() {
             const now = new Date().getTime();
-            const newYear = new Date('January 1, 2026 00:00:00').getTime();
+        
             const distance = newYear - now;
 
             if (distance > 0) {
@@ -751,7 +876,18 @@
                 document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
                 document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
             } else {
+                celebratenow();
                 document.getElementById('countdown').innerHTML = '<h2 style="color: #ffd700; font-size: 3rem;">🎉 Happy New Year 2026! 🎉</h2>';
+                document.getElementById('popperBtn').classList.remove('d-none');
+                const bgMusic = document.getElementById('bgMusic');
+                bgMusic.play().catch(err => {
+                console.log("Play failed (autoplay blocked):", err);
+                });
+                for(let i=0; i<8; i++){
+                    setTimeout(() => {
+                        document.getElementById('popperBtn').click();
+                    }, i*1000);
+                }
             }
         }
 
@@ -802,15 +938,160 @@
         // Initialize everything
         window.addEventListener('load', () => {
             createParticles();
-            createFireworks();
             createLeaves();
+            createFireworks();
             updateCountdown();
-            setInterval(updateCountdown, 1000);
+
+             if (Date.now() < newYear) {
+                const intervalId = setInterval(() => {
+                    updateCountdown();
+
+                    if (Date.now() >= newYear) {
+                        clearInterval(intervalId);
+                        celebratenow();
+                    }
+                    }, 1000);
+                } else {
+                    celebratenow();
+                }
         });
+
+        function createFirework(x, y) {
+            const colors = ['#FFD700', '#FFA500', '#FF6347', '#FF69B4', '#00CED1', '#7FFF00', '#FF1493'];
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = x + 'px';
+            firework.style.top = y + 'px';
+            firework.style.zIndex = '99999';
+            document.body.appendChild(firework);
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle1';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.background = color;
+                particle.style.boxShadow = `0 0 10px ${color}`;
+                
+                const angle = (Math.PI * 2 * i) / 50;
+                const velocity = 100 + Math.random() * 100;
+                const x = Math.cos(angle) * velocity;
+                const y = Math.sin(angle) * velocity;
+                
+                particle.style.setProperty('--x', x + 'px');
+                particle.style.setProperty('--y', y + 'px');
+                
+                firework.appendChild(particle);
+            }
+            
+            setTimeout(() => firework.remove(), 1000);
+        }
+        function createConfetti() {
+            const colors = ['#FFD700', '#FFA500', '#FF6347', '#FF69B4', '#00CED1', '#7FFF00'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+
+        function celebratenow() {
+            // Create multiple fireworks
+            const positions = [
+                [window.innerWidth * 0.2, window.innerHeight * 0.3],
+                [window.innerWidth * 0.5, window.innerHeight * 0.2],
+                [window.innerWidth * 0.8, window.innerHeight * 0.3],
+                [window.innerWidth * 0.3, window.innerHeight * 0.5],
+                [window.innerWidth * 0.7, window.innerHeight * 0.5]
+            ];
+            
+            positions.forEach((pos, index) => {
+                setTimeout(() => createFirework(pos[0], pos[1]), index * 200);
+            });
+            
+            createConfetti();
+            
+            // Show modal
+            // setTimeout(() => {
+            //     const modal = new bootstrap.Modal(document.getElementById('wishModal'));
+            //     modal.show();
+            // }, 1000);
+        }
+    </script>
+
+    <script>
+        const canvas = document.getElementById('celebration');
+        const ctx = canvas.getContext('2d');
+        const btn = document.getElementById('popperBtn');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        let particles = [];
+
+
+        function createConfetti2(x, y) {
+            const COLORS = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#FFFFFF'];
+            for (let i = 0; i < 250; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    size: Math.random() * 8 + 4,
+                    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() * -20) - 10, // Shoot upwards
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 10 - 5,
+                    life: 1.0
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.6; // Gravity
+                p.vx *= 0.99; // Air friction
+                p.rotation += p.rotationSpeed;
+                p.life -= 0.01;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                ctx.restore();
+
+                if (p.life <= 0) particles.splice(index, 1);
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        btn.addEventListener('click', (e) => {
+            const rect = btn.getBoundingClientRect();
+            // Trigger confetti from the top center of the button
+            createConfetti2(rect.left + rect.width / 2, rect.top);
+        });
+
+        animate();
     </script>
 </body>
-
 </html>
-
-
-
