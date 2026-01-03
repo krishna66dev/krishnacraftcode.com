@@ -1,20 +1,21 @@
 {
   "name": "Snake Game PWA",
   "short_name": "SnakeGame",
-  "start_url": "snack_game.html",
+  "start_url": "snake_game.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "icon-1.png",
+      "src": "Icon-1.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "Icon-2.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
 }
+
