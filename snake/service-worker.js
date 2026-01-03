@@ -1,10 +1,9 @@
 const CACHE_NAME = "snake-game-cache-v1";
 const ASSETS_TO_CACHE = [
-  "./",
-  "./snack_game.html",
-  "./manifest.json",
-  "./icon-1.png",
-  "./icon-2.png"
+  "snake_game.html",
+  "manifest.json",
+  "Icon-1.png",
+  "Icon-2.png"
 ];
 
 self.addEventListener("install", event => {
@@ -20,3 +19,4 @@ self.addEventListener("fetch", event => {
     })
   );
 });
+
