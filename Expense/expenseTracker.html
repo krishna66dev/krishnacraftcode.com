@@ -14,14 +14,17 @@
     <style>
         /* Root Variables - Pastel Colors */
         :root {
-            --primary: #a8e6cf;
-            --secondary: #ffd3b6;
-            --accent: #ffaaa5;
-            --info: #a8d8ea;
-            --warning: #ffb3ba;
-            --success: #bae1b3;
-            --dark: #2c3e50;
-            --light: #f8f9fa;
+           --primary: #A8E6CF;    /* food */
+            --info: #A8D8EA;       /* travel */
+            --warning: #FFB3BA;    /* bills */
+            --accent: #FFAAAA;     /* shopping */
+            --secondary: #CCCCCC;  /* other */
+            --success: #C8E6C9;    /* health */
+            --purple: #C5CAEB;     /* education */
+            --orange: #FFDFB6;     /* entertainment */
+            --yellow: #FFFACD;     /* savings */
+            --dark: #333333;       /* text on badges */
+
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -77,11 +80,18 @@
         @keyframes slideOut { to { opacity:0; transform: translateX(100px); } }
 
         .category-badge { padding:0.5rem 1rem; border-radius:20px; font-size:0.85rem; font-weight:600; display:inline-block; }
+       
         .category-food { background: var(--primary); color: var(--dark); }
         .category-travel { background: var(--info); color: var(--dark); }
         .category-bills { background: var(--warning); color: var(--dark); }
         .category-shopping { background: var(--accent); color: white; }
         .category-other { background: var(--secondary); color: var(--dark); }
+
+        .category-health { background: var(--success); color: var(--dark); }         
+        .category-education { background: var(--purple); color: var(--dark); }        
+        .category-entertainment { background: var(--orange); color: var(--dark); }    
+        .category-savings { background: var(--yellow); color: var(--dark); }         
+
 
         .form-card { background:white; border-radius:10px; padding:1.5rem; box-shadow:0 10px 30px rgba(0,0,0,0.1); }
         .form-control, .form-select { border:2px solid #e9ecef; border-radius:10px; padding:0.75rem; transition: all 0.3s ease; }
@@ -232,12 +242,17 @@
                     <div class="col-md-4 mb-2">
                         <label class="form-label small">By Category</label>
                         <div>
-                            <span class="filter-badge category-food" data-category="food" onclick="toggleCategoryFilter('food')"><i class="fas fa-utensils"></i> Food</span>
-                            <span class="filter-badge category-travel" data-category="travel" onclick="toggleCategoryFilter('travel')"><i class="fas fa-plane"></i> Travel</span>
-                            <span class="filter-badge category-bills" data-category="bills" onclick="toggleCategoryFilter('bills')"><i class="fas fa-file-invoice"></i> Bills</span>
-                            <span class="filter-badge category-shopping" data-category="shopping" onclick="toggleCategoryFilter('shopping')"><i class="fas fa-shopping-cart"></i> Shopping</span>
+                            <span class="filter-badge category-food" data-category="food" onclick="toggleCategoryFilter('food')"><i class="fas fa-utensils"></i> Food & Drinks</span>
+                            <span class="filter-badge category-travel" data-category="travel" onclick="toggleCategoryFilter('travel')"><i class="fas fa-plane"></i> Travel & Transport</span>
+                            <span class="filter-badge category-bills" data-category="bills" onclick="toggleCategoryFilter('bills')"><i class="fas fa-file-invoice"></i> Bills & Utilities</span>
+                            <span class="filter-badge category-shopping" data-category="shopping" onclick="toggleCategoryFilter('shopping')"><i class="fas fa-shopping-cart"></i> Shopping & Personal</span>
+                            <span class="filter-badge category-health" data-category="health" onclick="toggleCategoryFilter('health')"><i class="fas fa-heartbeat"></i> Health & Fitness</span>
+                            <span class="filter-badge category-education" data-category="education" onclick="toggleCategoryFilter('education')"><i class="fas fa-book"></i> Education & Learning</span>
+                            <span class="filter-badge category-entertainment" data-category="entertainment" onclick="toggleCategoryFilter('entertainment')"><i class="fas fa-film"></i> Entertainment & Leisure</span>
+                            <span class="filter-badge category-savings" data-category="savings" onclick="toggleCategoryFilter('savings')"><i class="fas fa-piggy-bank"></i> Savings & Investments</span>
                             <span class="filter-badge category-other" data-category="other" onclick="toggleCategoryFilter('other')"><i class="fas fa-ellipsis-h"></i> Other</span>
                         </div>
+
                     </div>
                     <div class="col-md-4 mb-2">
                         <label class="form-label small">By Status</label>
@@ -307,10 +322,14 @@
                         <label class="form-label">Category</label>
                         <select class="form-select" id="expenseCategory" required>
                             <option value="">Select Category</option>
-                            <option value="food">Food</option>
-                            <option value="travel">Travel</option>
-                            <option value="bills">Bills</option>
-                            <option value="shopping">Shopping</option>
+                            <option value="food">Food & Drinks</option>
+                            <option value="travel">Travel & Transport</option>
+                            <option value="bills">Bills & Utilities</option>
+                            <option value="shopping">Shopping & Personal</option>
+                            <option value="health">Health & Fitness</option>
+                            <option value="education">Education & Learning</option>
+                            <option value="entertainment">Entertainment & Leisure</option>
+                            <option value="savings">Savings & Investments</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
@@ -960,19 +979,37 @@
             });
         }
 
-        function renderCategoryChart() {
+        function renderCategoryChart() { 
             const ctx = document.getElementById('categoryChart');
             if (!ctx) return;
             if (categoryChart) categoryChart.destroy();
-            const categories = ['food','travel','bills','shopping','other'];
+
+            const categories = ['food','travel','bills','shopping','health','education','entertainment','savings','other'];
+
             const data = categories.map(cat => expenseManager.getCategoryTotal(cat));
-            const colors = ['rgba(168,230,207,0.8)','rgba(168,216,234,0.8)','rgba(255,179,186,0.8)','rgba(255,170,165,0.8)','rgba(255,211,182,0.8)'];
+            
+            const colors = [
+                'rgba(168,230,207,0.8)', // food
+                'rgba(168,216,234,0.8)', // travel
+                'rgba(255,179,186,0.8)', // bills
+                'rgba(255,170,165,0.8)', // shopping
+                'rgba(200,230,201,0.8)', // health
+                'rgba(197,202,233,0.8)', // education
+                'rgba(255,223,186,0.8)', // entertainment
+                'rgba(255,250,205,0.8)', // savings
+                'rgba(220,220,220,0.8)'  // other
+            ];
+
             categoryChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: categories.map(c => c.charAt(0).toUpperCase() + c.slice(1)), datasets: [{ data, backgroundColor: colors, borderColor:'#fff', borderWidth:3, hoverOffset:15 }] },
+                data: { 
+                    labels: categories.map(c => c.charAt(0).toUpperCase() + c.slice(1)), 
+                    datasets: [{ data, backgroundColor: colors, borderColor:'#fff', borderWidth:3, hoverOffset:15 }] 
+                },
                 options: { responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom' } } }
             });
         }
+
 
         // Settings
         function loadSettings() {
