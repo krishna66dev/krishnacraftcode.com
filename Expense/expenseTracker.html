@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <!-- favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- apple touch icon -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <title>Expense Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
     <style>
         /* Root Variables - Pastel Colors */
         :root {
@@ -132,6 +135,31 @@
 
         .tooltip-icon { display:inline-block; width:18px; height:18px; background:#6c757d; color:white; border-radius:50%; text-align:center; line-height:18px; font-size:12px; margin-left:5px; cursor:help; }
         .notification-badge { position:absolute; top:-5px; right:-5px; background:#dc3545; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:bold; }
+
+        .install-btn {
+  position: fixed;
+  bottom: 15px;
+  right: 10px;
+  z-index: 9999;
+
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  color: #000;
+  border: none;
+  border-radius: 50%;
+
+  padding: 10px 14px;
+  font-size: 16px;
+  font-weight: bold;
+
+  box-shadow: 0 8px 20px rgba(0, 255, 136, 0.4);
+  cursor: pointer;
+
+  display: none;
+}
+
+.install-btn:active {
+  transform: scale(0.95);
+}
     </style>
 </head>
 <body>
@@ -444,6 +472,8 @@
             </div>
         </div>
     </div>
+
+    <button aria-label="download" id="installBtn" class="install-btn"><i class="fa-solid fa-download"></i></button>
 
     <!-- External libs -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1138,5 +1168,35 @@
 
         window.addEventListener('DOMContentLoaded', initializeApp);
     </script>
+    <script>
+        if ("serviceWorker" in navigator) {
+                navigator.serviceWorker
+                    .register("service-worker.js")
+                    .then(() => console.log("Service Worker Registered"))
+                    .catch(err => console.log("SW registration failed:", err));
+            }
+
+            
+       let deferredPrompt;
+        const installBtn = document.getElementById("installBtn");
+
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = "block";
+        });
+
+        installBtn.addEventListener("click", async () => {
+            if (!deferredPrompt) return;
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+
+            console.log("Install outcome:", outcome);
+            deferredPrompt = null;
+            installBtn.style.display = "none";
+        });
+</script>
+
 </body>
 </html>
