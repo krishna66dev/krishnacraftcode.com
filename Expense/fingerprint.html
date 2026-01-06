@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fingerprint Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 16px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .fingerprint-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 40px auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .fingerprint-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .fingerprint-wrapper:active {
+            transform: scale(0.95);
+        }
+
+        /* Prevent accidental text selection during fingerprint interactions */
+        .fingerprint-wrapper, .status-message, .checkmark, .error-icon, .btn {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        .fingerprint-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fingerprint-circle::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .fingerprint-wrapper:hover .fingerprint-circle::before {
+            opacity: 1;
+        }
+
+        .fingerprint-icon {
+            width: 100px;
+            height: 100px;
+            fill: white;
+            z-index: 2;
+        }
+
+        .glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+        }
+
+        .scanning .glow {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 30px rgba(102, 126, 234, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+            top: -3px;
+            left: 0;
+            opacity: 0;
+        }
+
+        .scanning .scan-line {
+            animation: scan 2s ease-in-out infinite;
+            opacity: 1;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+            }
+            50% {
+                top: calc(100% - 3px);
+            }
+            100% {
+                top: 0;
+            }
+        }
+
+        .status-message {
+            margin-top: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            min-height: 30px;
+            color: #4a5568;
+        }
+
+        .scanning .status-message {
+            color: #667eea;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .success-message {
+            color: #48bb78 !important;
+            animation: none !important;
+        }
+
+        .error-message {
+            color: #f56565 !important;
+            animation: none !important;
+        }
+
+        .checkmark, .error-icon {
+            width: 80px;
+            height: 80px;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .checkmark.show, .error-icon.show {
+            display: block;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .checkmark-circle {
+            stroke: #48bb78;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 251;
+            stroke-dashoffset: 251;
+            animation: stroke 0.6s ease forwards;
+        }
+
+        .checkmark-check {
+            stroke: #48bb78;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 60;
+            stroke-dashoffset: 60;
+            animation: stroke 0.3s 0.6s ease forwards;
+        }
+
+        .error-circle {
+            stroke: #f56565;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 251;
+            stroke-dashoffset: 251;
+            animation: stroke 0.6s ease forwards;
+        }
+
+        .error-cross {
+            stroke: #f56565;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 60;
+            stroke-dashoffset: 60;
+            animation: stroke 0.3s 0.6s ease forwards;
+        }
+
+        @keyframes stroke {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .btn.show {
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .dashboard {
+            text-align: left;
+        }
+
+        .dashboard h1 {
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .info-label {
+            color: #718096;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 16px;
+            word-break: break-all;
+        }
+
+        .alert {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .alert-title {
+            color: #c53030;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .alert-text {
+            color: #742a2a;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 40px 24px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .fingerprint-wrapper {
+                width: 160px;
+                height: 160px;
+            }
+
+            .fingerprint-circle {
+                width: 160px;
+                height: 160px;
+            }
+
+            .fingerprint-icon {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Page -->
+        <div id="setupPage" class="page">
+            <h1>Setup Fingerprint</h1>
+            <p class="subtitle">Register your biometric authentication to secure your account</p>
+            
+            <div class="fingerprint-wrapper" id="setupFingerprint">
+                <div class="fingerprint-circle">
+                    <div class="glow"></div>
+                    <div class="scan-line"></div>
+                    <svg class="fingerprint-icon" viewBox="0 0 24 24">
+                        <path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27.23-.12.52-.02.64.21.12.23.02.52-.21.64-1.35.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.37.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39s-4.66 1.97-4.66 4.39c0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.85c-1.19 0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94s3.08 1.32 3.08 2.94c0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.6 7.51-4.6 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="status-message" id="setupStatus">Click to register (then touch sensor)</div>
+            
+            <svg class="checkmark" id="setupCheckmark" viewBox="0 0 100 100">
+                <circle class="checkmark-circle" cx="50" cy="50" r="45"/>
+                <path class="checkmark-check" d="M25,50 L40,65 L75,30"/>
+            </svg>
+        </div>
+
+        <!-- Verify Page -->
+        <div id="verifyPage" class="page">
+            <h1>Verify Identity</h1>
+            <p class="subtitle">Use your fingerprint to authenticate and continue</p>
+            
+            <div class="fingerprint-wrapper" id="verifyFingerprint">
+                <div class="fingerprint-circle">
+                    <div class="glow"></div>
+                    <div class="scan-line"></div>
+                    <svg class="fingerprint-icon" viewBox="0 0 24 24">
+                        <path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27.23-.12.52-.02.64.21.12.23.02.52-.21.64-1.35.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.37.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39s-4.66 1.97-4.66 4.39c0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.85c-1.19 0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94s3.08 1.32 3.08 2.94c0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.6 7.51-4.6 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="status-message" id="verifyStatus">Click to verify (then touch sensor)</div>
+            
+            <svg class="checkmark" id="verifyCheckmark" viewBox="0 0 100 100">
+                <circle class="checkmark-circle" cx="50" cy="50" r="45"/>
+                <path class="checkmark-check" d="M25,50 L40,65 L75,30"/>
+            </svg>
+
+            <svg class="error-icon" id="verifyError" viewBox="0 0 100 100">
+                <circle class="error-circle" cx="50" cy="50" r="45"/>
+                <path class="error-cross" d="M30,30 L70,70 M70,30 L30,70"/>
+            </svg>
+            
+            <button class="btn btn-secondary show" id="resetBtn">Remove Fingerprint</button>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page">
+            <h1>✓ Authenticated</h1>
+            
+            <div class="alert">
+                <div class="alert-title">WebAuthn Simulation</div>
+                <div class="alert-text">
+                    This is a simulated WebAuthn implementation. In a real application, this would use the Web Authentication API with hardware authenticators.
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">Credential ID</div>
+                <div class="info-value" id="credentialId">—</div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">User ID</div>
+                <div class="info-value" id="userId">—</div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">Last Authenticated</div>
+                <div class="info-value" id="lastAuth">—</div>
+            </div>
+
+            <button class="btn btn-secondary show" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // WebAuthn Helper - uses real WebAuthn API when available
+        class WebAuthnHelper {
+            static isSecureContext() {
+                // Localhost is considered secure in many browsers even over http
+                
+                return window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+            }
+
+            static async isAvailable() {
+                return !!(window.PublicKeyCredential && navigator.credentials && this.isSecureContext());
+            }
+
+            static generateChallenge(length = 32) {
+                const challenge = new Uint8Array(length);
+                crypto.getRandomValues(challenge);
+                return challenge;
+            }
+
+            static generateUserId() {
+                const id = new Uint8Array(16);
+                crypto.getRandomValues(id);
+                return id;
+            }
+
+            static bufferToBase64Url(buffer) {
+                const bytes = new Uint8Array(buffer);
+                let str = '';
+                for (let i = 0; i < bytes.length; i++) {
+                    str += String.fromCharCode(bytes[i]);
+                }
+                return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            }
+
+            static base64UrlToBuffer(base64url) {
+                const padding = '='.repeat((4 - base64url.length % 4) % 4);
+                const base64 = (base64url + padding).replace(/-/g, '+').replace(/_/g, '/');
+                const str = atob(base64);
+                const bytes = new Uint8Array(str.length);
+                for (let i = 0; i < str.length; i++) {
+                    bytes[i] = str.charCodeAt(i);
+                }
+                return bytes.buffer;
+            }
+
+            static async createCredential(username) {
+                if (!await this.isAvailable()) {
+                    throw new Error('WebAuthn not available or secure context required');
+                }
+
+                const userId = this.generateUserId();
+                const publicKey = {
+                    challenge: this.generateChallenge(32),
+                    rp: { name: 'Convertor' },
+                    user: { id: userId, name: username, displayName: username },
+                    pubKeyCredParams: [
+                        { type: 'public-key', alg: -7 }, // ES256
+                        { type: 'public-key', alg: -257 } // RS256
+                    ],
+                    authenticatorSelection: {
+                        authenticatorAttachment: 'platform',
+                        userVerification: 'required'
+                    },
+                    timeout: 60000,
+                    attestation: 'none'
+                };
+
+                const credential = await navigator.credentials.create({ publicKey });
+                if (!credential) throw new Error('Credential creation was not completed');
+
+                const rawId = this.bufferToBase64Url(credential.rawId);
+                const clientDataJSON = this.bufferToBase64Url(credential.response.clientDataJSON);
+                const attestationObject = this.bufferToBase64Url(credential.response.attestationObject);
+
+                return {
+                    id: credential.id,
+                    rawId: rawId,
+                    type: credential.type,
+                    response: {
+                        clientDataJSON: clientDataJSON,
+                        attestationObject: attestationObject
+                    },
+                    authenticatorAttachment: 'platform',
+                    userId: this.bufferToBase64Url(userId),
+                    username: username,
+                    createdAt: new Date().toISOString()
+                };
+            }
+
+            static async getCredential(storedCredential) {
+                if (!await this.isAvailable()) {
+                    throw new Error('WebAuthn not available or secure context required');
+                }
+
+                const allowCredential = {
+                    type: 'public-key',
+                    id: this.base64UrlToBuffer(storedCredential.rawId)
+                };
+
+                const publicKey = {
+                    challenge: this.generateChallenge(32),
+                    allowCredentials: [allowCredential],
+                    timeout: 60000,
+                    userVerification: 'required'
+                };
+
+                const assertion = await navigator.credentials.get({ publicKey });
+                if (!assertion) throw new Error('Authentication was not completed');
+
+                const clientDataJSON = this.bufferToBase64Url(assertion.response.clientDataJSON);
+                const authenticatorData = this.bufferToBase64Url(assertion.response.authenticatorData);
+                const signature = this.bufferToBase64Url(assertion.response.signature);
+
+                return {
+                    id: storedCredential.id,
+                    type: 'public-key',
+                    response: {
+                        clientDataJSON,
+                        authenticatorData,
+                        signature
+                    },
+                    lastAuthenticated: new Date().toISOString()
+                };
+            }
+        }
+
+        // Application State
+        const app = {
+            setupPage: document.getElementById('setupPage'),
+            verifyPage: document.getElementById('verifyPage'),
+            dashboardPage: document.getElementById('dashboardPage'),
+            setupFingerprint: document.getElementById('setupFingerprint'),
+            verifyFingerprint: document.getElementById('verifyFingerprint'),
+            setupStatus: document.getElementById('setupStatus'),
+            verifyStatus: document.getElementById('verifyStatus'),
+            setupCheckmark: document.getElementById('setupCheckmark'),
+            verifyCheckmark: document.getElementById('verifyCheckmark'),
+            verifyError: document.getElementById('verifyError'),
+            resetBtn: document.getElementById('resetBtn'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            credentialId: document.getElementById('credentialId'),
+            userId: document.getElementById('userId'),
+            lastAuth: document.getElementById('lastAuth'),
+
+            async init() {
+                this.checkStoredCredentials();
+                this.attachEventListeners();
+
+                // Check availability and update UI affordances
+                this.isWebAuthnAvailable = await WebAuthnHelper.isAvailable();
+                if (!this.isWebAuthnAvailable) {
+                    this.setupFingerprint.style.cursor = 'not-allowed';
+                    this.verifyFingerprint.style.cursor = 'not-allowed';
+                }
+            },
+
+
+            checkStoredCredentials() {
+                const storedData = localStorage.getItem('webauthn_credential');
+                if (storedData) {
+                    this.showPage('verify');
+                } else {
+                    this.showPage('setup');
+                }
+            },
+
+            showPage(page) {
+                [this.setupPage, this.verifyPage, this.dashboardPage].forEach(p => 
+                    p.classList.remove('active')
+                );
+                
+                if (page === 'setup') {
+                    this.setupPage.classList.add('active');
+                } else if (page === 'verify') {
+                    this.verifyPage.classList.add('active');
+                } else if (page === 'dashboard') {
+                    this.dashboardPage.classList.add('active');
+                }
+            },
+
+            attachEventListeners() {
+                this.setupFingerprint.addEventListener('click', () => this.handleSetup());
+                this.verifyFingerprint.addEventListener('click', () => this.handleVerify());
+                this.resetBtn.addEventListener('click', () => this.handleReset());
+                this.logoutBtn.addEventListener('click', () => this.handleLogout());
+
+                // Prevent accidental text selection while interacting with fingerprint widgets
+                [this.setupFingerprint, this.verifyFingerprint].forEach(el => {
+                    el.addEventListener('selectstart', e => e.preventDefault());
+                    el.addEventListener('dblclick', e => e.preventDefault());
+                });
+            },
+
+            async handleSetup() {
+                if (this.setupFingerprint.classList.contains('scanning')) return;
+
+                // Clear any text selection that might interfere with UX (avoids accidental copy highlight)
+                if (window.getSelection) window.getSelection().removeAllRanges && window.getSelection().removeAllRanges();
+
+                this.setupFingerprint.classList.add('scanning');
+                this.setupStatus.textContent = 'Touch your fingerprint sensor to register...';
+                this.setupCheckmark.classList.remove('show');
+
+                if (this.isWebAuthnAvailable === false) {
+                    this.setupFingerprint.classList.remove('scanning');
+                    this.setupStatus.textContent = 'WebAuthn not available here. Serve the page via HTTPS/localhost and use a device with a platform authenticator.';
+                    this.setupStatus.classList.add('error-message');
+                    setTimeout(() => {
+                        this.setupStatus.classList.remove('error-message');
+                        this.setupStatus.textContent = 'Click to register (then touch sensor)';
+                    }, 4000);
+                    return;
+                }
+
+                try {
+                    const credential = await WebAuthnHelper.createCredential('user@example.com');
+                    
+                    this.setupStatus.textContent = 'Processing...';
+                    
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Store credential in localStorage
+                    localStorage.setItem('webauthn_credential', JSON.stringify(credential));
+                    // Ensure no text is selected (some platforms highlight text after biometric prompt)
+                    if (window.getSelection) window.getSelection().removeAllRanges && window.getSelection().removeAllRanges();
+                    
+                    this.setupFingerprint.classList.remove('scanning');
+                    this.setupStatus.textContent = 'Fingerprint registered successfully!';
+                    this.setupStatus.classList.add('success-message');
+                    this.setupCheckmark.classList.add('show');
+                    
+                    setTimeout(() => {
+                        this.setupStatus.classList.remove('success-message');
+                        this.setupStatus.textContent = 'Click to register (then touch sensor)';
+                        this.setupCheckmark.classList.remove('show');
+                        this.showPage('verify');
+                    }, 2000);
+                } catch (error) {
+                    this.setupFingerprint.classList.remove('scanning');
+                    // Clear any accidental selection left by the platform prompt
+                    if (window.getSelection) window.getSelection().removeAllRanges && window.getSelection().removeAllRanges();
+                    if (error && error.name === 'NotAllowedError') {
+                        this.setupStatus.textContent = 'Registration cancelled. Touch the sensor when prompted.';
+                    } else {
+                        this.setupStatus.textContent = 'Registration failed. ' + (error && error.message ? error.message : 'Please try again.');
+                    }
+                    this.setupStatus.classList.add('error-message');
+                    
+                    setTimeout(() => {
+                        this.setupStatus.classList.remove('error-message');
+                        this.setupStatus.textContent = 'Click to register (then touch sensor)';
+                    }, 3000);
+                }
+            },
+
+            async handleVerify() {
+                if (this.verifyFingerprint.classList.contains('scanning')) return;
+
+                // Clear any text selection that might interfere with UX (avoids accidental copy highlight)
+                if (window.getSelection) window.getSelection().removeAllRanges && window.getSelection().removeAllRanges();
+
+                const storedData = localStorage.getItem('webauthn_credential');
+                if (!storedData) {
+                    this.showPage('setup');
+                    return;
+                }
+
+                const storedCredential = JSON.parse(storedData);
+                
+                this.verifyFingerprint.classList.add('scanning');
+                this.verifyStatus.textContent = 'Touch your fingerprint sensor to authenticate...';
+                this.verifyCheckmark.classList.remove('show');
+                this.verifyError.classList.remove('show');
+
+                if (this.isWebAuthnAvailable === false) {
+                    this.verifyFingerprint.classList.remove('scanning');
+                    this.verifyStatus.textContent = 'WebAuthn not available here. Serve the page via HTTPS/localhost and use a device with a platform authenticator.';
+                    this.verifyStatus.classList.add('error-message');
+                    this.verifyError.classList.add('show');
+                    setTimeout(() => {
+                        this.verifyStatus.classList.remove('error-message');
+                        this.verifyStatus.textContent = 'Click to verify (then touch sensor)';
+                        this.verifyError.classList.remove('show');
+                    }, 4000);
+                    return;
+                }
+
+                try {
+                    const assertion = await WebAuthnHelper.getCredential(storedCredential);
+                    
+                    // Update last authenticated time
+                    storedCredential.lastAuthenticated = assertion.lastAuthenticated;
+                    localStorage.setItem('webauthn_credential', JSON.stringify(storedCredential));
+                    
+                    this.verifyFingerprint.classList.remove('scanning');
+                    this.verifyStatus.textContent = 'Authentication successful!';
+                    this.verifyStatus.classList.add('success-message');
+                    this.verifyCheckmark.classList.add('show');
+                    
+                    setTimeout(() => {
+                        this.displayDashboard(storedCredential);
+                    }, 1500);
+                    
+                } catch (error) {
+                    this.verifyFingerprint.classList.remove('scanning');
+                    // Clear any accidental selection left by the platform prompt
+                    if (window.getSelection) window.getSelection().removeAllRanges && window.getSelection().removeAllRanges();
+                    if (error && error.name === 'NotAllowedError') {
+                        this.verifyStatus.textContent = 'Authentication cancelled or timed out. Try again.';
+                    } else {
+                        this.verifyStatus.textContent = 'Verification failed. ' + (error && error.message ? error.message : 'Try again.');
+                    }
+                    this.verifyStatus.classList.add('error-message');
+                    this.verifyError.classList.add('show');
+                    
+                    setTimeout(() => {
+                        this.verifyStatus.classList.remove('error-message');
+                        this.verifyStatus.textContent = 'Click to verify (then touch sensor)';
+                        this.verifyError.classList.remove('show');
+                    }, 3000);
+                }
+            },
+
+            displayDashboard(credential) {
+                this.credentialId.textContent = credential.id.substring(0, 32) + '...';
+                this.userId.textContent = credential.username || credential.userId;
+                this.lastAuth.textContent = new Date(credential.lastAuthenticated || credential.createdAt).toLocaleString();
+                
+                this.showPage('dashboard');
+            },
+
+            handleReset() {
+                if (confirm('Are you sure you want to remove your fingerprint? You will need to register again.')) {
+                    // Remove stored credential and provide user feedback
+                    localStorage.removeItem('webauthn_credential');
+
+                    // Show temporary success feedback on the verify page and redirect to setup
+                    this.verifyStatus.textContent = 'Fingerprint removed.';
+                    this.verifyStatus.classList.add('success-message');
+
+                    setTimeout(() => {
+                        this.verifyStatus.classList.remove('success-message');
+                        this.verifyStatus.textContent = 'Tap to verify';
+                        this.showPage('setup');
+                    }, 1200);
+                }
+            },
+
+            handleLogout() {
+                // Return to verify page without deleting credentials
+                this.showPage('verify');
+                this.verifyStatus.textContent = 'Please verify to continue';
+            }
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!(await WebAuthnHelper.isAvailable())) {
+                // Show an info alert on setup page if WebAuthn isn't available or not served securely
+                const alertEl = document.createElement('div');
+                alertEl.className = 'alert';
+                alertEl.innerHTML = '<div class="alert-title">Note</div><div class="alert-text">Your browser or environment does not support platform WebAuthn with required user verification. Ensure you serve this page from HTTPS or localhost and your device has a platform authenticator (fingerprint/biometric).</div>';
+                document.querySelector('.container').insertBefore(alertEl, document.querySelector('#setupPage'));
+            }
+            app.init();
+        });
+    </script>
+</body>
+</html>
