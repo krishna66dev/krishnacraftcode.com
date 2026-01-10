@@ -1,0 +1,48 @@
+body {
+  transition: background-color .25s, color .25s;
+}
+
+#themeToggle i {
+  pointer-events: none;
+}
+/* Modern Card & Input Focus */
+/* Card style */
+.card {
+  border-radius: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Input style */
+.form-control-lg {
+  border-radius: 0.75rem;
+  border: 1px solid #ddd;
+  transition: all 0.3s;
+}
+
+.form-control-lg:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 10px rgba(13,110,253,0.2);
+}
+
+/* Label style */
+label.fw-semibold {
+  font-weight: 600;
+}
+
+/* Button style */
+.btn-primary {
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+/* Icon inside input */
+.position-relative i {
+  pointer-events: none;
+}
