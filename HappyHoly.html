@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Happy Holi 2026 | ERP Software Development</title>
+
+<!-- Bootstrap 5 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+<!-- html2canvas for download -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&family=Righteous&display=swap" rel="stylesheet"/>
+
+<style>
+/* ============================================================
+   ROOT VARIABLES
+============================================================ */
+:root{
+  --pink:    #ff3d9a;
+  --hot-pink:#ff006e;
+  --yellow:  #ffd600;
+  --amber:   #ff9900;
+  --blue:    #00b4d8;
+  --sky:     #90e0ef;
+  --green:   #06d6a0;
+  --lime:    #aaff00;
+  --purple:  #9b5de5;
+  --orange:  #ff6b35;
+  --glass:   rgba(255,255,255,0.12);
+  --glass2:  rgba(255,255,255,0.22);
+  --border:  rgba(255,255,255,0.28);
+  --dark:    #0a0015;
+}
+
+/* ============================================================
+   RESET & BASE
+============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--dark);
+  color:#fff;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ============================================================
+   CUSTOM CURSOR
+============================================================ */
+#cursor-dot{
+  position:fixed;width:12px;height:12px;border-radius:50%;
+  background:var(--yellow);pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);transition:transform .06s;
+  mix-blend-mode:difference;
+}
+#cursor-ring{
+  position:fixed;width:34px;height:34px;border-radius:50%;
+  border:2px solid var(--pink);pointer-events:none;z-index:99998;
+  transform:translate(-50%,-50%);transition:transform .18s ease, width .25s, height .25s;
+  mix-blend-mode:screen;
+}
+
+/* ============================================================
+   ANIMATED BG CANVAS
+============================================================ */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ============================================================
+   COLOR BAR
+============================================================ */
+.color-bar{
+  height:4px;
+  background:linear-gradient(90deg,var(--pink),var(--yellow),var(--blue),var(--green),var(--purple),var(--orange));
+  background-size:400%;
+  animation:gradShift 5s linear infinite;
+}
+
+/* ============================================================
+   NAVBAR
+============================================================ */
+.navbar{
+  position:sticky;top:0;z-index:1000;
+  background:rgba(10,0,21,0.75);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:12px 0;
+}
+.navbar-brand{
+  font-family:'Righteous',cursive;font-size:1.4rem;
+  background:linear-gradient(90deg,var(--pink),var(--yellow),var(--blue));
+  background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:gradShift 4s linear infinite;
+}
+.nav-link{
+  color:rgba(255,255,255,0.78)!important;font-weight:600;
+  position:relative;transition:color .3s;padding:6px 14px!important;
+}
+.nav-link::after{
+  content:'';position:absolute;left:50%;bottom:0;
+  width:0;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--pink),var(--yellow));
+  transform:translateX(-50%);transition:width .35s;
+}
+.nav-link:hover{color:#fff!important}
+.nav-link:hover::after{width:80%}
+
+/* ============================================================
+   SECTION TITLES
+============================================================ */
+.sec-title{
+  font-family:'Righteous',cursive;font-size:clamp(2rem,5vw,3.2rem);
+  text-align:center;margin-bottom:8px;
+  background:linear-gradient(90deg,var(--yellow),var(--pink));
+  background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:gradShift 5s linear infinite;
+}
+.sec-sub{text-align:center;color:rgba(255,255,255,.6);margin-bottom:48px;font-size:1rem}
+
+/* ============================================================
+   HERO
+============================================================ */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;overflow:hidden;z-index:1;
+  padding:110px 20px 70px;
+}
+.hero-badge{
+  display:inline-block;
+  background:var(--glass);border:1px solid var(--border);
+  backdrop-filter:blur(10px);border-radius:50px;
+  padding:6px 22px;font-size:.82rem;font-weight:600;
+  color:var(--yellow);letter-spacing:1.5px;margin-bottom:22px;
+  animation:fadeUp .8s ease both;
+}
+.hero h1{
+  font-family:'Righteous',cursive;
+  font-size:clamp(3.2rem,11vw,7.5rem);line-height:1.0;
+  background:linear-gradient(135deg,var(--pink) 0%,var(--yellow) 28%,var(--blue) 58%,var(--green) 100%);
+  background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:gradShift 5s linear infinite, fadeUp .9s ease .1s both;
+  filter:drop-shadow(0 0 40px rgba(255,60,154,.45));
+}
+.hero-sub{
+  font-size:clamp(1rem,2.5vw,1.4rem);font-weight:300;
+  color:rgba(255,255,255,.85);margin-top:12px;
+  animation:fadeUp 1s ease .2s both;
+}
+.hero-p{
+  max-width:580px;margin:18px auto;color:rgba(255,255,255,.65);
+  font-size:1rem;line-height:1.75;animation:fadeUp 1s ease .35s both;
+}
+.hero-btns{
+  display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:28px;
+  animation:fadeUp 1s ease .5s both;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn-holi{
+  font-family:'Righteous',cursive;font-size:1.1rem;
+  padding:13px 38px;border:none;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--orange),var(--yellow));
+  color:#fff;cursor:pointer;position:relative;overflow:hidden;
+  box-shadow:0 8px 28px rgba(255,61,154,.55);
+  transition:transform .2s,box-shadow .2s;
+}
+.btn-holi:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 16px 40px rgba(255,61,154,.7)}
+.btn-holi:active{transform:scale(.96)}
+.btn-holi::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,.18);transform:scaleX(0);
+  transform-origin:left;transition:transform .45s;
+}
+.btn-holi:hover::before{transform:scaleX(1)}
+
+.btn-glass{
+  font-family:'Righteous',cursive;font-size:1rem;
+  padding:11px 28px;border-radius:50px;
+  background:var(--glass);border:1px solid var(--border);
+  backdrop-filter:blur(10px);color:var(--yellow);
+  cursor:pointer;transition:all .3s;
+}
+.btn-glass:hover{background:rgba(255,255,255,.22);color:#fff}
+
+.btn-green{
+  font-family:'Righteous',cursive;font-size:1rem;
+  padding:11px 30px;border:none;border-radius:50px;
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  color:#fff;cursor:pointer;
+  box-shadow:0 8px 24px rgba(6,214,160,.45);
+  transition:transform .2s,box-shadow .2s;
+}
+.btn-green:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(6,214,160,.6)}
+
+/* ============================================================
+   FLOATING BUBBLES
+============================================================ */
+.bubbles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.bubble{
+  position:absolute;bottom:-100px;border-radius:50%;
+  animation:floatUp linear infinite;
+}
+@keyframes floatUp{
+  0%{transform:translateY(0) rotate(0deg);opacity:.65}
+  80%{opacity:.3}
+  100%{transform:translateY(-110vh) rotate(360deg);opacity:0}
+}
+
+/* ============================================================
+   GLASS CARDS (Services & Form)
+============================================================ */
+.g-card{
+  background:var(--glass);border:1px solid var(--border);
+  backdrop-filter:blur(16px);border-radius:24px;
+  padding:36px 28px;transition:transform .35s,box-shadow .35s;
+  height:100%;
+}
+.g-card:hover{transform:translateY(-10px);box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.card-icon{font-size:2.6rem;display:block;margin-bottom:14px}
+.g-card h5{font-weight:700;font-size:1.1rem;margin-bottom:10px}
+.g-card p{color:rgba(255,255,255,.68);font-size:.91rem;line-height:1.7}
+
+.at-pink  {border-top:4px solid var(--pink)}
+.at-yellow{border-top:4px solid var(--yellow)}
+.at-blue  {border-top:4px solid var(--blue)}
+.at-green {border-top:4px solid var(--green)}
+
+/* ============================================================
+   PICHKARI
+============================================================ */
+#pichkari-fab{
+  position:fixed;bottom:28px;right:28px;z-index:999;
+  width:64px;height:64px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,var(--blue),var(--green));
+  font-size:1.8rem;color:#fff;cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,180,216,.55);
+  animation:fabPulse 2.5s ease infinite;
+  transition:transform .25s;
+}
+#pichkari-fab:hover{transform:scale(1.18) rotate(-18deg)}
+@keyframes fabPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(0,180,216,.55)}
+  50%{box-shadow:0 0 0 14px rgba(0,180,216,0)}
+}
+
+/* auto-spray svg pichkari */
+#pichkari-auto{
+  position:fixed;left:-10px;top:50%;transform:translateY(-50%);
+  width:90px;z-index:5;pointer-events:none;
+  filter:drop-shadow(0 4px 12px rgba(0,180,216,.5));
+  animation:pichkariWobble 3s ease-in-out infinite;
+}
+@keyframes pichkariWobble{
+  0%,100%{transform:translateY(-50%) rotate(-5deg)}
+  50%{transform:translateY(-52%) rotate(5deg)}
+}
+
+/* ============================================================
+   SPLASH PARTICLES
+============================================================ */
+.splash{
+  position:fixed;pointer-events:none;border-radius:50%;z-index:9999;
+  animation:splashOut .8s ease-out forwards;
+}
+@keyframes splashOut{
+  0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--tx),var(--ty)) scale(.15);opacity:0}
+}
+
+/* ============================================================
+   CONFETTI
+============================================================ */
+.cfpiece{
+  position:fixed;top:-18px;pointer-events:none;z-index:9998;
+  border-radius:3px;animation:cfFall linear forwards;
+}
+@keyframes cfFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(740deg);opacity:0}
+}
+
+/* ============================================================
+   WISH GENERATOR SECTION
+============================================================ */
+.wish-section{position:relative;z-index:1;padding:80px 0}
+
+.form-glass{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.3);
+  backdrop-filter:blur(20px);border-radius:28px;
+  padding:44px 38px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+
+.form-label{font-weight:600;color:rgba(255,255,255,.9);font-size:.9rem;margin-bottom:6px}
+.form-control,.form-select{
+  background:rgba(255,255,255,.1)!important;
+  border:1px solid rgba(255,255,255,.25)!important;
+  border-radius:14px!important;color:#fff!important;
+  padding:12px 16px!important;font-family:'Poppins',sans-serif;
+  transition:border-color .3s, box-shadow .3s;
+}
+.form-control:focus,.form-select:focus{
+  border-color:var(--pink)!important;
+  box-shadow:0 0 0 3px rgba(255,61,154,.25)!important;
+  background:rgba(255,255,255,.15)!important;
+  outline:none;
+}
+.form-control::placeholder{color:rgba(255,255,255,.4)!important}
+.form-select option{background:#1a0030;color:#fff}
+textarea.form-control{resize:vertical;min-height:100px}
+
+/* sticker picker */
+.sticker-grid{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;
+}
+.sticker-btn{
+  width:44px;height:44px;border-radius:12px;border:2px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.1);font-size:1.4rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;
+}
+.sticker-btn:hover,.sticker-btn.active{
+  border-color:var(--yellow);background:rgba(255,214,0,.2);transform:scale(1.15);
+}
+
+/* ============================================================
+   GREETING CARD PREVIEW
+============================================================ */
+#card-preview-wrap{display:none;margin-top:36px}
+
+.holi-card{
+  border-radius:24px;overflow:hidden;
+  position:relative;min-height:380px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 30px;text-align:center;
+  box-shadow:0 20px 70px rgba(0,0,0,.5);
+}
+.holi-card-inner{position:relative;z-index:2}
+.holi-card-bg{
+  position:absolute;inset:0;z-index:0;
+  animation:gradShift 6s linear infinite;
+  background-size:400%!important;
+}
+.holi-card h2{
+  font-family:'Righteous',cursive;
+  font-size:clamp(2rem,6vw,3.5rem);
+  text-shadow:0 3px 20px rgba(0,0,0,.4);
+  margin-bottom:8px;
+}
+.holi-card .card-name{
+  font-size:clamp(1.2rem,3vw,1.8rem);font-weight:700;
+  text-shadow:0 2px 12px rgba(0,0,0,.3);
+  margin-bottom:12px;
+}
+.holi-card .card-msg{
+  font-size:clamp(.85rem,2vw,1.05rem);
+  max-width:480px;line-height:1.7;
+  text-shadow:0 1px 8px rgba(0,0,0,.3);
+  opacity:.95;
+}
+.holi-card .card-photo{
+  width:90px;height:90px;border-radius:50%;
+  object-fit:cover;border:3px solid #fff;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+  margin-bottom:14px;
+}
+.holi-card .card-company{
+  font-size:.85rem;font-weight:600;opacity:.85;
+  margin-top:10px;letter-spacing:.5px;
+}
+.holi-card .card-sticker{font-size:2.5rem;margin:10px 0}
+.holi-card .card-erp-brand{
+  font-family:'Righteous',cursive;font-size:.8rem;
+  opacity:.7;margin-top:16px;letter-spacing:1px;
+}
+.splash-ring{
+  position:absolute;border-radius:50%;
+  pointer-events:none;animation:ring-out .8s ease-out forwards;
+}
+@keyframes ring-out{
+  0%{transform:scale(0);opacity:.8}
+  100%{transform:scale(3);opacity:0}
+}
+
+/* download / share bar */
+.card-actions{
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
+  margin-top:22px;
+}
+
+/* ============================================================
+   SCROLL REVEAL
+============================================================ */
+.reveal{opacity:0;transform:translateY(44px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+footer{
+  background:rgba(0,0,0,.65);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);padding:50px 0 28px;
+  position:relative;z-index:1;
+}
+.footer-brand{
+  font-family:'Righteous',cursive;font-size:1.35rem;
+  background:linear-gradient(90deg,var(--pink),var(--yellow));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.soc-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:50%;
+  background:var(--glass);border:1px solid var(--border);
+  color:#fff;font-size:1.1rem;text-decoration:none;
+  margin:0 5px;transition:all .3s;
+}
+.soc-icon:hover{background:var(--pink);border-color:var(--pink);color:#fff;transform:translateY(-5px)}
+.holi-tagline{
+  font-family:'Righteous',cursive;font-size:1.05rem;
+  background:linear-gradient(90deg,var(--green),var(--blue),var(--pink));
+  background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:gradShift 5s linear infinite;text-align:center;margin-top:14px;
+}
+
+/* ============================================================
+   KEYFRAMES
+============================================================ */
+@keyframes gradShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(44px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ============================================================
+   SCROLLBAR
+============================================================ */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--dark)}
+::-webkit-scrollbar-thumb{background:var(--pink);border-radius:3px}
+
+/* ============================================================
+   RESPONSIVE TWEAKS
+============================================================ */
+@media(max-width:576px){
+  .form-glass{padding:28px 20px}
+}
+
+/* music btn active */
+.btn-glass.music-on{
+  background:rgba(255,214,0,.2);border-color:var(--yellow);color:var(--yellow);
+}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- Animated BG -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Auto pichkari SVG (left side) -->
+<svg id="pichkari-auto" viewBox="0 0 80 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="70" width="50" height="20" rx="8" fill="#4dc3ff"/>
+  <rect x="40" y="60" width="18" height="40" rx="6" fill="#00b4d8"/>
+  <rect x="0"  y="78" width="20" height="8"  rx="4" fill="#0077b6"/>
+  <rect x="55" y="64" width="22" height="10" rx="5" fill="#48cae4"/>
+  <circle cx="62" cy="78" r="7" fill="#ade8f4"/>
+  <rect x="14" y="74" width="6" height="8" rx="3" fill="#90e0ef"/>
+</svg>
+
+<!-- Pichkari FAB -->
+<button id="pichkari-fab" title="Spray Colors!">🔫</button>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="#">⚙️ ERP Software Dev</a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span style="font-size:1.5rem;color:#fff">☰</span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#hero">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="#wishgen">Wish Generator</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="color-bar"></div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="hero">
+  <div class="bubbles" id="bubbles"></div>
+  <div class="container position-relative" style="z-index:2">
+    <div class="hero-badge">🌸 Festival of Colors — Holi 2026</div>
+    <h1>Happy Holi 2026 🎨</h1>
+    <p class="hero-sub">Celebrating Colors of Innovation &amp; Technology</p>
+    <p class="hero-p">
+      Just as Holi splashes the world in brilliant hues, our ERP ecosystem colours every
+      process of your business — from HR to Finance, Inventory to CRM — bringing
+      vibrant efficiency, agility, and growth to every corner of your enterprise.
+    </p>
+    <div class="hero-btns">
+      <button class="btn-holi" id="celebrateBtn">🎉 Celebrate with Colors</button>
+      <a href="#wishgen" class="btn-glass">✏️ Create My Wish</a>
+      <button class="btn-glass" id="musicBtn">🎵 Play Music</button>
+    </div>
+  </div>
+</section>
+
+<div class="color-bar"></div>
+
+<!-- ===================== SERVICES ===================== -->
+<section class="py-5 position-relative" id="services" style="z-index:1">
+  <div class="container">
+    <h2 class="sec-title reveal">Our ERP Modules 🌈</h2>
+    <p class="sec-sub reveal">Colour every corner of your enterprise with the right solution</p>
+    <div class="row g-4">
+
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="g-card at-pink">
+          <span class="card-icon">👥</span>
+          <h5>HR Management</h5>
+          <p>Automate payroll, attendance, recruitment, leave management and appraisals. Empower your people with vibrant HR tools.</p>
+          <div class="mt-3">
+            <span class="badge rounded-pill me-1" style="background:rgba(255,61,154,.25);color:var(--pink)">Payroll</span>
+            <span class="badge rounded-pill" style="background:rgba(255,61,154,.25);color:var(--pink)">Attendance</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="g-card at-yellow">
+          <span class="card-icon">💰</span>
+          <h5>Finance &amp; Accounting</h5>
+          <p>Real-time dashboards, GST compliance, multi-currency support, and budgeting — keep your financials brilliantly bright.</p>
+          <div class="mt-3">
+            <span class="badge rounded-pill me-1" style="background:rgba(255,214,0,.25);color:var(--yellow)">GST</span>
+            <span class="badge rounded-pill" style="background:rgba(255,214,0,.25);color:var(--yellow)">Ledger</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="g-card at-blue">
+          <span class="card-icon">📦</span>
+          <h5>Inventory Control</h5>
+          <p>Smart warehouse management, barcode integration, stock alerts and demand forecasting. Never run short of colors again.</p>
+          <div class="mt-3">
+            <span class="badge rounded-pill me-1" style="background:rgba(0,180,216,.25);color:var(--blue)">Barcode</span>
+            <span class="badge rounded-pill" style="background:rgba(0,180,216,.25);color:var(--blue)">Forecast</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="g-card at-green">
+          <span class="card-icon">🤝</span>
+          <h5>CRM &amp; Sales</h5>
+          <p>Lead tracking, pipeline management, automated follow-ups, and deep analytics to build truly colorful customer relationships.</p>
+          <div class="mt-3">
+            <span class="badge rounded-pill me-1" style="background:rgba(6,214,160,.25);color:var(--green)">Pipeline</span>
+            <span class="badge rounded-pill" style="background:rgba(6,214,160,.25);color:var(--green)">Analytics</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="g-card" style="border-top:4px solid var(--orange)">
+          <span class="card-icon">🏭</span>
+          <h5>Manufacturing</h5>
+          <p>Production planning, BOM management, shop-floor control and quality inspection — keep your factory floor brilliantly green.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="g-card" style="border-top:4px solid var(--purple)">
+          <span class="card-icon">🛒</span>
+          <h5>E-Commerce</h5>
+          <p>Unified online-offline inventory, order management, returns workflow, and marketplace integrations — all from one panel.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="g-card" style="border-top:4px solid var(--lime)">
+          <span class="card-icon">📊</span>
+          <h5>Business Intelligence</h5>
+          <p>Interactive charts, KPI tracking, role-based dashboards and one-click exports — turn raw data into a rainbow of insight.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="g-card" style="border-top:4px solid var(--sky)">
+          <span class="card-icon">☁️</span>
+          <h5>Cloud &amp; Mobile</h5>
+          <p>Secure cloud hosting, offline-capable mobile apps, real-time sync, and SSO — manage your business from anywhere.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="color-bar"></div>
+
+<!-- ===================== WISH GENERATOR ===================== -->
+<section class="wish-section" id="wishgen">
+  <div class="container">
+    <h2 class="sec-title reveal">✨ Holi Wish Generator</h2>
+    <p class="sec-sub reveal">Create &amp; download your personalized Holi greeting card in seconds</p>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-9 reveal">
+        <div class="form-glass">
+
+          <!-- Form -->
+          <div id="wish-form-area">
+            <div class="row g-3">
+
+              <!-- Full Name -->
+              <div class="col-md-6">
+                <label class="form-label">👤 Full Name <span style="color:var(--pink)">*</span></label>
+                <input type="text" id="wf-name" class="form-control" placeholder="Your full name" required/>
+              </div>
+
+              <!-- Company Name -->
+              <div class="col-md-6">
+                <label class="form-label">🏢 Company Name <small style="opacity:.6">(optional)</small></label>
+                <input type="text" id="wf-company" class="form-control" placeholder="e.g. Acme Corp"/>
+              </div>
+
+              <!-- Custom Message -->
+              <div class="col-12">
+                <label class="form-label">💬 Custom Holi Message</label>
+                <textarea id="wf-msg" class="form-control" rows="3"
+                  placeholder="e.g. Wishing you a colorful Holi full of joy and prosperity!"></textarea>
+              </div>
+
+              <!-- Upload Photo -->
+              <div class="col-md-6">
+                <label class="form-label">📸 Upload Photo <small style="opacity:.6">(optional)</small></label>
+                <input type="file" id="wf-photo" class="form-control" accept="image/*"/>
+              </div>
+
+              <!-- Background Theme -->
+              <div class="col-md-6">
+                <label class="form-label">🎨 Background Color Theme</label>
+                <select id="wf-theme" class="form-select">
+                  <option value="sunrise">🌅 Sunrise — Pink &amp; Orange</option>
+                  <option value="ocean">🌊 Ocean — Blue &amp; Teal</option>
+                  <option value="forest">🌿 Forest — Green &amp; Lime</option>
+                  <option value="cosmic">🌌 Cosmic — Purple &amp; Indigo</option>
+                  <option value="golden">✨ Golden — Yellow &amp; Amber</option>
+                  <option value="rainbow">🌈 Rainbow — Full Holi</option>
+                </select>
+              </div>
+
+              <!-- Sticker -->
+              <div class="col-12">
+                <label class="form-label">🎊 Decorative Sticker</label>
+                <div class="sticker-grid" id="sticker-grid">
+                  <button type="button" class="sticker-btn active" data-sticker="🌸">🌸</button>
+                  <button type="button" class="sticker-btn" data-sticker="🎨">🎨</button>
+                  <button type="button" class="sticker-btn" data-sticker="🌈">🌈</button>
+                  <button type="button" class="sticker-btn" data-sticker="🎊">🎊</button>
+                  <button type="button" class="sticker-btn" data-sticker="🌺">🌺</button>
+                  <button type="button" class="sticker-btn" data-sticker="💐">💐</button>
+                  <button type="button" class="sticker-btn" data-sticker="🎉">🎉</button>
+                  <button type="button" class="sticker-btn" data-sticker="🦋">🦋</button>
+                  <button type="button" class="sticker-btn" data-sticker="✨">✨</button>
+                  <button type="button" class="sticker-btn" data-sticker="🎆">🎆</button>
+                </div>
+              </div>
+
+              <!-- Generate Button -->
+              <div class="col-12 text-center mt-2">
+                <button class="btn-holi" id="generateBtn" style="font-size:1.05rem;padding:14px 44px">
+                  🪄 Generate Holi Wish Card
+                </button>
+              </div>
+
+            </div><!-- /row -->
+          </div><!-- /form area -->
+
+          <!-- ===== CARD PREVIEW ===== -->
+          <div id="card-preview-wrap">
+
+            <!-- The renderable card (will be html2canvas-ed) -->
+            <div id="holi-card-render">
+              <div class="holi-card" id="holi-card">
+                <div class="holi-card-bg" id="card-bg"></div>
+                <!-- inner -->
+                <div class="holi-card-inner">
+                  <img id="card-photo-img" class="card-photo d-none" src="" alt="Photo"/>
+                  <div class="card-sticker" id="card-sticker-el">🌸</div>
+                  <h2 id="card-heading">Happy Holi 2026 🎨</h2>
+                  <p class="card-name" id="card-name-el">Dear Friend</p>
+                  <p class="card-msg"  id="card-msg-el">Wishing you a colorful Holi full of joy and happiness!</p>
+                  <p class="card-company" id="card-company-el"></p>
+                  <p class="card-erp-brand">⚙️ ERP Software Development</p>
+                </div>
+              </div>
+            </div><!-- /render -->
+
+            <div class="card-actions">
+              <button class="btn-green" id="downloadBtn">⬇️ Download Image</button>
+              <button class="btn-glass" id="shareBtn">🔗 Share Wish</button>
+              <button class="btn-glass" id="regenerateBtn">🔄 Edit &amp; Regenerate</button>
+            </div>
+
+          </div><!-- /card-preview-wrap -->
+
+        </div><!-- /form-glass -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="color-bar"></div>
+
+<!-- ===================== ABOUT ===================== -->
+<section class="py-5 position-relative" id="about" style="z-index:1">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9 reveal">
+        <div class="g-card text-center" style="padding:60px 40px;border-top:4px solid var(--pink)">
+          <div style="font-size:3.5rem;margin-bottom:12px">🎊🌸🎨🌺🎊</div>
+          <h2 style="font-family:'Righteous',cursive;font-size:clamp(1.6rem,4vw,2.6rem);margin-bottom:14px;
+            background:linear-gradient(90deg,var(--pink),var(--yellow),var(--blue));background-size:300%;
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            animation:gradShift 5s linear infinite">
+            Celebrating Holi with You!
+          </h2>
+          <p style="color:rgba(255,255,255,.72);max-width:600px;margin:0 auto;line-height:1.8">
+            From the entire family at <strong style="color:#fff">ERP Software Development</strong>,
+            we wish you a Holi as vibrant as your ambitions. May every module of your business
+            run flawlessly, and each day bring a new shade of success, prosperity, and joy.
+          </p>
+          <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+            <span class="badge fs-6 px-3 py-2 rounded-pill" style="background:rgba(255,61,154,.25);border:1px solid var(--pink);color:var(--pink)">🌸 Joy</span>
+            <span class="badge fs-6 px-3 py-2 rounded-pill" style="background:rgba(255,214,0,.25);border:1px solid var(--yellow);color:var(--yellow)">✨ Prosperity</span>
+            <span class="badge fs-6 px-3 py-2 rounded-pill" style="background:rgba(0,180,216,.25);border:1px solid var(--blue);color:var(--blue)">💧 Harmony</span>
+            <span class="badge fs-6 px-3 py-2 rounded-pill" style="background:rgba(6,214,160,.25);border:1px solid var(--green);color:var(--green)">🌿 Growth</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONTACT ===================== -->
+<section class="py-5 text-center position-relative" id="contact" style="z-index:1">
+  <div class="container reveal">
+    <h2 class="sec-title">Ready to Color Your Business? 🚀</h2>
+    <p class="sec-sub">Let's craft your ERP solution — as vibrant as Holi itself!</p>
+    <a href="mailto:hello@erpsoftdev.com" class="btn-holi" style="text-decoration:none;display:inline-block;font-size:1.05rem">
+      📩 Get a Free ERP Demo
+    </a>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="container">
+    <div class="row align-items-center gy-4">
+      <div class="col-md-4 text-center text-md-start">
+        <div class="footer-brand">⚙️ ERP Software Dev</div>
+        <p style="color:rgba(255,255,255,.5);font-size:.88rem;margin-top:8px">
+          Painting business processes<br/>with the colors of technology.
+        </p>
+      </div>
+      <div class="col-md-4 text-center">
+        <a href="#" class="soc-icon"><i class="bi bi-linkedin"></i></a>
+        <a href="#" class="soc-icon"><i class="bi bi-twitter-x"></i></a>
+        <a href="#" class="soc-icon"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="soc-icon"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="soc-icon"><i class="bi bi-youtube"></i></a>
+      </div>
+      <div class="col-md-4 text-center text-md-end">
+        <p style="color:rgba(255,255,255,.42);font-size:.83rem">
+          © 2026 ERP Software Dev Pvt. Ltd.<br/>All rights reserved.
+        </p>
+      </div>
+    </div>
+    <div class="color-bar mt-4 mb-3" style="height:2px;border-radius:2px"></div>
+    <p class="holi-tagline">🌸 May your business grow with vibrant success! Happy Holi 2026 🎨</p>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+   CURSOR
+============================================================ */
+const dot  = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  dot.style.left=mx+'px'; dot.style.top=my+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*.15; ry+=(my-ry)*.15;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+
+/* ============================================================
+   BACKGROUND CANVAS
+============================================================ */
+(function(){
+  const cv=document.getElementById('bg-canvas');
+  const cx=cv.getContext('2d');
+  let W,H,blobs;
+  const palette=['#ff3d9a','#ffd600','#00b4d8','#06d6a0','#ff6b35','#9b5de5','#ff006e','#aaff00'];
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
+  function mkBlobs(){
+    blobs=palette.map(c=>({
+      x:Math.random()*W,y:Math.random()*H,
+      r:200+Math.random()*220,
+      vx:(Math.random()-.5)*.45,vy:(Math.random()-.5)*.45,
+      color:c
+    }));
+  }
+  function draw(){
+    cx.clearRect(0,0,W,H);
+    cx.fillStyle='#0a0015';cx.fillRect(0,0,W,H);
+    blobs.forEach(b=>{
+      b.x+=b.vx;b.y+=b.vy;
+      if(b.x<-b.r||b.x>W+b.r)b.vx*=-1;
+      if(b.y<-b.r||b.y>H+b.r)b.vy*=-1;
+      const g=cx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+      g.addColorStop(0,b.color+'55');g.addColorStop(1,'transparent');
+      cx.beginPath();cx.arc(b.x,b.y,b.r,0,Math.PI*2);cx.fillStyle=g;cx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{resize();mkBlobs()});
+  resize();mkBlobs();draw();
+})();
+
+/* ============================================================
+   FLOATING BUBBLES
+============================================================ */
+(function(){
+  const wrap=document.getElementById('bubbles');
+  const cols=['#ff3d9a','#ffd600','#00b4d8','#06d6a0','#ff6b35','#9b5de5','#aaff00','#ff006e'];
+  for(let i=0;i<30;i++){
+    const b=document.createElement('div');
+    b.className='bubble';
+    const sz=14+Math.random()*55;
+    b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;
+      background:${cols[~~(Math.random()*cols.length)]};
+      animation-duration:${9+Math.random()*13}s;
+      animation-delay:${Math.random()*-22}s;
+      opacity:${.25+Math.random()*.5};
+      filter:blur(${Math.random()*4}px)`;
+    wrap.appendChild(b);
+  }
+})();
+
+/* ============================================================
+   SPLASH HELPERS
+============================================================ */
+const COLS=['#ff3d9a','#ffd600','#00b4d8','#06d6a0','#ff6b35','#9b5de5','#aaff00','#ff006e'];
+function rnd(a){return a[~~(Math.random()*a.length)]}
+
+function splash(cx,cy,count=35){
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='splash';
+    const sz=8+Math.random()*20;
+    const ang=Math.random()*2*Math.PI;
+    const dist=70+Math.random()*200;
+    p.style.cssText=`left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;
+      background:${rnd(COLS)};--tx:${Math.cos(ang)*dist}px;--ty:${Math.sin(ang)*dist}px;
+      animation-duration:${.5+Math.random()*.7}s`;
+    document.body.appendChild(p);
+    p.addEventListener('animationend',()=>p.remove());
+  }
+}
+
+function confetti(count=90){
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='cfpiece';
+    const w=6+Math.random()*10,h=w*(.4+Math.random()*.7);
+    p.style.cssText=`left:${Math.random()*100}vw;width:${w}px;height:${h}px;
+      background:${rnd(COLS)};
+      animation-duration:${1.5+Math.random()*2.2}s;
+      animation-delay:${Math.random()*.9}s`;
+    document.body.appendChild(p);
+    p.addEventListener('animationend',()=>p.remove());
+  }
+}
+
+/* ============================================================
+   CELEBRATE BUTTON
+============================================================ */
+document.getElementById('celebrateBtn').addEventListener('click',function(e){
+  const r=this.getBoundingClientRect();
+  splash(r.left+r.width/2,r.top+r.height/2,55);
+  confetti(110);
+});
+
+/* ============================================================
+   PICHKARI FAB — click
+============================================================ */
+const fab=document.getElementById('pichkari-fab');
+fab.addEventListener('click',function(e){
+  const r=this.getBoundingClientRect();
+  splash(r.left+r.width/2,r.top+r.height/2,50);
+  confetti(70);
+  this.style.transform='scale(.8) rotate(-25deg)';
+  setTimeout(()=>this.style.transform='',350);
+});
+
+/* Double-click anywhere for mini spray */
+document.addEventListener('dblclick',e=>splash(e.clientX,e.clientY,22));
+
+/* ============================================================
+   AUTO PICHKARI — spray from left edge every 5s
+============================================================ */
+(function autoSpray(){
+  function spray(){
+    const pich=document.getElementById('pichkari-auto');
+    if(!pich)return;
+    const r=pich.getBoundingClientRect();
+    const startX=r.right, startY=r.top+r.height/2;
+    // directional spray rightward
+    for(let i=0;i<22;i++){
+      const p=document.createElement('div');
+      p.className='splash';
+      const sz=8+Math.random()*16;
+      const ang=(Math.random()-.35)*.9; // roughly rightward cone
+      const dist=100+Math.random()*250;
+      p.style.cssText=`left:${startX}px;top:${startY}px;width:${sz}px;height:${sz}px;
+        background:${rnd(COLS)};--tx:${Math.cos(ang)*dist}px;--ty:${Math.sin(ang)*dist}px;
+        animation-duration:${.6+Math.random()*.7}s`;
+      document.body.appendChild(p);
+      p.addEventListener('animationend',()=>p.remove());
+    }
+  }
+  setInterval(spray,8000);
+  setTimeout(spray,1500);
+})();
+
+/* ============================================================
+   MUSIC (Web Audio API synthesizer)
+============================================================ */
+let audioCtx=null,oscNodes=[],musicOn=false;
+const musicBtn=document.getElementById('musicBtn');
+
+function startMusic(){
+  audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();
+  const freqs=[261.63,329.63,392.00,523.25,659.25,783.99];
+  oscNodes=freqs.map((f,i)=>{
+    const osc=audioCtx.createOscillator();
+    const g=audioCtx.createGain();
+    const lfo=audioCtx.createOscillator();
+    const lg=audioCtx.createGain();
+    osc.type=i%2?'triangle':'sine';
+    osc.frequency.value=f;
+    g.gain.value=.035/(i+1);
+    lfo.frequency.value=4+i;lg.gain.value=4;
+    lfo.connect(lg);lg.connect(osc.frequency);
+    osc.connect(g);g.connect(audioCtx.destination);
+    lfo.start();osc.start();
+    return[osc,lfo];
+  });
+}
+function stopMusic(){
+  oscNodes.forEach(([o,l])=>{try{o.stop();l.stop()}catch(e){}});
+  oscNodes=[];
+}
+musicBtn.addEventListener('click',function(){
+  if(musicOn){stopMusic();this.textContent='🎵 Play Music';this.classList.remove('music-on')}
+  else{startMusic();this.textContent='🔇 Stop Music';this.classList.add('music-on')}
+  musicOn=!musicOn;
+});
+
+/* ============================================================
+   STICKER PICKER
+============================================================ */
+let selectedSticker='🌸';
+document.getElementById('sticker-grid').addEventListener('click',function(e){
+  const btn=e.target.closest('.sticker-btn');
+  if(!btn)return;
+  this.querySelectorAll('.sticker-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedSticker=btn.dataset.sticker;
+});
+
+/* ============================================================
+   THEME GRADIENTS
+============================================================ */
+const THEMES={
+  sunrise:'linear-gradient(135deg,#ff3d9a,#ff6b35,#ffd600)',
+  ocean:  'linear-gradient(135deg,#00b4d8,#06d6a0,#0077b6)',
+  forest: 'linear-gradient(135deg,#06d6a0,#aaff00,#028a0f)',
+  cosmic: 'linear-gradient(135deg,#9b5de5,#5e17eb,#c77dff)',
+  golden: 'linear-gradient(135deg,#ffd600,#ff9900,#ff6b35)',
+  rainbow:'linear-gradient(135deg,#ff3d9a,#ffd600,#00b4d8,#06d6a0,#9b5de5)'
+};
+const TEXT_COL={
+  sunrise:'#fff',ocean:'#fff',forest:'#001a00',
+  cosmic:'#fff',golden:'#2d1a00',rainbow:'#fff'
+};
+
+/* ============================================================
+   WISH GENERATOR
+============================================================ */
+document.getElementById('generateBtn').addEventListener('click',function(){
+  const name=document.getElementById('wf-name').value.trim();
+  if(!name){
+    document.getElementById('wf-name').focus();
+    document.getElementById('wf-name').style.borderColor='var(--pink)';
+    return;
+  }
+  document.getElementById('wf-name').style.borderColor='';
+
+  const company=document.getElementById('wf-company').value.trim();
+  const msg=document.getElementById('wf-msg').value.trim()||'Wishing you a Holi as bright as your success! 🌈';
+  const theme=document.getElementById('wf-theme').value;
+  const photoFile=document.getElementById('wf-photo').files[0];
+
+  /* -- update card elements -- */
+  document.getElementById('card-name-el').textContent='Dear '+name+' 🌸';
+  document.getElementById('card-msg-el').textContent=msg;
+  document.getElementById('card-company-el').textContent=company?'🏢 '+company:'';
+  document.getElementById('card-sticker-el').textContent=selectedSticker;
+
+  const cardEl=document.getElementById('holi-card');
+  const bgEl=document.getElementById('card-bg');
+  const tc=TEXT_COL[theme]||'#fff';
+  bgEl.style.background=THEMES[theme];
+  cardEl.style.color=tc;
+
+  /* photo */
+  const photoImg=document.getElementById('card-photo-img');
+  if(photoFile){
+    const reader=new FileReader();
+    reader.onload=e=>{photoImg.src=e.target.result;photoImg.classList.remove('d-none')};
+    reader.readAsDataURL(photoFile);
+  } else {
+    photoImg.classList.add('d-none');photoImg.src='';
+  }
+
+  /* show preview */
+  document.getElementById('wish-form-area').style.display='none';
+  document.getElementById('card-preview-wrap').style.display='block';
+
+  /* effects */
+  confetti(120);
+  const r=cardEl.getBoundingClientRect();
+  splash(r.left+r.width/2,r.top+r.height/2,50);
+
+  /* splash rings on card */
+  ['#ff3d9a','#ffd600','#00b4d8','#06d6a0'].forEach((c,i)=>{
+    const ring=document.createElement('div');
+    ring.className='splash-ring';
+    ring.style.cssText=`width:60px;height:60px;border:4px solid ${c};
+      top:50%;left:50%;transform:translate(-50%,-50%);
+      animation-delay:${i*.15}s;animation-duration:.9s`;
+    cardEl.appendChild(ring);
+    setTimeout(()=>ring.remove(),1200);
+  });
+
+  cardEl.scrollIntoView({behavior:'smooth',block:'center'});
+});
+
+/* ============================================================
+   DOWNLOAD CARD
+============================================================ */
+document.getElementById('downloadBtn').addEventListener('click',async function(){
+  const el=document.getElementById('holi-card');
+  try{
+    const canvas=await html2canvas(el,{
+      scale:3,useCORS:true,allowTaint:true,
+      backgroundColor:null,logging:false
+    });
+    const link=document.createElement('a');
+    link.download='HoliWish2026_ERPSoftDev.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    confetti(60);
+  }catch(err){
+    alert('Download failed — try a different browser or remove the photo.');
+    console.error(err);
+  }
+});
+
+/* ============================================================
+   SHARE
+============================================================ */
+document.getElementById('shareBtn').addEventListener('click',async function(){
+  const el=document.getElementById('holi-card');
+  try{
+    const canvas=await html2canvas(el,{scale:2,useCORS:true,allowTaint:true,backgroundColor:null});
+    canvas.toBlob(async blob=>{
+      if(navigator.share&&navigator.canShare({files:[new File([blob],'holi.png',{type:'image/png'})]})){
+        await navigator.share({title:'Happy Holi 2026!',files:[new File([blob],'holi.png',{type:'image/png'})]});
+      }else{
+        // fallback: just download
+        const link=document.createElement('a');
+        link.download='HoliWish2026_ERPSoftDev.png';
+        link.href=URL.createObjectURL(blob);
+        link.click();
+      }
+    },'image/png');
+  }catch(err){console.error(err)}
+});
+
+/* ============================================================
+   REGENERATE (back to form)
+============================================================ */
+document.getElementById('regenerateBtn').addEventListener('click',function(){
+  document.getElementById('wish-form-area').style.display='';
+  document.getElementById('card-preview-wrap').style.display='none';
+  document.getElementById('wish-form-area').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+/* ============================================================
+   SCROLL REVEAL (IntersectionObserver)
+============================================================ */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*90);
+  });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+/* ============================================================
+   AUTO CONFETTI ON LOAD
+============================================================ */
+window.addEventListener('load',()=>setTimeout(()=>confetti(70),700));
+</script>
+</body>
+</html>
