@@ -345,7 +345,7 @@
       line-height: 1.1;
       margin-bottom: 0.4rem;
       word-break: break-word;
-      margin-block: 30px;
+      margin-block: 20px;
     }
 
     #cardRecipient {
@@ -507,7 +507,7 @@
 
         <div class="mb-4">
           <label for="customMessage">✍️ Custom Message</label>
-          <textarea class="form-control" id="customMessage" placeholder="Wishing you a colorful and joyful Holi! May your life be filled with vibrant colors of happiness..."></textarea>
+          <textarea class="form-control" id="customMessage" placeholder="May your life be filled with joy, peace, and blessings. Celebrate this holy day with love, gratitude, and happiness that lights every moment of your life..."></textarea>
         </div>
 
         <div class="color-divider"></div>
@@ -563,9 +563,9 @@
         <!-- 3. Font Style -->
         <div class="section-title"><i class="bi bi-type"></i> Font Style</div>
         <div class="font-grid mb-4" id="fontGrid">
-          <button class="font-btn active" style="font-family:'Pacifico',cursive;" data-font="'Pacifico', cursive">Pacifico</button>
+          <button class="font-btn " style="font-family:'Pacifico',cursive;" data-font="'Pacifico', cursive">Pacifico</button>
           <button class="font-btn" style="font-family:'Fredoka One',cursive;" data-font="'Fredoka One', cursive">Fredoka</button>
-          <button class="font-btn" style="font-family:'Righteous',cursive;" data-font="'Righteous', cursive">Righteous</button>
+          <button class="font-btn active" style="font-family:'Righteous',cursive;" data-font="'Righteous', cursive">Righteous</button>
           <button class="font-btn" style="font-family:'Baloo 2',cursive;" data-font="'Baloo 2', cursive">Baloo</button>
           <button class="font-btn" style="font-family:'Caveat',cursive;" data-font="'Caveat', cursive">Caveat</button>
           <button class="font-btn" style="font-family:'Dancing Script',cursive;" data-font="'Dancing Script', cursive">Dancing</button>
@@ -621,7 +621,7 @@
                 <div id="profileImage"></div>
               <div  id="cardTitle">Happy Holi!</div>
               <div id="cardRecipient">Dear <span id="cardRecipientSpan">Friend</span></div>
-              <div id="cardMessage">Wishing you a colorful and joyful Holi!</div>
+              <div id="cardMessage">May your life be filled with joy, peace, and blessings. Celebrate this holy day with love, gratitude, and happiness that lights every moment of your life!</div>
             </div>
           </div>
         </div>
@@ -760,7 +760,7 @@ let capturedDataURL = null;   // Generated image
 =========================== */
 function updatePreview() {
   const recipient = document.getElementById('recipientName').value.trim() || 'Friend';
-  const message   = document.getElementById('customMessage').value.trim() || 'Wishing you a colorful and joyful Holi!';
+  const message   = document.getElementById('customMessage').value.trim() || 'May your life be filled with joy, peace, and blessings. Celebrate this holy day with love, gratitude, and happiness that lights every moment of your life!';
   const fontSize  = document.getElementById('fontSizeRange').value;
 
   document.getElementById('cardRecipientSpan').textContent = recipient;
@@ -943,7 +943,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   try {
     const card = document.getElementById('holiCard');
     const canvas = await html2canvas(card, {
-      scale: 3,             // High resolution (3x)
+      scale: 2,             // High resolution (3x)
       useCORS: true,
       allowTaint: true,
       backgroundColor: null,
