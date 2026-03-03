@@ -50,6 +50,79 @@
       z-index: 0;
     }
 
+    /* ===== FALLING HEARTS CANVAS ===== */
+    #hearts-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* ===== HEART CONTROLS PANEL ===== */
+    #heart-controls {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 1000;
+      background: rgba(20, 0, 35, 0.82);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,110,180,0.35);
+      border-radius: 20px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(255,110,180,0.15);
+      min-width: 130px;
+    }
+    .hc-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1rem;
+      color: var(--holi-pink);
+      text-align: center;
+      margin: 0 0 4px;
+    }
+    .hc-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,110,180,0.25);
+      border-radius: 50px;
+      padding: 7px 14px;
+      color: rgba(255,255,255,0.8);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .hc-btn:hover {
+      background: rgba(255,110,180,0.18);
+      border-color: var(--holi-pink);
+      color: #fff;
+      transform: scale(1.04);
+    }
+    .hc-btn.active {
+      background: linear-gradient(135deg, rgba(255,110,180,0.35), rgba(199,125,255,0.35));
+      border-color: var(--holi-pink);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255,110,180,0.3);
+    }
+    .hc-off { border-color: rgba(255,255,255,0.15); }
+    .hc-off.active {
+      background: rgba(80,0,80,0.4);
+      border-color: rgba(255,255,255,0.3);
+    }
+    @media (max-width: 480px) {
+      #heart-controls {
+        top: auto; bottom: 96px; right: 14px;
+        padding: 10px 12px; min-width: 110px;
+      }
+      .hc-btn { font-size: 0.75rem; padding: 6px 10px; }
+    }
+
     /* ===== FLOATING HEARTS ===== */
     #hearts-layer {
       position: fixed;
@@ -486,8 +559,32 @@
 <!-- =================== FIXED CANVAS (color splashes) =================== -->
 <canvas id="splash-canvas"></canvas>
 
-<!-- =================== FLOATING HEARTS LAYER =================== -->
+<!-- =================== FALLING HEARTS CANVAS =================== -->
+<canvas id="hearts-canvas"></canvas>
+
+<!-- =================== FLOATING HEARTS LAYER (emoji) =================== -->
 <div id="hearts-layer"></div>
+
+<!-- =================== HEART CONTROLS PANEL =================== -->
+<div id="heart-controls">
+  <p class="hc-title">💖 Heart Rain</p>
+  <button class="hc-btn active" id="btn-single" onclick="setHeartMode('single')">
+    <svg width="22" height="20" viewBox="0 0 22 20"><path d="M11 18.5S1 12 1 6a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 12.5-10 12.5z" fill="#ff6eb4" stroke="none"/></svg>
+    Single
+  </button>
+  <button class="hc-btn" id="btn-double" onclick="setHeartMode('double')">
+    <svg width="36" height="20" viewBox="0 0 36 20">
+      <path d="M9 17S1 11.5 1 6a4.5 4.5 0 0 1 9 0 4.5 4.5 0 0 1 9 0c0 5.5-9 11-9 11z" fill="#ff6eb4"/>
+      <path d="M27 17s-8-5.5-8-11a4.5 4.5 0 0 1 9 0 4.5 4.5 0 0 1 9 0c0 5.5-9 11-9 11z" fill="#c77dff"/>
+      <line x1="18" y1="6" x2="18" y2="17" stroke="#fff" stroke-width="1.5" stroke-dasharray="2,2"/>
+    </svg>
+    Double
+  </button>
+  <button class="hc-btn" id="btn-both" onclick="setHeartMode('both')">
+    ❤️+💕 Both
+  </button>
+  <button class="hc-btn hc-off" id="btn-off" onclick="setHeartMode('off')">⏹ Off</button>
+</div>
 
 <!-- =================== MUSIC TOGGLE =================== -->
 <button id="music-btn" title="Toggle music">🎵</button>
@@ -677,7 +774,7 @@
 
 <script>
 /* ================================================
-   FLOATING HEARTS
+   FLOATING HEARTS (emoji layer — kept for extra charm)
    ================================================ */
 const heartsLayer = document.getElementById('hearts-layer');
 const heartEmojis = ['💗','💖','💕','💓','💞','🩷','❤️','💝'];
@@ -694,10 +791,204 @@ function spawnHeart() {
   heartsLayer.appendChild(el);
   setTimeout(() => el.remove(), (dur + 5) * 1000);
 }
-// Spawn hearts periodically
 setInterval(spawnHeart, 600);
-// Kick off a bunch immediately
 for (let i = 0; i < 12; i++) setTimeout(spawnHeart, i * 200);
+
+
+/* ================================================
+   FALLING HEARTS CANVAS — SINGLE & DOUBLE
+   ================================================ */
+const hCanvas = document.getElementById('hearts-canvas');
+const hCtx    = hCanvas.getContext('2d');
+
+function resizeHCanvas() {
+  hCanvas.width  = window.innerWidth;
+  hCanvas.height = window.innerHeight;
+}
+resizeHCanvas();
+window.addEventListener('resize', resizeHCanvas);
+
+// Mode: 'single' | 'double' | 'both' | 'off'
+let heartMode = 'single';
+const fallingHearts = [];
+
+/* Colour palettes */
+const singleColors = [
+  ['#ff6eb4','#ff1493'],
+  ['#ff9f43','#ff6348'],
+  ['#c77dff','#9d4edd'],
+  ['#ffd700','#ffaa00'],
+  ['#ff6eb4','#c77dff'],
+  ['#5bc8f5','#0096c7'],
+  ['#ff1493','#ff6eb4'],
+];
+const doubleColorPairs = [
+  [['#ff6eb4','#ff1493'],['#c77dff','#9d4edd']],
+  [['#ffd700','#ffaa00'],['#ff6eb4','#ff1493']],
+  [['#5bc8f5','#0096c7'],['#ff6eb4','#c77dff']],
+  [['#06d6a0','#00b4d8'],['#ff9f43','#ff6348']],
+];
+
+/* ---- Draw a single heart path centred at (0,0), radius r ---- */
+function heartPath(ctx, r) {
+  const s = r / 10;
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 3);
+  ctx.bezierCurveTo( s * 5, -s * 8,  s * 10, -s * 2,  0,  s * 5);
+  ctx.bezierCurveTo(-s * 10, -s * 2, -s * 5, -s * 8,  0, -s * 3);
+  ctx.closePath();
+}
+
+/* ---- FallingHeart class ---- */
+class FallingHeart {
+  constructor(type) {
+    this.type   = type; // 'single' or 'double'
+    this.reset(true);
+  }
+
+  reset(init = false) {
+    this.x    = Math.random() * hCanvas.width;
+    this.y    = init ? Math.random() * -hCanvas.height : -60;
+    this.r    = Math.random() * 18 + 10;             // heart radius
+    this.vy   = Math.random() * 1.4 + 0.6;           // fall speed
+    this.vx   = (Math.random() - 0.5) * 0.6;         // gentle drift
+    this.rot  = Math.random() * Math.PI * 2;
+    this.rotV = (Math.random() - 0.5) * 0.025;       // spin speed
+    this.alpha= Math.random() * 0.5 + 0.5;
+    this.wobble = 0;
+    this.wobbleSpeed = Math.random() * 0.04 + 0.02;
+    this.wobbleAmp   = Math.random() * 20 + 8;
+
+    if (this.type === 'single') {
+      const c = singleColors[Math.floor(Math.random() * singleColors.length)];
+      this.color1 = c[0]; this.color2 = c[1];
+    } else {
+      const pair = doubleColorPairs[Math.floor(Math.random() * doubleColorPairs.length)];
+      this.lColor1 = pair[0][0]; this.lColor2 = pair[0][1];
+      this.rColor1 = pair[1][0]; this.rColor2 = pair[1][1];
+      this.gap     = this.r * 0.3; // small gap between hearts
+    }
+  }
+
+  update() {
+    this.wobble += this.wobbleSpeed;
+    this.x += this.vx + Math.sin(this.wobble) * this.wobbleAmp * 0.04;
+    this.y += this.vy;
+    this.rot += this.rotV;
+    if (this.y > hCanvas.height + 80) this.reset();
+  }
+
+  drawSingleHeart(ctx, r, c1, c2, alpha) {
+    const grad = ctx.createRadialGradient(-r*0.2, -r*0.3, r*0.1, 0, 0, r*1.1);
+    grad.addColorStop(0, c1);
+    grad.addColorStop(1, c2);
+    ctx.fillStyle   = grad;
+    ctx.globalAlpha = alpha;
+    ctx.shadowColor = c1;
+    ctx.shadowBlur  = r * 1.2;
+    heartPath(ctx, r);
+    ctx.fill();
+    // Inner shine
+    ctx.globalAlpha = alpha * 0.3;
+    ctx.fillStyle   = 'rgba(255,255,255,0.9)';
+    ctx.beginPath();
+    ctx.ellipse(-r*0.25, -r*0.35, r*0.22, r*0.14, -0.5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur  = 0;
+    ctx.globalAlpha = 1;
+  }
+
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+
+    if (this.type === 'single') {
+      this.drawSingleHeart(ctx, this.r, this.color1, this.color2, this.alpha);
+    } else {
+      /* Double / joined heart:
+         Two hearts side-by-side, touching at the bottom tip area,
+         connected by a glowing bond line */
+      const offset = this.r * 1.05 + this.gap;
+
+      // Left heart
+      ctx.save();
+      ctx.translate(-offset, 0);
+      this.drawSingleHeart(ctx, this.r, this.lColor1, this.lColor2, this.alpha);
+      ctx.restore();
+
+      // Right heart
+      ctx.save();
+      ctx.translate(offset, 0);
+      this.drawSingleHeart(ctx, this.r, this.rColor1, this.rColor2, this.alpha);
+      ctx.restore();
+
+      // Bond connector (glowing line between the two)
+      const bondGrad = ctx.createLinearGradient(-offset, 0, offset, 0);
+      bondGrad.addColorStop(0,   this.lColor1 + 'cc');
+      bondGrad.addColorStop(0.5, '#ffffff88');
+      bondGrad.addColorStop(1,   this.rColor1 + 'cc');
+      ctx.globalAlpha   = this.alpha * 0.75;
+      ctx.strokeStyle   = bondGrad;
+      ctx.lineWidth     = 2.5;
+      ctx.shadowColor   = '#fff';
+      ctx.shadowBlur    = 8;
+      ctx.lineCap       = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-offset * 0.55, this.r * 0.2);
+      ctx.lineTo( offset * 0.55, this.r * 0.2);
+      ctx.stroke();
+      ctx.shadowBlur  = 0;
+      ctx.globalAlpha = 1;
+
+      // Tiny centre sparkle
+      ctx.globalAlpha = this.alpha * 0.85;
+      ctx.fillStyle   = '#fff';
+      ctx.shadowColor = '#ffb3d9';
+      ctx.shadowBlur  = 10;
+      ctx.beginPath();
+      ctx.arc(0, this.r * 0.2, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur  = 0;
+      ctx.globalAlpha = 1;
+    }
+    ctx.restore();
+  }
+}
+
+/* ---- Populate initial hearts ---- */
+function buildHearts() {
+  fallingHearts.length = 0;
+  if (heartMode === 'off') return;
+
+  const count = window.innerWidth < 600 ? 18 : 32;
+  for (let i = 0; i < count; i++) {
+    let type;
+    if      (heartMode === 'single') type = 'single';
+    else if (heartMode === 'double') type = 'double';
+    else                             type = Math.random() < 0.5 ? 'single' : 'double';
+    fallingHearts.push(new FallingHeart(type));
+  }
+}
+buildHearts();
+
+/* ---- Control panel mode switch ---- */
+function setHeartMode(mode) {
+  heartMode = mode;
+  ['single','double','both','off'].forEach(m => {
+    document.getElementById('btn-' + m).classList.remove('active');
+  });
+  document.getElementById('btn-' + mode).classList.add('active');
+  buildHearts();
+}
+
+/* ---- Animation loop ---- */
+function animateHearts() {
+  hCtx.clearRect(0, 0, hCanvas.width, hCanvas.height);
+  fallingHearts.forEach(h => { h.update(); h.draw(hCtx); });
+  requestAnimationFrame(animateHearts);
+}
+animateHearts();
 
 
 /* ================================================
