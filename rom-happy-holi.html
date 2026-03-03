@@ -157,7 +157,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 60px 20px;
+      padding: 20px 20px;
       background: linear-gradient(135deg,
         #1a0033 0%,
         #3d0057 20%,
@@ -566,7 +566,7 @@
 <div id="hearts-layer"></div>
 
 <!-- =================== HEART CONTROLS PANEL =================== -->
-<div id="heart-controls">
+<div id="heart-controls d-none">
   <p class="hc-title">💖 Heart Rain</p>
   <button class="hc-btn active" id="btn-single" onclick="setHeartMode('single')">
     <svg width="22" height="20" viewBox="0 0 22 20"><path d="M11 18.5S1 12 1 6a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 12.5-10 12.5z" fill="#ff6eb4" stroke="none"/></svg>
@@ -580,7 +580,7 @@
     </svg>
     Double
   </button>
-  <button class="hc-btn" id="btn-both" onclick="setHeartMode('both')">
+  <button class="hc-btn active" id="btn-both" onclick="setHeartMode('both')">
     ❤️+💕 Both
   </button>
   <button class="hc-btn hc-off" id="btn-off" onclick="setHeartMode('off')">⏹ Off</button>
