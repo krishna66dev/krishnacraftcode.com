@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Holi My Love 💖</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      --holi-pink:    #ff6eb4;
+      --holi-yellow:  #ffd700;
+      --holi-blue:    #5bc8f5;
+      --holi-purple:  #c77dff;
+      --holi-green:   #06d6a0;
+      --holi-orange:  #ff9f43;
+      --soft-white:   rgba(255,255,255,0.92);
+      --card-shadow:  0 20px 60px rgba(0,0,0,0.18);
+      --glow-pink:    0 0 40px rgba(255,110,180,0.55);
+    }
+
+    /* ===== BASE ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: #0d0010;
+      color: #fff;
+      overflow-x: hidden;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E💗%3C/text%3E%3C/svg%3E") 12 12, auto;
+    }
+
+    /* ===== CANVAS (color powder splashes) ===== */
+    #splash-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+
+    /* ===== FLOATING HEARTS ===== */
+    #hearts-layer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -60px;
+      font-size: 1.5rem;
+      animation: floatUp linear infinite;
+      opacity: 0;
+      user-select: none;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+      10%  { opacity: 1; }
+      80%  { opacity: 0.8; }
+      100% { transform: translateY(-110vh) rotate(360deg) scale(1.3); opacity: 0; }
+    }
+
+    /* ===== HERO SECTION ===== */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(135deg,
+        #1a0033 0%,
+        #3d0057 20%,
+        #6a0572 35%,
+        #c2185b 55%,
+        #ff6eb4 70%,
+        #ff9f43 85%,
+        #ffd700 100%);
+      background-size: 300% 300%;
+      animation: gradientShift 8s ease infinite;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* shimmering overlay */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 40%, rgba(255,110,180,0.25) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(91,200,245,0.20) 0%, transparent 55%);
+      animation: shimmer 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes shimmer {
+      from { opacity: 0.6; }
+      to   { opacity: 1; }
+    }
+
+    .hero-content { position: relative; z-index: 3; }
+
+    .hero-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.8rem, 9vw, 6.5rem);
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(255,110,180,0.9), 0 4px 20px rgba(0,0,0,0.4);
+      animation: fadeSlideDown 1.2s ease forwards;
+      opacity: 0;
+    }
+
+    .hero-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      font-style: italic;
+      color: rgba(255,255,255,0.93);
+      margin-top: 18px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      animation: fadeSlideDown 1.4s 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    .hero-emoji-row {
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      margin-top: 24px;
+      animation: fadeSlideDown 1.4s 0.6s ease forwards;
+      opacity: 0;
+      letter-spacing: 8px;
+    }
+
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scroll arrow */
+    .scroll-arrow {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      animation: bounce 2s infinite;
+      z-index: 4;
+      opacity: 0.8;
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(12px); }
+    }
+
+    /* ===== COLOR DOTS (decorative) ===== */
+    .dot-ring {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.35;
+      animation: pulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to   { transform: scale(1.3); }
+    }
+
+    /* ===== SECTION SHARED ===== */
+    .section-wrapper {
+      position: relative;
+      z-index: 2;
+      padding: 90px 20px;
+    }
+
+    .section-heading {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2rem, 6vw, 3.8rem);
+      font-weight: 700;
+      color: var(--holi-pink);
+      text-shadow: 0 0 20px rgba(255,110,180,0.5);
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: rgba(255,255,255,0.7);
+      font-size: 1.05rem;
+      margin-bottom: 50px;
+    }
+
+    /* ===== LOVE LETTER CARD ===== */
+    #message-section {
+      background: linear-gradient(160deg, #0d0010 0%, #1a0036 50%, #0d001a 100%);
+    }
+
+    .love-card {
+      background: var(--soft-white);
+      border-radius: 28px;
+      padding: 50px 44px;
+      box-shadow: var(--card-shadow), var(--glow-pink);
+      color: #3a003a;
+      position: relative;
+      overflow: hidden;
+      max-width: 700px;
+      margin: 0 auto;
+      transition: transform 0.3s ease;
+    }
+
+    .love-card:hover { transform: translateY(-6px); }
+
+    .love-card::before {
+      content: '💌';
+      position: absolute;
+      top: -18px; right: 30px;
+      font-size: 3.5rem;
+      filter: drop-shadow(0 4px 10px rgba(255,110,180,0.5));
+    }
+
+    /* decorative color strips */
+    .love-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg,
+        var(--holi-pink), var(--holi-yellow),
+        var(--holi-blue), var(--holi-purple),
+        var(--holi-green));
+      border-radius: 28px 28px 0 0;
+    }
+
+    .love-card-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #c2185b;
+      margin-bottom: 20px;
+    }
+
+    .love-card-body {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.08rem;
+      line-height: 1.9;
+      color: #4a004a;
+    }
+
+    .surprise-btn {
+      margin-top: 32px;
+      background: linear-gradient(135deg, var(--holi-pink), var(--holi-purple));
+      border: none;
+      border-radius: 50px;
+      padding: 14px 40px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(255,110,180,0.45);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .surprise-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 12px 35px rgba(255,110,180,0.65);
+    }
+
+    .surprise-btn:active { transform: scale(0.97); }
+
+    /* ripple on click */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      transform: scale(0);
+      animation: rippleAnim 0.6s linear;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    /* hidden surprise message */
+    #surprise-msg {
+      display: none;
+      margin-top: 28px;
+      padding: 22px 28px;
+      background: linear-gradient(135deg, #fff0f8, #f8f0ff);
+      border-left: 5px solid var(--holi-pink);
+      border-radius: 14px;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #5c005c;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== COLOR CIRCLES (holi powders) ===== */
+    #colors-section {
+      background: linear-gradient(160deg, #0a001a 0%, #130030 100%);
+    }
+
+    .powder-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      box-shadow: 0 0 40px rgba(255,255,255,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      border: 3px solid rgba(255,255,255,0.2);
+    }
+    .powder-circle:hover {
+      transform: scale(1.12) rotate(8deg);
+      box-shadow: 0 0 60px rgba(255,255,255,0.4);
+    }
+    .powder-label {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.85);
+      margin-top: 8px;
+    }
+
+    /* ===== IMAGE SECTION ===== */
+    #image-section {
+      background: linear-gradient(160deg, #130030 0%, #1a0040 50%, #0a001a 100%);
+    }
+
+    .couple-frame {
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 20px 70px rgba(255,110,180,0.5), 0 0 0 4px rgba(255,110,180,0.25);
+      max-width: 520px;
+      margin: 0 auto;
+      transition: transform 0.4s ease;
+    }
+    .couple-frame:hover { transform: scale(1.025) rotate(-1deg); }
+
+    .couple-frame img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    /* placeholder image (SVG) */
+    .couple-placeholder {
+      width: 100%;
+      min-height: 360px;
+      background: linear-gradient(135deg, #ff6eb4 0%, #c77dff 50%, #5bc8f5 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      gap: 10px;
+    }
+    .couple-placeholder span {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.6rem;
+      color: rgba(255,255,255,0.9);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    /* ===== QUOTE CARDS ===== */
+    #quotes-section {
+      background: linear-gradient(160deg, #0a001a 0%, #0d0020 100%);
+    }
+
+    .quote-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,110,180,0.3);
+      border-radius: 22px;
+      padding: 36px 28px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, background 0.3s ease;
+      height: 100%;
+    }
+    .quote-card:hover {
+      transform: translateY(-8px);
+      background: rgba(255,110,180,0.1);
+    }
+    .quote-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .quote-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: rgba(255,255,255,0.88);
+      font-size: 1.02rem;
+      line-height: 1.8;
+    }
+
+    /* ===== MUSIC TOGGLE ===== */
+    #music-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 999;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--holi-pink), var(--holi-purple));
+      border: none;
+      font-size: 1.5rem;
+      color: #fff;
+      box-shadow: 0 6px 25px rgba(255,110,180,0.5);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #music-btn:hover { transform: scale(1.12); }
+    #music-btn.playing { animation: spin 3s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(135deg, #1a0033, #3d0057, #6a0572);
+      text-align: center;
+      padding: 50px 20px 36px;
+      border-top: 1px solid rgba(255,110,180,0.25);
+    }
+    .footer-heart {
+      font-size: 2.8rem;
+      animation: heartbeat 1.5s ease infinite;
+    }
+    @keyframes heartbeat {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.2); }
+    }
+    .footer-tagline {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+      color: rgba(255,255,255,0.88);
+      margin-top: 14px;
+    }
+    .footer-sub {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.45);
+      margin-top: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* ===== RESPONSIVE TWEAKS ===== */
+    @media (max-width: 575px) {
+      .love-card { padding: 36px 22px; }
+      .powder-circle { width: 90px; height: 90px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =================== FIXED CANVAS (color splashes) =================== -->
+<canvas id="splash-canvas"></canvas>
+
+<!-- =================== FLOATING HEARTS LAYER (emoji) =================== -->
+<div id="hearts-layer"></div>
+
+<!-- =================== MUSIC TOGGLE =================== -->
+<button id="music-btn" title="Toggle music">🎵</button>
+<!-- Hidden audio (replace src with your own MP3 if desired) -->
+<audio id="bg-music" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"/>
+</audio>
+
+<!-- =================== HERO SECTION =================== -->
+<section id="hero">
+  <!-- Atmospheric blobs -->
+  <div class="dot-ring" style="width:500px;height:500px;background:var(--holi-pink);top:-150px;left:-150px;"></div>
+  <div class="dot-ring" style="width:400px;height:400px;background:var(--holi-blue);bottom:-100px;right:-100px;animation-delay:2s;"></div>
+  <div class="dot-ring" style="width:300px;height:300px;background:var(--holi-yellow);top:40%;left:60%;animation-delay:4s;"></div>
+
+  <div class="hero-content container">
+    <div class="hero-emoji-row" style="animation-delay:0s;">🌸🎨🌈</div>
+    <h1 class="hero-title">Happy Holi My Love ❤️</h1>
+    <p class="hero-subtitle">
+      Every colour of Holi reminds me of you — vibrant, joyful, and absolutely breathtaking.
+      You are the most beautiful splash of colour in my life, my darling. 🌺
+    </p>
+    <div class="hero-emoji-row" style="animation-delay:0.9s;">💛💜💙🩷🧡</div>
+  </div>
+
+  <div class="scroll-arrow">💗</div>
+</section>
+
+
+<!-- =================== LOVE MESSAGE SECTION =================== -->
+<section id="message-section" class="section-wrapper">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">A Letter From My Heart 💌</h2>
+      <p class="section-sub">Written in colours, sealed with love</p>
+    </div>
+
+    <div class="love-card">
+      <p class="love-card-title">My Dearest Love,</p>
+      <p class="love-card-body">
+        Every morning I wake up and the world already looks like Holi — because you colour it with your smile.
+        On this beautiful festival of colours, I want you to know that you are my favourite shade of every hue.
+        You are the pink of sunsets, the gold of morning light, the blue of the calmest seas,
+        and the purple of the most magical dreams. 🌸
+        <br/><br/>
+        Holi comes once a year, but loving you is a celebration I live every single day.
+        Wishing you a day as colourful, as radiant, and as magical as you truly are, my love. 💕
+        <br/><br/>
+        — Always yours, forever & always ✨
+      </p>
+
+      <div class="text-center mt-4">
+        <button class="surprise-btn" id="surprise-btn" onclick="showSurprise(event)">
+          Click for Surprise 💕
+        </button>
+      </div>
+
+      <!-- Hidden Surprise Message -->
+      <div id="surprise-msg">
+        🌹 <strong>My special promise to you on Holi:</strong><br/><br/>
+        I promise to fill every day of your life with colours of happiness, warmth, and unconditional love.
+        I promise to be your shelter on cloudy days and your sunshine on dark ones.
+        You are not just my girlfriend — you are my home, my heart, my everything.
+        Happy Holi, my beautiful soul. May our love story be the most colourful one ever written. 💖🌈
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =================== HOLI COLORS SECTION =================== -->
+<section id="colors-section" class="section-wrapper">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">The Colours of Our Love 🎨</h2>
+      <p class="section-sub">Click a colour and feel the magic</p>
+    </div>
+    <div class="row g-4 justify-content-center text-center">
+      <div class="col-6 col-sm-4 col-md-2">
+        <div class="powder-circle" style="background:radial-gradient(circle at 35% 35%,#ff9fd8,#ff1493);" onclick="burstColor('#ff6eb4', this)"></div>
+        <p class="powder-label">Gulabi 🌸</p>
+      </div>
+      <div class="col-6 col-sm-4 col-md-2">
+        <div class="powder-circle" style="background:radial-gradient(circle at 35% 35%,#fff176,#ffd700);" onclick="burstColor('#ffd700', this)"></div>
+        <p class="powder-label">Pila 🌻</p>
+      </div>
+      <div class="col-6 col-sm-4 col-md-2">
+        <div class="powder-circle" style="background:radial-gradient(circle at 35% 35%,#90e0ff,#0096c7);" onclick="burstColor('#5bc8f5', this)"></div>
+        <p class="powder-label">Neela 💙</p>
+      </div>
+      <div class="col-6 col-sm-4 col-md-2">
+        <div class="powder-circle" style="background:radial-gradient(circle at 35% 35%,#e0aaff,#9d4edd);" onclick="burstColor('#c77dff', this)"></div>
+        <p class="powder-label">Baingani 💜</p>
+      </div>
+      <div class="col-6 col-sm-4 col-md-2">
+        <div class="powder-circle" style="background:radial-gradient(circle at 35% 35%,#80ffdb,#06d6a0);" onclick="burstColor('#06d6a0', this)"></div>
+        <p class="powder-label">Hara 💚</p>
+      </div>
+      <div class="col-6 col-sm-4 col-md-2">
+        <div class="powder-circle" style="background:radial-gradient(circle at 35% 35%,#ffcba4,#ff6b35);" onclick="burstColor('#ff9f43', this)"></div>
+        <p class="powder-label">Narangi 🍊</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =================== IMAGE SECTION =================== -->
+<section id="image-section" class="section-wrapper">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">You & Me 💞</h2>
+      <p class="section-sub">In every colour, in every season, always together</p>
+    </div>
+    <div class="row justify-content-center align-items-center g-5">
+      <div class="col-12 col-md-6">
+        <div class="couple-frame">
+          <!-- Romantic placeholder — replace with a real image src if desired -->
+          <div class="couple-placeholder">
+            <span style="font-size:5rem;">👫</span>
+            <span>Us, forever colourful 🌈</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 text-center text-md-start">
+        <h3 style="font-family:'Dancing Script',cursive;font-size:2.2rem;color:var(--holi-pink);margin-bottom:18px;">
+          Together we are a rainbow 🌈
+        </h3>
+        <p style="font-family:'Playfair Display',serif;font-style:italic;color:rgba(255,255,255,0.82);font-size:1.08rem;line-height:1.9;">
+          They say Holi is the festival of colours.
+          But to me, every moment spent with you is a festival.
+          Your laughter is my favourite song, your smile is my favourite colour,
+          and your love is my favourite celebration. 💖
+        </p>
+        <div style="margin-top:28px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;">
+          <span style="background:rgba(255,110,180,0.18);border:1px solid var(--holi-pink);border-radius:50px;padding:8px 20px;font-family:'Dancing Script',cursive;font-size:1.1rem;">💗 My Everything</span>
+          <span style="background:rgba(199,125,255,0.18);border:1px solid var(--holi-purple);border-radius:50px;padding:8px 20px;font-family:'Dancing Script',cursive;font-size:1.1rem;">✨ Forever Mine</span>
+          <span style="background:rgba(255,213,0,0.18);border:1px solid var(--holi-yellow);border-radius:50px;padding:8px 20px;font-family:'Dancing Script',cursive;font-size:1.1rem;">🌸 My Sunshine</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =================== QUOTES SECTION =================== -->
+<section id="quotes-section" class="section-wrapper">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-heading">Love Notes for You 💝</h2>
+      <p class="section-sub">A few things I never stop feeling</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-12 col-md-4">
+        <div class="quote-card">
+          <div class="quote-icon">🌹</div>
+          <p class="quote-text">"You are the reason I believe in magic. Every day with you feels like the most vivid dream I never want to wake from."</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="quote-card">
+          <div class="quote-icon">🎆</div>
+          <p class="quote-text">"Holi reminds me of you — bursting with colour, full of joy, impossible to ignore, and impossible not to love completely."</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="quote-card">
+          <div class="quote-icon">💫</div>
+          <p class="quote-text">"In a world full of ordinary days, you are every extraordinary moment. Thank you for being my favourite person, always."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =================== FOOTER =================== -->
+<footer>
+  <div class="footer-heart">💖</div>
+  <p class="footer-tagline">Made with ❤️ for the most beautiful girl in my life</p>
+  <p class="footer-sub">Happy Holi 2025 · With all my love, forever & always 🌈</p>
+</footer>
+
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ================================================
+   FLOATING HEARTS (emoji layer — kept for extra charm)
+   ================================================ */
+const heartsLayer = document.getElementById('hearts-layer');
+const heartEmojis = ['💗','💖','💕','💓','💞','🩷','❤️','💝'];
+
+function spawnHeart() {
+  const el = document.createElement('div');
+  el.classList.add('heart');
+  el.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.fontSize = (Math.random() * 1.5 + 0.9) + 'rem';
+  const dur = Math.random() * 8 + 7;
+  el.style.animationDuration = dur + 's';
+  el.style.animationDelay = Math.random() * 4 + 's';
+  heartsLayer.appendChild(el);
+  setTimeout(() => el.remove(), (dur + 5) * 1000);
+}
+setInterval(spawnHeart, 600);
+for (let i = 0; i < 12; i++) setTimeout(spawnHeart, i * 200);
+
+
+/* ================================================
+   CANVAS BACKGROUND — colour powder splashes
+   ================================================ */
+const canvas = document.getElementById('splash-canvas');
+const ctx    = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const splashColors = ['#ff6eb4','#ffd700','#5bc8f5','#c77dff','#06d6a0','#ff9f43','#ff1493','#00b4d8'];
+const particles = [];
+
+class Particle {
+  constructor(x, y, color) {
+    this.x = x; this.y = y;
+    this.color = color || splashColors[Math.floor(Math.random() * splashColors.length)];
+    this.r = Math.random() * 80 + 20;
+    this.alpha = Math.random() * 0.18 + 0.05;
+    this.dx = (Math.random() - 0.5) * 0.4;
+    this.dy = (Math.random() - 0.5) * 0.4;
+    this.life = 1;
+    this.decay = Math.random() * 0.001 + 0.0003;
+  }
+  draw() {
+    ctx.save();
+    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
+    grad.addColorStop(0, this.color + Math.floor(this.alpha * 255).toString(16).padStart(2,'0'));
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  update() {
+    this.x += this.dx;
+    this.y += this.dy;
+    this.life -= this.decay;
+    this.alpha = this.life * 0.18;
+  }
+}
+
+// Seed particles
+for (let i = 0; i < 40; i++) {
+  particles.push(new Particle(Math.random() * window.innerWidth, Math.random() * window.innerHeight));
+}
+
+function animateCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.update(); p.draw();
+    if (p.life <= 0) {
+      particles.splice(i, 1);
+      particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height));
+    }
+  }
+  requestAnimationFrame(animateCanvas);
+}
+animateCanvas();
+
+// Add splash on mouse move (throttled)
+let lastSplash = 0;
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  if (now - lastSplash > 120) {
+    lastSplash = now;
+    particles.push(new Particle(e.clientX, e.clientY));
+  }
+});
+
+
+/* ================================================
+   COLOUR BURST (powder circles click)
+   ================================================ */
+function burstColor(color, el) {
+  // Confetti burst
+  const rect = el.getBoundingClientRect();
+  const x = (rect.left + rect.width / 2) / window.innerWidth;
+  const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+  confetti({
+    particleCount: 120,
+    spread: 80,
+    origin: { x, y },
+    colors: [color, '#fff', '#ffd700'],
+    scalar: 1.1,
+    gravity: 0.7,
+  });
+
+  // Extra canvas splashes
+  for (let i = 0; i < 8; i++) {
+    particles.push(new Particle(
+      rect.left + rect.width / 2 + (Math.random() - 0.5) * 150,
+      rect.top + rect.height / 2 + (Math.random() - 0.5) * 150,
+      color
+    ));
+  }
+}
+
+
+/* ================================================
+   SURPRISE BUTTON
+   ================================================ */
+function showSurprise(e) {
+  // Ripple
+  const btn = document.getElementById('surprise-btn');
+  const ripple = document.createElement('span');
+  ripple.classList.add('ripple');
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;`;
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 700);
+
+  // Show message
+  const msg = document.getElementById('surprise-msg');
+  if (msg.style.display === 'block') {
+    msg.style.display = 'none';
+    btn.textContent = 'Click for Surprise 💕';
+  } else {
+    msg.style.display = 'block';
+    btn.textContent = 'Hide Surprise 🙈';
+    msg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Confetti rain
+  confetti({
+    particleCount: 180,
+    spread: 100,
+    origin: { x: 0.5, y: 0.55 },
+    colors: ['#ff6eb4','#ffd700','#c77dff','#5bc8f5','#ff9f43','#06d6a0'],
+    scalar: 1.2,
+  });
+}
+
+
+/* ================================================
+   BACKGROUND MUSIC TOGGLE
+   ================================================ */
+const musicBtn  = document.getElementById('music-btn');
+const bgMusic   = document.getElementById('bg-music');
+let musicPlaying = false;
+
+musicBtn.addEventListener('click', () => {
+  if (musicPlaying) {
+    bgMusic.pause();
+    musicBtn.textContent = '🎵';
+    musicBtn.classList.remove('playing');
+  } else {
+    bgMusic.play().catch(() => {});
+    musicBtn.textContent = '🎶';
+    musicBtn.classList.add('playing');
+  }
+  musicPlaying = !musicPlaying;
+});
+
+
+/* ================================================
+   INTERSECTION OBSERVER — fade-in on scroll
+   ================================================ */
+const observerOpts = { threshold: 0.15 };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity  = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, observerOpts);
+
+// Apply to cards and quote cards
+document.querySelectorAll('.love-card, .quote-card, .couple-frame, .powder-circle').forEach(el => {
+  el.style.opacity   = '0';
+  el.style.transform = 'translateY(30px)';
+  el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
