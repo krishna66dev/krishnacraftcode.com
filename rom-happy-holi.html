@@ -70,8 +70,7 @@
       border: 1px solid rgba(255,110,180,0.35);
       border-radius: 20px;
       padding: 14px 18px;
-      /* display: flex; */
-      display: none;
+      display: flex;
       flex-direction: column;
       gap: 8px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(255,110,180,0.15);
@@ -567,11 +566,10 @@
 <div id="hearts-layer"></div>
 
 <!-- =================== HEART CONTROLS PANEL =================== -->
-<div id="heart-controls d-none">
+<div id="heart-controls ">
   <p class="hc-title">💖 Heart Rain</p>
   <button class="hc-btn active" id="btn-single" onclick="setHeartMode('single')">
     <svg width="22" height="20" viewBox="0 0 22 20"><path d="M11 18.5S1 12 1 6a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 12.5-10 12.5z" fill="#ff6eb4" stroke="none"/></svg>
-    Single
   </button>
   <button class="hc-btn" id="btn-double" onclick="setHeartMode('double')">
     <svg width="36" height="20" viewBox="0 0 36 20">
@@ -579,12 +577,11 @@
       <path d="M27 17s-8-5.5-8-11a4.5 4.5 0 0 1 9 0 4.5 4.5 0 0 1 9 0c0 5.5-9 11-9 11z" fill="#c77dff"/>
       <line x1="18" y1="6" x2="18" y2="17" stroke="#fff" stroke-width="1.5" stroke-dasharray="2,2"/>
     </svg>
-    Double
   </button>
   <button class="hc-btn active" id="btn-both" onclick="setHeartMode('both')">
-    ❤️+💕 Both
+    ❤️+💕
   </button>
-  <button class="hc-btn hc-off" id="btn-off" onclick="setHeartMode('off')">⏹ Off</button>
+  <!-- <button class="hc-btn hc-off" id="btn-off" onclick="setHeartMode('off')">⏹ Off</button> -->
 </div>
 
 <!-- =================== MUSIC TOGGLE =================== -->
