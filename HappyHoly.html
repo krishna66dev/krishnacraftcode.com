@@ -519,7 +519,7 @@ footer{
     <div class="hero-btns">
       <button class="btn-holi" id="celebrateBtn">🎉 Celebrate with Colors</button>
       <a href="#wishgen" class="btn-glass">✏️ Create My Wish</a>
-      <button class="btn-glass" id="musicBtn">🎵 Play Music</button>
+      <button class="btn-glass d-none" id="musicBtn">🎵 Play Music</button>
     </div>
   </div>
 </section>
@@ -769,8 +769,8 @@ footer{
   <div class="container reveal">
     <h2 class="sec-title">Ready to Color Your Business? 🚀</h2>
     <p class="sec-sub">Let's craft your ERP solution — as vibrant as Holi itself!</p>
-    <a href="mailto:hello@erpsoftdev.com" class="btn-holi" style="text-decoration:none;display:inline-block;font-size:1.05rem">
-      📩 Get a Free ERP Demo
+    <a href="mailto:kp5671spn@gmail.com" class="btn-holi" style="text-decoration:none;display:inline-block;font-size:1.05rem">
+      📩 Email Us
     </a>
   </div>
 </section>
@@ -794,7 +794,7 @@ footer{
       </div>
       <div class="col-md-4 text-center text-md-end">
         <p style="color:rgba(255,255,255,.42);font-size:.83rem">
-          © 2026 ERP Software Dev Pvt. Ltd.<br/>All rights reserved.
+          © 2026 ERP Software Dev <br/>All rights reserved.
         </p>
       </div>
     </div>
@@ -933,6 +933,18 @@ fab.addEventListener('click',function(e){
   setTimeout(()=>this.style.transform='',350);
 });
 
+window.addEventListener('load', function () {
+  let count = 0;
+
+  const interval = setInterval(() => {
+    fab.click();
+    count++;
+
+    if (count >= 20) {
+      clearInterval(interval); 
+    }
+  }, 1000); 
+});
 /* Double-click anywhere for mini spray */
 document.addEventListener('dblclick',e=>splash(e.clientX,e.clientY,22));
 
@@ -959,7 +971,7 @@ document.addEventListener('dblclick',e=>splash(e.clientX,e.clientY,22));
       p.addEventListener('animationend',()=>p.remove());
     }
   }
-  setInterval(spray,8000);
+  setInterval(spray,2000);
   setTimeout(spray,1500);
 })();
 
