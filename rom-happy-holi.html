@@ -139,6 +139,7 @@
       font-size: 1.5rem;
       animation: floatUp linear infinite;
       opacity: 0;
+      z-index: 999;
       user-select: none;
     }
 
@@ -566,7 +567,7 @@
 <div id="hearts-layer"></div>
 
 <!-- =================== HEART CONTROLS PANEL =================== -->
-<div id="heart-controls">
+<div id="heart-controls d-none">
   <p class="hc-title">💖 Heart Rain</p>
   <button class="hc-btn active" id="btn-single" onclick="setHeartMode('single')">
     <svg width="22" height="20" viewBox="0 0 22 20"><path d="M11 18.5S1 12 1 6a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 12.5-10 12.5z" fill="#ff6eb4" stroke="none"/></svg>
@@ -775,7 +776,7 @@
    FLOATING HEARTS (emoji layer — kept for extra charm)
    ================================================ */
 const heartsLayer = document.getElementById('hearts-layer');
-const heartEmojis = ['💗','💖','💕','💓','💞','🩷','❤️','💝'];
+const heartEmojis = ['💗','💖','💕','💓','💞','❤️','💝'];
 
 function spawnHeart() {
   const el = document.createElement('div');
@@ -971,7 +972,7 @@ function buildHearts() {
 buildHearts();
 
 /* ---- Control panel mode switch ---- */
-function setHeartMode(mode) {
+function setHeartMode(mode='both') {
   heartMode = mode;
   ['single','double','both','off'].forEach(m => {
     document.getElementById('btn-' + m).classList.remove('active');
