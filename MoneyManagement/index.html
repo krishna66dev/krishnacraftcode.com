@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UdharBook — Money Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- apple touch icon -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+      <div class="brand-icon"><i class="bi bi-cash-coin"></i></div>
+      <span class="brand-name">UdharBook</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navContent">
+      <ul class="navbar-nav ms-auto gap-1">
+        <li class="nav-item"><a class="nav-link nav-pill active" href="#" onclick="showSection('dashboard')"><i class="bi bi-grid-1x2-fill me-1"></i>Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link nav-pill" href="#" onclick="showSection('persons')"><i class="bi bi-people-fill me-1"></i>Persons</a></li>
+        <li class="nav-item"><a class="nav-link nav-pill" href="#" onclick="showSection('transactions')"><i class="bi bi-arrow-left-right me-1"></i>Transactions</a></li>
+        <li class="nav-item"><a class="nav-link nav-pill" href="#" onclick="showSection('add-transaction')"><i class="bi bi-plus-circle-fill me-1"></i>Add Entry</a></li>
+      </ul>
+      <div class="ms-3 d-flex gap-2">
+        <button class="btn btn-export" onclick="exportToPDF()"><i class="bi bi-file-earmark-pdf me-1"></i>Export PDF</button>
+        <button class="btn btn-danger-soft" onclick="confirmClearAll()"><i class="bi bi-trash3 me-1"></i>Clear All</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="container-fluid px-4 py-4">
+
+  <!-- ========== DASHBOARD SECTION ========== -->
+  <section id="section-dashboard">
+    <div class="section-header mb-4">
+      <h2 class="section-title">Dashboard <span class="title-accent">Overview</span></h2>
+      <p class="section-subtitle">Your complete money summary at a glance</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-5">
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-receive">
+          <div class="stat-icon"><i class="bi bi-arrow-down-circle-fill"></i></div>
+          <div class="stat-body">
+            <p class="stat-label">Total to Receive</p>
+            <h3 class="stat-value" id="totalReceivable">₹0</h3>
+            <p class="stat-sub">Lena Hai</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-pay">
+          <div class="stat-icon"><i class="bi bi-arrow-up-circle-fill"></i></div>
+          <div class="stat-body">
+            <p class="stat-label">Total to Pay</p>
+            <h3 class="stat-value" id="totalPayable">₹0</h3>
+            <p class="stat-sub">Dena Hai</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-persons">
+          <div class="stat-icon"><i class="bi bi-person-lines-fill"></i></div>
+          <div class="stat-body">
+            <p class="stat-label">Total Persons</p>
+            <h3 class="stat-value" id="totalPersons">0</h3>
+            <p class="stat-sub">Log</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-txns">
+          <div class="stat-icon"><i class="bi bi-receipt-cutoff"></i></div>
+          <div class="stat-body">
+            <p class="stat-label">Transactions</p>
+            <h3 class="stat-value" id="totalTransactions">0</h3>
+            <p class="stat-sub">Kul Entries</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Person-wise Summary Table -->
+    <div class="content-card mb-4">
+      <div class="content-card-header">
+        <h5><i class="bi bi-table me-2"></i>Person-wise Balance Summary</h5>
+        <div class="search-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" id="dashSearchInput" class="form-control search-input" placeholder="Search person..." oninput="renderDashboardTable()">
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table custom-table" id="dashboardTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Person</th>
+              <th>Phone</th>
+              <th>Total Given</th>
+              <th>Total Taken</th>
+              <th>Balance</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="dashboardTableBody">
+            <tr><td colspan="8" class="text-center py-4 empty-row"><i class="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>Koi data nahi hai abhi</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="content-card">
+      <div class="content-card-header">
+        <h5><i class="bi bi-clock-history me-2"></i>Recent Transactions</h5>
+      </div>
+      <div class="table-responsive">
+        <table class="table custom-table">
+          <thead>
+            <tr><th>Date</th><th>Person</th><th>Type</th><th>Amount</th><th>Note</th><th>Status</th></tr>
+          </thead>
+          <tbody id="recentTxBody">
+            <tr><td colspan="6" class="text-center py-4 empty-row"><i class="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>Koi recent transaction nahi</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PERSONS SECTION ========== -->
+  <section id="section-persons" class="d-none">
+    <div class="section-header mb-4">
+      <h2 class="section-title">Person <span class="title-accent">Management</span></h2>
+      <p class="section-subtitle">Add and manage people you transact with</p>
+    </div>
+
+    <div class="row g-4">
+      <!-- Add Person Form -->
+      <div class="col-lg-4">
+        <div class="content-card h-100">
+          <div class="content-card-header">
+            <h5><i class="bi bi-person-plus-fill me-2"></i>Add New Person</h5>
+          </div>
+          <div class="p-4">
+            <div class="mb-3">
+              <label class="form-label">Full Name <span class="text-danger">*</span></label>
+              <input type="text" id="personName" class="form-control custom-input" placeholder="e.g. Rahul Sharma">
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Phone Number <span class="text-muted">(optional)</span></label>
+              <input type="tel" id="personPhone" class="form-control custom-input" placeholder="e.g. 9876543210">
+            </div>
+            <button class="btn btn-primary-main w-100" onclick="addPerson()">
+              <i class="bi bi-plus-circle me-2"></i>Add Person
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Persons List -->
+      <div class="col-lg-8">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h5><i class="bi bi-people me-2"></i>All Persons</h5>
+            <div class="search-wrap">
+              <i class="bi bi-search"></i>
+              <input type="text" id="personSearch" class="form-control search-input" placeholder="Search..." oninput="renderPersonsList()">
+            </div>
+          </div>
+          <div id="personsList" class="persons-grid p-3">
+            <div class="empty-state text-center py-5">
+              <i class="bi bi-person-x fs-1 opacity-25 d-block mb-3"></i>
+              <p class="opacity-50">Koi person nahi hai. Pehle kisi ko add karein.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TRANSACTIONS SECTION ========== -->
+  <section id="section-transactions" class="d-none">
+    <div class="section-header mb-4">
+      <h2 class="section-title">Transaction <span class="title-accent">History</span></h2>
+      <p class="section-subtitle">Sabhi lain-dain ka poora hisaab</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="content-card mb-4">
+      <div class="content-card-header">
+        <h5><i class="bi bi-funnel-fill me-2"></i>Filter Transactions</h5>
+      </div>
+      <div class="p-4">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Search Person</label>
+            <div class="search-wrap-full">
+              <i class="bi bi-search"></i>
+              <input type="text" id="filterSearch" class="form-control custom-input ps-5" placeholder="Name search..." oninput="applyFilters()">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Person</label>
+            <select id="filterPerson" class="form-select custom-input" onchange="applyFilters()">
+              <option value="">All Persons</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Type</label>
+            <select id="filterType" class="form-select custom-input" onchange="applyFilters()">
+              <option value="">All Types</option>
+              <option value="given">Given (Diya)</option>
+              <option value="taken">Taken (Liya)</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select id="filterStatus" class="form-select custom-input" onchange="applyFilters()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="content-card">
+      <div class="content-card-header">
+        <h5><i class="bi bi-list-ul me-2"></i>All Transactions</h5>
+        <span class="badge-count" id="txnCount">0 entries</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Person</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Note</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="txnTableBody">
+            <tr><td colspan="8" class="text-center py-4 empty-row"><i class="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>Koi transaction nahi mili</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ADD TRANSACTION SECTION ========== -->
+  <section id="section-add-transaction" class="d-none">
+    <div class="section-header mb-4">
+      <h2 class="section-title">Add New <span class="title-accent">Entry</span></h2>
+      <p class="section-subtitle">Naya lain-dain darj karein</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h5><i class="bi bi-pencil-square me-2"></i>Transaction Details</h5>
+          </div>
+          <div class="p-4">
+            <div class="mb-4">
+              <label class="form-label">Select Person <span class="text-danger">*</span></label>
+              <select id="txnPerson" class="form-select custom-input">
+                <option value="">-- Person chunein --</option>
+              </select>
+              <div class="mt-2">
+                <small class="text-muted">Person nahi hai? <a href="#" class="link-accent" onclick="showSection('persons')">Pehle add karein →</a></small>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Transaction Type <span class="text-danger">*</span></label>
+              <div class="type-toggle">
+                <input type="radio" class="btn-check" name="txnType" id="typeGiven" value="given" checked>
+                <label class="btn type-btn type-given" for="typeGiven">
+                  <i class="bi bi-arrow-up-right-circle-fill me-2"></i>Given (Maine Diya)
+                </label>
+                <input type="radio" class="btn-check" name="txnType" id="typeTaken" value="taken">
+                <label class="btn type-btn type-taken" for="typeTaken">
+                  <i class="bi bi-arrow-down-left-circle-fill me-2"></i>Taken (Maine Liya)
+                </label>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Amount (₹) <span class="text-danger">*</span></label>
+                <div class="input-icon-wrap">
+                  <span class="input-icon">₹</span>
+                  <input type="number" id="txnAmount" class="form-control custom-input ps-5" placeholder="0.00" min="1">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Date <span class="text-danger">*</span></label>
+                <input type="date" id="txnDate" class="form-control custom-input">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Note / Description</label>
+              <textarea id="txnNote" class="form-control custom-input" rows="3" placeholder="e.g. Birthday gift, Loan for bike repair..."></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Status</label>
+              <div class="d-flex gap-3">
+                <div class="form-check status-check">
+                  <input class="form-check-input" type="radio" name="txnStatus" id="statusPending" value="pending" checked>
+                  <label class="form-check-label" for="statusPending"><span class="badge-status badge-pending">Pending</span></label>
+                </div>
+                <div class="form-check status-check">
+                  <input class="form-check-input" type="radio" name="txnStatus" id="statusPaid" value="paid">
+                  <label class="form-check-label" for="statusPaid"><span class="badge-status badge-paid">Paid</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-3">
+              <button class="btn btn-primary-main flex-fill" onclick="saveTransaction()">
+                <i class="bi bi-check-circle me-2"></i>Save Entry
+              </button>
+              <button class="btn btn-outline-soft" onclick="resetForm()">
+                <i class="bi bi-x-circle me-2"></i>Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- end container -->
+
+<!-- ========== EDIT TRANSACTION MODAL ========== -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content custom-modal">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Transaction</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="editTxnId">
+        <div class="mb-3">
+          <label class="form-label">Person <span class="text-danger">*</span></label>
+          <select id="editTxnPerson" class="form-select custom-input"></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Type</label>
+          <div class="type-toggle">
+            <input type="radio" class="btn-check" name="editTxnType" id="editTypeGiven" value="given">
+            <label class="btn type-btn type-given" for="editTypeGiven"><i class="bi bi-arrow-up-right-circle-fill me-2"></i>Given</label>
+            <input type="radio" class="btn-check" name="editTxnType" id="editTypeTaken" value="taken">
+            <label class="btn type-btn type-taken" for="editTypeTaken"><i class="bi bi-arrow-down-left-circle-fill me-2"></i>Taken</label>
+          </div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Amount (₹)</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">₹</span>
+              <input type="number" id="editTxnAmount" class="form-control custom-input ps-5" min="1">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Date</label>
+            <input type="date" id="editTxnDate" class="form-control custom-input">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Note</label>
+          <textarea id="editTxnNote" class="form-control custom-input" rows="2"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editTxnStatus" id="editStatusPending" value="pending">
+              <label class="form-check-label" for="editStatusPending"><span class="badge-status badge-pending">Pending</span></label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editTxnStatus" id="editStatusPaid" value="paid">
+              <label class="form-check-label" for="editStatusPaid"><span class="badge-status badge-paid">Paid</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-soft" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary-main" onclick="updateTransaction()"><i class="bi bi-save me-1"></i>Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PERSON DETAIL MODAL ========== -->
+<div class="modal fade" id="personDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content custom-modal">
+      <div class="modal-header">
+        <h5 class="modal-title" id="personDetailTitle"><i class="bi bi-person-circle me-2"></i>Person Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="personDetailBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-soft" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TOAST ========== -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="appToast" class="toast custom-toast" role="alert">
+    <div class="toast-body" id="toastMsg">Message here</div>
+  </div>
+</div>
+
+<!-- ========== CONFIRM MODAL ========== -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content custom-modal">
+      <div class="modal-body text-center p-4">
+        <div class="confirm-icon mb-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <h6 id="confirmText" class="mb-3">Are you sure?</h6>
+        <div class="d-flex gap-2 justify-content-center">
+          <button class="btn btn-outline-soft" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger-solid" id="confirmYesBtn">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<button aria-label="download" id="installBtn" class="install-btn"><i class="fa-solid fa-download"></i></button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+ <script>
+        if ("serviceWorker" in navigator) {
+                navigator.serviceWorker
+                    .register("service-worker.js")
+                    .then(() => console.log("Service Worker Registered"))
+                    .catch(err => console.log("SW registration failed:", err));
+            }
+
+            
+       let deferredPrompt;
+        const installBtn = document.getElementById("installBtn");
+
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = "block";
+        });
+
+        installBtn.addEventListener("click", async () => {
+            if (!deferredPrompt) return;
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+
+            console.log("Install outcome:", outcome);
+            deferredPrompt = null;
+            installBtn.style.display = "none";
+        });
+</script>
+</body>
+</html>
