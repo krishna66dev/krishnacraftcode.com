@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PixelShift — Image Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Theme toggle -->
+<button class="theme-toggle" id="themeToggle" title="Toggle theme">
+  <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+</button>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3">
+      <div class="logo-mark">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="10" fill="var(--accent)"/>
+          <path d="M8 26L14 14L20 20L24 16L28 26H8Z" fill="white" opacity="0.9"/>
+          <circle cx="24" cy="12" r="3" fill="white" opacity="0.7"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="logo-text">PixelShift</h1>
+        <span class="logo-sub">Image Format Converter</span>
+      </div>
+    </div>
+    <div class="header-badges">
+      <span class="badge-pill">PNG</span>
+      <span class="badge-pill">WEBP</span>
+      <span class="badge-pill">AVIF</span>
+      <span class="badge-pill accent">→ JPG</span>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="container">
+
+    <!-- Upload Zone -->
+    <section class="upload-section">
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-inner">
+          <div class="drop-icon-wrap">
+            <svg class="drop-icon" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="39" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 4"/>
+              <path d="M40 52V28M28 40l12-12 12 12" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="24" y="54" width="32" height="4" rx="2" fill="var(--accent)" opacity="0.4"/>
+            </svg>
+          </div>
+          <h2 class="drop-title">Drop images here</h2>
+          <p class="drop-sub">PNG, WEBP, AVIF, BMP, GIF, TIFF — max 10MB each</p>
+          <label for="" class="btn-upload">
+            <i class="bi bi-folder2-open me-2"></i>Browse Files
+          </label>
+          
+        </div>
+      </div>
+      <input type="file" id="fileInput" multiple accept="image/png,image/webp,image/avif,image/jpeg,image/bmp,image/gif,image/tiff" class="d-none" />
+    </section>
+
+    <!-- Settings Panel -->
+    <section class="settings-panel" id="settingsPanel">
+      <div class="settings-grid">
+
+        <!-- Quality -->
+        <div class="setting-card">
+          <div class="setting-label">
+            <i class="bi bi-stars"></i>
+            <span>Output Quality</span>
+            <span class="setting-value" id="qualityVal">85%</span>
+          </div>
+          <input type="range" class="custom-range" id="qualitySlider" min="10" max="100" value="85" />
+          <div class="range-hints"><span>10%</span><span>100%</span></div>
+        </div>
+
+        <!-- Target Format -->
+        <div class="setting-card">
+          <div class="setting-label">
+            <i class="bi bi-file-earmark-image"></i>
+            <span>Output Format</span>
+          </div>
+          <div class="format-tabs" id="formatTabs">
+            <button class="fmt-tab active" data-fmt="jpg">JPG</button>
+            <button class="fmt-tab" data-fmt="png">PNG</button>
+            <button class="fmt-tab" data-fmt="webp">WEBP</button>
+          </div>
+        </div>
+
+        <!-- Resize -->
+        <div class="setting-card">
+          <div class="setting-label">
+            <i class="bi bi-aspect-ratio"></i>
+            <span>Resize Output</span>
+            <label class="mini-toggle ms-auto">
+              <input type="checkbox" id="resizeToggle" />
+              <span class="mini-slider"></span>
+            </label>
+          </div>
+          <div class="resize-inputs" id="resizeInputs" style="display:none;">
+            <div class="dim-input-wrap">
+              <input type="number" id="resizeW" placeholder="Width px" class="dim-input" min="1" max="9999" />
+              <span class="dim-sep">×</span>
+              <input type="number" id="resizeH" placeholder="Height px" class="dim-input" min="1" max="9999" />
+            </div>
+            <label class="ratio-lock">
+              <input type="checkbox" id="aspectLock" checked />
+              <i class="bi bi-lock-fill"></i> Lock aspect ratio
+            </label>
+          </div>
+        </div>
+
+        <!-- Rename -->
+        <div class="setting-card">
+          <div class="setting-label">
+            <i class="bi bi-tag"></i>
+            <span>File Rename</span>
+          </div>
+          <div class="rename-inputs">
+            <input type="text" id="prefixInput" placeholder="prefix_" class="rename-field" maxlength="32" />
+            <span class="rename-sep">filename</span>
+            <input type="text" id="suffixInput" placeholder="_suffix" class="rename-field" maxlength="32" />
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- File Queue -->
+    <section class="queue-section" id="queueSection" style="display:none;">
+      <div class="queue-header">
+        <h3><i class="bi bi-stack me-2"></i>Conversion Queue <span class="queue-count" id="queueCount">0</span></h3>
+        <button class="btn-clear" id="clearAll"><i class="bi bi-trash3"></i> Clear All</button>
+      </div>
+
+      <div class="file-grid" id="fileGrid"></div>
+
+      <!-- Actions Bar -->
+      <div class="actions-bar">
+        <button class="btn-primary-action" id="convertBtn" disabled>
+          <i class="bi bi-lightning-charge-fill me-2"></i>
+          Convert All
+        </button>
+        <button class="btn-secondary-action" id="downloadZipBtn" disabled>
+          <i class="bi bi-archive-fill me-2"></i>
+          Download ZIP
+        </button>
+      </div>
+
+      <!-- Overall Progress -->
+      <div class="overall-progress" id="overallProgress" style="display:none;">
+        <div class="progress-label">
+          <span id="progressText">Converting…</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error Toast -->
+    <div class="error-toast" id="errorToast" style="display:none;">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <span id="errorMsg">Error message</span>
+      <button onclick="this.parentElement.style.display='none'" class="toast-close">×</button>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="success-banner" id="successBanner" style="display:none;">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <span id="successMsg">Conversion complete!</span>
+    </div>
+
+  </div>
+</main>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content preview-modal-content">
+      <div class="modal-header preview-modal-header">
+        <h5 class="modal-title" id="previewModalLabel">Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body preview-modal-body">
+        <div class="comparison-wrap">
+          <div class="compare-pane">
+            <div class="compare-label">Original</div>
+            <img id="previewOriginal" src="" alt="Original" class="preview-img" />
+          </div>
+          <div class="compare-divider"></div>
+          <div class="compare-pane">
+            <div class="compare-label">Converted</div>
+            <img id="previewConverted" src="" alt="Converted" class="preview-img" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>PixelShift — Client-side image conversion &amp; server-ready PHP backend</span>
+    <span class="footer-note">Files are processed locally or via your PHP server. No data stored.</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Voice Search</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ─── CSS Variables ─────────────────────────────── */
+    :root {
+      --bg:        #09090f;
+      --surface:   #111120;
+      --border:    #1e1e38;
+      --accent:    #6c63ff;
+      --accent2:   #ff6584;
+      --text:      #e8e8f0;
+      --muted:     #5a5a7a;
+      --glow:      rgba(108,99,255,.55);
+      --glow2:     rgba(255,101,132,.45);
+      --radius:    16px;
+    }
+
+    /* ─── Base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    /* ─── Mesh background ───────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 20%, rgba(108,99,255,.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,101,132,.09) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Noise grain overlay ───────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: .35;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 760px;
+    }
+
+    /* ─── Header ────────────────────────────────────── */
+    .brand {
+      text-align: center;
+      margin-bottom: 2.8rem;
+    }
+
+    .brand-icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 32px var(--glow);
+    }
+
+    .brand h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -1px;
+      background: linear-gradient(100deg, #fff 30%, var(--accent) 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: .95rem;
+      margin-top: .5rem;
+      font-weight: 300;
+      letter-spacing: .02em;
+    }
+
+    /* ─── Search Card ───────────────────────────────── */
+    .search-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.03);
+      transition: box-shadow .3s;
+    }
+
+    /* ─── Search Bar ────────────────────────────────── */
+    .search-bar {
+      display: flex;
+      gap: .6rem;
+      align-items: stretch;
+    }
+
+    .search-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    #searchInput {
+      width: 100%;
+      height: 54px;
+      background: rgba(255,255,255,.04);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      padding: 0 1.1rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    #searchInput::placeholder { color: var(--muted); }
+
+    #searchInput:focus {
+      border-color: var(--accent);
+      background: rgba(108,99,255,.06);
+      box-shadow: 0 0 0 3px rgba(108,99,255,.15);
+    }
+
+    /* ─── Buttons ───────────────────────────────────── */
+    .btn-mic, .btn-search {
+      height: 54px;
+      width: 54px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform .15s, box-shadow .2s, background .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-mic {
+      background: rgba(108,99,255,.12);
+      color: var(--accent);
+      border: 1.5px solid rgba(108,99,255,.3);
+    }
+
+    .btn-mic:hover:not(:disabled) {
+      background: rgba(108,99,255,.22);
+      transform: scale(1.05);
+      box-shadow: 0 0 18px var(--glow);
+    }
+
+    .btn-mic:active:not(:disabled) { transform: scale(.97); }
+
+    .btn-mic:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .btn-search {
+      background: linear-gradient(135deg, var(--accent), #8b83ff);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 20px var(--glow);
+    }
+
+    .btn-search:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 28px var(--glow);
+    }
+
+    .btn-search:active { transform: scale(.97); }
+
+    /* ─── Listening State ───────────────────────────── */
+    .btn-mic.listening {
+      background: rgba(255,101,132,.15);
+      color: var(--accent2);
+      border-color: rgba(255,101,132,.4);
+      animation: mic-pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes mic-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--glow2); }
+      50%       { box-shadow: 0 0 0 10px transparent; }
+    }
+
+    /* Ripple rings around mic button */
+    .btn-mic.listening::before,
+    .btn-mic.listening::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: calc(var(--radius) + 4px);
+      border: 1.5px solid rgba(255,101,132,.35);
+      animation: ripple-ring 1.4s ease-out infinite;
+    }
+    .btn-mic.listening::after { animation-delay: .7s; }
+
+    @keyframes ripple-ring {
+      0%   { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.55); }
+    }
+
+    /* ─── Status Bar ────────────────────────────────── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-top: 1rem;
+      min-height: 22px;
+      font-size: .82rem;
+      color: var(--muted);
+      transition: color .2s;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+      transition: background .2s;
+    }
+
+    .status-bar.listening-state .status-dot {
+      background: var(--accent2);
+      animation: blink-dot 1s ease-in-out infinite;
+    }
+
+    .status-bar.listening-state { color: var(--accent2); }
+
+    .status-bar.error-state .status-dot { background: #ff4d4d; }
+    .status-bar.error-state { color: #ff6b6b; }
+
+    .status-bar.success-state .status-dot { background: #4ade80; }
+    .status-bar.success-state { color: #4ade80; }
+
+    @keyframes blink-dot {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .3; }
+    }
+
+    /* ─── Waveform ──────────────────────────────────── */
+    .waveform {
+      display: none;
+      align-items: flex-end;
+      gap: 3px;
+      height: 20px;
+      margin-left: .4rem;
+    }
+
+    .waveform.active { display: flex; }
+
+    .waveform span {
+      width: 3px;
+      border-radius: 2px;
+      background: var(--accent2);
+      animation: wave 0.8s ease-in-out infinite;
+    }
+
+    .waveform span:nth-child(1) { height: 6px;  animation-delay: 0s; }
+    .waveform span:nth-child(2) { height: 14px; animation-delay: .1s; }
+    .waveform span:nth-child(3) { height: 20px; animation-delay: .2s; }
+    .waveform span:nth-child(4) { height: 12px; animation-delay: .3s; }
+    .waveform span:nth-child(5) { height: 8px;  animation-delay: .4s; }
+
+    @keyframes wave {
+      0%, 100% { transform: scaleY(.4); opacity: .6; }
+      50%       { transform: scaleY(1);  opacity: 1;  }
+    }
+
+    /* ─── Divider ───────────────────────────────────── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── Results ───────────────────────────────────── */
+    #resultsContainer {
+      display: none;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .results-label {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .results-clear {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: .8rem;
+      cursor: pointer;
+      padding: .2rem .5rem;
+      border-radius: 6px;
+      transition: color .15s, background .15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .results-clear:hover { color: var(--accent2); background: rgba(255,101,132,.08); }
+
+    #resultsContent {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.4rem;
+      min-height: 80px;
+      color: var(--text);
+      font-size: .9rem;
+      line-height: 1.7;
+      animation: fade-up .3s ease;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Skeleton Loader ───────────────────────────── */
+    .skeleton {
+      border-radius: 6px;
+      background: linear-gradient(90deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.09) 50%, rgba(255,255,255,.05) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      height: 14px;
+      margin-bottom: .7rem;
+    }
+
+    .skeleton:last-child { width: 60%; margin-bottom: 0; }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ─── Unsupported Banner ────────────────────────── */
+    #unsupportedBanner {
+      display: none;
+      background: rgba(255,77,77,.1);
+      border: 1px solid rgba(255,77,77,.3);
+      border-radius: var(--radius);
+      padding: .9rem 1.2rem;
+      color: #ff8080;
+      font-size: .85rem;
+      margin-bottom: 1.2rem;
+      animation: fade-up .3s ease;
+    }
+
+    /* ─── Footer ────────────────────────────────────── */
+    .footer-note {
+      text-align: center;
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .02em;
+    }
+
+    .footer-note a { color: var(--accent); text-decoration: none; }
+    .footer-note a:hover { text-decoration: underline; }
+
+    /* ─── Responsive ────────────────────────────────── */
+    @media (max-width: 480px) {
+      .search-card { padding: 1.4rem; }
+      .btn-mic, .btn-search { width: 48px; height: 48px; font-size: 1.05rem; }
+      #searchInput { height: 48px; font-size: .92rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- ── Brand ── -->
+  <div class="brand">
+    <div class="brand-icon"><i class="bi bi-soundwave"></i></div>
+    <h1>VoiceSearch</h1>
+    <p>Speak your query — or type it below</p>
+  </div>
+
+  <!-- ── Unsupported Browser Banner ── -->
+  <div id="unsupportedBanner">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    Your browser does not support the Web Speech API. Voice input is unavailable.
+    Please use Chrome, Edge, or Safari for full functionality.
+  </div>
+
+  <!-- ── Search Card ── -->
+  <div class="search-card">
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <!-- Text Input -->
+      <div class="search-input-wrap">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search anything…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <!-- Microphone Button -->
+      <button class="btn-mic" id="micBtn" title="Voice search">
+        <i class="bi bi-mic-fill" id="micIcon"></i>
+      </button>
+
+      <!-- Search Button -->
+      <button class="btn-search" id="searchBtn" title="Search">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar" id="statusBar">
+      <span class="status-dot"></span>
+      <span id="statusText">Ready</span>
+      <!-- Waveform animation (shown while listening) -->
+      <div class="waveform" id="waveform">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider" id="resultsDivider" style="display:none;">Results</div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer">
+      <div class="results-header">
+        <span class="results-label"><i class="bi bi-layout-text-window-reverse me-1"></i>Search Results</span>
+        <button class="results-clear" id="clearResults">
+          <i class="bi bi-x me-1"></i>Clear
+        </button>
+      </div>
+      <div id="resultsContent"></div>
+    </div>
+
+  </div><!-- /.search-card -->
+
+  <p class="footer-note">
+    Powered by <a href="#">Web Speech API</a> &amp; CodeIgniter 4 &middot;
+    <i class="bi bi-shield-lock-fill" style="color:var(--muted)"></i> Speech processed locally
+  </p>
+
+</div><!-- /.page-wrap -->
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* ════════════════════════════════════════════════════
+     1. ELEMENT REFERENCES
+  ════════════════════════════════════════════════════ */
+  const input = document.getElementById('searchInput');
+  const micBtn = document.getElementById('micBtn');
+  const micIcon = document.getElementById('micIcon');
+  const searchBtn = document.getElementById('searchBtn');
+  const statusBar = document.getElementById('statusBar');
+  const statusText = document.getElementById('statusText');
+  const waveform = document.getElementById('waveform');
+  const resultsContainer = document.getElementById('resultsContainer');
+  const resultsDivider = document.getElementById('resultsDivider');
+  const resultsContent = document.getElementById('resultsContent');
+  const clearResults = document.getElementById('clearResults');
+  const unsupportedBanner = document.getElementById('unsupportedBanner');
+
+  /* ════════════════════════════════════════════════════
+     2. WEB SPEECH API SETUP
+  ════════════════════════════════════════════════════ */
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+  let recognition = null;
+  let isListening = false;
+
+  if (!SpeechRecognition) {
+    unsupportedBanner.style.display = 'block';
+    micBtn.disabled = true;
+    micBtn.title = 'Voice search not supported';
+    setStatus('Voice not supported', 'error-state');
+  } else {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = function (event) {
+      const transcript = event.results[0][0].transcript.trim();
+      input.value = transcript;
+      setStatus(`Heard: "${transcript}"`, 'success-state');
+      stopListening();
+      triggerSearch();
+    };
+
+    recognition.onspeechend = function () {
+      stopListening();
+    };
+
+    recognition.onnomatch = function () {
+      setStatus("Couldn't catch that. Try again.", 'error-state');
+      stopListening();
+    };
+
+    recognition.onerror = function (event) {
+      let msg = 'Something went wrong.';
+      switch (event.error) {
+        case 'no-speech': msg = 'No speech detected. Try again.'; break;
+        case 'audio-capture': msg = 'No microphone found.'; break;
+        case 'not-allowed': msg = 'Microphone permission denied.'; break;
+        case 'network': msg = 'Network error. Check connection.'; break;
+        case 'aborted': msg = 'Listening stopped.'; break;
+      }
+      setStatus(msg, 'error-state');
+      stopListening();
+    };
+  }
+
+  /* ════════════════════════════════════════════════════
+     3. LISTENING HELPERS
+  ════════════════════════════════════════════════════ */
+  function startListening() {
+    if (!recognition || isListening) return;
+    isListening = true;
+
+    recognition.start();
+
+    micBtn.classList.add('listening');
+    micBtn.disabled = true;
+    micIcon.classList.remove('bi-mic-fill');
+    micIcon.classList.add('bi-stop-fill');
+    waveform.classList.add('active');
+    setStatus('Listening…', 'listening-state');
+  }
+
+  function stopListening() {
+    if (!recognition) return;
+    isListening = false;
+
+    try { recognition.stop(); } catch (e) {}
+
+    micBtn.classList.remove('listening');
+    micBtn.disabled = false;
+    micIcon.classList.remove('bi-stop-fill');
+    micIcon.classList.add('bi-mic-fill');
+    waveform.classList.remove('active');
+  }
+
+  /* ════════════════════════════════════════════════════
+     4. STATUS BAR HELPER
+  ════════════════════════════════════════════════════ */
+  function setStatus(msg, cls) {
+    statusBar.classList.remove('listening-state', 'error-state', 'success-state');
+    if (cls) statusBar.classList.add(cls);
+    statusText.textContent = msg;
+  }
+
+  /* ════════════════════════════════════════════════════
+     5. AJAX SEARCH (FETCH API)
+  ════════════════════════════════════════════════════ */
+  function showSkeleton() {
+    resultsDivider.style.display = 'block';
+    resultsContainer.style.display = 'block';
+    resultsContent.innerHTML = `
+      <div class="skeleton" style="width:100%"></div>
+      <div class="skeleton" style="width:80%"></div>
+      <div class="skeleton" style="width:60%"></div>
+    `;
+  }
+
+  function triggerSearch() {
+    const keyword = input.value.trim();
+
+    if (!keyword) {
+      setStatus('Please enter a search term.', 'error-state');
+      return;
+    }
+
+    setStatus('Searching…', '');
+    showSkeleton();
+
+    fetch('/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({ keyword })
+    })
+    .then(res => {
+      if (!res.ok) throw res;
+      return res.text();
+    })
+    .then(response => {
+      resultsContent.innerHTML = response;
+      setStatus(`Results loaded for "${keyword}"`, 'success-state');
+    })
+    .catch(async (err) => {
+      let msg = 'Server error. Please try again.';
+      if (err.status === 404) msg = 'Search endpoint not found (404).';
+
+      resultsContent.innerHTML = `
+        <div style="color:#ff6b6b;">
+          ${msg}
+        </div>
+      `;
+      setStatus('Search failed.', 'error-state');
+    });
+  }
+
+  /* ════════════════════════════════════════════════════
+     6. EVENT BINDINGS
+  ════════════════════════════════════════════════════ */
+  micBtn.addEventListener('click', function () {
+    if (isListening) {
+      stopListening();
+      setStatus('Stopped listening.', '');
+    } else {
+      startListening();
+    }
+  });
+
+  searchBtn.addEventListener('click', triggerSearch);
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') triggerSearch();
+  });
+
+  clearResults.addEventListener('click', function () {
+    resultsContainer.style.display = 'none';
+    resultsContent.innerHTML = '';
+    resultsDivider.style.display = 'none';
+    input.value = '';
+    input.focus();
+    setStatus('Ready', '');
+  });
+
+  input.addEventListener('input', function () {
+    if (!isListening) setStatus('Ready', '');
+  });
+
+});
+</script>
+</body>
+</html>
