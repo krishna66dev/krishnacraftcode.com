@@ -360,6 +360,7 @@ body::before {
   vertical-align: middle;
   font-size: 0.85rem;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 .custom-table tbody tr { transition: background 0.15s; }
 .custom-table tbody tr:hover { background: var(--bg-card-hover); }
