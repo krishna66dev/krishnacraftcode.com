@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Advanced Age Calculator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- Dark Mode Toggle -->
+  <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+    <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+  </button>
+
+  <div class="app-wrapper">
+    <div class="container py-5">
+
+      <!-- Header -->
+      <div class="text-center mb-5 app-header">
+        <div class="header-badge mb-3">
+          <i class="bi bi-hourglass-split me-2"></i>Time Since Birth
+        </div>
+        <h1 class="display-title">Age <span class="accent-text">Calculator</span></h1>
+        <p class="subtitle">Discover exactly how long you've been on this planet</p>
+      </div>
+
+      <!-- Input Card -->
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card main-card mb-4">
+            <div class="card-body p-4 p-md-5">
+              <h5 class="section-label mb-4"><i class="bi bi-calendar3 me-2"></i>Enter Your Details</h5>
+
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label for="dob" class="form-label field-label">Date of Birth</label>
+                  <input type="date" class="form-control custom-input" id="dob" max="" placeholder="Select DOB"/>
+                  <div class="invalid-feedback" id="dobError">Please enter a valid date of birth (not in the future).</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="customDate" class="form-label field-label">
+                    Custom "Current" Date
+                    <span class="optional-badge">optional</span>
+                  </label>
+                  <input type="date" class="form-control custom-input" id="customDate" placeholder="Leave blank for today"/>
+                  <div class="form-text hint-text">Leave blank to use today's date</div>
+                </div>
+              </div>
+
+              <div class="d-flex gap-3 mt-4">
+                <button class="btn btn-calculate flex-grow-1" id="calculateBtn" onclick="calculate()">
+                  <i class="bi bi-calculator me-2"></i>Calculate Age
+                </button>
+                <button class="btn btn-reset" id="resetBtn" onclick="resetAll()">
+                  <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="alert custom-alert alert-danger d-none" id="errorAlert" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="errorMsg"></span>
+          </div>
+
+          <!-- Results Section -->
+          <div id="resultsSection" class="d-none">
+
+            <!-- Exact Age -->
+            <div class="card result-card mb-4 fade-in">
+              <div class="card-body p-4">
+                <h5 class="section-label mb-4"><i class="bi bi-stopwatch me-2"></i>Exact Age</h5>
+                <div class="row g-3">
+                  <div class="col-6 col-md-3">
+                    <div class="age-unit-box">
+                      <div class="age-number" id="ageYears">0</div>
+                      <div class="age-unit">Years</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="age-unit-box">
+                      <div class="age-number" id="ageMonths">0</div>
+                      <div class="age-unit">Months</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="age-unit-box">
+                      <div class="age-number" id="ageDays">0</div>
+                      <div class="age-unit">Days</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="age-unit-box accent-box">
+                      <div class="age-number" id="ageHours">0</div>
+                      <div class="age-unit">Hours</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-6">
+                    <div class="age-unit-box">
+                      <div class="age-number" id="ageMinutes">0</div>
+                      <div class="age-unit">Minutes</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-6">
+                    <div class="age-unit-box live-box">
+                      <div class="age-number" id="ageSeconds">0</div>
+                      <div class="age-unit"><i class="bi bi-broadcast me-1 live-dot"></i>Seconds (live)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Statistics -->
+            <div class="card result-card mb-4 fade-in">
+              <div class="card-body p-4">
+                <h5 class="section-label mb-4"><i class="bi bi-bar-chart-line me-2"></i>Total Statistics</h5>
+                <div class="row g-3">
+                  <div class="col-6 col-md-4">
+                    <div class="stat-box">
+                      <div class="stat-icon"><i class="bi bi-calendar-week"></i></div>
+                      <div class="stat-value" id="totalDays">0</div>
+                      <div class="stat-label">Total Days</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="stat-box">
+                      <div class="stat-icon"><i class="bi bi-calendar2-range"></i></div>
+                      <div class="stat-value" id="totalWeeks">0</div>
+                      <div class="stat-label">Total Weeks</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="stat-box">
+                      <div class="stat-icon"><i class="bi bi-calendar3"></i></div>
+                      <div class="stat-value" id="totalMonths">0</div>
+                      <div class="stat-label">Total Months</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="stat-box">
+                      <div class="stat-icon"><i class="bi bi-clock"></i></div>
+                      <div class="stat-value" id="totalHours">0</div>
+                      <div class="stat-label">Total Hours</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="stat-box">
+                      <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+                      <div class="stat-value" id="totalMinutes">0</div>
+                      <div class="stat-label">Total Minutes</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="stat-box highlight-stat">
+                      <div class="stat-icon"><i class="bi bi-lightning-charge"></i></div>
+                      <div class="stat-value" id="totalSeconds">0</div>
+                      <div class="stat-label">Total Seconds</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Birthday Info + Zodiac + Planets row -->
+            <div class="row g-4 mb-4">
+              <!-- Birthday -->
+              <div class="col-md-6">
+                <div class="card result-card h-100 fade-in">
+                  <div class="card-body p-4">
+                    <h5 class="section-label mb-4"><i class="bi bi-gift me-2"></i>Next Birthday</h5>
+                    <div class="birthday-info">
+                      <div class="birthday-date" id="nextBirthdayDate">—</div>
+                      <div class="birthday-day" id="nextBirthdayDow">—</div>
+                    </div>
+                    <div class="birthday-countdown mt-3">
+                      <i class="bi bi-hourglass me-2"></i>
+                      <span id="daysUntilBirthday">0</span> days until next birthday
+                    </div>
+                    <div class="progress birthday-progress mt-3">
+                      <div class="progress-bar" id="birthdayProgress" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-labels">
+                      <span>Last birthday</span><span>Next birthday</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Zodiac -->
+              <div class="col-md-6">
+                <div class="card result-card h-100 fade-in">
+                  <div class="card-body p-4">
+                    <h5 class="section-label mb-4"><i class="bi bi-stars me-2"></i>Zodiac Sign</h5>
+                    <div class="zodiac-display">
+                      <div class="zodiac-symbol" id="zodiacSymbol">♈</div>
+                      <div>
+                        <div class="zodiac-name" id="zodiacName">Aries</div>
+                        <div class="zodiac-dates" id="zodiacDates">Mar 21 – Apr 19</div>
+                        <div class="zodiac-trait" id="zodiacTrait"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Planet Ages -->
+            <div class="card result-card mb-4 fade-in">
+              <div class="card-body p-4">
+                <h5 class="section-label mb-4"><i class="bi bi-globe2 me-2"></i>Your Age on Other Planets</h5>
+                <div class="row g-3" id="planetGrid"></div>
+              </div>
+            </div>
+
+          </div>
+          <!-- /results -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
