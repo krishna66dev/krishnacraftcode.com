@@ -207,19 +207,19 @@ function viewPersonDetail(personId) {
 
   document.getElementById('personDetailBody').innerHTML = `
     <div class="row g-3 mb-4">
-      <div class="col-4">
+      <div class="col-md-4">
         <div class="balance-box">
           <div class="balance-label">Total Diya</div>
           <div class="balance-value amount-given">₹${fmt(totalGiven)}</div>
         </div>
       </div>
-      <div class="col-4">
+      <div class="col-md-4">
         <div class="balance-box">
           <div class="balance-label">Total Liya</div>
           <div class="balance-value amount-taken">₹${fmt(totalTaken)}</div>
         </div>
       </div>
-      <div class="col-4">
+      <div class="col-md-4">
         <div class="balance-box">
           <div class="balance-label">Balance</div>
           <div class="balance-value" style="color:${balance>=0?'var(--green)':'var(--red)'}">₹${fmt(Math.abs(balance))}</div>
