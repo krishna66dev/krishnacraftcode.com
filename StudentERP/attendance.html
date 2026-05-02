@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance — Student ERP</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body data-page="attendance">
+
+  <div id="sidebar-overlay"></div>
+
+  <!-- ════════════ SIDEBAR ════════════ -->
+  <nav id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <div>
+        <div class="brand-text"><span>EduManager</span> ERP</div>
+        <div class="brand-sub">v1.0 · School System</div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Main Menu</div>
+      <a href="index.html"      class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="students.html"   class="nav-item"><span class="nav-icon">👨‍🎓</span> Students</a>
+      <a href="attendance.html" class="nav-item active"><span class="nav-icon">📋</span> Attendance</a>
+      <a href="leaves.html"     class="nav-item"><span class="nav-icon">📝</span> Leave Management</a>
+      <a href="exams.html"      class="nav-item"><span class="nav-icon">📊</span> Exam Marks</a>
+      <a href="fees.html"       class="nav-item"><span class="nav-icon">💰</span> Fee Management</a>
+    </div>
+    <div class="sidebar-footer"><div class="version">Attendance System</div></div>
+  </nav>
+
+  <!-- ════════════ MAIN ════════════ -->
+  <div id="main-content">
+    <div class="topbar">
+      <button class="btn-menu-toggle" id="menu-toggle">☰</button>
+      <div class="topbar-title">Attendance <span>System</span></div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Stat mini-row -->
+      <div class="row g-3 mb-3">
+        <div class="col-4">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+                      padding:14px 16px;border-top:2px solid var(--accent2);">
+            <div style="font-size:22px;font-weight:700;color:var(--accent2);font-family:var(--font-mono);"
+                 id="att-present-count">0</div>
+            <div style="font-size:11px;color:var(--text-muted);">Present</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+                      padding:14px 16px;border-top:2px solid var(--accent3);">
+            <div style="font-size:22px;font-weight:700;color:var(--accent3);font-family:var(--font-mono);"
+                 id="att-absent-count">0</div>
+            <div style="font-size:11px;color:var(--text-muted);">Absent</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+                      padding:14px 16px;border-top:2px solid var(--text-muted);">
+            <div style="font-size:22px;font-weight:700;color:var(--text-secondary);font-family:var(--font-mono);"
+                 id="att-unmarked-count">0</div>
+            <div style="font-size:11px;color:var(--text-muted);">Unmarked</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="row g-3">
+
+        <!-- Mark Attendance -->
+        <div class="col-12 col-lg-8">
+          <div class="card-custom">
+            <div class="card-header-custom">
+              <h5>📋 Mark Attendance — <span id="att-date-label" style="color:var(--accent)">Today</span></h5>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <input type="date" id="att-date" class="form-control"
+                  style="width:auto;padding:7px 12px;font-size:13px;"/>
+                <button class="btn-primary-custom" id="btn-save-attendance">💾 Save</button>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table class="erp-table">
+                <thead>
+                  <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Mark</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="att-tbody">
+                  <tr><td colspan="5">
+                    <div class="empty-state">
+                      <div class="empty-icon">📋</div>
+                      <p>No students added yet. <a href="students.html" style="color:var(--accent);">Add students first.</a></p>
+                    </div>
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance Summary -->
+        <div class="col-12 col-lg-4">
+          <div class="card-custom">
+            <div class="card-header-custom">
+              <h5>📊 Overall Summary</h5>
+            </div>
+            <div class="card-body-custom" id="att-summary-list">
+              <p style="color:var(--text-muted);text-align:center;padding:20px;font-size:13px;">
+                No student data yet.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

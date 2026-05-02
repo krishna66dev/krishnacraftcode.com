@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fee Management — Student ERP</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body data-page="fees">
+
+  <div id="sidebar-overlay"></div>
+
+  <!-- ════════════ SIDEBAR ════════════ -->
+  <nav id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <div>
+        <div class="brand-text"><span>EduManager</span> ERP</div>
+        <div class="brand-sub">v1.0 · School System</div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Main Menu</div>
+      <a href="index.html"      class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="students.html"   class="nav-item"><span class="nav-icon">👨‍🎓</span> Students</a>
+      <a href="attendance.html" class="nav-item"><span class="nav-icon">📋</span> Attendance</a>
+      <a href="leaves.html"     class="nav-item"><span class="nav-icon">📝</span> Leave Management</a>
+      <a href="exams.html"      class="nav-item"><span class="nav-icon">📊</span> Exam Marks</a>
+      <a href="fees.html"       class="nav-item active"><span class="nav-icon">💰</span> Fee Management</a>
+    </div>
+    <div class="sidebar-footer"><div class="version">Fee Management</div></div>
+  </nav>
+
+  <!-- ════════════ MAIN ════════════ -->
+  <div id="main-content">
+    <div class="topbar">
+      <button class="btn-menu-toggle" id="menu-toggle">☰</button>
+      <div class="topbar-title">Fee <span>Management</span></div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Summary Stats -->
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+                      padding:14px 16px;border-top:2px solid var(--accent);">
+            <div style="font-size:16px;font-weight:700;color:var(--accent);font-family:var(--font-mono);"
+                 id="fees-total-amount">₹0</div>
+            <div style="font-size:11px;color:var(--text-muted);">Total Fees</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+                      padding:14px 16px;border-top:2px solid var(--accent2);">
+            <div style="font-size:16px;font-weight:700;color:var(--accent2);font-family:var(--font-mono);"
+                 id="fees-collected-amount">₹0</div>
+            <div style="font-size:11px;color:var(--text-muted);">Collected</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+                      padding:14px 16px;border-top:2px solid var(--accent3);">
+            <div style="font-size:16px;font-weight:700;color:var(--accent3);font-family:var(--font-mono);"
+                 id="fees-pending-amount">₹0</div>
+            <div style="font-size:11px;color:var(--text-muted);">Pending</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+                      padding:14px 16px;border-top:2px solid var(--accent4);">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span style="font-size:13px;font-weight:700;color:var(--accent2);font-family:var(--font-mono);"
+                    id="fees-paid-count">0</span>
+              <span style="font-size:11px;color:var(--text-muted);">Paid</span>
+              <span style="font-size:13px;font-weight:700;color:var(--accent4);font-family:var(--font-mono);"
+                    id="fees-partial-count">0</span>
+              <span style="font-size:11px;color:var(--text-muted);">Partial</span>
+              <span style="font-size:13px;font-weight:700;color:var(--accent3);font-family:var(--font-mono);"
+                    id="fees-unpaid-count">0</span>
+              <span style="font-size:11px;color:var(--text-muted);">Unpaid</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Status Breakdown</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Card -->
+      <div class="card-custom">
+        <div class="card-header-custom">
+          <h5>💰 Fee Records</h5>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <select id="fee-filter-status" class="form-select"
+              style="width:auto;padding:8px 12px;font-size:13px;background:var(--bg-base);
+                     border:1px solid var(--border);color:var(--text-primary);border-radius:var(--radius);">
+              <option value="">All Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Partial">Partial</option>
+              <option value="Pending">Pending</option>
+            </select>
+            <button class="btn-primary-custom" id="btn-add-fee">➕ Add Fee Record</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="erp-table">
+            <thead>
+              <tr>
+                <th>Roll No</th>
+                <th>Student</th>
+                <th>Class</th>
+                <th>Fee Type</th>
+                <th>Period</th>
+                <th>Total</th>
+                <th>Paid</th>
+                <th>Pending</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="fees-tbody">
+              <tr><td colspan="10">
+                <div class="empty-state">
+                  <div class="empty-icon">💰</div>
+                  <p>No fee records yet. Click "Add Fee Record" to start.</p>
+                </div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════ FEE MODAL ════════════ -->
+  <div class="modal fade" id="feeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="feeModalLabel">➕ Add Fee Record</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="fee-form" novalidate>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Student *</label>
+                <select id="fee-student-id" class="form-select">
+                  <option value="">-- Select Student --</option>
+                </select>
+                <div class="invalid-feedback">Please select a student.</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Fee Type *</label>
+                <select id="fee-type" class="form-select">
+                  <option value="">Select Type</option>
+                  <option value="Tuition Fee">Tuition Fee</option>
+                  <option value="Exam Fee">Exam Fee</option>
+                  <option value="Transport Fee">Transport Fee</option>
+                  <option value="Library Fee">Library Fee</option>
+                  <option value="Sports Fee">Sports Fee</option>
+                  <option value="Annual Fee">Annual Fee</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="invalid-feedback">Required.</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Period</label>
+                <input type="text" id="fee-period" class="form-control" placeholder="e.g. April 2026 / Q1 2026"/>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Total Fee (₹) *</label>
+                <input type="number" id="fee-total" class="form-control" placeholder="e.g. 15000" min="1"/>
+                <div class="invalid-feedback">Enter total fee > 0.</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Paid Amount (₹) *</label>
+                <input type="number" id="fee-paid" class="form-control" placeholder="e.g. 10000" min="0"/>
+                <div class="invalid-feedback">Enter paid amount.</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Due Date</label>
+                <input type="date" id="fee-due-date" class="form-control"/>
+              </div>
+              <!-- Pending Preview -->
+              <div class="col-12">
+                <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:var(--radius);
+                            padding:12px 16px;font-size:13px;font-family:var(--font-mono);color:var(--accent3);">
+                  <span id="fee-pending-preview">Pending: ₹0</span>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn-primary-custom" id="btn-save-fee">💾 Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
