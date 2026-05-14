@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Krishna Pal – PHP & Laravel Developer with 3+ years building robust web apps, REST APIs, ERP/HRMS systems and eCommerce platforms." />
+  <meta name="keywords" content="PHP Developer, Laravel Developer, Backend Developer, Krishna Pal, CodeIgniter, REST API, MySQL" />
+  <meta name="author" content="Krishna Pal" />
+  <meta property="og:title" content="Krishna Pal | PHP & Laravel Developer" />
+  <meta property="og:description" content="Backend Developer specializing in PHP, Laravel, and scalable web solutions." />
+  <title>Krishna Pal | PHP & Laravel Developer</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- AOS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ████  LOADER  ████ -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-logo">KP</div>
+    <div class="loader-bar"><span></span></div>
+    <p class="loader-text">Loading Portfolio...</p>
+  </div>
+</div>
+
+<!-- ████  SCROLL PROGRESS  ████ -->
+<div id="scroll-progress"></div>
+
+<!-- ████  NAVBAR  ████ -->
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+
+    <!-- Brand -->
+    <a class="navbar-brand" href="#hero">
+      <span class="brand-lt">&lt;</span>KP<span class="brand-lt">/&gt;</span>
+    </a>
+
+    <!-- Collapse: desktop links -->
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+        <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+        <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
+        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <!-- Right controls (theme toggle + hamburger) — always visible -->
+    <div class="nav-controls">
+      <button id="themeToggle" class="theme-btn" aria-label="Toggle theme">
+        <i id="themeIcon" class="fas fa-sun"></i>
+      </button>
+      <button class="hamburger d-lg-none" type="button"
+              data-bs-toggle="collapse" data-bs-target="#navMenu"
+              aria-controls="navMenu" aria-expanded="false" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ████  HERO  ████ -->
+<section id="hero" class="hero-section">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-orb orb-1"></div>
+  <div class="hero-orb orb-2"></div>
+
+  <div class="container hero-container">
+    <div class="row align-items-center hero-row">
+
+      <!-- Left: Text Content -->
+      <div class="col-lg-7 col-12 hero-left">
+        <div class="hero-badge" data-aos="fade-up" data-aos-delay="100">
+          <span class="pulse-dot"></span> Available for Work
+        </div>
+
+        <h1 class="hero-title" data-aos="fade-up" data-aos-delay="180">
+          Hi, I'm<br>
+          <span class="name-gradient">Krishna Pal</span>
+        </h1>
+
+        <div class="hero-typed-box" data-aos="fade-up" data-aos-delay="260">
+          <span class="typed-arrow">&gt;&nbsp;</span>
+          <span id="typed-text"></span><span class="cursor-blink">|</span>
+        </div>
+
+        <p class="hero-desc" data-aos="fade-up" data-aos-delay="340">
+          Passionate backend developer crafting robust web applications,
+          scalable RESTful APIs, and enterprise systems. Turning complex
+          business problems into clean, elegant solutions.
+        </p>
+
+        <div class="hero-cta" data-aos="fade-up" data-aos-delay="420">
+          <a href="#" class="btn-primary-kp">
+            <i class="fas fa-download"></i> Download Resume
+          </a>
+          <a href="#contact" class="btn-outline-kp">
+            <i class="fas fa-paper-plane"></i> Contact Me
+          </a>
+        </div>
+
+        <div class="hero-stats" data-aos="fade-up" data-aos-delay="500">
+          <div class="stat">
+            <span class="stat-val"><span class="counter" data-target="3">0</span>+</span>
+            <span class="stat-key">Years Exp.</span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat">
+            <span class="stat-val"><span class="counter" data-target="20">0</span>+</span>
+            <span class="stat-key">Projects</span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat">
+            <span class="stat-val"><span class="counter" data-target="15">0</span>+</span>
+            <span class="stat-key">Clients</span>
+          </div>
+        </div>
+      </div><!-- /hero-left -->
+
+      <!-- Right: Visual Card -->
+      <div class="col-lg-5 col-12 hero-right" data-aos="fade-up" data-aos-delay="200">
+        <div class="hero-visual">
+          <!-- Spinning ring + avatar -->
+          <div class="av-ring"></div>
+          <div class="av-core">KP</div>
+
+          <!-- Floating tech chips -->
+          <span class="fchip fchip-php">PHP</span>
+          <span class="fchip fchip-laravel">Laravel</span>
+          <span class="fchip fchip-mysql">MySQL</span>
+          <span class="fchip fchip-api">REST API</span>
+
+          <!-- Terminal code card -->
+          <div class="term-card">
+            <div class="term-dots">
+              <span class="td td-r"></span>
+              <span class="td td-y"></span>
+              <span class="td td-g"></span>
+            </div>
+            <pre class="term-code"><span class="tc-var">$dev</span> = [
+  <span class="tc-key">'name'</span> => <span class="tc-val">'Krishna'</span>,
+  <span class="tc-key">'role'</span> => <span class="tc-val">'PHP Dev'</span>,
+  <span class="tc-key">'exp'</span>  => <span class="tc-val">'3+ yrs'</span>,
+];</pre>
+          </div>
+        </div>
+      </div><!-- /hero-right -->
+
+    </div><!-- /row -->
+  </div><!-- /container -->
+
+  <a href="#about" class="scroll-down" aria-label="Scroll down">
+    <span>Scroll</span>
+    <i class="fas fa-chevron-down"></i>
+  </a>
+</section>
+
+<!-- ████  ABOUT  ████ -->
+<section id="about" class="section-pad">
+  <div class="container">
+    <div class="sec-header" data-aos="fade-up">
+      <span class="sec-tag">Who I Am</span>
+      <h2 class="sec-title">About <span class="grad-text">Me</span></h2>
+    </div>
+
+    <div class="row align-items-center g-5 mt-2">
+      <!-- Image Box -->
+      <div class="col-lg-5 col-12" data-aos="fade-right">
+        <div class="about-img-wrap">
+          <div class="about-img-box">
+            <div class="about-av">KP</div>
+          </div>
+          <div class="about-badge-exp">
+            <strong>3+</strong>
+            <span>Years<br>Experience</span>
+          </div>
+          <div class="about-badge-tech">
+            <i class="fab fa-php"></i> PHP Expert
+          </div>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="col-lg-7 col-12" data-aos="fade-left">
+        <h3 class="about-sub">PHP Developer &amp; Laravel Specialist</h3>
+        <p class="about-p">
+          I'm a passionate <strong>PHP Developer</strong> with over
+          <strong>3 years of hands-on experience</strong> building powerful,
+          scalable web applications and RESTful APIs. My journey in web
+          development has equipped me with a solid foundation in backend
+          architecture, database design, and system integration.
+        </p>
+        <p class="about-p">
+          I specialize in <strong>Laravel</strong> and <strong>CodeIgniter</strong>
+          frameworks, crafting enterprise-grade systems including ERPs, HRMs,
+          and multi-vendor eCommerce platforms. I thrive on turning complex
+          business requirements into clean, maintainable code.
+        </p>
+
+        <div class="about-grid">
+          <div class="about-info-item">
+            <i class="fas fa-user"></i>
+            <div><span class="ai-label">Name</span><span class="ai-val">Krishna Pal</span></div>
+          </div>
+          <div class="about-info-item">
+            <i class="fas fa-code"></i>
+            <div><span class="ai-label">Role</span><span class="ai-val">PHP Developer</span></div>
+          </div>
+          <div class="about-info-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <div><span class="ai-label">Location</span><span class="ai-val">India</span></div>
+          </div>
+          <div class="about-info-item">
+            <i class="fas fa-briefcase"></i>
+            <div><span class="ai-label">Experience</span><span class="ai-val">3+ Years</span></div>
+          </div>
+          <div class="about-info-item">
+            <i class="fas fa-graduation-cap"></i>
+            <div><span class="ai-label">Specialty</span><span class="ai-val">Backend Dev</span></div>
+          </div>
+          <div class="about-info-item">
+            <i class="fas fa-check-circle"></i>
+            <div><span class="ai-label">Status</span><span class="ai-val" style="color:var(--accent)">Available</span></div>
+          </div>
+        </div>
+
+        <a href="#" class="btn-primary-kp mt-4">
+          <i class="fas fa-download"></i> Download CV
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ████  SKILLS  ████ -->
+<section id="skills" class="section-pad section-alt">
+  <div class="container">
+    <div class="sec-header" data-aos="fade-up">
+      <span class="sec-tag">What I Know</span>
+      <h2 class="sec-title">My <span class="grad-text">Skills</span></h2>
+    </div>
+
+    <div class="row g-5 mt-2">
+      <!-- Core Skills -->
+      <div class="col-lg-6 col-12" data-aos="fade-right">
+        <h4 class="skill-cat"><i class="fas fa-server me-2"></i>Backend & Database</h4>
+        <div class="skill-list">
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fab fa-php me-2"></i>PHP</span><span class="spct">90%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="90"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fab fa-laravel me-2"></i>Laravel</span><span class="spct">85%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="85"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fas fa-fire me-2"></i>CodeIgniter</span><span class="spct">80%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="80"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fas fa-database me-2"></i>MySQL</span><span class="spct">85%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="85"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fas fa-plug me-2"></i>REST APIs</span><span class="spct">88%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="88"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Frontend Skills -->
+      <div class="col-lg-6 col-12" data-aos="fade-left">
+        <h4 class="skill-cat"><i class="fas fa-paint-brush me-2"></i>Frontend & Tools</h4>
+        <div class="skill-list">
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fab fa-js me-2"></i>JavaScript / jQuery</span><span class="spct">75%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="75"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fab fa-html5 me-2"></i>HTML5</span><span class="spct">92%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="92"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fab fa-css3-alt me-2"></i>CSS3</span><span class="spct">85%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="85"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fab fa-bootstrap me-2"></i>Bootstrap</span><span class="spct">90%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="90"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-meta"><span><i class="fas fa-sitemap me-2"></i>MVC Architecture</span><span class="spct">90%</span></div>
+            <div class="skill-track"><div class="skill-fill" data-w="90"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools & Tech chips -->
+    <div class="tools-section" data-aos="fade-up" data-aos-delay="100">
+      <h4 class="skill-cat text-center mb-4"><i class="fas fa-tools me-2"></i>Tools & Technologies</h4>
+      <div class="tools-grid">
+        <div class="tool-chip"><i class="fab fa-git-alt"></i>Git</div>
+        <div class="tool-chip"><i class="fab fa-github"></i>GitHub</div>
+        <div class="tool-chip"><i class="fas fa-code"></i>VS Code</div>
+        <div class="tool-chip"><i class="fas fa-paper-plane"></i>Postman</div>
+        <div class="tool-chip"><i class="fas fa-robot"></i>ChatGPT</div>
+        <div class="tool-chip"><i class="fas fa-brain"></i>Claude AI</div>
+        <div class="tool-chip"><i class="fas fa-exchange-alt"></i>AJAX</div>
+        <div class="tool-chip"><i class="fas fa-file-code"></i>JSON</div>
+        <div class="tool-chip"><i class="fas fa-terminal"></i>CLI</div>
+        <div class="tool-chip"><i class="fab fa-linux"></i>Linux</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ████  PROJECTS  ████ -->
+<section id="projects" class="section-pad">
+  <div class="container">
+    <div class="sec-header" data-aos="fade-up">
+      <span class="sec-tag">What I've Built</span>
+      <h2 class="sec-title">Featured <span class="grad-text">Projects</span></h2>
+    </div>
+
+    <div class="row g-4 mt-3">
+
+      <!-- ERP -->
+      <div class="col-lg-6 col-md-6 col-12" data-aos="fade-up" data-aos-delay="80">
+        <div class="proj-card">
+          <div class="proj-header ph-erp">
+            <div class="proj-icon"><i class="fas fa-building"></i></div>
+            <div class="proj-tags">
+              <span>PHP</span><span>Laravel</span><span>MySQL</span><span>Bootstrap</span>
+            </div>
+          </div>
+          <div class="proj-body">
+            <h3 class="proj-title">ERP System</h3>
+            <p class="proj-desc">
+              A comprehensive Enterprise Resource Planning system covering
+              inventory management, finance modules, procurement, HR
+              integration, and real-time reporting dashboards for mid-size businesses.
+            </p>
+            <div class="proj-btns">
+              <a href="#" class="pb-primary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+              <a href="#" class="pb-outline"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HRMS -->
+      <div class="col-lg-6 col-md-6 col-12" data-aos="fade-up" data-aos-delay="160">
+        <div class="proj-card">
+          <div class="proj-header ph-hrms">
+            <div class="proj-icon pi-purple"><i class="fas fa-users-cog"></i></div>
+            <div class="proj-tags">
+              <span>Laravel</span><span>REST API</span><span>MySQL</span><span>jQuery</span>
+            </div>
+          </div>
+          <div class="proj-body">
+            <h3 class="proj-title">HRMS System</h3>
+            <p class="proj-desc">
+              Human Resource Management System with employee onboarding,
+              attendance tracking, leave management, payroll processing,
+              and performance evaluation with role-based access control.
+            </p>
+            <div class="proj-btns">
+              <a href="#" class="pb-primary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+              <a href="#" class="pb-outline"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ecommerce -->
+      <div class="col-lg-6 col-md-6 col-12" data-aos="fade-up" data-aos-delay="240">
+        <div class="proj-card">
+          <div class="proj-header ph-ecom">
+            <div class="proj-icon pi-blue"><i class="fas fa-store"></i></div>
+            <div class="proj-tags">
+              <span>PHP</span><span>CodeIgniter</span><span>jQuery</span><span>MySQL</span>
+            </div>
+          </div>
+          <div class="proj-body">
+            <h3 class="proj-title">Multi-Vendor Ecommerce</h3>
+            <p class="proj-desc">
+              Full-featured multi-vendor marketplace with vendor dashboards,
+              product management, order tracking, payment gateway integration,
+              review system, and a comprehensive admin control panel.
+            </p>
+            <div class="proj-btns">
+              <a href="#" class="pb-primary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+              <a href="#" class="pb-outline"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visa -->
+      <div class="col-lg-6 col-md-6 col-12" data-aos="fade-up" data-aos-delay="320">
+        <div class="proj-card">
+          <div class="proj-header ph-visa">
+            <div class="proj-icon pi-yellow"><i class="fas fa-passport"></i></div>
+            <div class="proj-tags">
+              <span>Laravel</span><span>Bootstrap</span><span>AJAX</span><span>MySQL</span>
+            </div>
+          </div>
+          <div class="proj-body">
+            <h3 class="proj-title">Visa Website</h3>
+            <p class="proj-desc">
+              Dynamic visa application portal with document upload workflow,
+              application status tracking, admin review panel, appointment
+              scheduling system, and automated email notifications.
+            </p>
+            <div class="proj-btns">
+              <a href="#" class="pb-primary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+              <a href="#" class="pb-outline"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ████  EXPERIENCE  ████ -->
+<section id="experience" class="section-pad section-alt">
+  <div class="container">
+    <div class="sec-header" data-aos="fade-up">
+      <span class="sec-tag">My Journey</span>
+      <h2 class="sec-title">Work <span class="grad-text">Experience</span></h2>
+    </div>
+
+    <div class="timeline mt-5">
+
+      <div class="tl-item" data-aos="fade-right" data-aos-delay="80">
+        <div class="tl-dot"><i class="fas fa-briefcase"></i></div>
+        <div class="tl-card">
+          <div class="tl-head">
+            <div>
+              <h4 class="tl-role">PHP Developer</h4>
+              <p class="tl-company"><i class="fas fa-building me-1"></i>Tech Company &nbsp;<span class="tl-current">Current</span></p>
+            </div>
+            <span class="tl-date">2023 – Present</span>
+          </div>
+          <ul class="tl-list">
+            <li>Developing and maintaining large-scale Laravel applications including ERP and HRMS platforms.</li>
+            <li>Designing and building RESTful APIs consumed by mobile and web clients.</li>
+            <li>Collaborating with frontend teams to integrate UI with backend logic via AJAX and JSON.</li>
+            <li>Optimizing MySQL queries and database schemas for high-performance production environments.</li>
+          </ul>
+          <div class="tl-chips">
+            <span>Laravel</span><span>PHP</span><span>MySQL</span><span>REST API</span><span>Git</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item" data-aos="fade-right" data-aos-delay="160">
+        <div class="tl-dot"><i class="fas fa-laptop-code"></i></div>
+        <div class="tl-card">
+          <div class="tl-head">
+            <div>
+              <h4 class="tl-role">Junior PHP Developer</h4>
+              <p class="tl-company"><i class="fas fa-building me-1"></i>Software Agency</p>
+            </div>
+            <span class="tl-date">2022 – 2023</span>
+          </div>
+          <ul class="tl-list">
+            <li>Built multi-vendor eCommerce platforms using CodeIgniter with full admin panel functionality.</li>
+            <li>Developed visa management portal with document workflow and appointment booking system.</li>
+            <li>Integrated third-party payment gateways and SMS/email notification services via APIs.</li>
+            <li>Participated in code reviews and adopted clean MVC architecture best practices.</li>
+          </ul>
+          <div class="tl-chips">
+            <span>CodeIgniter</span><span>jQuery</span><span>Bootstrap</span><span>MySQL</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item" data-aos="fade-right" data-aos-delay="240">
+        <div class="tl-dot"><i class="fas fa-graduation-cap"></i></div>
+        <div class="tl-card">
+          <div class="tl-head">
+            <div>
+              <h4 class="tl-role">PHP Trainee / Intern</h4>
+              <p class="tl-company"><i class="fas fa-building me-1"></i>Web Development Firm</p>
+            </div>
+            <span class="tl-date">2021 – 2022</span>
+          </div>
+          <ul class="tl-list">
+            <li>Learned core PHP, MySQL fundamentals and MVC design patterns hands-on.</li>
+            <li>Built dynamic web pages and form-based data management applications under mentorship.</li>
+            <li>Gained practical experience with Git version control and agile team workflows.</li>
+          </ul>
+          <div class="tl-chips">
+            <span>PHP</span><span>HTML5</span><span>CSS3</span><span>MySQL</span><span>Git</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ████  SERVICES  ████ -->
+<section id="services" class="section-pad">
+  <div class="container">
+    <div class="sec-header" data-aos="fade-up">
+      <span class="sec-tag">What I Offer</span>
+      <h2 class="sec-title">My <span class="grad-text">Services</span></h2>
+    </div>
+
+    <div class="row g-4 mt-3">
+      <div class="col-lg-4 col-md-6 col-12" data-aos="fade-up" data-aos-delay="80">
+        <div class="srv-card">
+          <div class="srv-icon"><i class="fab fa-php"></i></div>
+          <h4 class="srv-title">PHP Web Development</h4>
+          <p class="srv-desc">Building robust, secure, and scalable PHP applications tailored to your business requirements with clean, maintainable code and best practices.</p>
+          <div class="srv-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 col-12" data-aos="fade-up" data-aos-delay="140">
+        <div class="srv-card">
+          <div class="srv-icon"><i class="fab fa-laravel"></i></div>
+          <h4 class="srv-title">Laravel Development</h4>
+          <p class="srv-desc">Expert Laravel development — Eloquent ORM, Blade templating, queue systems, authentication, and full-stack SPA/MPA applications.</p>
+          <div class="srv-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 col-12" data-aos="fade-up" data-aos-delay="200">
+        <div class="srv-card">
+          <div class="srv-icon"><i class="fas fa-plug"></i></div>
+          <h4 class="srv-title">API Integration</h4>
+          <p class="srv-desc">Designing RESTful APIs, integrating third-party services, payment gateways, SMS/email providers, and secure API authentication systems.</p>
+          <div class="srv-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 col-12" data-aos="fade-up" data-aos-delay="260">
+        <div class="srv-card">
+          <div class="srv-icon"><i class="fas fa-store"></i></div>
+          <h4 class="srv-title">Ecommerce Development</h4>
+          <p class="srv-desc">Full-featured eCommerce solutions — multi-vendor marketplaces, shopping carts, inventory management, and payment processing integration.</p>
+          <div class="srv-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 col-12" data-aos="fade-up" data-aos-delay="320">
+        <div class="srv-card">
+          <div class="srv-icon"><i class="fas fa-tachometer-alt"></i></div>
+          <h4 class="srv-title">Admin Panel Development</h4>
+          <p class="srv-desc">Powerful admin dashboards with role-based access control, data analytics, CRUD operations, export features, and reporting modules.</p>
+          <div class="srv-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 col-12" data-aos="fade-up" data-aos-delay="380">
+        <div class="srv-card">
+          <div class="srv-icon"><i class="fas fa-cogs"></i></div>
+          <h4 class="srv-title">ERP / HRMS Systems</h4>
+          <p class="srv-desc">Enterprise-grade ERP and HRM systems — finance, inventory, payroll, HR workflows, and business automation for growing organizations.</p>
+          <div class="srv-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ████  CONTACT  ████ -->
+<section id="contact" class="section-pad section-alt">
+  <div class="container">
+    <div class="sec-header" data-aos="fade-up">
+      <span class="sec-tag">Get In Touch</span>
+      <h2 class="sec-title">Contact <span class="grad-text">Me</span></h2>
+    </div>
+
+    <div class="row g-5 mt-2">
+
+      <!-- Left: Info -->
+      <div class="col-lg-5 col-12" data-aos="fade-right">
+        <h3 class="contact-heading">Let's Work Together!</h3>
+        <p class="contact-sub">
+          Have a project in mind or looking for a dedicated PHP developer?
+          I'd love to hear from you. Let's build something amazing together.
+        </p>
+
+        <div class="contact-info-list">
+          <div class="cinfo-item">
+            <div class="cinfo-icon"><i class="fas fa-envelope"></i></div>
+            <div>
+              <span class="cinfo-lbl">Email</span>
+              <span class="cinfo-val">krishnapal.dev@gmail.com</span>
+            </div>
+          </div>
+          <div class="cinfo-item">
+            <div class="cinfo-icon"><i class="fas fa-phone-alt"></i></div>
+            <div>
+              <span class="cinfo-lbl">Phone</span>
+              <span class="cinfo-val">+91 98765 43210</span>
+            </div>
+          </div>
+          <div class="cinfo-item">
+            <div class="cinfo-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div>
+              <span class="cinfo-lbl">Location</span>
+              <span class="cinfo-val">India</span>
+            </div>
+          </div>
+          <div class="cinfo-item">
+            <div class="cinfo-icon"><i class="fas fa-clock"></i></div>
+            <div>
+              <span class="cinfo-lbl">Availability</span>
+              <span class="cinfo-val">Mon – Sat, 9am – 6pm IST</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="social-row mt-4">
+          <a href="#" class="soc-btn" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" class="soc-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="soc-btn" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="soc-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+
+      <!-- Right: Form -->
+      <div class="col-lg-7 col-12" data-aos="fade-left">
+        <div class="contact-form-card">
+          <div id="form-success" class="form-ok d-none">
+            <i class="fas fa-check-circle me-2"></i> Message sent! I'll get back to you within 24 hours.
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6 col-12">
+              <div class="fgroup">
+                <label>Name <span class="req">*</span></label>
+                <div class="finput-wrap">
+                  <i class="fas fa-user"></i>
+                  <input type="text" id="f-name" placeholder="John Doe" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-12">
+              <div class="fgroup">
+                <label>Mobile <span class="req">*</span></label>
+                <div class="finput-wrap">
+                  <i class="fas fa-user"></i>
+                  <input type="text" id="f-mobile" placeholder="9876543210"  />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 col-12">
+              <div class="fgroup">
+                <label>Email <span class="req">*</span></label>
+                <div class="finput-wrap">
+                  <i class="fas fa-envelope"></i>
+                  <input type="email" id="f-email" placeholder="you@email.com" />
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="fgroup">
+                <label>Subject</label>
+                <div class="finput-wrap">
+                  <i class="fas fa-tag"></i>
+                  <input type="text" id="f-subject" placeholder="Project Inquiry" />
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="fgroup">
+                <label>Message <span class="req">*</span></label>
+                <div class="finput-wrap ftextarea">
+                  <i class="fas fa-comment-dots"></i>
+                  <textarea id="f-message" rows="5" placeholder="Tell me about your project or idea..."></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <button id="sendBtn" class="btn-primary-kp w-100 justify-content-center" onclick="handleContactForm()">
+                <i class="fas fa-paper-plane"></i> Send Message
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ████  FOOTER  ████ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4 pb-5">
+
+      <div class="col-lg-4 col-md-12">
+        <div class="ft-brand"><span class="brand-lt">&lt;</span>KP<span class="brand-lt">/&gt;</span></div>
+        <p class="ft-tagline">PHP & Laravel Developer crafting scalable web solutions with passion, precision, and clean code.</p>
+        <div class="social-row mt-3">
+          <a href="#" class="soc-btn" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" class="soc-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="soc-btn" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="soc-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <h5 class="ft-title">Quick Links</h5>
+        <ul class="ft-links">
+          <li><a href="#about"><i class="fas fa-chevron-right"></i>About Me</a></li>
+          <li><a href="#skills"><i class="fas fa-chevron-right"></i>Skills</a></li>
+          <li><a href="#projects"><i class="fas fa-chevron-right"></i>Projects</a></li>
+          <li><a href="#experience"><i class="fas fa-chevron-right"></i>Experience</a></li>
+          <li><a href="#services"><i class="fas fa-chevron-right"></i>Services</a></li>
+          <li><a href="#contact"><i class="fas fa-chevron-right"></i>Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <h5 class="ft-title">Tech Stack</h5>
+        <div class="ft-tags">
+          <span>PHP</span><span>Laravel</span><span>CodeIgniter</span>
+          <span>MySQL</span><span>JavaScript</span><span>Bootstrap</span>
+          <span>REST API</span><span>Git</span><span>AJAX</span><span>JSON</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ft-bottom">
+      <p>&copy; <span id="year"></span> <strong>Krishna Pal</strong>. Crafted with <i class="fas fa-heart" style="color:var(--accent)"></i> and lots of ☕</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Back to Top -->
+<button id="backToTop" class="btt-btn" aria-label="Back to top">
+  <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- AOS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+     AOS.init({
+    duration: 1000,
+    once: true
+  });
+  
+    (function () {
+      emailjs.init("4ZUqX5FAJf1U2J-8H"); 
+    })();
+</script>
+<!-- Custom JS -->
+<script src="script.js"></script>
+</body>
+</html>
