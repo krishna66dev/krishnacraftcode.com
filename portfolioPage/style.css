@@ -13,7 +13,7 @@
   --r          : 14px;
   --rs         : 8px;
   --ease       : .3s cubic-bezier(.4,0,.2,1);
-  --ff-head    :       sans-serif;
+  --ff-head    : 'Syne',       sans-serif;
   --ff-body    : 'DM Sans',    sans-serif;
   --ff-mono    : 'JetBrains Mono', monospace;
 }
@@ -51,7 +51,7 @@
 html{
   scroll-behavior:smooth;
   font-size:16px;
-  /* KEY FIX: offset all anchor targets below fixed navbar */
+  overflow-x:hidden;
   scroll-padding-top:calc(var(--nav-h) + 12px);
 }
 body{
@@ -59,6 +59,7 @@ body{
   background:var(--bg);color:var(--txt);
   line-height:1.7;
   overflow-x:hidden;
+  max-width:100%;
   transition:background var(--ease),color var(--ease);
 }
 a{text-decoration:none;color:inherit}
@@ -209,10 +210,12 @@ ul{list-style:none;padding:0;margin:0}
 ══════════════════════════════ */
 .hero-section{
   min-height:100vh;
-  padding-top:var(--nav-h);       /* <-- THE critical fix */
+  padding-top:var(--nav-h);
   background:var(--bg);
-  position:relative;overflow:hidden;
+  position:relative;
+  overflow:hidden;               /* clips orbs + grid that extend outside */
   display:flex;align-items:center;
+  max-width:100%;                /* never wider than viewport */
 }
 .hero-container{width:100%}
 .hero-row{
@@ -225,6 +228,7 @@ ul{list-style:none;padding:0;margin:0}
 /* Grid bg */
 .hero-bg-grid{
   position:absolute;inset:0;
+  overflow:hidden;
   background-image:
     linear-gradient(var(--border) 1px,transparent 1px),
     linear-gradient(90deg,var(--border) 1px,transparent 1px);
@@ -238,8 +242,8 @@ ul{list-style:none;padding:0;margin:0}
   filter:blur(80px);pointer-events:none;
   animation:orbf 8s ease-in-out infinite alternate;
 }
-.orb-1{width:500px;height:500px;background:radial-gradient(circle,rgba(0,212,170,.12) 0%,transparent 70%);top:-100px;right:-80px}
-.orb-2{width:400px;height:400px;background:radial-gradient(circle,rgba(124,58,237,.10) 0%,transparent 70%);bottom:-80px;left:-80px;animation-delay:-4s}
+.orb-1{width:min(500px,80vw);height:min(500px,80vw);background:radial-gradient(circle,rgba(0,212,170,.12) 0%,transparent 70%);top:-100px;right:-80px}
+.orb-2{width:min(400px,70vw);height:min(400px,70vw);background:radial-gradient(circle,rgba(124,58,237,.10) 0%,transparent 70%);bottom:-80px;left:-80px;animation-delay:-4s}
 @keyframes orbf{from{transform:translate(0,0) scale(1)}to{transform:translate(18px,-18px) scale(1.05)}}
 
 /* Hero Left */
@@ -389,6 +393,8 @@ ul{list-style:none;padding:0;margin:0}
 .fchip-laravel{top:10px;right:10px;border-color:rgba(239,68,68,.4);animation-delay:1s}
 .fchip-mysql {bottom:68px;left:2px;border-color:rgba(59,130,246,.4);animation-delay:2s}
 .fchip-api   {bottom:68px;right:2px;border-color:rgba(124,58,237,.4);animation-delay:.5s}
+/* hero-visual is the containing block for chips — clip anything that escapes it */
+.hero-visual{overflow:visible}   /* chips intentionally peek out of visual box */
 @keyframes flt{from{transform:translateY(0)}to{transform:translateY(-8px)}}
 
 /* Terminal card */
@@ -426,6 +432,15 @@ ul{list-style:none;padding:0;margin:0}
 ══════════════════════════════ */
 .section-pad{padding:6rem 0}
 .section-alt{background:var(--bg2)}
+
+/* ── Global overflow guard ──────────────────────────────────────
+   Bootstrap .row uses margin-left/right: calc(var(--bs-gutter-x) * -.5)
+   which causes horizontal scroll when a row's parent has no padding.
+   Fix: ensure every row is always inside a .container (which has padding),
+   and add a hard cap on all sections & wrappers.
+─────────────────────────────────────────────────────────────── */
+section{ max-width:100%; overflow-x:clip }
+.container,.container-fluid{ max-width:100% }
 
 /* KEY FIX: all sections get scroll-margin-top so
    clicking nav links never hides the section header */
@@ -623,7 +638,9 @@ section[id]{
 /* ══════════════════════════════
    TIMELINE
 ══════════════════════════════ */
-.timeline{position:relative;padding-left:3rem}
+.timeline{position:relative;padding-left:3rem;overflow:visible}
+/* contain timeline within section width */
+#experience .container{overflow:hidden}
 .timeline::before{
   content:'';position:absolute;
   left:17px;top:0;bottom:0;width:2px;
@@ -761,7 +778,7 @@ section[id]{
 /* ══════════════════════════════
    FOOTER
 ══════════════════════════════ */
-.site-footer{background:var(--bg2);border-top:1px solid var(--border);padding-top:4.5rem}
+.site-footer{background:var(--bg2);border-top:1px solid var(--border);padding-top:4.5rem;overflow:hidden;max-width:100%}
 .ft-brand{font-family:var(--ff-head);font-size:1.55rem;font-weight:800;color:var(--txt);letter-spacing:-1px;margin-bottom:.6rem}
 .ft-tagline{color:var(--txt2);font-size:.84rem;line-height:1.7;max-width:260px}
 .ft-title{font-family:var(--ff-head);font-weight:700;font-size:.93rem;color:var(--txt);margin-bottom:.95rem}
@@ -829,6 +846,13 @@ section[id]{
 @media(max-width:767.98px){
   :root{--nav-h:62px}
 
+  /* Belt-and-suspenders: clip all overflow at every breakpoint */
+  html,body{overflow-x:hidden!important;max-width:100vw}
+  section,footer,.container,.row,.col,.col-12,[class*="col-"]{
+    max-width:100%;
+    /* DO NOT set overflow:hidden on col - breaks sticky/dropdown */
+  }
+
   .section-pad{padding:4.5rem 0}
 
   /* Hero */
@@ -837,7 +861,8 @@ section[id]{
   .btn-primary-kp,.btn-outline-kp{width:100%;justify-content:center}
   .stat-sep{height:36px}
 
-  /* Hero visual smaller */
+  /* Hero visual smaller — clip chips so none poke outside viewport */
+  .hero-right{overflow:hidden}
   .hero-visual{width:250px;height:288px}
   .av-ring{width:165px;height:165px}
   .av-core{width:128px;height:128px;font-size:2.7rem}
