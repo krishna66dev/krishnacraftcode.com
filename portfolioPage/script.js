@@ -280,11 +280,11 @@ function handleContactForm() {
   /* Simulated async — replace with real fetch() to your backend */
 
   const templateParams = {
-    name: name,
-    number: number,
-    email: email,
-    subject: subject,
-    message: message
+    name: nameEl.value.trim(),
+    number: mobileEl.value.trim(),
+    email: mailEl.value.trim(),
+    subject: subjectEl.value.trim(),
+    message: msgEl.value.trim()
   };
   emailjs.send(
       "service_94g327l",   // 🔧 replace
