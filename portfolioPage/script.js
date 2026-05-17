@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var typedEl   = document.getElementById('typed-text');
   var roles     = [
     'PHP Developer',
+    'CodeIgniter Expert',
     'Laravel Developer',
     'Backend Developer',
-    'API Developer',
-    'CodeIgniter Expert',
+    'API Integration',
   ];
   var rIdx   = 0;
   var cIdx   = 0;
