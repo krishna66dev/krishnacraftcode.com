@@ -13,7 +13,7 @@
   --r          : 14px;
   --rs         : 8px;
   --ease       : .3s cubic-bezier(.4,0,.2,1);
-  --ff-head    : 'Syne',       sans-serif;
+  --ff-head    :     sans-serif;
   --ff-body    : 'DM Sans',    sans-serif;
   --ff-mono    : 'JetBrains Mono', monospace;
 }
@@ -388,6 +388,7 @@ ul{list-style:none;padding:0;margin:0}
   white-space:nowrap;z-index:3;
   backdrop-filter:blur(8px);
   animation:flt 4s ease-in-out infinite alternate;
+  z-index: 9;
 }
 .fchip-php   {top:10px;left:10px; border-color:rgba(0,212,170,.4);animation-delay:0s}
 .fchip-laravel{top:10px;right:10px;border-color:rgba(239,68,68,.4);animation-delay:1s}
@@ -432,6 +433,9 @@ ul{list-style:none;padding:0;margin:0}
 ══════════════════════════════ */
 .section-pad{padding:6rem 0}
 .section-alt{background:var(--bg2)}
+.row{
+    margin-inline: 0px !important;
+}
 
 /* ── Global overflow guard ──────────────────────────────────────
    Bootstrap .row uses margin-left/right: calc(var(--bs-gutter-x) * -.5)
