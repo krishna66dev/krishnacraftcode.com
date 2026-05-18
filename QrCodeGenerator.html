@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Code Generator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─────────────────────────────────────────────────────────────
+       ROOT & THEME
+    ───────────────────────────────────────────────────────────── */
+    :root {
+      --neon-a: #00f5c4;
+      --neon-b: #7b5ea7;
+      --neon-c: #ff6b6b;
+      --accent: #00f5c4;
+      --accent2: #7b5ea7;
+
+      /* Dark theme */
+      --bg-body: #080b12;
+      --bg-card: rgba(12, 17, 30, 0.82);
+      --bg-input: rgba(255,255,255,0.04);
+      --border: rgba(0,245,196,0.13);
+      --text-primary: #e8f0fe;
+      --text-secondary: #8892a4;
+      --text-muted: #4a5568;
+      --shadow-neon: 0 0 30px rgba(0,245,196,0.18), 0 0 60px rgba(123,94,167,0.10);
+      --shadow-card: 0 8px 48px rgba(0,0,0,0.52), 0 1.5px 0 rgba(0,245,196,0.08);
+      --glass: blur(18px) saturate(1.6);
+    }
+
+    [data-theme="light"] {
+      --bg-body: #f0f4ff;
+      --bg-card: rgba(255,255,255,0.80);
+      --bg-input: rgba(0,0,0,0.04);
+      --border: rgba(123,94,167,0.18);
+      --text-primary: #0d1117;
+      --text-secondary: #4a5568;
+      --text-muted: #a0aec0;
+      --shadow-neon: 0 0 24px rgba(123,94,167,0.15), 0 0 48px rgba(0,245,196,0.10);
+      --shadow-card: 0 8px 40px rgba(0,0,0,0.10), 0 1.5px 0 rgba(123,94,167,0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    /* Animated mesh background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 20% 10%, rgba(0,245,196,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 80% 90%, rgba(123,94,167,0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 60% 30%, rgba(255,107,107,0.05) 0%, transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    [data-theme="light"] body::before {
+      background:
+        radial-gradient(ellipse 70% 60% at 20% 10%, rgba(0,245,196,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 80% 90%, rgba(123,94,167,0.12) 0%, transparent 70%);
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+      animation: orbFloat 12s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 420px; height: 420px; background: var(--neon-a); top: -100px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 320px; height: 320px; background: var(--neon-b); bottom: -80px; right: -80px; animation-delay: -4s; }
+    .orb-3 { width: 240px; height: 240px; background: var(--neon-c); top: 50%; left: 60%; animation-delay: -8s; }
+
+    @keyframes orbFloat {
+      0% { transform: translate(0,0) scale(1); }
+      100% { transform: translate(30px, 40px) scale(1.08); }
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       NAVBAR
+    ───────────────────────────────────────────────────────────── */
+    .navbar-brand-text { font-family:  sans-serif; font-weight: 800; font-size: 1.4rem; }
+    .navbar-brand-text span { color: var(--neon-a); }
+
+    nav.top-nav {
+      position: sticky; top: 0; z-index: 1000;
+      backdrop-filter: var(--glass);
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.22);
+    }
+
+    .nav-badge {
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em;
+      background: linear-gradient(135deg, var(--neon-a), var(--neon-b));
+      color: #000; border-radius: 4px; padding: 2px 6px; margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      position: relative; width: 52px; height: 26px; cursor: pointer;
+    }
+    .theme-toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 999px; transition: 0.3s;
+      display: flex; align-items: center; padding: 3px;
+    }
+    .toggle-slider::after {
+      content: '🌙'; font-size: 13px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--neon-a);
+      display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; line-height: 1;
+    }
+    .theme-toggle input:checked + .toggle-slider::after {
+      transform: translateX(26px); content: '☀️';
+      background: var(--neon-b);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       HERO
+    ───────────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center; padding: 4rem 1rem 2rem;
+      position: relative; z-index: 1;
+    }
+    .hero h1 {
+      font-family:  sans-serif; font-weight: 800;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      line-height: 1.05;
+      background: linear-gradient(135deg, var(--neon-a) 0%, #ffffff 50%, var(--neon-b) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+    [data-theme="light"] .hero h1 {
+      background: linear-gradient(135deg, #00b894 0%, #0d1117 50%, #7b5ea7 100%);
+      -webkit-background-clip: text; background-clip: text;
+    }
+    .hero p { color: var(--text-secondary); font-size: 1rem; max-width: 500px; margin: 0 auto; }
+
+    /* ─────────────────────────────────────────────────────────────
+       GLASS CARD
+    ───────────────────────────────────────────────────────────── */
+    .glass-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      backdrop-filter: var(--glass);
+      box-shadow: var(--shadow-card);
+      padding: 2rem;
+      position: relative; z-index: 1;
+      transition: box-shadow 0.3s;
+    }
+    .glass-card:hover { box-shadow: var(--shadow-neon), var(--shadow-card); }
+
+    .section-label {
+      font-family:  sans-serif; font-weight: 700;
+      font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--neon-a); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ─────────────────────────────────────────────────────────────
+       INPUTS & CONTROLS
+    ───────────────────────────────────────────────────────────── */
+    .smart-input-wrap { position: relative; }
+    .type-badge {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em;
+      padding: 3px 8px; border-radius: 999px; text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .type-badge.url     { background: rgba(0,245,196,0.15); color: var(--neon-a); border: 1px solid rgba(0,245,196,0.3); }
+    .type-badge.email   { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+    .type-badge.phone   { background: rgba(40,167,69,0.15); color: #2ecc71; border: 1px solid rgba(40,167,69,0.3); }
+    .type-badge.whatsapp{ background: rgba(37,211,102,0.15); color: #25d366; border: 1px solid rgba(37,211,102,0.3); }
+    .type-badge.sms     { background: rgba(255,107,107,0.15); color: var(--neon-c); border: 1px solid rgba(255,107,107,0.3); }
+    .type-badge.text    { background: rgba(123,94,167,0.15); color: #b39ddb; border: 1px solid rgba(123,94,167,0.3); }
+
+    .form-control, .form-select {
+      /* background: var(--bg-input) !important; */
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text-primary) !important;
+      border-radius: 10px !important;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.88rem;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--neon-a) !important;
+      box-shadow: 0 0 0 3px rgba(0,245,196,0.12) !important;
+      outline: none !important;
+    }
+    .form-control::placeholder { color: var(--text-muted) !important; }
+
+    .char-counter { font-size: 0.7rem; color: var(--text-muted); text-align: right; margin-top: 4px; }
+    .char-counter.warn { color: var(--neon-c); }
+
+    /* Color pickers */
+    .color-pick-wrap {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .color-swatch {
+      width: 38px; height: 38px; border-radius: 8px;
+      border: 2px solid var(--border); cursor: pointer;
+      overflow: hidden; transition: border-color 0.2s;
+    }
+    .color-swatch:hover { border-color: var(--neon-a); }
+    .color-swatch input[type="color"] {
+      width: 200%; height: 200%;
+      margin: -50% 0 0 -50%; border: none;
+      cursor: pointer; opacity: 0;
+      position: absolute;
+    }
+    .color-swatch { position: relative; }
+    .color-preview {
+      position: absolute; inset: 0; border-radius: 6px;
+      pointer-events: none;
+    }
+
+    /* Range slider */
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 4px;
+      background: var(--border); border-radius: 999px; outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px;
+      border-radius: 50%; background: var(--neon-a);
+      cursor: pointer; box-shadow: 0 0 8px rgba(0,245,196,0.5);
+    }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 12px; padding: 1.5rem;
+      text-align: center; cursor: pointer;
+      transition: all 0.3s; position: relative;
+    }
+    .dropzone:hover, .dropzone.drag-over {
+      border-color: var(--neon-a);
+      background: rgba(0,245,196,0.04);
+    }
+    .dropzone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .dropzone-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .dropzone p { color: var(--text-secondary); font-size: 0.8rem; }
+    .logo-preview-img {
+      width: 56px; height: 56px; border-radius: 8px;
+      object-fit: cover; border: 2px solid var(--border);
+      display: none;
+    }
+
+    /* Buttons */
+    .btn-neon {
+      background: linear-gradient(135deg, var(--neon-a), var(--neon-b));
+      border: none; color: #000; font-family:  sans-serif;
+      font-weight: 700; font-size: 0.88rem; letter-spacing: 0.04em;
+      border-radius: 10px; padding: 0.65rem 1.5rem;
+      cursor: pointer; transition: all 0.25s;
+      box-shadow: 0 4px 20px rgba(0,245,196,0.25);
+      position: relative; overflow: hidden;
+    }
+    .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,245,196,0.4); }
+    .btn-neon:active { transform: translateY(0); }
+    .btn-neon::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .btn-neon:hover::after { opacity: 1; }
+
+    .btn-ghost {
+      background: var(--bg-input); border: 1px solid var(--border);
+      color: var(--text-primary); font-family: 'DM Mono', monospace;
+      font-size: 0.8rem; border-radius: 8px; padding: 0.5rem 1rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--neon-a); color: var(--neon-a); }
+
+    /* ─────────────────────────────────────────────────────────────
+       QR PREVIEW
+    ───────────────────────────────────────────────────────────── */
+    .qr-preview-panel {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 340px;
+    }
+    .qr-canvas-wrap {
+      position: relative; display: inline-flex;
+      align-items: center; justify-content: center;
+      transition: all 0.4s cubic-bezier(.23,1,.32,1);
+    }
+    .qr-canvas-wrap.appear {
+      animation: qrAppear 0.5s cubic-bezier(.23,1,.32,1) both;
+    }
+    @keyframes qrAppear {
+      from { opacity: 0; transform: scale(0.82) translateY(12px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .qr-glow-ring {
+      position: absolute; inset: -12px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--neon-a), var(--neon-b));
+      opacity: 0; transition: opacity 0.4s;
+      filter: blur(18px); z-index: -1;
+    }
+    .qr-canvas-wrap:hover .qr-glow-ring { opacity: 0.45; }
+
+    #qrCanvas, #qrContainer canvas {
+      border-radius: 12px;
+      max-width: 100%;
+      display: block;
+    }
+    #qrContainer { position: relative; }
+    #qrPlaceholder {
+      width: 220px; height: 220px;
+      border: 2px dashed var(--border);
+      border-radius: 16px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+      color: var(--text-muted);
+    }
+    .qr-placeholder-icon { font-size: 3rem; opacity: 0.4; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.7} }
+
+    .qr-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 1.2rem; }
+
+    /* ─────────────────────────────────────────────────────────────
+       DOWNLOAD SECTION
+    ───────────────────────────────────────────────────────────── */
+    .dl-btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .dl-btn {
+      flex: 1; min-width: 80px;
+      background: var(--bg-input); border: 1px solid var(--border);
+      color: var(--text-primary); font-family: 'DM Mono', monospace;
+      font-size: 0.78rem; font-weight: 500;
+      border-radius: 10px; padding: 0.6rem 0.8rem;
+      cursor: pointer; transition: all 0.22s; text-align: center;
+    }
+    .dl-btn:hover { border-color: var(--neon-a); color: var(--neon-a); background: rgba(0,245,196,0.06); }
+    .dl-btn .dl-icon { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+
+    /* ─────────────────────────────────────────────────────────────
+       HISTORY
+    ───────────────────────────────────────────────────────────── */
+    .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; }
+    .history-list::-webkit-scrollbar { width: 4px; }
+    .history-list::-webkit-scrollbar-track { background: transparent; }
+    .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .hist-item {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.65rem 0.9rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .hist-item:hover { border-color: var(--neon-a); background: rgba(0,245,196,0.04); }
+    .hist-thumb {
+      width: 40px; height: 40px; border-radius: 6px;
+      flex-shrink: 0; object-fit: contain;
+      background: white;
+    }
+    .hist-info { flex: 1; min-width: 0; }
+    .hist-content { font-size: 0.78rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hist-meta { font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; }
+    .hist-del {
+      background: none; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 1.1rem; padding: 2px 6px;
+      border-radius: 6px; transition: all 0.2s; flex-shrink: 0;
+    }
+    .hist-del:hover { color: var(--neon-c); background: rgba(255,107,107,0.1); }
+
+    /* ─────────────────────────────────────────────────────────────
+       TOAST
+    ───────────────────────────────────────────────────────────── */
+    #toastContainer {
+      position: fixed; top: 80px; right: 20px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast-item {
+      background: var(--bg-card); border: 1px solid var(--border);
+      backdrop-filter: var(--glass); border-radius: 10px;
+      padding: 0.75rem 1.2rem; font-size: 0.82rem;
+      color: var(--text-primary); min-width: 220px;
+      box-shadow: var(--shadow-card);
+      animation: toastIn 0.35s cubic-bezier(.23,1,.32,1) both;
+      display: flex; align-items: center; gap: 8px;
+    }
+    @keyframes toastIn {
+      from { opacity:0; transform: translateX(40px); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+    .toast-item.success .toast-icon { color: var(--neon-a); }
+    .toast-item.error   .toast-icon { color: var(--neon-c); }
+    .toast-item.info    .toast-icon { color: #7b5ea7; }
+
+    /* ─────────────────────────────────────────────────────────────
+       FULLSCREEN OVERLAY
+    ───────────────────────────────────────────────────────────── */
+    #fsOverlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.92); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; flex-direction: column;
+      gap: 20px;
+    }
+    #fsOverlay.show { display: flex; }
+    #fsOverlay canvas { border-radius: 12px; max-width: 90vw; max-height: 80vh; }
+    #fsOverlay .fs-close {
+      position: absolute; top: 20px; right: 24px;
+      background: none; border: none; color: #fff; font-size: 2rem;
+      cursor: pointer; opacity: 0.7; transition: opacity 0.2s;
+    }
+    #fsOverlay .fs-close:hover { opacity: 1; }
+
+    /* ─────────────────────────────────────────────────────────────
+       MISC
+    ───────────────────────────────────────────────────────────── */
+    .gradient-toggle {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; color: var(--text-secondary); cursor: pointer;
+    }
+    .gradient-toggle input { accent-color: var(--neon-a); }
+
+    .ec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .ec-btn {
+      background: var(--bg-input); border: 1px solid var(--border);
+      color: var(--text-secondary); border-radius: 8px; padding: 6px 4px;
+      font-size: 0.72rem; font-family: 'DM Mono', monospace;
+      cursor: pointer; text-align: center; transition: all 0.2s;
+    }
+    .ec-btn:hover, .ec-btn.active {
+      border-color: var(--neon-a); color: var(--neon-a);
+      background: rgba(0,245,196,0.08);
+    }
+
+    footer {
+      text-align: center; padding: 2rem 1rem;
+      color: var(--text-muted); font-size: 0.75rem;
+      border-top: 1px solid var(--border);
+      margin-top: 4rem; position: relative; z-index: 1;
+    }
+    footer a { color: var(--neon-a); text-decoration: none; }
+
+    .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+    /* Rounded QR toggle */
+    .option-chip {
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px; font-size: 0.75rem;
+      color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'DM Mono', monospace;
+    }
+    .option-chip input { accent-color: var(--neon-a); }
+    .option-chip:hover { border-color: var(--neon-b); }
+
+    /* Gradient color pickers */
+    #gradientControls { transition: all 0.3s; }
+
+    /* Scroll offset for sticky nav */
+    html { scroll-padding-top: 70px; }
+
+    /* Mobile refinements */
+    @media (max-width: 767px) {
+      .hero { padding: 2.5rem 1rem 1.5rem; }
+      .glass-card { padding: 1.25rem; }
+      .qr-actions .btn-ghost { font-size: 0.72rem; padding: 0.4rem 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Floating orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- Toast container -->
+<div id="toastContainer"></div>
+
+<!-- Fullscreen overlay -->
+<div id="fsOverlay">
+  <button class="fs-close" onclick="closeFullscreen()">✕</button>
+  <canvas id="fsCanvas"></canvas>
+  <p style="color:#8892a4;font-size:.8rem;font-family:'DM Mono',monospace;">Click anywhere or press ESC to close</p>
+</div>
+
+<!-- ──────────────── NAVBAR ──────────────── -->
+<nav class="top-nav" aria-label="Main navigation">
+  <div class="navbar-brand-text">
+    QR<span>Forge</span>
+    <span class="nav-badge">PRO</span>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <span style="font-size:0.72rem;color:var(--text-muted)">Dark</span>
+    <label class="theme-toggle" aria-label="Toggle light/dark mode">
+      <input type="checkbox" id="themeSwitch" />
+      <span class="toggle-slider"></span>
+    </label>
+    <span style="font-size:0.72rem;color:var(--text-muted)">Light</span>
+  </div>
+</nav>
+
+<!-- ──────────────── HERO ──────────────── -->
+<div class="hero">
+  <h1>Generate. Customize.<br>Share Instantly.</h1>
+  <p>The most powerful QR code generator with smart input detection, full customization &amp; logo embedding.</p>
+</div>
+
+<!-- ──────────────── MAIN CONTENT ──────────────── -->
+<div class="container pb-5" style="max-width:1100px; position:relative; z-index:1;">
+  <div class="row g-4">
+
+    <!-- LEFT COLUMN: Controls -->
+    <div class="col-lg-7">
+
+      <!-- Smart Input Card -->
+      <div class="glass-card mb-4">
+        <div class="section-label">Smart Input</div>
+        <div class="smart-input-wrap">
+          <textarea
+            id="qrInput"
+            class="form-control"
+            rows="3"
+            placeholder="Type URL, email, phone, wa:number, sms:number or any text…"
+            aria-label="QR Code content input"
+            spellcheck="false"
+          ></textarea>
+          <span id="typeBadge" class="type-badge text" style="top:14px;transform:none;">text</span>
+        </div>
+        <div class="char-counter" id="charCounter">0 / 2048 chars</div>
+
+        <div class="row g-2 mt-2">
+          <div class="col-6">
+            <label class="section-label" style="font-size:0.65rem; margin-bottom:6px;">QR SIZE</label>
+            <select class="form-select form-select-sm" id="qrSize" aria-label="QR code size">
+              <option value="240">Small (240px)</option>
+              <option value="320" selected>Medium (320px)</option>
+              <option value="420">Large (420px)</option>
+              <option value="520">XL (520px)</option>
+              <option value="720">XXL (720px)</option>
+              <option value="920">920px</option>
+              <option value="1200">1200px</option>
+              <option value="1600">1600px</option>
+              <option value="2200">2200px</option>
+              <option value="3200">3200px</option>
+              <option value="4200">4200px</option>
+              <option value="5200">5200px</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="section-label" style="font-size:0.65rem; margin-bottom:6px;">ERROR CORRECTION</label>
+            <div class="ec-grid">
+              <button class="ec-btn" data-ec="L" aria-label="Error correction L">L</button>
+              <button class="ec-btn active" data-ec="M" aria-label="Error correction M">M</button>
+              <button class="ec-btn" data-ec="Q" aria-label="Error correction Q">Q</button>
+              <button class="ec-btn" data-ec="H" aria-label="Error correction H">H</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customization Card -->
+      <div class="glass-card mb-4">
+        <div class="section-label">Customization</div>
+
+        <!-- Colors -->
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="d-block mb-1" style="font-size:0.72rem;color:var(--text-secondary)">Foreground</label>
+            <div class="color-pick-wrap">
+              <div class="color-swatch" title="Foreground color">
+                <div class="color-preview" id="fgPreview" style="background:#000000;"></div>
+                <input type="color" id="fgColor" value="#000000" aria-label="Foreground color picker" />
+              </div>
+              <input type="text" class="form-control form-control-sm" id="fgHex" value="#000000" maxlength="7" aria-label="Foreground hex" />
+            </div>
+          </div>
+          <div class="col-6">
+            <label class="d-block mb-1" style="font-size:0.72rem;color:var(--text-secondary)">Background</label>
+            <div class="color-pick-wrap">
+              <div class="color-swatch" title="Background color">
+                <div class="color-preview" id="bgPreview" style="background:#ffffff;"></div>
+                <input type="color" id="bgColor" value="#ffffff" aria-label="Background color picker" />
+              </div>
+              <input type="text" class="form-control form-control-sm" id="bgHex" value="#ffffff" maxlength="7" aria-label="Background hex" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Gradient -->
+        <label class="gradient-toggle mb-2">
+          <input type="checkbox" id="useGradient" aria-label="Use gradient foreground" />
+          Use gradient foreground
+        </label>
+        <div id="gradientControls" class="d-none mb-3">
+          <div class="row g-2">
+            <div class="col-6">
+              <label style="font-size:0.7rem;color:var(--text-muted)">Gradient start</label>
+              <div class="color-pick-wrap mt-1">
+                <div class="color-swatch">
+                  <div class="color-preview" id="gradStartPreview" style="background:#00f5c4;"></div>
+                  <input type="color" id="gradStart" value="#00f5c4" aria-label="Gradient start color" />
+                </div>
+                <input type="text" class="form-control form-control-sm" id="gradStartHex" value="#00f5c4" />
+              </div>
+            </div>
+            <div class="col-6">
+              <label style="font-size:0.7rem;color:var(--text-muted)">Gradient end</label>
+              <div class="color-pick-wrap mt-1">
+                <div class="color-swatch">
+                  <div class="color-preview" id="gradEndPreview" style="background:#7b5ea7;"></div>
+                  <input type="color" id="gradEnd" value="#7b5ea7" aria-label="Gradient end color" />
+                </div>
+                <input type="text" class="form-control form-control-sm" id="gradEndHex" value="#7b5ea7" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Options row -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <label class="option-chip">
+            <input type="checkbox" id="roundedCorners" /> Rounded corners
+          </label>
+          <label class="option-chip">
+            <input type="checkbox" id="roundedLogo" /> Rounded logo
+          </label>
+        </div>
+
+        <!-- Padding -->
+        <label style="font-size:0.72rem;color:var(--text-secondary)" class="mb-1 d-block">Padding: <span id="paddingVal">4</span>px</label>
+        <input type="range" id="qrPadding" min="0" max="40" value="4" aria-label="QR code padding" />
+
+      </div>
+
+      <!-- Logo Upload Card -->
+      <div class="glass-card mb-4">
+        <div class="section-label">Logo / Image</div>
+        <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Logo upload area">
+          <input type="file" id="logoFile" accept="image/*" aria-label="Upload logo file" />
+          <div id="dropzoneContent">
+            <div class="dropzone-icon">🖼️</div>
+            <p>Drop logo here or <strong style="color:var(--neon-a)">click to upload</strong></p>
+            <p style="font-size:0.68rem;margin-top:4px;">PNG, JPG, SVG, WebP supported</p>
+          </div>
+          <div id="logoPreviewWrap" class="d-none mt-2">
+            <img id="logoPreviewImg" class="logo-preview-img" alt="Logo preview" />
+            <button class="btn-ghost ms-2" id="removeLogo" style="font-size:0.72rem;" aria-label="Remove logo">✕ Remove</button>
+          </div>
+        </div>
+
+        <div id="logoSizeWrap" class="mt-3 d-none">
+          <label style="font-size:0.72rem;color:var(--text-secondary)" class="mb-1 d-block">
+            Logo size: <span id="logoSizeVal">22</span>% of QR
+          </label>
+          <input type="range" id="logoSize" min="8" max="40" value="22" aria-label="Logo size" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Preview -->
+    <div class="col-lg-5">
+      <div class="glass-card" style="position:sticky;top:80px;">
+        <div class="section-label">Live Preview</div>
+
+        <div class="qr-preview-panel">
+          <div class="qr-canvas-wrap" id="qrCanvasWrap">
+            <div class="qr-glow-ring"></div>
+            <div id="qrPlaceholder">
+              <div class="qr-placeholder-icon">⬛</div>
+              <span style="font-size:0.75rem;">Enter text to generate QR</span>
+            </div>
+            <div id="qrContainer" style="display:none;"></div>
+          </div>
+
+          <div class="qr-actions">
+            <button class="btn-ghost" id="btnCopy" aria-label="Copy content">📋 Copy</button>
+            <button class="btn-ghost" id="btnFullscreen" aria-label="Fullscreen preview">⛶ Full</button>
+            <button class="btn-ghost" id="btnShare" aria-label="Share QR">↗ Share</button>
+            <button class="btn-ghost" id="btnClearInput" aria-label="Clear input">🗑 Clear</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Generate button -->
+        <button class="btn-neon w-100 mb-3" id="generateBtn" aria-label="Generate QR code">
+          ✦ Generate QR Code
+        </button>
+
+        <!-- Download options -->
+        <div class="section-label">Download As</div>
+        <div class="dl-btn-group">
+          <button class="dl-btn" id="dlPng" aria-label="Download PNG">
+            <span class="dl-icon">🖼️</span>PNG
+          </button>
+          <button class="dl-btn" id="dlJpg" aria-label="Download JPG">
+            <span class="dl-icon">📷</span>JPG
+          </button>
+          <button class="dl-btn" id="dlSvg" aria-label="Download SVG">
+            <span class="dl-icon">✏️</span>SVG
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.row -->
+
+  <!-- ──────────────── HISTORY ──────────────── -->
+  <div class="glass-card mt-4" id="historyCard">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="section-label" style="margin-bottom:0; flex:1;">History</div>
+      <button class="btn-ghost" id="clearHistory" style="font-size:0.72rem;" aria-label="Clear all history">Clear All</button>
+    </div>
+    <div id="historyList" class="history-list">
+      <p id="noHistory" style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:1rem;">
+        No history yet. Generate a QR code to see it here.
+      </p>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<!-- ──────────────── FOOTER ──────────────── -->
+<footer>
+  <p>QRForge &mdash; Premium QR Code Generator &nbsp;|&nbsp; Built with ♥ &nbsp;|&nbsp;
+  <a href="#" onclick="return false;">Privacy</a> &middot; <a href="#" onclick="return false;">Terms</a></p>
+</footer>
+
+<!-- ──────────────── CDN SCRIPTS ──────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<script>
+/* ──────────────────────────────────────────────────────────────
+   QRForge — Main Application Script
+   ────────────────────────────────────────────────────────────── */
+
+'use strict';
+
+/* ─── State ──────────────────────────────────── */
+const state = {
+  qrInstance: null,
+  logoDataUrl: null,
+  errorCorrection: 'M',
+  history: [],
+  lastGeneratedText: '',
+  debounceTimer: null,
+};
+
+/* ─── DOM refs ───────────────────────────────── */
+const $ = id => document.getElementById(id);
+const qrInput       = $('qrInput');
+const typeBadge     = $('typeBadge');
+const charCounter   = $('charCounter');
+const qrSize        = $('qrSize');
+const fgColor       = $('fgColor');
+const bgColor       = $('bgColor');
+const fgHex         = $('fgHex');
+const bgHex         = $('bgHex');
+const fgPreview     = $('fgPreview');
+const bgPreview     = $('bgPreview');
+const useGradient   = $('useGradient');
+const gradControls  = $('gradientControls');
+const gradStart     = $('gradStart');
+const gradEnd       = $('gradEnd');
+const gradStartHex  = $('gradStartHex');
+const gradEndHex    = $('gradEndHex');
+const gradStartPrev = $('gradStartPreview');
+const gradEndPrev   = $('gradEndPreview');
+const roundedCorners= $('roundedCorners');
+const roundedLogo   = $('roundedLogo');
+const qrPadding     = $('qrPadding');
+const paddingVal    = $('paddingVal');
+const dropzone      = $('dropzone');
+const logoFile      = $('logoFile');
+const logoSizeWrap  = $('logoSizeWrap');
+const logoSize      = $('logoSize');
+const logoSizeVal   = $('logoSizeVal');
+const logoPreviewWrap=$('logoPreviewWrap');
+const logoPreviewImg= $('logoPreviewImg');
+const removeLogo    = $('removeLogo');
+const qrPlaceholder = $('qrPlaceholder');
+const qrContainer   = $('qrContainer');
+const qrCanvasWrap  = $('qrCanvasWrap');
+const generateBtn   = $('generateBtn');
+const themeSwitch   = $('themeSwitch');
+const historyList   = $('historyList');
+const noHistory     = $('noHistory');
+const fsOverlay     = $('fsOverlay');
+const fsCanvas      = $('fsCanvas');
+
+/* ─── Theme ──────────────────────────────────── */
+function initTheme() {
+  const saved = localStorage.getItem('qrforge-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  themeSwitch.checked = saved === 'light';
+}
+themeSwitch.addEventListener('change', () => {
+  const t = themeSwitch.checked ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('qrforge-theme', t);
+});
+initTheme();
+
+/* ─── Smart Input Detection ──────────────────── */
+function detectType(raw) {
+  const t = raw.trim();
+  if (!t) return { type: 'text', value: '' };
+  // WhatsApp prefix
+  if (/^wa:/i.test(t)) {
+    const num = t.slice(3).replace(/\D/g,'');
+    return { type: 'whatsapp', value: `https://wa.me/${num}` };
+  }
+  // SMS
+  if (/^sms:/i.test(t)) {
+    return { type: 'sms', value: t.startsWith('sms:') ? t : `sms:${t.slice(4)}` };
+  }
+  // Email
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) {
+    return { type: 'email', value: `mailto:${t}` };
+  }
+  // Phone (7-15 digits, optional +)
+  if (/^\+?[\d\s\-\(\)]{7,15}$/.test(t) && /\d{7,}/.test(t.replace(/\D/,''))) {
+    return { type: 'phone', value: `tel:${t.replace(/\s/g,'')}` };
+  }
+  // URL
+  if (/^(https?:\/\/)/.test(t)) return { type: 'url', value: t };
+  if (/^[\w\-]+\.[a-z]{2,}(\/|$)/i.test(t)) return { type: 'url', value: `https://${t}` };
+  return { type: 'text', value: t };
+}
+
+function updateTypeBadge(type) {
+  typeBadge.className = `type-badge ${type}`;
+  const labels = { url:'🔗 URL', email:'✉ Email', phone:'📞 Phone', whatsapp:'💬 WhatsApp', sms:'💬 SMS', text:'📝 Text' };
+  typeBadge.textContent = labels[type] || type;
+}
+
+qrInput.addEventListener('input', () => {
+  const raw = qrInput.value;
+  const count = raw.length;
+  charCounter.textContent = `${count} / 2048 chars`;
+  charCounter.className = count > 1800 ? 'char-counter warn' : 'char-counter';
+
+  const { type } = detectType(raw);
+  updateTypeBadge(type);
+
+  // Debounced auto-generate
+  clearTimeout(state.debounceTimer);
+  if (raw.trim()) {
+    state.debounceTimer = setTimeout(() => generateQR(), 6000);
+  }
+});
+
+/* ─── Error Correction ───────────────────────── */
+document.querySelectorAll('.ec-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ec-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.errorCorrection = btn.dataset.ec;
+  });
+});
+
+/* ─── Color Pickers ──────────────────────────── */
+function syncColor(colorInput, hexInput, previewEl) {
+  colorInput.addEventListener('input', () => {
+    hexInput.value = colorInput.value;
+    previewEl.style.background = colorInput.value;
+  });
+  hexInput.addEventListener('input', () => {
+    if (/^#[0-9a-fA-F]{6}$/.test(hexInput.value)) {
+      colorInput.value = hexInput.value;
+      previewEl.style.background = hexInput.value;
+    }
+  });
+}
+syncColor(fgColor, fgHex, fgPreview);
+syncColor(bgColor, bgHex, bgPreview);
+syncColor(gradStart, gradStartHex, gradStartPrev);
+syncColor(gradEnd, gradEndHex, gradEndPrev);
+
+// Swatch click → open color picker
+document.querySelectorAll('.color-swatch').forEach(sw => {
+  const picker = sw.querySelector('input[type="color"]');
+  if (picker) sw.addEventListener('click', e => { if(e.target===sw||e.target===sw.querySelector('.color-preview')) picker.click(); });
+});
+
+/* ─── Gradient Toggle ────────────────────────── */
+useGradient.addEventListener('change', () => {
+  gradControls.classList.toggle('d-none', !useGradient.checked);
+});
+
+/* ─── Padding Slider ─────────────────────────── */
+qrPadding.addEventListener('input', () => { paddingVal.textContent = qrPadding.value; });
+
+/* ─── Logo Upload ────────────────────────────── */
+function handleLogoFile(file) {
+  if (!file || !file.type.startsWith('image/')) { toast('Please upload an image file.', 'error'); return; }
+  if (file.size > 5 * 1024 * 1024) { toast('Image too large (max 5MB)', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.logoDataUrl = e.target.result;
+    logoPreviewImg.src = state.logoDataUrl;
+    logoPreviewImg.style.display = 'inline-block';
+    logoPreviewWrap.classList.remove('d-none');
+    $('dropzoneContent').style.display = 'none';
+    logoSizeWrap.classList.remove('d-none');
+    toast('Logo uploaded!', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+logoFile.addEventListener('change', e => handleLogoFile(e.target.files[0]));
+removeLogo.addEventListener('click', e => {
+  e.stopPropagation();
+  state.logoDataUrl = null;
+  logoPreviewImg.src = '';
+  logoPreviewImg.style.display = 'none';
+  logoPreviewWrap.classList.add('d-none');
+  $('dropzoneContent').style.display = '';
+  logoSizeWrap.classList.add('d-none');
+  logoFile.value = '';
+  toast('Logo removed', 'info');
+});
+
+// Drag & drop
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault(); dropzone.classList.remove('drag-over');
+  handleLogoFile(e.dataTransfer.files[0]);
+});
+dropzone.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') logoFile.click(); });
+
+logoSize.addEventListener('input', () => { logoSizeVal.textContent = logoSize.value; });
+
+/* ─── QR Generation ──────────────────────────── */
+const EC_MAP = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
+
+function generateQR() {
+  const raw = qrInput.value.trim();
+  if (!raw) { toast('Please enter some content first.', 'error'); return; }
+  if (raw.length > 2048) { toast('Content too long (max 2048 chars)', 'error'); return; }
+
+  // Validate
+  const { type, value } = detectType(raw);
+  if (type === 'email' && !/^mailto:.+@.+\..+/.test(value)) {
+    toast('Invalid email address', 'error'); return;
+  }
+  updateTypeBadge(type);
+
+  const size = parseInt(qrSize.value);
+  const padding = parseInt(qrPadding.value);
+  const totalSize = size + padding * 2;
+  const fg = fgColor.value;
+  const bg = bgColor.value;
+
+  // Clear previous
+  qrContainer.innerHTML = '';
+  state.qrInstance = null;
+
+  try {
+    state.qrInstance = new QRCode(qrContainer, {
+      text: value,
+      width: size,
+      height: size,
+      colorDark: fg,
+      colorLight: bg,
+      correctLevel: EC_MAP[state.errorCorrection] || QRCode.CorrectLevel.M,
+    });
+  } catch(err) {
+    toast('Failed to generate QR: ' + err.message, 'error'); return;
+  }
+
+  // Wait for QRCode to render
+  setTimeout(() => {
+    const canvas = qrContainer.querySelector('canvas');
+    if (!canvas) { toast('QR render error', 'error'); return; }
+
+    // Post-process: gradient, rounded, logo, padding
+    const finalCanvas = postProcess(canvas, { size, padding, totalSize, fg, bg, type });
+
+    // Replace container content
+    qrContainer.innerHTML = '';
+    qrContainer.appendChild(finalCanvas);
+
+    // Show
+    qrPlaceholder.style.display = 'none';
+    qrContainer.style.display = 'block';
+    qrCanvasWrap.classList.remove('appear');
+    void qrCanvasWrap.offsetWidth; // reflow
+    qrCanvasWrap.classList.add('appear');
+
+    state.lastGeneratedText = value;
+    saveToHistory(raw, type, finalCanvas.toDataURL('image/png'));
+    toast('QR generated!', 'success');
+  }, 80);
+}
+
+function postProcess(srcCanvas, { size, padding, totalSize, fg, bg }) {
+  const out = document.createElement('canvas');
+  // Cap display size for preview
+  const displayMax = 320;
+  const scale = size > displayMax ? displayMax / size : 1;
+  out.width = totalSize;
+  out.height = totalSize;
+  out.style.width = Math.round(totalSize * scale) + 'px';
+  out.style.height = Math.round(totalSize * scale) + 'px';
+  const ctx = out.getContext('2d');
+
+  // Background
+  ctx.fillStyle = bg;
+  if (roundedCorners.checked) {
+    roundRect(ctx, 0, 0, totalSize, totalSize, 18);
+    ctx.fill();
+  } else {
+    ctx.fillRect(0, 0, totalSize, totalSize);
+  }
+
+  // Gradient overlay or solid
+  if (useGradient.checked) {
+    // Draw QR in black on temp
+    const tmp = document.createElement('canvas');
+    tmp.width = size; tmp.height = size;
+    const tmpCtx = tmp.getContext('2d');
+    tmpCtx.drawImage(srcCanvas, 0, 0, size, size);
+
+    // Create gradient
+    const grad = ctx.createLinearGradient(padding, padding, padding+size, padding+size);
+    grad.addColorStop(0, gradStart.value);
+    grad.addColorStop(1, gradEnd.value);
+
+    // Draw QR on out with gradient
+    ctx.save();
+    ctx.drawImage(tmp, padding, padding, size, size);
+    ctx.globalCompositeOperation = 'source-in';
+    // Reapply background first
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, totalSize, totalSize);
+    ctx.globalCompositeOperation = 'multiply';
+    // Actually do proper gradient: draw the QR, colorize dark pixels
+    ctx.restore();
+
+    // Simpler approach: draw QR then overlay gradient on dark pixels
+    const tmpCanvas2 = document.createElement('canvas');
+    tmpCanvas2.width = size; tmpCanvas2.height = size;
+    const ctx2 = tmpCanvas2.getContext('2d');
+    ctx2.drawImage(srcCanvas, 0, 0, size, size);
+    const imgData = ctx2.getImageData(0,0,size,size);
+    const d = imgData.data;
+    const gradHelper = document.createElement('canvas');
+    gradHelper.width = size; gradHelper.height = size;
+    const ghCtx = gradHelper.getContext('2d');
+    const ghGrad = ghCtx.createLinearGradient(0,0,size,size);
+    ghGrad.addColorStop(0, gradStart.value);
+    ghGrad.addColorStop(1, gradEnd.value);
+    ghCtx.fillStyle = ghGrad;
+    ghCtx.fillRect(0,0,size,size);
+    const gradData = ghCtx.getImageData(0,0,size,size).data;
+    for (let i=0;i<d.length;i+=4) {
+      if (d[i]<128) { // dark pixel → apply gradient color
+        d[i]=gradData[i]; d[i+1]=gradData[i+1]; d[i+2]=gradData[i+2];
+      } else { // light pixel → apply bg color
+        const bgParsed = hexToRgb(bg);
+        d[i]=bgParsed.r; d[i+1]=bgParsed.g; d[i+2]=bgParsed.b;
+      }
+    }
+    ctx2.putImageData(imgData,0,0);
+    ctx.drawImage(tmpCanvas2, padding, padding, size, size);
+
+  } else {
+    // Standard: just draw QR
+    ctx.drawImage(srcCanvas, padding, padding, size, size);
+  }
+
+  // Logo overlay
+  if (state.logoDataUrl) {
+    const img = new Image();
+    img.src = state.logoDataUrl;
+    const logoFrac = parseInt(logoSize.value) / 100;
+    const lw = size * logoFrac;
+    const lh = lw;
+    const lx = padding + (size - lw) / 2;
+    const ly = padding + (size - lh) / 2;
+
+    ctx.save();
+    // White bg behind logo
+    ctx.fillStyle = '#ffffff';
+    if (roundedLogo.checked) {
+      roundRect(ctx, lx-4, ly-4, lw+8, lh+8, lw/2);
+    } else {
+      roundRect(ctx, lx-4, ly-4, lw+8, lh+8, 8);
+    }
+    ctx.fill();
+
+    // Clip logo shape
+    ctx.beginPath();
+    if (roundedLogo.checked) {
+      roundRect(ctx, lx, ly, lw, lh, lw/2);
+    } else {
+      roundRect(ctx, lx, ly, lw, lh, 6);
+    }
+    ctx.clip();
+    ctx.drawImage(img, lx, ly, lw, lh);
+    ctx.restore();
+  }
+
+  return out;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+
+generateBtn.addEventListener('click', generateQR);
+
+/* ─── Action Buttons ─────────────────────────── */
+$('btnCopy').addEventListener('click', () => {
+  const raw = qrInput.value.trim();
+  if (!raw) { toast('Nothing to copy', 'error'); return; }
+  navigator.clipboard.writeText(raw).then(() => toast('Copied to clipboard!', 'success')).catch(() => toast('Copy failed', 'error'));
+});
+
+$('btnFullscreen').addEventListener('click', () => {
+  const c = getOutputCanvas();
+  if (!c) { toast('Generate a QR first', 'error'); return; }
+  fsCanvas.width = c.width; fsCanvas.height = c.height;
+  const ctx = fsCanvas.getContext('2d');
+  ctx.drawImage(c, 0, 0);
+  fsOverlay.classList.add('show');
+});
+
+$('btnShare').addEventListener('click', async () => {
+  const c = getOutputCanvas();
+  if (!c) { toast('Generate a QR first', 'error'); return; }
+  if (navigator.share) {
+    c.toBlob(async blob => {
+      try {
+        await navigator.share({ files: [new File([blob],'qr.png',{type:'image/png'})], title: 'QR Code' });
+      } catch(e) { toast('Share cancelled', 'info'); }
+    });
+  } else {
+    toast('Share not supported — try download', 'info');
+  }
+});
+
+$('btnClearInput').addEventListener('click', () => {
+  qrInput.value = '';
+  updateTypeBadge('text');
+  charCounter.textContent = '0 / 2048 chars';
+  qrContainer.innerHTML = '';
+  qrContainer.style.display = 'none';
+  qrPlaceholder.style.display = 'flex';
+});
+
+function closeFullscreen() { fsOverlay.classList.remove('show'); }
+fsOverlay.addEventListener('click', e => { if(e.target===fsOverlay) closeFullscreen(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeFullscreen(); });
+
+/* ─── Downloads ──────────────────────────────── */
+function getOutputCanvas() {
+  return qrContainer.querySelector('canvas');
+}
+
+function downloadCanvas(canvas, name, type='image/png', quality=0.95) {
+  const url = canvas.toDataURL(type, quality);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  toast(`Downloaded as ${name}`, 'success');
+}
+
+$('dlPng').addEventListener('click', () => {
+  const c = getOutputCanvas(); if (!c) { toast('Generate a QR first', 'error'); return; }
+  downloadCanvas(c, 'qrforge.png', 'image/png');
+});
+$('dlJpg').addEventListener('click', () => {
+  const c = getOutputCanvas(); if (!c) { toast('Generate a QR first', 'error'); return; }
+  // Need white bg for JPG
+  const tmp = document.createElement('canvas');
+  tmp.width = c.width; tmp.height = c.height;
+  const ctx = tmp.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,tmp.width,tmp.height);
+  ctx.drawImage(c,0,0);
+  downloadCanvas(tmp, 'qrforge.jpg', 'image/jpeg', 0.92);
+});
+$('dlSvg').addEventListener('click', () => {
+  const c = getOutputCanvas(); if (!c) { toast('Generate a QR first', 'error'); return; }
+  const png = c.toDataURL('image/png');
+  const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${c.width}" height="${c.height}">
+  <image href="${png}" width="${c.width}" height="${c.height}"/>
+</svg>`;
+  const blob = new Blob([svgContent], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='qrforge.svg'; a.click();
+  URL.revokeObjectURL(url);
+  toast('Downloaded as SVG', 'success');
+});
+
+/* ─── History ────────────────────────────────── */
+function loadHistory() {
+  try { state.history = JSON.parse(localStorage.getItem('qrforge-history') || '[]'); } catch { state.history = []; }
+  renderHistory();
+}
+
+function saveToHistory(content, type, thumb) {
+  const entry = {
+    id: Date.now(),
+    content,
+    type,
+    thumb,
+    time: new Date().toLocaleString(),
+    options: {
+      fg: fgColor.value,
+      bg: bgColor.value,
+      size: qrSize.value,
+      ec: state.errorCorrection,
+    }
+  };
+  // Deduplicate by content
+  state.history = state.history.filter(h => h.content !== content);
+  state.history.unshift(entry);
+  if (state.history.length > 20) state.history = state.history.slice(0,20);
+  localStorage.setItem('qrforge-history', JSON.stringify(state.history));
+  renderHistory();
+}
+
+function renderHistory() {
+  historyList.innerHTML = '';
+  if (state.history.length === 0) {
+    historyList.appendChild(noHistory);
+    noHistory.style.display = '';
+    return;
+  }
+  state.history.forEach(entry => {
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    div.setAttribute('role', 'button');
+    div.setAttribute('tabindex', '0');
+    div.setAttribute('aria-label', `Restore: ${entry.content}`);
+    div.innerHTML = `
+      <img class="hist-thumb" src="${entry.thumb}" alt="QR thumbnail" />
+      <div class="hist-info">
+        <div class="hist-content">${escHtml(entry.content)}</div>
+        <div class="hist-meta">${entry.type.toUpperCase()} &middot; ${entry.time}</div>
+      </div>
+      <button class="hist-del" data-id="${entry.id}" aria-label="Delete history entry">✕</button>
+    `;
+    div.addEventListener('click', e => {
+      if (e.target.classList.contains('hist-del')) return;
+      restoreFromHistory(entry);
+    });
+    div.addEventListener('keydown', e => {
+      if (e.key==='Enter' || e.key===' ') restoreFromHistory(entry);
+    });
+    div.querySelector('.hist-del').addEventListener('click', e => {
+      e.stopPropagation();
+      deleteHistory(entry.id);
+    });
+    historyList.appendChild(div);
+  });
+}
+
+function restoreFromHistory(entry) {
+  qrInput.value = entry.content;
+  if (entry.options) {
+    fgColor.value = entry.options.fg || '#000000';
+    fgHex.value   = fgColor.value; fgPreview.style.background = fgColor.value;
+    bgColor.value = entry.options.bg || '#ffffff';
+    bgHex.value   = bgColor.value; bgPreview.style.background = bgColor.value;
+    qrSize.value  = entry.options.size || '320';
+    state.errorCorrection = entry.options.ec || 'M';
+    document.querySelectorAll('.ec-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.ec === state.errorCorrection);
+    });
+  }
+  updateTypeBadge(entry.type);
+  charCounter.textContent = `${entry.content.length} / 2048 chars`;
+  generateQR();
+  toast('QR restored from history', 'info');
+}
+
+function deleteHistory(id) {
+  state.history = state.history.filter(h => h.id !== id);
+  localStorage.setItem('qrforge-history', JSON.stringify(state.history));
+  renderHistory();
+  toast('Entry deleted', 'info');
+}
+
+$('clearHistory').addEventListener('click', () => {
+  if (!state.history.length) return;
+  state.history = [];
+  localStorage.removeItem('qrforge-history');
+  renderHistory();
+  toast('History cleared', 'info');
+});
+
+/* ─── Toast ──────────────────────────────────── */
+function toast(msg, type='info') {
+  const icons = { success:'✓', error:'✕', info:'ℹ' };
+  const el = document.createElement('div');
+  el.className = `toast-item ${type}`;
+  el.innerHTML = `<span class="toast-icon">${icons[type]||'•'}</span>${escHtml(msg)}`;
+  $('toastContainer').appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; el.style.transform='translateX(40px)'; el.style.transition='all 0.3s'; setTimeout(()=>el.remove(),300); }, 3000);
+}
+
+/* ─── Utils ──────────────────────────────────── */
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ─── Init ───────────────────────────────────── */
+loadHistory();
+updateTypeBadge('text');
+
+// Keyboard shortcut: Ctrl+Enter to generate
+qrInput.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); generateQR(); }
+});
+
+</script>
+</body>
+</html>
