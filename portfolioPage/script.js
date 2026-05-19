@@ -340,3 +340,19 @@ function shake(el) {
   s.textContent = '@keyframes kpShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}';
   document.head.appendChild(s);
 }());
+
+
+function downloadCV() {
+  // Name of your PDF file in the same folder
+  const fileName = "Krishna_Pal_Resume.pdf";
+
+  // Create download link
+  const link = document.createElement("a");
+  link.href = fileName;
+  link.download = fileName;
+
+  // Trigger download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
