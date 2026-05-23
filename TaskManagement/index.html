@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServicePro — Login</title>
+  <meta name="description" content="Service Management System Login">
+  <meta name="theme-color" content="#080d14">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230ea5e9'/><text y='24' x='5' font-size='22'>⚙</text></svg>">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <style>
+    .login-page { padding: 20px; }
+    .login-card { animation: card-in 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+    .demo-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      border-radius: 99px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 20px;
+      cursor: default;
+    }
+    .demo-pill i { font-size: 11px; }
+
+    .demo-creds {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-top: 20px;
+      font-size: 12px;
+    }
+    .demo-creds p { margin: 0 0 6px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; }
+    .demo-cred-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .demo-cred {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .demo-cred:hover { border-color: var(--accent); color: var(--accent); }
+    .demo-cred .role-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .demo-cred .role-dot.admin { background: var(--accent); }
+    .demo-cred .role-dot.tech  { background: var(--success); }
+
+    .login-btn-content { display: flex; align-items: center; gap: 8px; justify-content: center; }
+    .login-btn-content .spinner { width: 16px; height: 16px; border-width: 2px; display: none; }
+
+    .wave-divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 20px 0;
+    }
+    .wave-divider::before, .wave-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .wave-divider span { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+    .header-actions {
+      position: absolute; top: 20px; right: 20px;
+      display: flex; gap: 8px;
+    }
+
+    /* Floating particles bg */
+    .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: float-particle linear infinite;
+    }
+    @keyframes float-particle {
+      0%   { opacity: 0; transform: translateY(0) scale(0); }
+      20%  { opacity: 0.4; }
+      80%  { opacity: 0.2; }
+      100% { opacity: 0; transform: translateY(-600px) scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Offline bar -->
+<div class="offline-bar"><i class="bi bi-wifi-off me-2"></i>You are offline. Some features may not work.</div>
+
+<!-- Background -->
+<div class="login-bg">
+  <div class="login-grid-bg"></div>
+</div>
+<div class="particles" id="particles"></div>
+
+<!-- Header actions -->
+<div class="header-actions">
+  <div class="theme-toggle" title="Toggle theme" style="cursor:pointer">
+    <i class="bi bi-sun-fill"></i>
+  </div>
+</div>
+
+<!-- Login Page -->
+<main class="login-page">
+  <div class="login-card">
+    <!-- Logo -->
+    <div class="login-logo">
+      <i class="bi bi-gear-wide-connected"></i>
+    </div>
+
+    <div class="demo-pill">
+      <i class="bi bi-lightning-charge-fill"></i>
+      Demo Mode Active
+    </div>
+
+    <h1 class="login-title">Welcome back</h1>
+    <p class="login-subtitle">Sign in to your ServicePro account</p>
+
+    <!-- Form -->
+    <form id="loginForm" novalidate>
+      <!-- Username -->
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <div class="input-group">
+          <span class="input-group-text" style="border-radius:var(--radius-md) 0 0 var(--radius-md)!important;border-right:none">
+            <i class="bi bi-person"></i>
+          </span>
+          <input type="text" id="username" class="form-control" placeholder="Enter username" autocomplete="username" required
+                 style="border-left:none!important;border-radius:0 var(--radius-md) var(--radius-md) 0!important">
+        </div>
+        <div class="invalid-feedback" id="username-err" style="display:none;color:var(--danger);font-size:11px;margin-top:4px"></div>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <div class="input-group">
+          <span class="input-group-text" style="border-radius:var(--radius-md) 0 0 var(--radius-md)!important;border-right:none">
+            <i class="bi bi-lock"></i>
+          </span>
+          <input type="password" id="password" class="form-control" placeholder="Enter password" autocomplete="current-password" required
+                 style="border-left:none!important;border-radius:0!important">
+          <span class="input-group-text" id="togglePwd" style="cursor:pointer" title="Show/hide password">
+            <i class="bi bi-eye" id="eyeIcon"></i>
+          </span>
+        </div>
+        <div class="invalid-feedback" id="pwd-err" style="display:none;color:var(--danger);font-size:11px;margin-top:4px"></div>
+      </div>
+
+      <!-- Remember me -->
+      <div class="d-flex align-items-center justify-content-between mb-4" style="font-size:13px; display:none;">
+        <div class="d-flex align-items-center gap-2">
+          <input class="form-check-input" type="checkbox" id="rememberMe"
+                 style="background:var(--bg-input);border-color:var(--border);width:16px;height:16px;margin:0;cursor:pointer">
+          <label for="rememberMe" style="color:var(--text-secondary);cursor:pointer">Remember me</label>
+        </div>
+        <a href="#" style="font-size:12px" onclick="Toast.info('Contact admin to reset password')">Forgot password?</a>
+      </div>
+
+      <!-- Login button -->
+      <button type="submit" class="btn btn-primary btn-lg w-100" id="loginBtn">
+        <span class="login-btn-content">
+          <div class="spinner" id="loginSpinner"></div>
+          <i class="bi bi-arrow-right-circle" id="loginIcon"></i>
+          <span id="loginText">Sign In</span>
+        </span>
+      </button>
+    </form>
+
+    <!-- Demo credentials -->
+    <div class="demo-creds">
+      <p>Quick Login (Demo)</p>
+      <div class="demo-cred-row">
+        <div class="demo-cred" onclick="fillCreds('admin','admin123')">
+          <div class="role-dot admin"></div>
+          Admin
+        </div>
+        <div class="demo-cred" onclick="fillCreds('rahul','tech123')">
+          <div class="role-dot tech"></div>
+          Technician 1
+        </div>
+        <div class="demo-cred" onclick="fillCreds('priya','tech123')">
+          <div class="role-dot tech"></div>
+          Technician 2
+        </div>
+      </div>
+    </div>
+
+    <!-- Version -->
+    <!-- <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:20px;margin-bottom:0">
+      ServicePro v2.0 &nbsp;·&nbsp; <span style="color:var(--accent)">Powered by Google Sheets</span>
+    </p> -->
+  </div>
+</main>
+
+<!-- PWA Install Popup -->
+<div class="install-popup" id="installPopup" style="display:none">
+  <div class="brand-icon" style="width:36px;height:36px;font-size:16px;flex-shrink:0"><i class="bi bi-gear-wide-connected"></i></div>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Install ServicePro</div>
+    <div style="font-size:11px;color:var(--text-muted)">Add to home screen for quick access</div>
+  </div>
+  <button class="btn btn-primary btn-sm" id="installBtn">Install</button>
+  <button class="btn btn-sm" style="color:var(--text-muted)" onclick="document.getElementById('installPopup').style.display='none'">
+    <i class="bi bi-x"></i>
+  </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script src="app.js"></script>
+<script>
+// ── Particles ─────────────────────────────────────────────────
+(function spawnParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      bottom:${-10 + Math.random()*10}px;
+      animation-duration:${8 + Math.random()*12}s;
+      animation-delay:${Math.random()*10}s;
+      opacity:0;
+      width:${2+Math.random()*3}px;
+      height:${2+Math.random()*3}px;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+if(!API.DEMO_MODE){
+  document.querySelector('.demo-pill').style.display = 'none';
+  document.querySelector('.demo-creds').style.display = 'none';
+}
+
+// ── Quick fill creds ─────────────────────────────────────────
+function fillCreds(user, pass) {
+  document.getElementById('username').value = user;
+  document.getElementById('password').value = pass;
+  document.getElementById('username').dispatchEvent(new Event('input'));
+}
+
+// ── Show/hide password ───────────────────────────────────────
+document.getElementById('togglePwd').addEventListener('click', function() {
+  const pwd  = document.getElementById('password');
+  const icon = document.getElementById('eyeIcon');
+  if (pwd.type === 'password') { pwd.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+  else                          { pwd.type = 'password'; icon.className = 'bi bi-eye'; }
+});
+
+// ── Clear validation on input ────────────────────────────────
+['username','password'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    document.getElementById(id + '-err').style.display = 'none';
+    document.getElementById(id).style.borderColor = '';
+  });
+});
+
+// ── Login form ───────────────────────────────────────────────
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const remember = document.getElementById('rememberMe').checked;
+
+  let valid = true;
+  if (!username) { showErr('username', 'Username is required'); valid = false; }
+  if (!password) { showErr('pwd', 'Password is required'); valid = false; }
+  if (!valid) return;
+
+  setLoading(true);
+  const res = await API.login(username, password);
+  setLoading(false);
+
+  if (res.success) {
+    Auth.save(res.user, remember);
+    Toast.success(`Welcome back, ${res.user.name}!`);
+    setTimeout(() => {
+      window.location.href = res.user.role === 'admin' ? 'admin.html' : 'technician.html';
+    }, 600);
+  } else {
+    showErr('username', res.message || 'Invalid credentials');
+    showErr('pwd', ' ');
+    Toast.error(res.message || 'Login failed');
+  }
+});
+
+function showErr(field, msg) {
+  const err = document.getElementById(field + '-err');
+  const inp = document.getElementById(field === 'pwd' ? 'password' : 'username');
+  if (err) { err.textContent = msg; err.style.display = 'block'; }
+  if (inp) inp.style.borderColor = 'var(--danger)';
+}
+
+function setLoading(loading) {
+  const btn  = document.getElementById('loginBtn');
+  const spin = document.getElementById('loginSpinner');
+  const icon = document.getElementById('loginIcon');
+  const text = document.getElementById('loginText');
+  btn.disabled = loading;
+  spin.style.display = loading ? 'block' : 'none';
+  icon.style.display = loading ? 'none' : 'inline';
+  text.textContent   = loading ? 'Signing in…' : 'Sign In';
+}
+
+// ── Auto-redirect if already logged in ──────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const user = Auth.get();
+  if (user) {
+    window.location.href = user.role === 'admin' ? 'admin.html' : 'technician.html';
+  }
+});
+
+// ── Service Worker ───────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(e => console.log('[SW] Registration failed:', e));
+}
+
+// ── PWA Install ──────────────────────────────────────────────
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installPopup').style.display = 'flex';
+});
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') Toast.success('App installed!');
+    deferredPrompt = null;
+    document.getElementById('installPopup').style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "name": "ServicePro — Service Management",
+  "short_name": "ServicePro",
+  "description": "Service Management System for assigning and tracking technician jobs",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#080d14",
+  "theme_color": "#0ea5e9",
+  "orientation": "any",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230ea5e9'/><text y='140' x='28' font-size='130'>⚙</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%230ea5e9'/><text y='380' x='60' font-size='360'>⚙</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Admin Dashboard",
+      "url": "/admin.html",
+      "description": "Go to Admin Dashboard"
+    },
+    {
+      "name": "Technician Dashboard",
+      "url": "/technician.html",
+      "description": "Go to Technician Dashboard"
+    }
+  ]
+}

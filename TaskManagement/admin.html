@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServicePro — Admin Dashboard</title>
+  <meta name="theme-color" content="#080d14">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230ea5e9'/><text y='24' x='5' font-size='22'>⚙</text></svg>">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <style>
+    /* ── Extra admin styles ── */
+    .priority-indicator {
+      width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+    }
+    .priority-indicator.High   { background: var(--danger); }
+    .priority-indicator.Medium { background: var(--warning); }
+    .priority-indicator.Low    { background: var(--success); }
+
+    .job-id-cell { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: var(--accent); }
+
+    .mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
+    .mini-bar { flex: 1; border-radius: 3px 3px 0 0; background: linear-gradient(to top, var(--accent), var(--accent-2)); opacity: 0.8; transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+    .mini-bar:hover { opacity: 1; }
+
+    .activity-list { display: flex; flex-direction: column; gap: 0; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0; margin-top: 1px;
+    }
+    .activity-text { font-size: 13px; color: var(--text-primary); flex: 1; }
+    .activity-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Assign form styles */
+    .form-section-title {
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 12px; margin-top: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .tech-select-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer; transition: var(--transition);
+    }
+    .tech-select-card:hover, .tech-select-card.selected {
+      border-color: var(--accent); background: var(--accent-soft);
+    }
+
+    /* Charts */
+    .donut-ring { transform: rotate(-90deg); transform-origin: 50% 50%; }
+    .donut-text { dominant-baseline: middle; text-anchor: middle; }
+
+    /* Table cell truncate */
+    .cell-truncate { max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Report card */
+    .report-stat {
+      text-align: center; padding: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    .report-stat .value { font-family: var(--font-display); font-size: 32px; font-weight: 800; }
+    .report-stat .label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+    .settings-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row-label { font-size: 14px; color: var(--text-primary); }
+    .settings-row-sub   { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .toggle-switch {
+      width: 44px; height: 24px; background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 99px; cursor: pointer; position: relative; transition: var(--transition);
+    }
+    .toggle-switch::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; background: var(--text-muted);
+      border-radius: 50%; transition: var(--transition);
+    }
+    .toggle-switch.on { background: var(--accent); border-color: var(--accent); }
+    .toggle-switch.on::after { left: calc(100% - 19px); background: #fff; }
+  </style>
+</head>
+<body>
+
+<!-- Offline bar -->
+<div class="offline-bar"><i class="bi bi-wifi-off me-2"></i>You are offline.</div>
+
+<!-- Sidebar overlay -->
+<div class="sidebar-overlay"></div>
+
+<!-- ── SIDEBAR ───────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-gear-wide-connected"></i></div>
+    <div class="brand-name">ServicePro<span>Admin Panel</span></div>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebarAvatar">A</div>
+    <div class="user-info">
+      <div class="user-name" id="sidebarName">Admin</div>
+      <div class="user-role">Administrator</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+
+    <div class="nav-item active" data-section="dashboard">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </div>
+    <div class="nav-item" data-section="assign">
+      <i class="bi bi-plus-circle"></i> Assign Work
+    </div>
+    <div class="nav-item" data-section="worklist">
+      <i class="bi bi-list-task"></i> Work List
+      <span class="nav-badge" id="pendingBadge">0</span>
+    </div>
+    <div class="nav-item" data-section="completed">
+      <i class="bi bi-check2-all"></i> Completed Work
+    </div>
+
+    <div class="nav-section-label" style="margin-top:6px">Management</div>
+
+    <div class="nav-item" data-section="technicians">
+      <i class="bi bi-people"></i> Technicians
+    </div>
+    <div class="nav-item" data-section="reports">
+      <i class="bi bi-bar-chart-line"></i> Reports
+    </div>
+    <div class="nav-item" data-section="settings">
+      <i class="bi bi-sliders"></i> Settings
+    </div>
+
+    <div style="margin-top:8px">
+      <div class="nav-item logout-btn" style="color:var(--danger)">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div style="font-size:11px;color:var(--text-muted);text-align:center">ServicePro v2.0</div>
+  </div>
+</aside>
+
+<!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+<div class="main-content">
+
+  <!-- Top Header -->
+  <header class="top-header">
+    <button class="header-btn menu-toggle">
+      <i class="bi bi-list" style="font-size:20px"></i>
+    </button>
+    <div class="header-title" id="headerTitle">Dashboard</div>
+    <div class="header-clock">00:00:00</div>
+    <div class="header-btn theme-toggle" title="Toggle theme">
+      <i class="bi bi-sun-fill"></i>
+    </div>
+    <div class="header-btn notif-btn" style="position:relative" title="Notifications">
+      <i class="bi bi-bell"></i>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="profile-dropdown">
+      <div class="profile-btn">
+        <div class="user-avatar" style="width:30px;height:30px;font-size:12px" id="headerAvatar">A</div>
+        <span class="profile-btn-name" id="headerName">Admin</span>
+        <i class="bi bi-chevron-down"></i>
+      </div>
+    </div>
+    <button class="btn btn-danger btn-sm logout-btn">
+      <i class="bi bi-box-arrow-right"></i>
+      <span class="d-none d-md-inline">Logout</span>
+    </button>
+  </header>
+
+  <!-- Notification Panel -->
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-header">
+      <span class="notif-title">Notifications</span>
+      <button class="btn btn-sm" style="color:var(--text-muted);font-size:11px" onclick="markAllRead()">Mark all read</button>
+    </div>
+    <div id="notifList">
+      <div class="notif-item">
+        <div class="notif-dot2"></div>
+        <div>
+          <div class="notif-text">New job assigned to Rahul Sharma</div>
+          <div class="notif-time">2 min ago</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot2" style="background:var(--success)"></div>
+        <div>
+          <div class="notif-text">Job JB005 completed successfully</div>
+          <div class="notif-time">3 hrs ago</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot2" style="background:var(--warning)"></div>
+        <div>
+          <div class="notif-text">Job JB002 status changed to In Progress</div>
+          <div class="notif-time">1 hr ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <main class="page-content">
+
+    <!-- ── DASHBOARD SECTION ────────────────────────── -->
+    <div class="section-view active" id="dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard Overview</h1>
+        <p class="page-subtitle" id="dashDate">Today, Loading…</p>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stat-cards" id="statCards">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-clipboard-data"></i></div>
+          <div class="stat-body">
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-label">Total Jobs</div>
+            <div class="stat-change up"><i class="bi bi-arrow-up-short"></i>All time</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="bi bi-hourglass-split"></i></div>
+          <div class="stat-body">
+            <div class="stat-value" id="statPending">0</div>
+            <div class="stat-label">Pending Jobs</div>
+            <div class="stat-change" style="color:var(--text-muted)"><i class="bi bi-clock"></i>Awaiting</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-arrow-repeat"></i></div>
+          <div class="stat-body">
+            <div class="stat-value" id="statProgress">0</div>
+            <div class="stat-label">In Progress</div>
+            <div class="stat-change up"><i class="bi bi-activity"></i>Active now</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-patch-check"></i></div>
+          <div class="stat-body">
+            <div class="stat-value" id="statCompleted">0</div>
+            <div class="stat-label">Completed</div>
+            <div class="stat-change up"><i class="bi bi-arrow-up-short"></i>Done</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="bi bi-people-fill"></i></div>
+          <div class="stat-body">
+            <div class="stat-value" id="statTechs">0</div>
+            <div class="stat-label">Active Technicians</div>
+            <div class="stat-change up"><i class="bi bi-person-check"></i>Available</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="row g-20 mb-4">
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-header">
+              <i class="bi bi-bar-chart-line text-accent"></i>
+              <span class="card-title">Jobs This Week</span>
+              <span style="font-size:12px;color:var(--text-muted)">Daily breakdown</span>
+            </div>
+            <div class="card-body">
+              <div id="weekChart" style="display:flex;align-items:flex-end;gap:8px;height:180px;padding-bottom:20px;position:relative">
+                <!-- rendered by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <i class="bi bi-pie-chart text-accent"></i>
+              <span class="card-title">Status Split</span>
+            </div>
+            <div class="card-body d-flex flex-column align-items-center justify-content-center" style="gap:16px">
+              <svg viewBox="0 0 120 120" width="120" height="120" id="donutChart">
+                <circle cx="60" cy="60" r="46" fill="none" stroke="var(--bg-surface)" stroke-width="14"/>
+                <circle cx="60" cy="60" r="46" fill="none" stroke="var(--accent)" stroke-width="14"
+                        stroke-dasharray="0 289" id="donutPending" class="donut-ring" style="transition:stroke-dasharray 1s ease"/>
+                <circle cx="60" cy="60" r="46" fill="none" stroke="var(--success)" stroke-width="14"
+                        stroke-dasharray="0 289" id="donutCompleted" stroke-dashoffset="0" class="donut-ring" style="transition:stroke-dasharray 1s ease,stroke-dashoffset 1s ease"/>
+                <text x="60" y="58" class="donut-text" style="fill:var(--text-primary);font-size:14px;font-weight:700;font-family:var(--font-display)" id="donutPct">0%</text>
+                <text x="60" y="70" class="donut-text" style="fill:var(--text-muted);font-size:7px">Complete</text>
+              </svg>
+              <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+                  <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:var(--warning);border-radius:2px;display:inline-block"></span>Pending</span>
+                  <span id="legendPending" style="font-weight:700;color:var(--text-primary)">0</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+                  <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:var(--accent);border-radius:2px;display:inline-block"></span>In Progress</span>
+                  <span id="legendProgress" style="font-weight:700;color:var(--text-primary)">0</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+                  <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:var(--success);border-radius:2px;display:inline-block"></span>Completed</span>
+                  <span id="legendCompleted" style="font-weight:700;color:var(--text-primary)">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="row g-20">
+        <div class="col-lg-7">
+          <div class="card">
+            <div class="card-header">
+              <i class="bi bi-activity text-accent"></i>
+              <span class="card-title">Recent Jobs</span>
+              <button class="btn btn-outline-primary btn-sm" onclick="switchSection('worklist')">View All</button>
+            </div>
+            <div class="card-body" style="padding-top:8px">
+              <div id="recentJobs">
+                <!-- rendered by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="card">
+            <div class="card-header">
+              <i class="bi bi-lightning text-accent"></i>
+              <span class="card-title">Quick Actions</span>
+            </div>
+            <div class="card-body d-flex flex-column gap-3">
+              <button class="btn btn-primary w-100" onclick="switchSection('assign')">
+                <i class="bi bi-plus-circle"></i> Assign New Job
+              </button>
+              <button class="btn btn-outline-primary w-100" onclick="switchSection('technicians')">
+                <i class="bi bi-person-plus"></i> Add Technician
+              </button>
+              <button class="btn btn-outline-primary w-100" onclick="switchSection('worklist')">
+                <i class="bi bi-list-task"></i> View Work List
+              </button>
+              <button class="btn btn-outline-primary w-100" onclick="switchSection('reports')">
+                <i class="bi bi-download"></i> Export Reports
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ASSIGN WORK SECTION ──────────────────────── -->
+    <div class="section-view" id="assign">
+      <div class="page-header">
+        <h1 class="page-title">Assign New Job</h1>
+        <p class="page-subtitle">Fill in the details to assign work to a technician</p>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <form id="assignForm" novalidate>
+            <!-- Customer Details -->
+            <div class="form-section-title"><i class="bi bi-person-badge"></i>Customer Information</div>
+            <div class="row g-14 mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Customer Name *</label>
+                <input type="text" class="form-control" id="customerName" placeholder="Full name" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Mobile Number *</label>
+                <input type="tel" class="form-control" id="customerMobile" placeholder="10-digit number" maxlength="10" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Service Date *</label>
+                <input type="date" class="form-control" id="serviceDate" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Address / Location *</label>
+                <input type="text" class="form-control" id="location" placeholder="Full address with landmark" required>
+              </div>
+            </div>
+
+            <!-- Appliance Details -->
+            <div class="form-section-title" style="margin-top:12px"><i class="bi bi-tools"></i>Appliance Details</div>
+            <div class="row g-14 mb-3">
+              <div class="col-md-3">
+                <label class="form-label">Brand *</label>
+                <select class="form-select" id="brand" required>
+                  <option value="">Select Brand</option>
+                  <option>Samsung</option><option>LG</option><option>Whirlpool</option>
+                  <option>Daikin</option><option>Voltas</option><option>Panasonic</option>
+                  <option>Godrej</option><option>Haier</option><option>Sony</option>
+                  <option>IFB</option><option>Bosch</option><option>Other</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Appliance Type *</label>
+                <select class="form-select" id="appliance" required>
+                  <option value="">Select Appliance</option>
+                  <option>AC</option><option>Refrigerator</option><option>Washing Machine</option>
+                  <option>Microwave</option><option>TV</option><option>Geyser</option>
+                  <option>Mixer Grinder</option><option>Water Purifier</option>
+                  <option>Dishwasher</option><option>Other</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Priority *</label>
+                <select class="form-select" id="priority" required>
+                  <option value="">Select Priority</option>
+                  <option>High</option><option>Medium</option><option>Low</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Service Type</label>
+                <select class="form-select" id="serviceType">
+                  <option>Repair</option><option>Installation</option><option>Maintenance</option>
+                  <option>AMC Visit</option><option>Inspection</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Problem Description *</label>
+                <textarea class="form-control" id="problem" rows="3" placeholder="Describe the issue in detail…" required></textarea>
+              </div>
+            </div>
+
+            <!-- Technician -->
+            <div class="form-section-title" style="margin-top:12px"><i class="bi bi-person-gear"></i>Assign Technician</div>
+            <div class="row g-14 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Select Technician *</label>
+                <select class="form-select" id="technicianSelect" required onchange="autoFillTechMobile(this)">
+                  <option value="">Choose technician…</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Technician Mobile</label>
+                <input type="text" class="form-control" id="technicianMobile" placeholder="Auto-filled" readonly
+                       style="opacity:0.7;cursor:default">
+              </div>
+              <div class="col-12">
+                <label class="form-label">Additional Notes</label>
+                <textarea class="form-control" id="notes" rows="2" placeholder="Any special instructions or notes…"></textarea>
+              </div>
+            </div>
+
+            <!-- Photos -->
+            <div class="form-section-title" style="margin-top:12px"><i class="bi bi-camera"></i>Photos</div>
+            <div class="row g-14 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Customer Photo</label>
+                <div class="upload-area" id="custImgArea">
+                  <i class="bi bi-person-bounding-box d-block text-center" style="font-size:28px;color:var(--text-muted)"></i>
+                  <p>Click or drag to upload customer photo</p>
+                  <small>JPG, PNG — max 5MB</small>
+                </div>
+                <input type="file" id="custImgInput" accept="image/*" style="display:none">
+                <div id="custImgPreview"></div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Problem Photo</label>
+                <div class="upload-area" id="probImgArea">
+                  <i class="bi bi-camera d-block text-center" style="font-size:28px;color:var(--text-muted)"></i>
+                  <p>Click or drag to upload problem photo</p>
+                  <small>JPG, PNG — max 5MB</small>
+                </div>
+                <input type="file" id="probImgInput" accept="image/*" style="display:none">
+                <div id="probImgPreview"></div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-3 flex-wrap">
+              <button type="submit" class="btn btn-primary" id="assignBtn">
+                <i class="bi bi-plus-circle"></i> Assign Job
+              </button>
+              <button type="button" class="btn btn-outline-primary" onclick="clearAssignForm()">
+                <i class="bi bi-arrow-counterclockwise"></i> Clear Form
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WORK LIST SECTION ────────────────────────── -->
+    <div class="section-view" id="worklist">
+      <div class="page-header">
+        <h1 class="page-title">Work List</h1>
+        <p class="page-subtitle">All assigned jobs — search, filter, manage</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="flex-wrap:wrap;gap:10px">
+          <span class="card-title">All Jobs</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;align-items:center">
+            <input type="text" class="form-control" id="jobSearch" placeholder="Search jobs…" style="width:180px;height:34px" oninput="filterJobs()">
+            <select class="form-select" id="statusFilter" style="width:140px;height:34px" onchange="filterJobs()">
+              <option value="">All Status</option>
+              <option>Pending</option><option>In Progress</option><option>Completed</option><option>Cancelled</option>
+            </select>
+            <select class="form-select" id="techFilter" style="width:160px;height:34px" onchange="filterJobs()">
+              <option value="">All Technicians</option>
+            </select>
+            <button class="btn btn-outline-primary btn-sm" onclick="exportJobsCSV()">
+              <i class="bi bi-download"></i> Export
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="app-table" id="jobsTable">
+            <thead>
+              <tr>
+                <th>Job ID</th>
+                <th>Customer</th>
+                <th>Mobile</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Brand / Appliance</th>
+                <th>Technician</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="jobsTbody">
+              <tr><td colspan="10"><div class="skeleton skeleton-row" style="height:36px;margin:4px 0"></div></td></tr>
+              <tr><td colspan="10"><div class="skeleton skeleton-row" style="height:36px;margin:4px 0"></div></td></tr>
+              <tr><td colspan="10"><div class="skeleton skeleton-row" style="height:36px;margin:4px 0"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer d-flex justify-content-end">
+          <div id="jobsPagination"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMPLETED WORK ───────────────────────────── -->
+    <div class="section-view" id="completed">
+      <div class="page-header">
+        <h1 class="page-title">Completed Work</h1>
+        <p class="page-subtitle">All finished jobs with details and remarks</p>
+      </div>
+      <div id="completedGrid" class="task-grid">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ── TECHNICIANS ──────────────────────────────── -->
+    <div class="section-view" id="technicians">
+      <div class="page-header d-flex align-items-center gap-3">
+        <div>
+          <h1 class="page-title">Technicians</h1>
+          <p class="page-subtitle">Manage your service team</p>
+        </div>
+        <div style="margin-left:auto">
+          <button class="btn btn-primary" onclick="openTechModal()">
+            <i class="bi bi-person-plus"></i> Add Technician
+          </button>
+        </div>
+      </div>
+      <div id="techGrid" class="row g-20">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ── REPORTS ───────────────────────────────────── -->
+    <div class="section-view" id="reports">
+      <div class="page-header">
+        <h1 class="page-title">Reports & Analytics</h1>
+        <p class="page-subtitle">Export and analyse service data</p>
+      </div>
+      <div class="row g-20 mb-4" id="reportStats">
+        <!-- rendered by JS -->
+      </div>
+      <div class="row g-20">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header"><i class="bi bi-download text-accent"></i><span class="card-title">Export Data</span></div>
+            <div class="card-body d-flex flex-column gap-3">
+              <button class="btn btn-outline-primary w-100" onclick="exportJobsCSV()"><i class="bi bi-file-earmark-spreadsheet"></i> Export All Jobs (CSV)</button>
+              <button class="btn btn-outline-primary w-100" onclick="exportCompletedCSV()"><i class="bi bi-file-earmark-check"></i> Export Completed Jobs (CSV)</button>
+              <button class="btn btn-outline-primary w-100" onclick="exportTechsCSV()"><i class="bi bi-people"></i> Export Technicians (CSV)</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header"><i class="bi bi-person-lines-fill text-accent"></i><span class="card-title">Technician Performance</span></div>
+            <div class="card-body">
+              <div id="techPerformance"><!-- rendered by JS --></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ──────────────────────────────────── -->
+    <div class="section-view" id="settings">
+      <div class="page-header">
+        <h1 class="page-title">Settings</h1>
+        <p class="page-subtitle">App preferences and configuration</p>
+      </div>
+      <div class="row g-20">
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header"><i class="bi bi-palette text-accent"></i><span class="card-title">Appearance</span></div>
+            <div class="card-body">
+              <div class="settings-row">
+                <div><div class="settings-row-label">Dark Mode</div><div class="settings-row-sub">Switch between dark and light theme</div></div>
+                <div class="toggle-switch on" id="themeSwitchToggle" onclick="toggleThemeSwitch(this)"></div>
+              </div>
+              <div class="settings-row">
+                <div><div class="settings-row-label">Compact View</div><div class="settings-row-sub">Reduce spacing in tables</div></div>
+                <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header"><i class="bi bi-bell text-accent"></i><span class="card-title">Notifications</span></div>
+            <div class="card-body">
+              <div class="settings-row">
+                <div><div class="settings-row-label">Job Assignments</div><div class="settings-row-sub">Notify when new job is assigned</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+              </div>
+              <div class="settings-row">
+                <div><div class="settings-row-label">Job Completions</div><div class="settings-row-sub">Notify when technician completes job</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header"><i class="bi bi-database text-accent"></i><span class="card-title">Data & API</span></div>
+            <div class="card-body">
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Google Sheets API URL</div>
+                  <div class="settings-row-sub">Deployed Apps Script Web App URL</div>
+                </div>
+              </div>
+              <input type="url" class="form-control mb-3" placeholder="https://script.google.com/macros/s/…/exec" value="">
+              <button class="btn btn-primary btn-sm" onclick="Toast.success('API URL saved')"><i class="bi bi-check2"></i> Save URL</button>
+              <button class="btn btn-outline-primary btn-sm ms-2" onclick="Toast.info('Testing connection…')"><i class="bi bi-plug"></i> Test Connection</button>
+              <div style="margin-top:12px;padding:10px 12px;background:var(--success-soft);border-radius:var(--radius-sm);border:1px solid var(--success);display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--success)">
+                <i class="bi bi-lightning-charge-fill"></i>
+                <strong>Demo Mode Active</strong> — Using built-in mock data. Replace API URL to use real Google Sheets backend.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MOBILE BOTTOM NAV ─────────────────────────────── -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-items">
+    <div class="mobile-nav-item active" data-section="dashboard"><i class="bi bi-grid"></i><span>Home</span></div>
+    <div class="mobile-nav-item" data-section="assign"><i class="bi bi-plus-circle"></i><span>Assign</span></div>
+    <div class="mobile-nav-item" data-section="worklist"><i class="bi bi-list-task"></i><span>Jobs</span></div>
+    <div class="mobile-nav-item" data-section="technicians"><i class="bi bi-people"></i><span>Team</span></div>
+    <div class="mobile-nav-item" data-section="reports"><i class="bi bi-bar-chart"></i><span>Reports</span></div>
+  </div>
+</nav>
+
+<!-- ── TECHNICIAN MODAL ──────────────────────────────── -->
+<div class="modal-overlay" id="techModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="techModalTitle">Add Technician</span>
+      <div class="modal-close" onclick="closeTechModal()"><i class="bi bi-x"></i></div>
+    </div>
+    <div class="modal-body">
+      <form id="techForm">
+        <input type="hidden" id="techEditId">
+        <div class="row g-14">
+          <div class="col-md-6">
+            <label class="form-label">Full Name *</label>
+            <input type="text" class="form-control" id="techName" placeholder="Technician name" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Mobile *</label>
+            <input type="tel" class="form-control" id="techMobile" placeholder="10-digit number" maxlength="10" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="techEmail" placeholder="email@example.com">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="techStatus">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Skills (comma separated)</label>
+            <input type="text" class="form-control" id="techSkills" placeholder="e.g. AC, Refrigerator, TV">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-primary btn-sm" onclick="closeTechModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveTechnician()"><i class="bi bi-check2"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── JOB VIEW MODAL ────────────────────────────────── -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal-box" style="max-width:640px">
+    <div class="modal-header">
+      <span class="modal-title">Job Details</span>
+      <div class="modal-close" onclick="closeModal('viewModal')"><i class="bi bi-x"></i></div>
+    </div>
+    <div class="modal-body" id="viewModalBody"><!-- rendered by JS --></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-primary btn-sm" onclick="closeModal('viewModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── EDIT JOB MODAL ────────────────────────────────── -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-header">
+      <span class="modal-title">Edit Job</span>
+      <div class="modal-close" onclick="closeModal('editModal')"><i class="bi bi-x"></i></div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editJobId">
+      <div class="row g-14">
+        <div class="col-md-6">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="editStatus">
+            <option>Pending</option><option>In Progress</option><option>Completed</option><option>Cancelled</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Priority</label>
+          <select class="form-select" id="editPriority">
+            <option>High</option><option>Medium</option><option>Low</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Reassign Technician</label>
+          <select class="form-select" id="editTech" onchange="autoFillEditTechMobile(this)">
+            <option value="">Keep current technician</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-control" id="editRemarks" rows="3" placeholder="Add remarks…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-primary btn-sm" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveJobEdit()"><i class="bi bi-check2"></i> Update</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script src="app.js"></script>
+<script>
+/* ── ADMIN APP STATE ─────────────────────────────────────────── */
+let allTasks = [];
+let allTechs = [];
+let filteredJobs = [];
+let jobsPager;
+const SECTIONS = ['dashboard','assign','worklist','completed','technicians','reports','settings'];
+
+/* ── INIT ────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = Auth.require('admin');
+  if (!user) return;
+
+  // Set user info
+  ['sidebarAvatar','headerAvatar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = user.name.charAt(0).toUpperCase();
+  });
+  document.getElementById('sidebarName').textContent = user.name;
+  document.getElementById('headerName').textContent  = user.name;
+
+  // Date
+  document.getElementById('dashDate').textContent =
+    'Today, ' + new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // Theme settings toggle
+  const ts = document.getElementById('themeSwitchToggle');
+  if (ts) ts.classList.toggle('on', Theme.get() === 'dark');
+
+  initSidebar();
+  initNotifPanel();
+  initSectionNav(
+    [...document.querySelectorAll('.nav-item[data-section]'), ...document.querySelectorAll('.mobile-nav-item[data-section]')],
+    SECTIONS.map(s => document.getElementById(s)),
+    onSectionSwitch
+  );
+
+  // Upload areas
+  initUploadArea('custImgArea','custImgInput','custImgPreview');
+  initUploadArea('probImgArea','probImgInput','probImgPreview');
+
+  // Set default service date
+  document.getElementById('serviceDate').value = today();
+
+  // Load data
+  await loadAll();
+});
+
+async function loadAll() {
+  const [tRes, techRes] = await Promise.all([API.getTasks(), API.getTechnicians()]);
+  if (tRes.success)    { allTasks = tRes.data;  }
+  if (techRes.success) { allTechs = techRes.data; }
+  console.log('Loaded tasks:', tRes);
+  console.log('Loaded technicians:', allTechs);
+  renderAll();
+}
+
+function renderAll() {
+  renderDashboard();
+  renderJobsTable();
+  renderCompleted();
+  renderTechGrid();
+  renderReports();
+  populateTechDropdowns();
+}
+
+/* ── SECTION SWITCH ─────────────────────────────────────────── */
+function switchSection(id) {
+  document.querySelectorAll('.nav-item[data-section], .mobile-nav-item[data-section]').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === id);
+  });
+  SECTIONS.forEach(s => {
+    document.getElementById(s).classList.toggle('active', s === id);
+  });
+  const titles = { dashboard:'Dashboard', assign:'Assign Work', worklist:'Work List', completed:'Completed Work', technicians:'Technicians', reports:'Reports', settings:'Settings' };
+  document.getElementById('headerTitle').textContent = titles[id] || 'Dashboard';
+  onSectionSwitch(id);
+}
+
+function onSectionSwitch(id) {
+  const titles = { dashboard:'Dashboard', assign:'Assign Work', worklist:'Work List', completed:'Completed Work', technicians:'Technicians', reports:'Reports', settings:'Settings' };
+  document.getElementById('headerTitle').textContent = titles[id] || 'Dashboard';
+}
+
+/* ── DASHBOARD ──────────────────────────────────────────────── */
+function renderDashboard() {
+  const pending   = allTasks.filter(t => t.status === 'Pending').length;
+  const progress  = allTasks.filter(t => t.status === 'In Progress').length;
+  const completed = allTasks.filter(t => t.status === 'Completed').length;
+  const activeTechs = allTechs.filter(t => t.status === 'active').length;
+  const todayStr  = today();
+  const todayCount = allTasks.filter(t => t.serviceDate === todayStr).length;
+
+  animateCounter('statTotal',     allTasks.length);
+  animateCounter('statPending',   pending);
+  animateCounter('statProgress',  progress);
+  animateCounter('statCompleted', completed);
+  animateCounter('statTechs',     activeTechs);
+
+  document.getElementById('pendingBadge').textContent = pending + progress;
+
+  // Donut chart
+  const total = allTasks.length || 1;
+  const circumference = 289;
+  const completedPct = completed / total;
+  const pendingPct   = pending / total;
+  const progressPct  = progress / total;
+
+  setTimeout(() => {
+    const dp = document.getElementById('donutPending');
+    const dc = document.getElementById('donutCompleted');
+    if (dp) {
+      const pLen  = pendingPct   * circumference;
+      const cLen  = completedPct * circumference;
+      const prLen = progressPct  * circumference;
+      dp.setAttribute('stroke', 'var(--warning)');
+      dp.setAttribute('stroke-dasharray', `${pLen} ${circumference - pLen}`);
+      dc.setAttribute('stroke-dasharray', `${cLen} ${circumference - cLen}`);
+      dc.setAttribute('stroke-dashoffset', `${circumference - pLen}`);
+      document.getElementById('donutPct').textContent = Math.round(completedPct * 100) + '%';
+    }
+    document.getElementById('legendPending').textContent   = pending;
+    document.getElementById('legendProgress').textContent  = progress;
+    document.getElementById('legendCompleted').textContent = completed;
+  }, 200);
+
+  // Week chart
+  renderWeekChart();
+
+  // Recent jobs
+  const recent = [...allTasks].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0,5);
+  const el = document.getElementById('recentJobs');
+  if (!recent.length) { el.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><h4>No jobs yet</h4><p>Assign your first job to get started</p></div>`; return; }
+  el.innerHTML = recent.map(t => `
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${priorityColor(t.priority)}20;color:${priorityColor(t.priority)}">
+        <i class="bi bi-tools"></i>
+      </div>
+      <div style="flex:1">
+        <div class="activity-text">
+          <strong>${t.customerName}</strong> — ${t.appliance} (${t.brand})
+        </div>
+        <div class="activity-time" style="display:flex;align-items:center;gap:8px">
+          <span>${t.technician}</span> · ${statusBadge(t.status)} · ${fmtDate(t.serviceDate)}
+        </div>
+      </div>
+      <span class="job-id-cell">${t.id}</span>
+    </div>`).join('');
+}
+
+function renderWeekChart() {
+  const el = document.getElementById('weekChart');
+  if (!el) return;
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const values = days.map(() => Math.floor(Math.random() * 8 + 1));
+  const max = Math.max(...values, 1);
+  el.innerHTML = days.map((d,i) => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+      <span style="font-size:11px;color:var(--text-muted)">${values[i]}</span>
+      <div style="width:100%;max-width:36px;background:linear-gradient(to top,var(--accent),var(--accent-2));border-radius:4px 4px 0 0;height:0;opacity:0.85;transition:height 0.8s cubic-bezier(0.34,1.56,0.64,1) ${i*0.07}s"
+           data-h="${Math.round((values[i]/max)*140)}"></div>
+      <span style="font-size:11px;color:var(--text-muted)">${d}</span>
+    </div>`).join('');
+  setTimeout(() => {
+    el.querySelectorAll('[data-h]').forEach(b => { b.style.height = b.dataset.h + 'px'; });
+  }, 100);
+}
+
+function animateCounter(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let start = 0;
+  const step = Math.ceil(target / 30);
+  const interval = setInterval(() => {
+    start = Math.min(start + step, target);
+    el.textContent = start;
+    if (start >= target) clearInterval(interval);
+  }, 30);
+}
+
+function priorityColor(p) {
+  return p === 'High' ? 'var(--danger)' : p === 'Medium' ? 'var(--warning)' : 'var(--success)';
+}
+
+/* ── JOBS TABLE ─────────────────────────────────────────────── */
+function renderJobsTable() {
+  const search     = (document.getElementById('jobSearch')?.value || '').toLowerCase();
+  const statusF    = document.getElementById('statusFilter')?.value || '';
+  const techF      = document.getElementById('techFilter')?.value || '';
+
+  filteredJobs = allTasks.filter(t => {
+    const matchSearch = !search ||
+      t.customerName.toLowerCase().includes(search) ||
+      t.id.toLowerCase().includes(search) ||
+      t.technician.toLowerCase().includes(search) ||
+      t.location.toLowerCase().includes(search);
+    const matchStatus = !statusF || t.status === statusF;
+    const matchTech   = !techF   || t.technician === techF;
+    return matchSearch && matchStatus && matchTech;
+  });
+
+  if (!jobsPager) { jobsPager = new Paginator(filteredJobs, 8); }
+  else            { jobsPager.setData(filteredJobs); }
+
+  const tbody = document.getElementById('jobsTbody');
+  const page  = jobsPager.current();
+
+  if (!page.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state" style="padding:40px"><i class="bi bi-search"></i><h4>No jobs found</h4><p>Try adjusting your filters</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = page.map(t => `
+      <tr>
+        <td><span class="job-id-cell">${t.id}</span></td>
+        <td><strong>${t.customerName}</strong></td>
+        <td style="color:var(--text-secondary)">${t.customerMobile}</td>
+        <td><span class="cell-truncate" title="${t.location}">${t.location}</span></td>
+        <td style="white-space:nowrap">${fmtDate(t.serviceDate)}</td>
+        <td><div style="font-size:12px"><strong>${t.brand}</strong><div style="color:var(--text-muted)">${t.appliance}</div></div></td>
+        <td>
+          <div style="font-size:12px">
+            <div>${t.technician}</div>
+            <div style="color:var(--text-muted)">${t.technicianMobile}</div>
+          </div>
+        </td>
+        <td>${priorityBadge(t.priority)}</td>
+        <td>${statusBadge(t.status)}</td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-icon btn-sm btn-outline-primary" title="View" onclick="viewJob('${t.id}')"><i class="bi bi-eye"></i></button>
+            <button class="btn btn-icon btn-sm btn-outline-primary" title="Edit" onclick="editJob('${t.id}')"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-icon btn-sm btn-danger" title="Delete" onclick="deleteJob('${t.id}')"><i class="bi bi-trash"></i></button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+  jobsPager.renderControls('jobsPagination', renderJobsTable);
+}
+
+function filterJobs() { jobsPager = null; renderJobsTable(); }
+
+function populateTechDropdowns() {
+  const activeTechs = allTechs.filter(t => t.status === 'active');
+  const opts = activeTechs.map(t => `<option value="${t.name}" data-mobile="${t.mobile}">${t.name}</option>`).join('');
+  const baseOpt = `<option value="">Choose technician…</option>`;
+  const baseOptEdit = `<option value="">Keep current</option>`;
+
+  const sel = document.getElementById('technicianSelect');
+  if (sel) sel.innerHTML = baseOpt + opts;
+
+  const techF = document.getElementById('techFilter');
+  if (techF) techF.innerHTML = `<option value="">All Technicians</option>` + activeTechs.map(t => `<option>${t.name}</option>`).join('');
+
+  const editTech = document.getElementById('editTech');
+  if (editTech) editTech.innerHTML = baseOptEdit + opts;
+}
+
+function autoFillTechMobile(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById('technicianMobile').value = opt?.dataset.mobile || '';
+}
+
+function autoFillEditTechMobile(sel) {
+  // Just updates the hidden field if needed
+}
+
+/* ── ASSIGN FORM ────────────────────────────────────────────── */
+document.getElementById('assignForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const techName   = document.getElementById('technicianSelect').value;
+  const techMobile = document.getElementById('technicianMobile').value;
+  if (!techName) { Toast.warning('Please select a technician'); return; }
+
+  const task = {
+    customerName:    document.getElementById('customerName').value.trim(),
+    customerMobile:  document.getElementById('customerMobile').value.trim(),
+    location:        document.getElementById('location').value.trim(),
+    serviceDate:     document.getElementById('serviceDate').value,
+    brand:           document.getElementById('brand').value,
+    appliance:       document.getElementById('appliance').value,
+    problem:         document.getElementById('problem').value.trim(),
+    technician:      techName,
+    technicianMobile:techMobile,
+    priority:        document.getElementById('priority').value,
+    status:          'Pending',
+    remarks:         '',
+    image:           document.getElementById('probImgInput').dataset.base64 || '',
+  };
+
+  if (!task.customerName || !task.customerMobile || !task.location || !task.brand || !task.appliance || !task.problem || !task.priority) {
+    Toast.warning('Please fill all required fields'); return;
+  }
+
+  const btn = document.getElementById('assignBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Assigning…';
+
+  const res = await API.addTask(task);
+  btn.disabled = false; btn.innerHTML = '<i class="bi bi-plus-circle"></i> Assign Job';
+
+  if (res.success) {
+    allTasks.push(res.data);
+    Toast.success(`Job ${res.data.id} assigned to ${task.technician}!`);
+    clearAssignForm();
+    renderAll();
+    setTimeout(() => switchSection('worklist'), 800);
+  } else {
+    Toast.error(res.message || 'Failed to assign job');
+  }
+});
+
+function clearAssignForm() {
+  document.getElementById('assignForm').reset();
+  document.getElementById('serviceDate').value = today();
+  document.getElementById('technicianMobile').value = '';
+  clearUpload('custImgArea','custImgInput','custImgPreview');
+  clearUpload('probImgArea','probImgInput','probImgPreview');
+}
+
+/* ── VIEW / EDIT / DELETE JOB ───────────────────────────────── */
+function viewJob(id) {
+  const t = allTasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('viewModalBody').innerHTML = `
+    <div class="row g-14">
+      <div class="col-6"><div class="form-label">Job ID</div><div class="job-id-cell" style="font-size:14px">${t.id}</div></div>
+      <div class="col-6"><div class="form-label">Status</div>${statusBadge(t.status)}</div>
+      <div class="col-6"><div class="form-label">Customer</div><strong>${t.customerName}</strong></div>
+      <div class="col-6"><div class="form-label">Mobile</div>${t.customerMobile}</div>
+      <div class="col-12"><div class="form-label">Location</div>${t.location}</div>
+      <div class="col-4"><div class="form-label">Brand</div>${t.brand}</div>
+      <div class="col-4"><div class="form-label">Appliance</div>${t.appliance}</div>
+      <div class="col-4"><div class="form-label">Priority</div>${priorityBadge(t.priority)}</div>
+      <div class="col-12"><div class="form-label">Problem</div>${t.problem}</div>
+      <div class="col-6"><div class="form-label">Technician</div>${t.technician}</div>
+      <div class="col-6"><div class="form-label">Tech Mobile</div>${t.technicianMobile}</div>
+      <div class="col-6"><div class="form-label">Service Date</div>${fmtDate(t.serviceDate)}</div>
+      <div class="col-6"><div class="form-label">Created</div>${fmtDate(t.createdAt)}</div>
+      ${t.remarks ? `<div class="col-12"><div class="form-label">Remarks</div>${t.remarks}</div>` : ''}
+      ${t.completedAt ? `<div class="col-12"><div class="form-label">Completed</div>${fmtDate(t.completedAt)}</div>` : ''}
+    </div>`;
+  openModal('viewModal');
+}
+
+function editJob(id) {
+  const t = allTasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('editJobId').value = id;
+  document.getElementById('editStatus').value   = t.status;
+  document.getElementById('editPriority').value = t.priority;
+  document.getElementById('editRemarks').value  = t.remarks || '';
+  openModal('editModal');
+}
+
+async function saveJobEdit() {
+  const id = document.getElementById('editJobId').value;
+  const data = {
+    status:   document.getElementById('editStatus').value,
+    priority: document.getElementById('editPriority').value,
+    remarks:  document.getElementById('editRemarks').value,
+  };
+  const newTech = document.getElementById('editTech').value;
+  if (newTech) {
+    const tech = allTechs.find(t => t.name === newTech);
+    data.technician      = newTech;
+    data.technicianMobile = tech?.mobile || '';
+  }
+  const res = await API.updateTask(id, data);
+  if (res.success) {
+    const i = allTasks.findIndex(t => t.id === id);
+    if (i >= 0) allTasks[i] = res.data;
+    Toast.success('Job updated!');
+    closeModal('editModal');
+    renderAll();
+  } else Toast.error(res.message);
+}
+
+function deleteJob(id) {
+  showConfirm('Delete Job', `Are you sure you want to delete job ${id}? This cannot be undone.`, async () => {
+    const res = await API.deleteTask(id);
+    if (res.success) {
+      allTasks = allTasks.filter(t => t.id !== id);
+      Toast.success('Job deleted');
+      renderAll();
+    } else Toast.error(res.message);
+  });
+}
+
+/* ── COMPLETED WORK ─────────────────────────────────────────── */
+function renderCompleted() {
+  const completed = allTasks.filter(t => t.status === 'Completed');
+  const el = document.getElementById('completedGrid');
+  if (!completed.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1;padding:60px"><i class="bi bi-check2-circle" style="font-size:48px;color:var(--success)"></i><h4>No completed jobs yet</h4><p>Completed jobs will appear here</p></div>`;
+    return;
+  }
+  el.innerHTML = completed.map(t => `
+    <div class="task-card priority-${t.priority}">
+      <div class="task-header">
+        <div><div class="task-id">${t.id}</div><div class="task-customer">${t.customerName}</div></div>
+        ${statusBadge(t.status)}
+      </div>
+      <div class="task-meta">
+        <div class="task-meta-item"><i class="bi bi-tools"></i>${t.brand} ${t.appliance}</div>
+        <div class="task-meta-item"><i class="bi bi-person-check"></i>${t.technician}</div>
+        <div class="task-meta-item"><i class="bi bi-calendar-check"></i>${fmtDate(t.completedAt || t.serviceDate)}</div>
+        <div class="task-meta-item"><i class="bi bi-geo-alt"></i><span class="cell-truncate" style="max-width:160px">${t.location}</span></div>
+      </div>
+      ${t.remarks ? `<div style="background:var(--success-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--success);margin-top:6px"><i class="bi bi-chat-text me-1"></i>${t.remarks}</div>` : ''}
+      <div class="task-actions">
+        <button class="btn btn-outline-primary btn-sm" onclick="viewJob('${t.id}')"><i class="bi bi-eye"></i> Details</button>
+        <a class="btn btn-outline-primary btn-sm" href="tel:${t.customerMobile}"><i class="bi bi-telephone"></i> Call</a>
+      </div>
+    </div>`).join('');
+}
+
+/* ── TECHNICIANS ────────────────────────────────────────────── */
+function renderTechGrid() {
+  const el = document.getElementById('techGrid');
+  if (!allTechs.length) {
+    el.innerHTML = `<div class="col-12"><div class="empty-state"><i class="bi bi-people"></i><h4>No technicians yet</h4><p>Add your first technician</p><button class="btn btn-primary mt-3" onclick="openTechModal()"><i class="bi bi-person-plus"></i> Add Technician</button></div></div>`;
+    return;
+  }
+  el.innerHTML = allTechs.map(t => `
+    <div class="col-xl-3 col-md-4 col-sm-6">
+      <div class="tech-card">
+        <div class="tech-avatar">${t.name.charAt(0)}</div>
+        <div class="tech-name">${t.name}</div>
+        <div class="tech-mobile"><i class="bi bi-telephone" style="font-size:11px"></i> ${t.mobile}</div>
+        ${t.email ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">${t.email}</div>` : ''}
+        <div class="tech-skills">
+          ${(t.skills || '').split(',').map(s => s.trim() ? `<span class="skill-tag">${s.trim()}</span>` : '').join('')}
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">
+          <span class="tech-status-dot ${t.status === 'active' ? '' : 'inactive'}"></span>
+          ${t.status === 'active' ? 'Active' : 'Inactive'}
+          &nbsp;·&nbsp; <strong>${allTasks.filter(j => j.technician === t.name && j.status !== 'Completed').length}</strong> active jobs
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline-primary btn-sm" onclick="openTechModal('${t.id}')"><i class="bi bi-pencil"></i></button>
+          <button class="btn btn-${t.status === 'active' ? 'warning' : 'success'} btn-sm" onclick="toggleTechStatus('${t.id}')">
+            <i class="bi bi-${t.status === 'active' ? 'pause' : 'play'}"></i>
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTech('${t.id}')"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openTechModal(id) {
+  document.getElementById('techEditId').value = id || '';
+  if (id) {
+    const t = allTechs.find(x => x.id === id);
+    if (t) {
+      document.getElementById('techModalTitle').textContent = 'Edit Technician';
+      document.getElementById('techName').value   = t.name;
+      document.getElementById('techMobile').value = t.mobile;
+      document.getElementById('techEmail').value  = t.email || '';
+      document.getElementById('techSkills').value = t.skills || '';
+      document.getElementById('techStatus').value = t.status;
+    }
+  } else {
+    document.getElementById('techModalTitle').textContent = 'Add Technician';
+    document.getElementById('techForm').reset();
+  }
+  openModal('techModal');
+}
+
+function closeTechModal() { closeModal('techModal'); }
+
+async function saveTechnician() {
+  const name   = document.getElementById('techName').value.trim();
+  const mobile = document.getElementById('techMobile').value.trim();
+  if (!name || !mobile) { Toast.warning('Name and mobile are required'); return; }
+  const id = document.getElementById('techEditId').value;
+  const data = {
+    name, mobile,
+    email:  document.getElementById('techEmail').value.trim(),
+    skills: document.getElementById('techSkills').value.trim(),
+    status: document.getElementById('techStatus').value,
+  };
+  let res;
+  if (id) res = await API.updateTechnician(id, data);
+  else    res = await API.addTechnician(data);
+
+  if (res.success) {
+    if (id) { const i = allTechs.findIndex(t => t.id === id); if (i>=0) allTechs[i] = res.data; }
+    else    { allTechs.push(res.data); }
+    Toast.success(`Technician ${id ? 'updated' : 'added'}!`);
+    closeTechModal();
+    renderAll();
+  } else Toast.error(res.message);
+}
+
+async function toggleTechStatus(id) {
+  const t = allTechs.find(x => x.id === id);
+  if (!t) return;
+  const newStatus = t.status === 'active' ? 'inactive' : 'active';
+  const res = await API.updateTechnician(id, { status: newStatus });
+  if (res.success) {
+    const i = allTechs.findIndex(x => x.id === id);
+    if (i >= 0) allTechs[i] = res.data;
+    Toast.success(`Technician ${newStatus}`);
+    renderAll();
+  }
+}
+
+function deleteTech(id) {
+  showConfirm('Delete Technician', 'Are you sure? Assigned jobs will remain.', async () => {
+    const res = await API.deleteTechnician(id);
+    if (res.success) { allTechs = allTechs.filter(t => t.id !== id); Toast.success('Technician removed'); renderAll(); }
+    else Toast.error(res.message);
+  });
+}
+
+/* ── REPORTS ─────────────────────────────────────────────────── */
+function renderReports() {
+  const total     = allTasks.length;
+  const completed = allTasks.filter(t => t.status === 'Completed').length;
+  const pending   = allTasks.filter(t => t.status === 'Pending').length;
+  const high      = allTasks.filter(t => t.priority === 'High').length;
+
+  document.getElementById('reportStats').innerHTML = [
+    { label:'Total Jobs', value: total,     color:'var(--accent)'   },
+    { label:'Completed',  value: completed, color:'var(--success)'  },
+    { label:'Pending',    value: pending,   color:'var(--warning)'  },
+    { label:'High Priority', value: high,   color:'var(--danger)'   },
+  ].map(s => `
+    <div class="col-6 col-md-3">
+      <div class="report-stat">
+        <div class="value" style="color:${s.color}">${s.value}</div>
+        <div class="label">${s.label}</div>
+      </div>
+    </div>`).join('');
+
+  const tp = document.getElementById('techPerformance');
+  if (!tp) return;
+  tp.innerHTML = allTechs.map(t => {
+    const done  = allTasks.filter(j => j.technician === t.name && j.status === 'Completed').length;
+    const total2 = allTasks.filter(j => j.technician === t.name).length;
+    const pct   = total2 ? Math.round(done / total2 * 100) : 0;
+    return `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px">
+          <span style="color:var(--text-primary)">${t.name}</span>
+          <span style="color:var(--text-muted)">${done}/${total2} (${pct}%)</span>
+        </div>
+        <div style="height:6px;background:var(--bg-surface);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(to right,var(--accent),var(--accent-2));border-radius:99px;transition:width 1s ease"></div>
+        </div>
+      </div>`;
+  }).join('') || '<div style="color:var(--text-muted);font-size:13px">No technician data</div>';
+}
+
+/* ── EXPORT ──────────────────────────────────────────────────── */
+function exportJobsCSV()       { exportCSV(allTasks, 'all_jobs.csv'); }
+function exportCompletedCSV()  { exportCSV(allTasks.filter(t=>t.status==='Completed'), 'completed_jobs.csv'); }
+function exportTechsCSV()      { exportCSV(allTechs, 'technicians.csv'); }
+
+/* ── MODAL HELPERS ───────────────────────────────────────────── */
+function openModal(id) {
+  const m = document.getElementById(id);
+  if (m) { m.style.display='flex'; setTimeout(()=>m.classList.add('open'),10); }
+}
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (m) { m.classList.remove('open'); setTimeout(()=>m.style.display='none',300); }
+}
+
+function markAllRead() {
+  document.querySelectorAll('.notif-dot2').forEach(d => { d.style.background='var(--text-muted)'; });
+  document.querySelector('.notif-dot').style.display = 'none';
+  Toast.info('All notifications marked as read');
+}
+
+function toggleThemeSwitch(el) {
+  el.classList.toggle('on');
+  Theme.toggle();
+}
+
+// ── Service Worker ─────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(e => console.log('[SW]', e));
+}
+</script>
+</body>
+</html>

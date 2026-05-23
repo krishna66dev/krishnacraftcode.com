@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServicePro — Technician Dashboard</title>
+  <meta name="theme-color" content="#080d14">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2310b981'/><text y='24' x='5' font-size='22'>🔧</text></svg>">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <style>
+    /* Technician uses teal/green accent overrides */
+    .tech-app { --accent: #10b981; --accent-2: #059669; --accent-3: #34d399; --accent-soft: rgba(16,185,129,0.12); --accent-glow: rgba(16,185,129,0.3); --border-strong: rgba(16,185,129,0.2); --shadow-accent: 0 4px 24px rgba(16,185,129,0.25); }
+
+    .status-steps {
+      display: flex; gap: 0; margin: 16px 0;
+    }
+    .status-step {
+      flex: 1; text-align: center; font-size: 11px; color: var(--text-muted);
+      position: relative; padding-top: 24px;
+    }
+    .status-step::before {
+      content: ''; position: absolute; top: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg-surface); z-index: 1;
+    }
+    .status-step::after {
+      content: ''; position: absolute; top: 14px; left: calc(50% + 7px);
+      width: calc(100% - 14px); height: 2px;
+      background: var(--border); z-index: 0;
+    }
+    .status-step:last-child::after { display: none; }
+    .status-step.done::before { background: var(--accent); border-color: var(--accent); }
+    .status-step.done::after  { background: var(--accent); }
+    .status-step.active::before { background: var(--accent-soft); border-color: var(--accent); }
+
+    .job-card-full {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .job-card-full:hover { box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+
+    .job-card-top {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+
+    .job-card-number {
+      width: 40px; height: 40px;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 800;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .job-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      padding: 16px 20px;
+    }
+
+    .job-detail-item { }
+    .job-detail-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .job-detail-value { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+
+    .job-card-actions {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-surface);
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+
+    /* Profile view */
+    .profile-hero {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .profile-big-avatar {
+      width: 80px; height: 80px;
+      background: rgba(255,255,255,0.2);
+      border: 3px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 800;
+      margin: 0 auto 12px;
+    }
+  </style>
+</head>
+<body class="tech-app">
+
+<!-- Offline bar -->
+<div class="offline-bar"><i class="bi bi-wifi-off me-2"></i>You are offline.</div>
+
+<!-- Sidebar overlay -->
+<div class="sidebar-overlay"></div>
+
+<!-- ── SIDEBAR ───────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon" style="background:linear-gradient(135deg,var(--accent),var(--accent-2))">
+      <i class="bi bi-wrench-adjustable"></i>
+    </div>
+    <div class="brand-name">ServicePro<span>Technician Portal</span></div>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebarAvatar" style="background:linear-gradient(135deg,var(--accent),var(--accent-2))">T</div>
+    <div class="user-info">
+      <div class="user-name" id="sidebarName">Technician</div>
+      <div class="user-role" style="color:var(--accent)">Service Technician</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Work</div>
+    <div class="nav-item active" data-section="mytasks"><i class="bi bi-list-check"></i>My Tasks<span class="nav-badge" id="pendingBadge">0</span></div>
+    <div class="nav-item" data-section="myCompleted"><i class="bi bi-check2-all"></i>Completed Tasks</div>
+
+    <div class="nav-section-label" style="margin-top:6px">Account</div>
+    <div class="nav-item" data-section="profile"><i class="bi bi-person"></i>My Profile</div>
+    <div class="nav-item" data-section="tsettings"><i class="bi bi-sliders"></i>Settings</div>
+
+    <div style="margin-top:8px">
+      <div class="nav-item logout-btn" style="color:var(--danger)"><i class="bi bi-box-arrow-right"></i>Logout</div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div style="font-size:11px;color:var(--text-muted);text-align:center">ServicePro v2.0</div>
+  </div>
+</aside>
+
+<!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+<div class="main-content">
+
+  <!-- Top Header -->
+  <header class="top-header">
+    <button class="header-btn menu-toggle"><i class="bi bi-list" style="font-size:20px"></i></button>
+    <div class="header-title" id="headerTitle">My Tasks</div>
+    <div class="header-clock">00:00:00</div>
+    <div class="header-btn theme-toggle" title="Toggle theme"><i class="bi bi-sun-fill"></i></div>
+    <div class="header-btn notif-btn" style="position:relative" title="Notifications">
+      <i class="bi bi-bell"></i><div class="notif-dot"></div>
+    </div>
+    <div class="profile-btn">
+      <div class="user-avatar" style="width:30px;height:30px;font-size:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2))" id="headerAvatar">T</div>
+      <span class="profile-btn-name" id="headerName">Technician</span>
+    </div>
+    <button class="btn btn-danger btn-sm logout-btn"><i class="bi bi-box-arrow-right"></i></button>
+  </header>
+
+  <!-- Notification Panel -->
+  <div class="notif-panel">
+    <div class="notif-header">
+      <span class="notif-title">Notifications</span>
+    </div>
+    <div id="notifList">
+      <div class="notif-item">
+        <div class="notif-dot2" style="background:var(--accent)"></div>
+        <div><div class="notif-text">New job JB006 assigned to you</div><div class="notif-time">5 min ago</div></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot2" style="background:var(--warning)"></div>
+        <div><div class="notif-text">Reminder: Job JB001 is scheduled for today</div><div class="notif-time">1 hr ago</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <main class="page-content">
+
+    <!-- ── MY TASKS ─────────────────────────────────── -->
+    <div class="section-view active" id="mytasks">
+      <div class="page-header">
+        <h1 class="page-title">My Tasks</h1>
+        <p class="page-subtitle" id="myTasksSubtitle">Your assigned service jobs</p>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="stat-cards" id="techStatCards" style="margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-clipboard-data"></i></div>
+          <div class="stat-body"><div class="stat-value" id="tStatTotal">0</div><div class="stat-label">Total Assigned</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="bi bi-hourglass-split"></i></div>
+          <div class="stat-body"><div class="stat-value" id="tStatPending">0</div><div class="stat-label">Pending</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--accent-soft);color:var(--accent)"><i class="bi bi-play-circle"></i></div>
+          <div class="stat-body"><div class="stat-value" id="tStatProgress">0</div><div class="stat-label">In Progress</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+          <div class="stat-body"><div class="stat-value" id="tStatDone">0</div><div class="stat-label">Completed</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="bi bi-calendar-day"></i></div>
+          <div class="stat-body"><div class="stat-value" id="tStatToday">0</div><div class="stat-label">Today's Jobs</div></div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="toolbar mb-3">
+        <input type="text" class="form-control" id="taskSearch" placeholder="Search tasks…" oninput="renderMyTasks()">
+        <select class="form-select" id="taskStatusFilter" onchange="renderMyTasks()">
+          <option value="">All Status</option>
+          <option>Pending</option><option>In Progress</option><option>Completed</option>
+        </select>
+        <select class="form-select" id="taskPriorityFilter" onchange="renderMyTasks()">
+          <option value="">All Priority</option>
+          <option>High</option><option>Medium</option><option>Low</option>
+        </select>
+      </div>
+
+      <div id="myTasksList">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ── MY COMPLETED ──────────────────────────────── -->
+    <div class="section-view" id="myCompleted">
+      <div class="page-header">
+        <h1 class="page-title">Completed Tasks</h1>
+        <p class="page-subtitle">Your finished service jobs</p>
+      </div>
+      <div id="myCompletedList" class="task-grid">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ── PROFILE ───────────────────────────────────── -->
+    <div class="section-view" id="profile">
+      <div class="page-header">
+        <h1 class="page-title">My Profile</h1>
+        <p class="page-subtitle">Your account information</p>
+      </div>
+
+      <div class="row g-20">
+        <div class="col-lg-4">
+          <div class="profile-hero">
+            <div class="profile-big-avatar" id="profileAvatar">T</div>
+            <div style="font-size:20px;font-weight:800;margin-bottom:4px" id="profileName">Technician</div>
+            <div style="font-size:13px;opacity:0.8">Service Technician</div>
+            <div style="margin-top:12px;font-size:13px;opacity:0.9" id="profileMobile">—</div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;font-weight:600">Performance Summary</div>
+              <div id="profileStats"><!-- rendered by JS --></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-header"><i class="bi bi-person-badge text-accent"></i><span class="card-title">Profile Details</span></div>
+            <div class="card-body">
+              <div class="row g-14">
+                <div class="col-md-6">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="profileNameEdit" placeholder="Your name">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Mobile</label>
+                  <input type="tel" class="form-control" id="profileMobileEdit" placeholder="Mobile number" readonly style="opacity:0.7">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Change Password</label>
+                  <input type="password" class="form-control" id="newPassword" placeholder="Leave blank to keep current">
+                </div>
+                <div class="col-12">
+                  <button class="btn btn-primary" onclick="saveProfile()"><i class="bi bi-check2"></i> Update Profile</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mt-20">
+            <div class="card-header"><i class="bi bi-clock-history text-accent"></i><span class="card-title">Recent Activity</span></div>
+            <div class="card-body" id="profileActivity">
+              <!-- rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ──────────────────────────────────── -->
+    <div class="section-view" id="tsettings">
+      <div class="page-header">
+        <h1 class="page-title">Settings</h1>
+        <p class="page-subtitle">App preferences</p>
+      </div>
+      <div class="row g-20">
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header"><i class="bi bi-palette text-accent"></i><span class="card-title">Appearance</span></div>
+            <div class="card-body">
+              <div class="settings-row">
+                <div><div class="settings-row-label">Dark Mode</div><div class="settings-row-sub">Switch theme</div></div>
+                <div class="toggle-switch on" id="tThemeToggle" onclick="toggleTechTheme(this)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header"><i class="bi bi-bell text-accent"></i><span class="card-title">Notifications</span></div>
+            <div class="card-body">
+              <div class="settings-row">
+                <div><div class="settings-row-label">Job Notifications</div><div class="settings-row-sub">Get notified for new jobs</div></div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MOBILE BOTTOM NAV ─────────────────────────────── -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-items">
+    <div class="mobile-nav-item active" data-section="mytasks"><i class="bi bi-list-check"></i><span>My Tasks</span></div>
+    <div class="mobile-nav-item" data-section="myCompleted"><i class="bi bi-check2-all"></i><span>Completed</span></div>
+    <div class="mobile-nav-item" data-section="profile"><i class="bi bi-person"></i><span>Profile</span></div>
+    <div class="mobile-nav-item" data-section="tsettings"><i class="bi bi-sliders"></i><span>Settings</span></div>
+  </div>
+</nav>
+
+<!-- ── COMPLETE JOB MODAL ────────────────────────────── -->
+<div class="modal-overlay" id="completeModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Complete Job</span>
+      <div class="modal-close" onclick="closeCompleteModal()"><i class="bi bi-x"></i></div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="completeJobId">
+      <div class="mb-3">
+        <label class="form-label">Completion Remarks *</label>
+        <textarea class="form-control" id="completeRemarks" rows="3" placeholder="What was done? Parts replaced? Notes for admin…" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Completed Work Photo</label>
+        <div class="upload-area" id="completeImgArea">
+          <i class="bi bi-camera d-block text-center" style="font-size:28px;color:var(--text-muted)"></i>
+          <p>Upload photo of completed work</p>
+          <small>JPG, PNG — max 5MB</small>
+        </div>
+        <input type="file" id="completeImgInput" accept="image/*" style="display:none">
+        <div id="completeImgPreview"></div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Customer Feedback (optional)</label>
+        <textarea class="form-control" id="customerFeedback" rows="2" placeholder="Any customer feedback…"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Customer Signature Placeholder</label>
+        <div style="border:2px dashed var(--border);border-radius:var(--radius-md);height:80px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;background:var(--bg-input)">
+          <i class="bi bi-pen me-2"></i> Customer signs here (physical copy)
+        </div>
+      </div>
+      <div style="background:var(--warning-soft);border:1px solid var(--warning);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--warning)">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        This action cannot be undone. The job will be marked as completed.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-primary btn-sm" onclick="closeCompleteModal()">Cancel</button>
+      <button class="btn btn-success btn-sm" onclick="submitComplete()"><i class="bi bi-check2-circle"></i> Mark Completed</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── JOB DETAIL MODAL ──────────────────────────────── -->
+<div class="modal-overlay" id="jobDetailModal">
+  <div class="modal-box" style="max-width:640px">
+    <div class="modal-header">
+      <span class="modal-title">Job Details</span>
+      <div class="modal-close" onclick="closeModal2('jobDetailModal')"><i class="bi bi-x"></i></div>
+    </div>
+    <div class="modal-body" id="jobDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-primary btn-sm" onclick="closeModal2('jobDetailModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script src="app.js"></script>
+<script>
+/* ── STATE ────────────────────────────────────────────────────── */
+let myTasks  = [];
+let allTasks = [];
+let currentUser = null;
+const T_SECTIONS = ['mytasks','myCompleted','profile','tsettings'];
+
+/* ── INIT ─────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+  currentUser = Auth.require('technician');
+  if (!currentUser) return;
+
+  // Set user info
+  const initial = currentUser.name.charAt(0).toUpperCase();
+  ['sidebarAvatar','headerAvatar','profileAvatar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = initial;
+  });
+  document.getElementById('sidebarName').textContent     = currentUser.name;
+  document.getElementById('headerName').textContent      = currentUser.name;
+  document.getElementById('profileName').textContent     = currentUser.name;
+  document.getElementById('profileMobile').textContent   = currentUser.mobile || '—';
+  document.getElementById('profileNameEdit').value       = currentUser.name;
+  document.getElementById('profileMobileEdit').value     = currentUser.mobile || '';
+
+  const ts = document.getElementById('tThemeToggle');
+  if (ts) ts.classList.toggle('on', Theme.get() === 'dark');
+
+  document.getElementById('myTasksSubtitle').textContent =
+    'Welcome back, ' + currentUser.name + ' · ' + new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
+
+  initSidebar();
+  initNotifPanel();
+  initSectionNav(
+    [...document.querySelectorAll('.nav-item[data-section]'), ...document.querySelectorAll('.mobile-nav-item[data-section]')],
+    T_SECTIONS.map(s => document.getElementById(s)),
+    id => { document.getElementById('headerTitle').textContent = { mytasks:'My Tasks', myCompleted:'Completed Tasks', profile:'Profile', tsettings:'Settings' }[id] || 'Dashboard'; }
+  );
+
+  initUploadArea('completeImgArea','completeImgInput','completeImgPreview');
+
+  await loadMyTasks();
+});
+
+async function loadMyTasks() {
+  const res = await API.getTasks();
+  if (res.success) {
+    allTasks = res.data;
+    myTasks  = allTasks.filter(t => t.technician === currentUser.name);
+    renderStats();
+    renderMyTasks();
+    renderMyCompleted();
+    renderProfileStats();
+    renderProfileActivity();
+  }
+}
+
+/* ── STATS ────────────────────────────────────────────────────── */
+function renderStats() {
+  const todayStr = today();
+  const pending  = myTasks.filter(t => t.status === 'Pending').length;
+  const progress = myTasks.filter(t => t.status === 'In Progress').length;
+  const done     = myTasks.filter(t => t.status === 'Completed').length;
+  const todayC   = myTasks.filter(t => t.serviceDate === todayStr).length;
+
+  document.getElementById('tStatTotal').textContent   = myTasks.length;
+  document.getElementById('tStatPending').textContent = pending;
+  document.getElementById('tStatProgress').textContent = progress;
+  document.getElementById('tStatDone').textContent    = done;
+  document.getElementById('tStatToday').textContent   = todayC;
+  document.getElementById('pendingBadge').textContent = pending + progress;
+}
+
+/* ── MY TASKS RENDER ──────────────────────────────────────────── */
+function renderMyTasks() {
+  const search   = (document.getElementById('taskSearch')?.value || '').toLowerCase();
+  const statusF  = document.getElementById('taskStatusFilter')?.value || '';
+  const priorityF = document.getElementById('taskPriorityFilter')?.value || '';
+
+  const filtered = myTasks.filter(t => {
+    if (t.status === 'Completed') return false; // Don't show completed in main list
+    const ms = !search || t.customerName.toLowerCase().includes(search) || t.id.toLowerCase().includes(search) || t.location.toLowerCase().includes(search);
+    const ss = !statusF || t.status === statusF;
+    const ps = !priorityF || t.priority === priorityF;
+    return ms && ss && ps;
+  });
+
+  const el = document.getElementById('myTasksList');
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty-state"><i class="bi bi-clipboard-check" style="font-size:48px;color:var(--accent)"></i><h4>No active tasks</h4><p>You have no pending or in-progress jobs right now</p></div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map(t => buildTaskCard(t)).join('');
+}
+
+function buildTaskCard(t) {
+  const stepDone = t.status === 'Completed';
+  const stepStart = t.status === 'In Progress' || stepDone;
+  const isToday = t.serviceDate === today();
+
+  return `
+    <div class="job-card-full mb-4 priority-${t.priority.toLowerCase()}" id="card-${t.id}" style="position:relative;overflow:hidden">
+      ${isToday ? `<div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-2))"></div>` : ''}
+
+      <div class="job-card-top">
+        <div class="job-card-number">${t.id.replace('JB','')}</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--text-primary)">${t.customerName}</div>
+              <div style="font-size:12px;color:var(--text-secondary)">${t.brand} ${t.appliance}</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+              ${priorityBadge(t.priority)}
+              ${statusBadge(t.status)}
+              ${isToday ? `<span class="badge" style="background:var(--accent-soft);color:var(--accent)">TODAY</span>` : ''}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="status-steps" style="padding:0 20px">
+        <div class="status-step ${t.status === 'Pending' || stepStart || stepDone ? 'done' : ''}">Assigned</div>
+        <div class="status-step ${stepStart ? 'done' : t.status === 'Pending' ? '' : 'active'}">Started</div>
+        <div class="status-step ${stepDone ? 'done' : ''}">Completed</div>
+      </div>
+
+      <div class="job-detail-grid">
+        <div class="job-detail-item">
+          <div class="job-detail-label"><i class="bi bi-telephone" style="color:var(--accent)"></i> Mobile</div>
+          <div class="job-detail-value"><a href="tel:${t.customerMobile}" style="color:var(--accent)">${t.customerMobile}</a></div>
+        </div>
+        <div class="job-detail-item">
+          <div class="job-detail-label"><i class="bi bi-geo-alt" style="color:var(--accent)"></i> Location</div>
+          <div class="job-detail-value">${t.location}</div>
+        </div>
+        <div class="job-detail-item">
+          <div class="job-detail-label"><i class="bi bi-calendar" style="color:var(--accent)"></i> Date</div>
+          <div class="job-detail-value">${fmtDate(t.serviceDate)}</div>
+        </div>
+        <div class="job-detail-item">
+          <div class="job-detail-label"><i class="bi bi-exclamation-triangle" style="color:var(--accent)"></i> Problem</div>
+          <div class="job-detail-value">${t.problem}</div>
+        </div>
+      </div>
+
+      <div class="job-card-actions">
+        ${t.status === 'Pending'     ? `<button class="btn btn-success btn-sm" onclick="acceptJob('${t.id}')"><i class="bi bi-hand-thumbs-up"></i> Accept</button>` : ''}
+        ${t.status === 'Pending'     ? `<button class="btn btn-primary btn-sm" onclick="startJob('${t.id}')"><i class="bi bi-play-fill"></i> Start Work</button>` : ''}
+        ${t.status === 'In Progress' ? `<button class="btn btn-success btn-sm" onclick="openCompleteModal('${t.id}')"><i class="bi bi-check2-circle"></i> Complete Work</button>` : ''}
+        <a href="tel:${t.customerMobile}" class="btn btn-outline-primary btn-sm"><i class="bi bi-telephone"></i> Call Customer</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.location)}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-map"></i> Maps</a>
+        <button class="btn btn-outline-primary btn-sm" onclick="viewJobDetail('${t.id}')"><i class="bi bi-eye"></i> Details</button>
+      </div>
+    </div>`;
+}
+
+/* ── JOB ACTIONS ──────────────────────────────────────────────── */
+async function acceptJob(id) {
+  const res = await API.updateTask(id, { status: 'Pending' });
+  Toast.success('Job accepted!');
+  // Just visual feedback; status stays Pending but marked acknowledged
+  const card = document.getElementById(`card-${id}`);
+  if (card) { const btn = card.querySelector('.btn-success'); if (btn && btn.textContent.includes('Accept')) btn.remove(); }
+}
+
+async function startJob(id) {
+  const res = await API.updateTask(id, { status: 'In Progress' });
+  if (res.success) {
+    const i = myTasks.findIndex(t => t.id === id);
+    if (i >= 0) myTasks[i] = res.data;
+    Toast.success('Job started!');
+    renderStats();
+    renderMyTasks();
+  } else Toast.error(res.message);
+}
+
+function openCompleteModal(id) {
+  document.getElementById('completeJobId').value = id;
+  document.getElementById('completeRemarks').value = '';
+  document.getElementById('customerFeedback').value = '';
+  clearUpload('completeImgArea','completeImgInput','completeImgPreview');
+  openModal2('completeModal');
+}
+
+function closeCompleteModal() { closeModal2('completeModal'); }
+
+async function submitComplete() {
+  const id      = document.getElementById('completeJobId').value;
+  const remarks = document.getElementById('completeRemarks').value.trim();
+  if (!remarks) { Toast.warning('Please add completion remarks'); return; }
+  const image = document.getElementById('completeImgInput').dataset.base64 || '';
+
+  const btn = document.querySelector('#completeModal .btn-success');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Completing…';
+
+  const res = await API.completeTask(id, remarks, image);
+  btn.disabled = false; btn.innerHTML = '<i class="bi bi-check2-circle"></i> Mark Completed';
+
+  if (res.success) {
+    const i = myTasks.findIndex(t => t.id === id);
+    if (i >= 0) myTasks[i] = res.data;
+    Toast.success('Job completed successfully! 🎉');
+    closeCompleteModal();
+    renderStats();
+    renderMyTasks();
+    renderMyCompleted();
+    renderProfileStats();
+  } else Toast.error(res.message);
+}
+
+/* ── COMPLETED RENDER ─────────────────────────────────────────── */
+function renderMyCompleted() {
+  const done = myTasks.filter(t => t.status === 'Completed');
+  const el   = document.getElementById('myCompletedList');
+  if (!done.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="bi bi-check2-circle" style="font-size:48px;color:var(--success)"></i><h4>No completed jobs yet</h4><p>Complete your first job to see it here</p></div>`;
+    return;
+  }
+  el.innerHTML = done.map(t => `
+    <div class="task-card priority-${t.priority.toLowerCase()}">
+      <div class="task-header">
+        <div><div class="task-id">${t.id}</div><div class="task-customer">${t.customerName}</div><div class="task-appliance">${t.brand} ${t.appliance}</div></div>
+        ${statusBadge(t.status)}
+      </div>
+      <div class="task-meta">
+        <div class="task-meta-item"><i class="bi bi-calendar-check"></i>${fmtDate(t.completedAt || t.serviceDate)}</div>
+        <div class="task-meta-item"><i class="bi bi-geo-alt"></i>${t.location.substring(0,30)}${t.location.length>30?'…':''}</div>
+        ${priorityBadge(t.priority)}
+      </div>
+      ${t.remarks ? `<div style="background:var(--success-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--success);margin:10px 0"><i class="bi bi-chat-text me-1"></i>${t.remarks}</div>` : ''}
+      <div class="task-actions">
+        <button class="btn btn-outline-primary btn-sm" onclick="viewJobDetail('${t.id}')"><i class="bi bi-eye"></i> Details</button>
+        <a class="btn btn-outline-primary btn-sm" href="tel:${t.customerMobile}"><i class="bi bi-telephone"></i> Call</a>
+      </div>
+    </div>`).join('');
+}
+
+/* ── PROFILE ──────────────────────────────────────────────────── */
+function renderProfileStats() {
+  const done  = myTasks.filter(t => t.status === 'Completed').length;
+  const total = myTasks.length;
+  const pct   = total ? Math.round(done / total * 100) : 0;
+  const el    = document.getElementById('profileStats');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+        <span style="color:var(--text-secondary)">Completion Rate</span>
+        <span style="font-weight:700;color:var(--accent)">${pct}%</span>
+      </div>
+      <div style="height:6px;background:var(--bg-surface);border-radius:99px">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(to right,var(--accent),var(--accent-2));border-radius:99px;transition:width 1s ease"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+      <div style="text-align:center;background:var(--bg-surface);padding:10px;border-radius:var(--radius-md)">
+        <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--text-primary)">${total}</div>
+        <div style="font-size:11px;color:var(--text-muted)">Total Jobs</div>
+      </div>
+      <div style="text-align:center;background:var(--success-soft);padding:10px;border-radius:var(--radius-md)">
+        <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--success)">${done}</div>
+        <div style="font-size:11px;color:var(--text-muted)">Completed</div>
+      </div>
+    </div>`;
+}
+
+function renderProfileActivity() {
+  const el = document.getElementById('profileActivity');
+  if (!el) return;
+  const recent = [...myTasks].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0,5);
+  if (!recent.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:13px">No activity yet</div>'; return; }
+  el.innerHTML = recent.map(t => `
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="width:30px;height:30px;background:var(--accent-soft);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px;flex-shrink:0">
+        <i class="bi bi-tools"></i>
+      </div>
+      <div>
+        <div style="font-size:13px;color:var(--text-primary)"><strong>${t.customerName}</strong> — ${t.appliance}</div>
+        <div style="font-size:11px;color:var(--text-muted);display:flex;gap:8px;margin-top:2px">
+          <span>${t.id}</span> · ${statusBadge(t.status)} · <span>${fmtDate(t.serviceDate)}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function saveProfile() {
+  Toast.success('Profile updated successfully!');
+}
+
+function viewJobDetail(id) {
+  const t = allTasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('jobDetailBody').innerHTML = `
+    <div class="row g-14">
+      <div class="col-6"><div class="form-label">Job ID</div><div style="font-weight:700;color:var(--accent)">${t.id}</div></div>
+      <div class="col-6"><div class="form-label">Status</div>${statusBadge(t.status)}</div>
+      <div class="col-6"><div class="form-label">Customer</div><strong>${t.customerName}</strong></div>
+      <div class="col-6"><div class="form-label">Mobile</div><a href="tel:${t.customerMobile}" style="color:var(--accent)">${t.customerMobile}</a></div>
+      <div class="col-12"><div class="form-label">Location</div>${t.location}</div>
+      <div class="col-4"><div class="form-label">Brand</div>${t.brand}</div>
+      <div class="col-4"><div class="form-label">Appliance</div>${t.appliance}</div>
+      <div class="col-4"><div class="form-label">Priority</div>${priorityBadge(t.priority)}</div>
+      <div class="col-12"><div class="form-label">Problem</div>${t.problem}</div>
+      <div class="col-6"><div class="form-label">Service Date</div>${fmtDate(t.serviceDate)}</div>
+      ${t.completedAt ? `<div class="col-6"><div class="form-label">Completed</div>${fmtDate(t.completedAt)}</div>` : ''}
+      ${t.remarks ? `<div class="col-12"><div class="form-label">Remarks</div><div style="background:var(--success-soft);padding:8px;border-radius:var(--radius-sm);color:var(--success);font-size:13px">${t.remarks}</div></div>` : ''}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <a href="tel:${t.customerMobile}" class="btn btn-primary btn-sm"><i class="bi bi-telephone"></i> Call Customer</a>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.location)}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-map"></i> Open Maps</a>
+    </div>`;
+  openModal2('jobDetailModal');
+}
+
+/* ── MODAL HELPERS ────────────────────────────────────────────── */
+function openModal2(id) {
+  const m = document.getElementById(id);
+  if (m) { m.style.display='flex'; setTimeout(()=>m.classList.add('open'),10); }
+}
+function closeModal2(id) {
+  const m = document.getElementById(id);
+  if (m) { m.classList.remove('open'); setTimeout(()=>m.style.display='none',300); }
+}
+
+/* ── MISC ─────────────────────────────────────────────────────── */
+function toggleTechTheme(el) {
+  el.classList.toggle('on');
+  Theme.toggle();
+}
+
+// ── Service Worker ─────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(e => console.log('[SW]', e));
+}
+</script>
+</body>
+</html>
