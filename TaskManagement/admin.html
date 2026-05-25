@@ -469,8 +469,8 @@
             </div>
 
             <!-- Photos -->
-            <div class="form-section-title" style="margin-top:12px"><i class="bi bi-camera"></i>Photos</div>
-            <div class="row g-14 mb-4">
+            <div class="form-section-title d-none" style="margin-top:12px; display: none;"><i class="bi bi-camera"></i>Photos</div>
+            <div class="row g-14 mb-4 d-none">
               <div class="col-md-6">
                 <label class="form-label">Customer Photo</label>
                 <div class="upload-area" id="custImgArea">
@@ -727,6 +727,12 @@
           <div class="col-12">
             <label class="form-label">Skills (comma separated)</label>
             <input type="text" class="form-control" id="techSkills" placeholder="e.g. AC, Refrigerator, TV">
+          </div>
+          <div class="col-12 creadentials d-none">
+            <span id="usernamecreate" ></span>
+          </div>
+          <div class="col-12 creadentials d-none">
+            <label class="form-label"> Password</label>
           </div>
         </div>
       </form>
@@ -1270,10 +1276,14 @@ function openTechModal(id) {
       document.getElementById('techEmail').value  = t.email || '';
       document.getElementById('techSkills').value = t.skills || '';
       document.getElementById('techStatus').value = t.status;
+      document.querySelector('.creadentials').classList.remove('d-none');
+      // document.getElementById('usernamecreate').textContent = `Username: ${t.username}`;
+      // document.getElementById('techPassword').textContent = `Password: ${t.password}`;
     }
   } else {
     document.getElementById('techModalTitle').textContent = 'Add Technician';
     document.getElementById('techForm').reset();
+    document.querySelector('.creadentials').classList.add('d-none');
   }
   openModal('techModal');
 }

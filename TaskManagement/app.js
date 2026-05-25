@@ -60,7 +60,7 @@ const Auth = (() => {
 })();
 
 // ── TOAST ──────────────────────────────────────────────────────
-const Toast = (() => {
+window.Toast = (() => {
   let container;
 
   function ensureContainer() {
@@ -68,26 +68,43 @@ const Toast = (() => {
       container = document.createElement('div');
       container.className = 'toast-container';
       document.body.appendChild(container);
+      console.log('Toast container created');
     }
   }
 
   const ICONS = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', warning: 'bi-exclamation-triangle-fill', info: 'bi-info-circle-fill' };
 
   function show(message, type = 'info', duration = 3500) {
-    ensureContainer();
-    const el = document.createElement('div');
-    el.className = `toast ${type}`;
-    el.innerHTML = `
-      <i class="bi ${ICONS[type] || ICONS.info} toast-icon"></i>
-      <span class="toast-text">${message}</span>
-      <i class="bi bi-x toast-close" onclick="this.parentElement.remove()"></i>
-    `;
-    container.appendChild(el);
+
+  ensureContainer();
+
+  const el = document.createElement('div');
+
+  el.className = `toast ${type}`;
+
+  el.innerHTML = `
+    <i class="bi ${ICONS[type] || ICONS.info} toast-icon"></i>
+    <span class="toast-text">${message}</span>
+    <i class="bi bi-x toast-close"></i>
+  `;
+
+  el.querySelector('.toast-close')
+    .addEventListener('click', () => {
+      el.remove();
+    });
+
+  container.appendChild(el);
+
+  setTimeout(() => {
+
+    el.classList.add('hiding');
+
     setTimeout(() => {
-      el.classList.add('hiding');
-      setTimeout(() => el.remove(), 300);
-    }, duration);
-  }
+      el.remove();
+    }, 5000);
+
+  }, duration);
+}
 
   return {
     success: (msg, d) => show(msg, 'success', d),

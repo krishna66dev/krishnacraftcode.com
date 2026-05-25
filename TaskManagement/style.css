@@ -831,8 +831,11 @@ img { max-width: 100%; }
 .toast-container {
   position: fixed;
   top: 20px; right: 20px;
-  z-index: 1000;
+  z-index: 9999;
   display: flex; flex-direction: column; gap: 10px;
+}
+.toast:not(.show){
+  display: block !important;
 }
 
 .toast {

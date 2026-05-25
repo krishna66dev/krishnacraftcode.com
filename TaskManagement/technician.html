@@ -10,7 +10,7 @@
    <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
+  <link href="style.css?1" rel="stylesheet">
   <style>
     /* Technician uses teal/green accent overrides */
     .tech-app { --accent: #10b981; --accent-2: #059669; --accent-3: #34d399; --accent-soft: rgba(16,185,129,0.12); --accent-glow: rgba(16,185,129,0.3); --border-strong: rgba(16,185,129,0.2); --shadow-accent: 0 4px 24px rgba(16,185,129,0.25); }
@@ -378,7 +378,7 @@
         <label class="form-label">Customer Feedback (optional)</label>
         <textarea class="form-control" id="customerFeedback" rows="2" placeholder="Any customer feedback…"></textarea>
       </div>
-      <div class="mb-3">
+      <div class="mb-3 d-none">
         <label class="form-label">Customer Signature Placeholder</label>
         <div style="border:2px dashed var(--border);border-radius:var(--radius-md);height:80px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;background:var(--bg-input)">
           <i class="bi bi-pen me-2"></i> Customer signs here (physical copy)
@@ -615,6 +615,7 @@ async function submitComplete() {
   const res = await API.completeTask(id, remarks, image);
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-check2-circle"></i> Mark Completed';
 
+  console.log('Complete response:', res);
   if (res.success) {
     const i = myTasks.findIndex(t => t.id === id);
     if (i >= 0) myTasks[i] = res.data;
