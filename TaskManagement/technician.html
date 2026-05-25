@@ -587,8 +587,9 @@ async function startJob(id) {
     const i = myTasks.findIndex(t => t.id === id);
     if (i >= 0) myTasks[i] = res.data;
     Toast.success('Job started!');
-    renderStats();
-    renderMyTasks();
+    // renderStats();
+    // renderMyTasks();
+    location.reload(); // Quick way to refresh status steps without complex state handling
   } else Toast.error(res.message);
 }
 

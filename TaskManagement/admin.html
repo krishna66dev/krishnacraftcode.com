@@ -284,7 +284,7 @@
 
       <!-- Charts row -->
       <div class="row g-20 mb-4">
-        <div class="col-lg-8">
+        <div class="col-lg-8 d-none">
           <div class="card">
             <div class="card-header">
               <i class="bi bi-bar-chart-line text-accent"></i>
@@ -298,7 +298,7 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-6">
           <div class="card h-100">
             <div class="card-header">
               <i class="bi bi-pie-chart text-accent"></i>
@@ -541,6 +541,7 @@
                 <th>Date</th>
                 <th>Brand / Appliance</th>
                 <th>Technician</th>
+                <th>Image</th>
                 <th>Priority</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -1019,6 +1020,14 @@ function renderJobsTable() {
             <div style="color:var(--text-muted)">${t.technicianMobile}</div>
           </div>
         </td>
+        <td>
+         <img
+            src="${t.image}"
+            class="avatar avatar-sm"
+            style="cursor:pointer;"
+            onclick="downloadImage('${t.image}', 'image.jpg')"
+          />
+        </td>
         <td>${priorityBadge(t.priority)}</td>
         <td>${statusBadge(t.status)}</td>
         <td>
@@ -1033,6 +1042,14 @@ function renderJobsTable() {
   jobsPager.renderControls('jobsPagination', renderJobsTable);
 }
 
+function downloadImage(base64, filename) {
+  const a = document.createElement('a');
+  a.href = base64;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
 function filterJobs() { jobsPager = null; renderJobsTable(); }
 
 function populateTechDropdowns() {

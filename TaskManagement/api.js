@@ -6,7 +6,7 @@
 
 const API = (() => {
   // ── CONFIGURATION ──────────────────────────────────────────
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxbIQ-kYsutP3vSsXi3rXU5l1dfr8EnAvuCFskyFRdA_uR9uRhmDbN42glPfaOW-NB7_A/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRQZaQy6xsP69Xfd521qqpsXL-N-SF6hTD31UGETPPvK4z2d4HT8HxF8qz33yMZFc/exec';
 
   // Toggle for demo/offline mode (uses mock data when true)
   const DEMO_MODE = false;
