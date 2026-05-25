@@ -1,8 +1,8 @@
 {
-  "name": "ServicePro — Service Management",
-  "short_name": "ServicePro",
+  "name": "Service Management",
+  "short_name": "Service",
   "description": "Service Management System for assigning and tracking technician jobs",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#080d14",
   "theme_color": "#0ea5e9",
@@ -26,12 +26,12 @@
   "shortcuts": [
     {
       "name": "Admin Dashboard",
-      "url": "/admin.html",
+      "url": "admin.html",
       "description": "Go to Admin Dashboard"
     },
     {
       "name": "Technician Dashboard",
-      "url": "/technician.html",
+      "url": "technician.html",
       "description": "Go to Technician Dashboard"
     }
   ]
