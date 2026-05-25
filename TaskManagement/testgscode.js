@@ -194,13 +194,20 @@ function addTechnician(ss, tech) {
   let randomNum = Math.floor(1000 + Math.random() * 9000);  
   const Password = (tech.name || 'tech').toLowerCase().replace(/\s+/g, '') + '@' + randomNum;
 
+  const status = tech.status || 'active';
+  const skills = tech.skills ? tech.skills.join(',') : '';
+  const email = tech.email || '';
+
   sheet.appendRow([
     newId,       
     username,    
     Password,   
     'technician',
     tech.name   || '',  
-    tech.mobile || ''   
+    tech.mobile || '',
+    status,
+    skills,
+    email   
   ]);
 
   return { success: true, data: { id: newId, name: tech.name, mobile: tech.mobile } };

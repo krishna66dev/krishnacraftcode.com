@@ -5,7 +5,6 @@
 
 const CACHE_NAME  = 'servicepro-v2';
 const CORE_ASSETS = [
-  '/',
   'index.html',
   'admin.html',
   'technician.html',
@@ -62,7 +61,7 @@ self.addEventListener('fetch', event => {
           if (cached) return cached;
           // Fallback for HTML navigation
           if (event.request.destination === 'document') {
-            return caches.match('/index.html');
+            return caches.match('index.html');
           }
         });
       })

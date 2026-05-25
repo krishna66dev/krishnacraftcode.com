@@ -7,7 +7,10 @@
   <meta name="description" content="Service Management System Login">
   <meta name="theme-color" content="#080d14">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230ea5e9'/><text y='24' x='5' font-size='22'>⚙</text></svg>">
+
+   <link rel="icon" type="image/x-icon" href="favicon.ico">
+   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
@@ -112,7 +115,8 @@
   <div class="login-card">
     <!-- Logo -->
     <div class="login-logo">
-      <i class="bi bi-gear-wide-connected"></i>
+      <!-- <i class="bi bi-gear-wide-connected"></i> -->
+      <img src="android-chrome-192x192.png" alt="Logo" style="width:45px;height:40px;">
     </div>
 
     <div class="demo-pill">
@@ -202,7 +206,10 @@
 
 <!-- PWA Install Popup -->
 <div class="install-popup" id="installPopup" style="display:none">
-  <div class="brand-icon" style="width:36px;height:36px;font-size:16px;flex-shrink:0"><i class="bi bi-gear-wide-connected"></i></div>
+  <div class="brand-icon" style="width:36px;height:30px;font-size:16px;flex-shrink:0">
+    <!-- <i class="bi bi-gear-wide-connected"></i> -->
+     <img src="android-chrome-192x192.png" alt="Logo" style="width:36px;height:30px;">
+  </div>
   <div style="flex:1">
     <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Install ServicePro</div>
     <div style="font-size:11px;color:var(--text-muted)">Add to home screen for quick access</div>
@@ -313,32 +320,56 @@ function setLoading(loading) {
 
 // ── Auto-redirect if already logged in ──────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  const user = Auth.get();
-  if (user) {
-    window.location.href = user.role === 'admin' ? 'admin.html' : 'technician.html';
+  if (typeof Auth !== 'undefined') {
+    const user = Auth.get();
+
+    if (user) {
+      const targetPage =
+        user.role === 'admin'
+          ? 'admin.html'
+          : 'technician.html';
+
+      if (!window.location.pathname.includes(targetPage)) {
+        window.location.href = targetPage;
+      }
+    }
   }
 });
 
 // ── Service Worker ───────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(e => console.log('[SW] Registration failed:', e));
+  navigator.serviceWorker
+    .register('/sw.js')
+    .catch(e => console.log('[SW] Registration failed:', e));
 }
 
 // ── PWA Install ──────────────────────────────────────────────
 let deferredPrompt;
+
+const installPopup = document.getElementById('installPopup');
+const installBtn = document.getElementById('installBtn');
+
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  document.getElementById('installPopup').style.display = 'flex';
+
+  installPopup?.style && (installPopup.style.display = 'flex');
 });
-document.getElementById('installBtn')?.addEventListener('click', async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') Toast.success('App installed!');
-    deferredPrompt = null;
-    document.getElementById('installPopup').style.display = 'none';
+
+installBtn?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+
+  const { outcome } = await deferredPrompt.userChoice;
+
+  if (outcome === 'accepted') {
+    Toast?.success?.('App installed!');
   }
+
+  deferredPrompt = null;
+
+  installPopup?.style && (installPopup.style.display = 'none');
 });
 </script>
 </body>
