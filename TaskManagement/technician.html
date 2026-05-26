@@ -413,6 +413,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="api.js"></script>
 <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 <script>
 /* ── STATE ────────────────────────────────────────────────────── */
 let myTasks  = [];
@@ -603,11 +604,16 @@ function openCompleteModal(id) {
 
 function closeCompleteModal() { closeModal2('completeModal'); }
 
+
 async function submitComplete() {
   const id      = document.getElementById('completeJobId').value;
   const remarks = document.getElementById('completeRemarks').value.trim();
   if (!remarks) { Toast.warning('Please add completion remarks'); return; }
   const image = document.getElementById('completeImgInput').dataset.base64 || '';
+
+    if (image) {
+        image = await compressImage(image);
+    }
 
   const btn = document.querySelector('#completeModal .btn-success');
   btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Completing…';
@@ -626,6 +632,30 @@ async function submitComplete() {
     renderMyCompleted();
     renderProfileStats();
   } else Toast.error(res.message);
+}
+
+async function compressImage(base64) {
+    // base64 -> File convert
+    const res = await fetch(base64);
+    const blob = await res.blob();
+
+    const file = new File([blob], "image.jpg", {
+        type: blob.type,
+    });
+
+    const options = {
+        maxSizeMB: 0.3, // 300KB
+        maxWidthOrHeight: 1200,
+        useWebWorker: true,
+        fileType: 'image/webp', // convert to webp
+        initialQuality: 0.7,
+    };
+
+    // compress + convert webp
+    const compressedFile = await imageCompression(file, options);
+
+    // webp -> base64
+    return await imageCompression.getDataUrlFromFile(compressedFile);
 }
 
 /* ── COMPLETED RENDER ─────────────────────────────────────────── */
