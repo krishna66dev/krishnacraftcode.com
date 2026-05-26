@@ -609,11 +609,14 @@ async function submitComplete() {
   const id      = document.getElementById('completeJobId').value;
   const remarks = document.getElementById('completeRemarks').value.trim();
   if (!remarks) { Toast.warning('Please add completion remarks'); return; }
-  const image = document.getElementById('completeImgInput').dataset.base64 || '';
+  let image = document.getElementById('completeImgInput').dataset.base64 || '';
 
-    if (image) {
-        image = await compressImage(image);
-    }
+  if (image) {
+            image = await compressImage(image);
+        }
+  if (image && image.includes(',')) {
+    image = image.split(',')[1];
+  }
 
   const btn = document.querySelector('#completeModal .btn-success');
   btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Completing…';
@@ -635,26 +638,30 @@ async function submitComplete() {
 }
 
 async function compressImage(base64) {
-    // base64 -> File convert
-    const res = await fetch(base64);
-    const blob = await res.blob();
 
-    const file = new File([blob], "image.jpg", {
-        type: blob.type,
+    if (!base64) return '';
+
+    // ensure valid data url
+    if (!base64.startsWith('data:')) {
+        throw new Error('Invalid image format');
+    }
+
+    const blob = await (await fetch(base64)).blob();
+
+    const file = new File([blob], "image.webp", {
+        type: blob.type || "image/webp",
     });
 
     const options = {
-        maxSizeMB: 0.3, // 300KB
-        maxWidthOrHeight: 1200,
+        maxSizeMB: 0.2,           // 🔥 lower for Drive safety
+        maxWidthOrHeight: 1000,   // better balance
         useWebWorker: true,
-        fileType: 'image/webp', // convert to webp
-        initialQuality: 0.7,
+        fileType: 'image/webp',
+        initialQuality: 0.6       // 🔥 more compression
     };
 
-    // compress + convert webp
     const compressedFile = await imageCompression(file, options);
 
-    // webp -> base64
     return await imageCompression.getDataUrlFromFile(compressedFile);
 }
 
