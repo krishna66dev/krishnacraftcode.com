@@ -280,6 +280,22 @@
             <div class="stat-change up"><i class="bi bi-person-check"></i>Available</div>
           </div>
         </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-currency-rupee"></i></div>
+          <div class="stat-body">
+            <div class="stat-value" id="TotalAmount">0</div>
+            <div class="stat-label">Total Amount Earned</div>
+            <div class="stat-change up"><i class="bi bi-currency-dollar"></i>Revenue</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-currency-rupee"></i></div>
+          <div class="stat-body">
+            <div class="stat-value" id="TodayAmount">0</div>
+            <div class="stat-label">Today's Amount Earned</div>
+            <div class="stat-change up"><i class="bi bi-currency-dollar"></i>Revenue</div>
+          </div>
+        </div>
       </div>
 
       <!-- Charts row -->
@@ -739,7 +755,10 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline-primary btn-sm" onclick="closeTechModal()">Cancel</button>
-      <button class="btn btn-primary btn-sm" onclick="saveTechnician()"><i class="bi bi-check2"></i> Save</button>
+      <button class="btn btn-primary btn-sm" id="saveTechnician" onclick="saveTechnician()"><i class="bi bi-check2"></i> Save</button>
+      <div class="spinner-border text-primary d-none" id="loaderspin" role="status">
+        <span class="sr-only"></span>
+      </div>
     </div>
   </div>
 </div>
@@ -895,10 +914,21 @@ function renderDashboard() {
   const todayStr  = today();
   const todayCount = allTasks.filter(t => t.serviceDate === todayStr).length;
 
+  const TotalAmount = allTasks.reduce((sum, t) => sum + Number(t.amount || 0),0);
+  const todayAmount = allTasks.reduce((sum, t) => {
+  const completedDate = t.completedAt?.split('T')[0];
+
+  return sum + (completedDate === todayStr
+    ? Number(t.amount || 0)
+    : 0);
+}, 0);
+
   animateCounter('statTotal',     allTasks.length);
   animateCounter('statPending',   pending);
   animateCounter('statProgress',  progress);
   animateCounter('statCompleted', completed);
+  animateCounter('TotalAmount',   TotalAmount);
+  animateCounter('TodayAmount',   todayAmount);
   animateCounter('statTechs',     activeTechs);
 
   document.getElementById('pendingBadge').textContent = pending + progress;
@@ -1003,7 +1033,7 @@ function renderJobsTable() {
     return matchSearch && matchStatus && matchTech;
   });
 
-  if (!jobsPager) { jobsPager = new Paginator(filteredJobs, 8); }
+  if (!jobsPager) { jobsPager = new Paginator(filteredJobs, 10); }
   else            { jobsPager.setData(filteredJobs); }
 
   const tbody = document.getElementById('jobsTbody');
@@ -1295,6 +1325,10 @@ async function saveTechnician() {
   const mobile = document.getElementById('techMobile').value.trim();
   if (!name || !mobile) { Toast.warning('Name and mobile are required'); return; }
   const id = document.getElementById('techEditId').value;
+
+  document.getElementById('saveTechnician').classList.add('d-none');
+  document.getElementById('loaderspin').classList.remove('d-none');
+
   const data = {
     name, mobile,
     email:  document.getElementById('techEmail').value.trim(),
@@ -1309,8 +1343,11 @@ async function saveTechnician() {
     if (id) { const i = allTechs.findIndex(t => t.id === id); if (i>=0) allTechs[i] = res.data; }
     else    { allTechs.push(res.data); }
     Toast.success(`Technician ${id ? 'updated' : 'added'}!`);
+    document.getElementById('saveTechnician').classList.remove('d-none');
+    document.getElementById('loaderspin').classList.add('d-none');
     closeTechModal();
     renderAll();
+    console.log('Technician saved:', allTechs);
   } else Toast.error(res.message);
 }
 

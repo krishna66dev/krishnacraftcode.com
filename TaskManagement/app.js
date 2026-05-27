@@ -245,7 +245,17 @@ class Paginator {
     this.page     = 1;
     this.total    = Math.ceil(data.length / pageSize);
   }
-  setData(data) { this.data = data; this.total = Math.ceil(data.length / this.pageSize); this.page = 1; }
+  setData(data, resetPage = false) { 
+    this.data = data; 
+    this.total = Math.ceil(data.length / this.pageSize); 
+    // this.page = 1; 
+    if (resetPage) {
+      this.page = 1;
+    }
+     if (this.page > this.total) {
+      this.page = this.total || 1;
+    }
+  }
   current()     { const s = (this.page - 1) * this.pageSize; return this.data.slice(s, s + this.pageSize); }
   prev()        { if (this.page > 1) this.page--; }
   next()        { if (this.page < this.total) this.page++; }

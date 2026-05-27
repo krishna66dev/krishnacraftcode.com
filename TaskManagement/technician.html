@@ -361,6 +361,10 @@
     <div class="modal-body">
       <input type="hidden" id="completeJobId">
       <div class="mb-3">
+        <label class="form-label">Amount *</label>
+        <input type="number" class="form-control" id="completeAmount" placeholder="Enter amount" required>
+      </div>
+      <div class="mb-3">
         <label class="form-label">Completion Remarks *</label>
         <textarea class="form-control" id="completeRemarks" rows="3" placeholder="What was done? Parts replaced? Notes for admin…" required></textarea>
       </div>
@@ -597,6 +601,7 @@ async function startJob(id) {
 function openCompleteModal(id) {
   document.getElementById('completeJobId').value = id;
   document.getElementById('completeRemarks').value = '';
+  document.getElementById('completeAmount').value = '';
   document.getElementById('customerFeedback').value = '';
   clearUpload('completeImgArea','completeImgInput','completeImgPreview');
   openModal2('completeModal');
@@ -608,6 +613,8 @@ function closeCompleteModal() { closeModal2('completeModal'); }
 async function submitComplete() {
   const id      = document.getElementById('completeJobId').value;
   const remarks = document.getElementById('completeRemarks').value.trim();
+  const amount  = document.getElementById('completeAmount').value.trim();
+   if (!amount) { Toast.warning('Please enter the completion amount'); return; }
   if (!remarks) { Toast.warning('Please add completion remarks'); return; }
   let image = document.getElementById('completeImgInput').dataset.base64 || '';
 
@@ -621,7 +628,7 @@ async function submitComplete() {
   const btn = document.querySelector('#completeModal .btn-success');
   btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Completing…';
 
-  const res = await API.completeTask(id, remarks, image);
+  const res = await API.completeTask(id, remarks, image, amount);
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-check2-circle"></i> Mark Completed';
 
   console.log('Complete response:', res);

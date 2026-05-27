@@ -6,7 +6,8 @@
 
 const API = (() => {
   // ── CONFIGURATION ──────────────────────────────────────────
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRQZaQy6xsP69Xfd521qqpsXL-N-SF6hTD31UGETPPvK4z2d4HT8HxF8qz33yMZFc/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJmuFHeIeReuWeUGVpAUOkyxhCAKywXePWL6I7b9zyuDgtME2HiF-LkTDqEqkozL1o/exec';
+  // https://script.google.com/macros/s/AKfycbwG303adlpEtglLRp0D8kAbuXoc6kRB1JzQGVJACktXFic38Ci5mQnZ4yMbBHQlp9mE/exec
 
   // Toggle for demo/offline mode (uses mock data when true)
   const DEMO_MODE = false;
@@ -137,7 +138,7 @@ const API = (() => {
     addTask:            (task)                  => request('addTask', { task }),
     updateTask:         (id, data)              => request('updateTask', { id, data }),
     deleteTask:         (id)                    => request('deleteTask', { id }),
-    completeTask:       (id, remarks, image)    => request('completeTask', { id, remarks, image }),
+    completeTask:       (id, remarks, image,amount)    => request('completeTask', { id, remarks, image, amount }),
     getTechnicians:     ()                      => request('getTechnicians'),
     addTechnician:      (tech)                  => request('addTechnician', { tech }),
     updateTechnician:   (id, data)              => request('updateTechnician', { id, data }),
@@ -173,7 +174,7 @@ const API = (() => {
   //       result = deleteTask(ss, data.id);
   //       break;
   //     case 'completeTask':
-  //       result = completeTask(ss, data.id, data.remarks, data.image);
+  //       result = completeTask(ss, data.id, data.remarks, data.image, data.amount);
   //       break;
   //     case 'getTechnicians':
   //       result = getTechnicians(ss);
