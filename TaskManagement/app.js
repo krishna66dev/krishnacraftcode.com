@@ -32,6 +32,7 @@ const Auth = (() => {
     store.setItem(KEY, JSON.stringify(user));
   }
 
+
   function get() {
     return JSON.parse(localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || 'null');
   }
@@ -41,13 +42,13 @@ const Auth = (() => {
     sessionStorage.removeItem(KEY);
   }
 
-  function require(role) {
+  function require() {
     const user = get();
     if (!user) { window.location.href = 'index.html'; return null; }
-    if (role && user.role !== role) {
-      window.location.href = user.role === 'admin' ? 'admin.html' : 'technician.html';
-      return null;
-    }
+    // if (user.role !== role) {
+    //   window.location.href = (user.role === 'admin' || user.role === 'manager') ? 'admin.html' : 'technician.html';
+    //   return null;
+    // }
     return user;
   }
 

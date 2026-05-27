@@ -288,10 +288,14 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   setLoading(false);
 
   if (res.success) {
+    //  set role in localStorage for demo mode (not secure, just for demo purposes)
+    if(API.DEMO_MODE){
+      Auth.saveRole(res.user.role);
+    }
     Auth.save(res.user, remember);
     Toast.success(`Welcome back, ${res.user.name}!`);
     setTimeout(() => {
-      window.location.href = res.user.role === 'admin' ? 'admin.html' : 'technician.html';
+      window.location.href = (res.user.role === 'admin' || res.user.role === 'manager') ? 'admin.html' : 'technician.html';
     }, 600);
   } else {
     showErr('username', res.message || 'Invalid credentials');
@@ -325,7 +329,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (user) {
       const targetPage =
-        user.role === 'admin'
+        user.role === 'admin' || user.role === 'manager'
           ? 'admin.html'
           : 'technician.html';
 

@@ -427,7 +427,7 @@ const T_SECTIONS = ['mytasks','myCompleted','profile','tsettings'];
 
 /* ── INIT ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  currentUser = Auth.require('technician');
+  currentUser = Auth.require(); 
   if (!currentUser) return;
 
   // Set user info

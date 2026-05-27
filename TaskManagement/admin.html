@@ -747,8 +747,8 @@
           <div class="col-12 creadentials d-none">
             <span id="usernamecreate" ></span>
           </div>
-          <div class="col-12 creadentials d-none">
-            <label class="form-label"> Password</label>
+          <div class="col-12 creadentialspass d-none">
+            <span id="techPassword" ></span>
           </div>
         </div>
       </form>
@@ -831,7 +831,7 @@ const SECTIONS = ['dashboard','assign','worklist','completed','technicians','rep
 
 /* ── INIT ────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  const user = Auth.require('admin');
+  const user = Auth.require();
   if (!user) return;
 
   // Set user info
@@ -1042,38 +1042,93 @@ function renderJobsTable() {
   if (!page.length) {
     tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state" style="padding:40px"><i class="bi bi-search"></i><h4>No jobs found</h4><p>Try adjusting your filters</p></div></td></tr>`;
   } else {
-    tbody.innerHTML = page.map(t => `
+    tbody.innerHTML = page.map(t => {
+
+    let adminButtons = '';
+    let User = Auth.get();
+    if (User.role === 'admin') {
+        adminButtons = `
+            <button class="btn btn-icon btn-sm btn-outline-primary"
+                title="Edit"
+                onclick="editJob('${t.id}')">
+                <i class="bi bi-pencil"></i>
+            </button>
+
+            <button class="btn btn-icon btn-sm btn-danger"
+                title="Delete"
+                onclick="deleteJob('${t.id}')">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+    }
+
+    return `
       <tr>
         <td><span class="job-id-cell">${t.id}</span></td>
+
         <td><strong>${t.customerName}</strong></td>
-        <td style="color:var(--text-secondary)">${t.customerMobile}</td>
-        <td><span class="cell-truncate" title="${t.location}">${t.location}</span></td>
-        <td style="white-space:nowrap">${fmtDate(t.serviceDate)}</td>
-        <td><div style="font-size:12px"><strong>${t.brand}</strong><div style="color:var(--text-muted)">${t.appliance}</div></div></td>
-        <td>
-          <div style="font-size:12px">
-            <div>${t.technician}</div>
-            <div style="color:var(--text-muted)">${t.technicianMobile}</div>
-          </div>
+
+        <td style="color:var(--text-secondary)">
+            ${t.customerMobile}
         </td>
+
         <td>
-         <img
-            src="${t.image}"
-            class="avatar avatar-sm"
-            style="cursor:pointer;"
-            onclick="downloadImage('${t.image}', 'image.jpg')"
-          />
+            <span class="cell-truncate" title="${t.location}">
+                ${t.location}
+            </span>
         </td>
+
+        <td style="white-space:nowrap">
+            ${fmtDate(t.serviceDate)}
+        </td>
+
+        <td>
+            <div style="font-size:12px">
+                <strong>${t.brand}</strong>
+                <div style="color:var(--text-muted)">
+                    ${t.appliance}
+                </div>
+            </div>
+        </td>
+
+        <td>
+            <div style="font-size:12px">
+                <div>${t.technician}</div>
+                <div style="color:var(--text-muted)">
+                    ${t.technicianMobile}
+                </div>
+            </div>
+        </td>
+
+        <td>
+            <img
+                src="${t.image}"
+                class="avatar avatar-sm"
+                style="cursor:pointer;"
+                onclick="downloadImage('${t.image}', 'image.jpg')"
+            />
+        </td>
+
         <td>${priorityBadge(t.priority)}</td>
+
         <td>${statusBadge(t.status)}</td>
+
         <td>
-          <div style="display:flex;gap:4px">
-            <button class="btn btn-icon btn-sm btn-outline-primary" title="View" onclick="viewJob('${t.id}')"><i class="bi bi-eye"></i></button>
-            <button class="btn btn-icon btn-sm btn-outline-primary" title="Edit" onclick="editJob('${t.id}')"><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-icon btn-sm btn-danger" title="Delete" onclick="deleteJob('${t.id}')"><i class="bi bi-trash"></i></button>
-          </div>
+            <div style="display:flex;gap:4px">
+
+                <button class="btn btn-icon btn-sm btn-outline-primary"
+                    title="View"
+                    onclick="viewJob('${t.id}')">
+                    <i class="bi bi-eye"></i>
+                </button>
+
+                ${adminButtons}
+
+            </div>
         </td>
-      </tr>`).join('');
+      </tr>
+    `;
+}).join('');
   }
   jobsPager.renderControls('jobsPagination', renderJobsTable);
 }
@@ -1264,35 +1319,102 @@ function renderCompleted() {
 
 /* ── TECHNICIANS ────────────────────────────────────────────── */
 function renderTechGrid() {
+
+  let User = Auth.get();  
   const el = document.getElementById('techGrid');
   if (!allTechs.length) {
     el.innerHTML = `<div class="col-12"><div class="empty-state"><i class="bi bi-people"></i><h4>No technicians yet</h4><p>Add your first technician</p><button class="btn btn-primary mt-3" onclick="openTechModal()"><i class="bi bi-person-plus"></i> Add Technician</button></div></div>`;
     return;
   }
-  el.innerHTML = allTechs.map(t => `
+
+  el.innerHTML = allTechs.map(t => {
+
+  let actionBtn = '';
+
+  if (User.role === 'admin') {
+    actionBtn = `
+      <div style="display:flex;gap:6px">
+
+        <button class="btn btn-outline-primary btn-sm"
+          onclick="openTechModal('${t.id}')">
+          <i class="bi bi-pencil"></i>
+        </button>
+
+        <button class="btn btn-${t.status === 'active' ? 'warning' : 'success'} btn-sm"
+          onclick="toggleTechStatus('${t.id}')">
+
+          <i class="bi bi-${t.status === 'active' ? 'pause' : 'play'}"></i>
+
+        </button>
+
+        <button class="btn btn-danger btn-sm"
+          onclick="deleteTech('${t.id}')">
+          <i class="bi bi-trash"></i>
+        </button>
+
+      </div>
+    `;
+  }
+
+  return `
     <div class="col-xl-3 col-md-4 col-sm-6">
       <div class="tech-card">
-        <div class="tech-avatar">${t.name.charAt(0)}</div>
-        <div class="tech-name">${t.name}</div>
-        <div class="tech-mobile"><i class="bi bi-telephone" style="font-size:11px"></i> ${t.mobile}</div>
-        ${t.email ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">${t.email}</div>` : ''}
+
+        <div class="tech-avatar">
+          ${t.name.charAt(0)}
+        </div>
+
+        <div class="tech-name">
+          ${t.name}
+        </div>
+
+        <div class="tech-mobile">
+          <i class="bi bi-telephone" style="font-size:11px"></i>
+          ${t.mobile}
+        </div>
+
+        ${t.email
+          ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">
+               ${t.email}
+             </div>`
+          : ''
+        }
+
         <div class="tech-skills">
-          ${(t.skills || '').split(',').map(s => s.trim() ? `<span class="skill-tag">${s.trim()}</span>` : '').join('')}
+          ${(t.skills || '')
+            .split(',')
+            .map(s =>
+              s.trim()
+                ? `<span class="skill-tag">${s.trim()}</span>`
+                : ''
+            ).join('')
+          }
         </div>
+
         <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">
+
           <span class="tech-status-dot ${t.status === 'active' ? '' : 'inactive'}"></span>
+
           ${t.status === 'active' ? 'Active' : 'Inactive'}
-          &nbsp;·&nbsp; <strong>${allTasks.filter(j => j.technician === t.name && j.status !== 'Completed').length}</strong> active jobs
+
+          &nbsp;·&nbsp;
+
+          <strong>
+            ${allTasks.filter(j =>
+              j.technician === t.name &&
+              j.status !== 'Completed'
+            ).length}
+          </strong>
+
+          active jobs
         </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-outline-primary btn-sm" onclick="openTechModal('${t.id}')"><i class="bi bi-pencil"></i></button>
-          <button class="btn btn-${t.status === 'active' ? 'warning' : 'success'} btn-sm" onclick="toggleTechStatus('${t.id}')">
-            <i class="bi bi-${t.status === 'active' ? 'pause' : 'play'}"></i>
-          </button>
-          <button class="btn btn-danger btn-sm" onclick="deleteTech('${t.id}')"><i class="bi bi-trash"></i></button>
-        </div>
+
+        ${actionBtn}
+
       </div>
-    </div>`).join('');
+    </div>
+  `;
+}).join('');
 }
 
 function openTechModal(id) {
@@ -1307,8 +1429,9 @@ function openTechModal(id) {
       document.getElementById('techSkills').value = t.skills || '';
       document.getElementById('techStatus').value = t.status;
       document.querySelector('.creadentials').classList.remove('d-none');
-      // document.getElementById('usernamecreate').textContent = `Username: ${t.username}`;
-      // document.getElementById('techPassword').textContent = `Password: ${t.password}`;
+      document.querySelector('.creadentialspass').classList.remove('d-none');
+      document.getElementById('usernamecreate').textContent = `Username: ${t.username}`;
+      document.getElementById('techPassword').textContent = `Password: ${t.password}`;
     }
   } else {
     document.getElementById('techModalTitle').textContent = 'Add Technician';
