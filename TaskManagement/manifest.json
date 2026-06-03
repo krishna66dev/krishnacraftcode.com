@@ -1,6 +1,6 @@
 {
   "name": "Service Management",
-  "short_name": "Service",
+  "short_name": "Home Service",
   "description": "Service Management System for assigning and tracking technician jobs",
   "start_url": "index.html",
   "display": "standalone",

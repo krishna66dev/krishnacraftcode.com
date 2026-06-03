@@ -1,9 +1,9 @@
 /**
- * sw.js — ServicePro Service Worker
+ * sw.js — Home Service Service Worker
  * Provides offline caching and PWA support
  */
 
-const CACHE_NAME  = 'servicepro-v2';
+const CACHE_NAME  = 'homeservice-v2';
 const CORE_ASSETS = [
   'index.html',
   'admin.html',

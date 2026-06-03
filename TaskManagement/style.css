@@ -1142,7 +1142,7 @@ img { max-width: 100%; }
   padding: 0 8px;
 }
 
-.mobile-nav-items { display: flex; height: 100%; align-items: center; }
+.mobile-nav-items { display: flex; height: 100%; align-items: center;width: 100%; gap: 4px; }
 
 .mobile-nav-item {
   flex: 1;

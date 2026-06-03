@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ServicePro — Technician Dashboard</title>
+  <title>Home Service — Technician Dashboard</title>
   <meta name="theme-color" content="#080d14">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -121,7 +121,7 @@
       <!-- <i class="bi bi-wrench-adjustable"></i> -->
       <img src="android-chrome-192x192.png" alt="Logo" style="width:36px;height:30px;">
     </div>
-    <div class="brand-name">ServicePro<span>Technician Portal</span></div>
+    <div class="brand-name">Home Service<span>Technician Portal</span></div>
   </div>
 
   <div class="sidebar-user">
@@ -147,7 +147,7 @@
   </nav>
 
   <div class="sidebar-footer">
-    <div style="font-size:11px;color:var(--text-muted);text-align:center">ServicePro v2.0</div>
+    <div style="font-size:11px;color:var(--text-muted);text-align:center">Home Service v2.0</div>
   </div>
 </aside>
 
@@ -363,6 +363,10 @@
       <div class="mb-3">
         <label class="form-label">Amount *</label>
         <input type="number" class="form-control" id="completeAmount" placeholder="Enter amount" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Parts Amount *</label>
+        <input type="number" class="form-control" id="completePartsAmount" placeholder="Enter parts amount or 0" required>
       </div>
       <div class="mb-3">
         <label class="form-label">Completion Remarks *</label>
@@ -602,6 +606,7 @@ function openCompleteModal(id) {
   document.getElementById('completeJobId').value = id;
   document.getElementById('completeRemarks').value = '';
   document.getElementById('completeAmount').value = '';
+  document.getElementById('completePartsAmount').value = '';
   document.getElementById('customerFeedback').value = '';
   clearUpload('completeImgArea','completeImgInput','completeImgPreview');
   openModal2('completeModal');
@@ -614,7 +619,9 @@ async function submitComplete() {
   const id      = document.getElementById('completeJobId').value;
   const remarks = document.getElementById('completeRemarks').value.trim();
   const amount  = document.getElementById('completeAmount').value.trim();
+  const partsAmount = document.getElementById('completePartsAmount').value.trim();
    if (!amount) { Toast.warning('Please enter the completion amount'); return; }
+   if (!partsAmount) { Toast.warning('Please enter the parts amount'); return; }
   if (!remarks) { Toast.warning('Please add completion remarks'); return; }
   let image = document.getElementById('completeImgInput').dataset.base64 || '';
 
@@ -628,7 +635,7 @@ async function submitComplete() {
   const btn = document.querySelector('#completeModal .btn-success');
   btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Completing…';
 
-  const res = await API.completeTask(id, remarks, image, amount);
+  const res = await API.completeTask(id, remarks, image, amount, partsAmount);
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-check2-circle"></i> Mark Completed';
 
   console.log('Complete response:', res);

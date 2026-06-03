@@ -1,18 +1,11 @@
-/**
- * api.js — Google Sheets / Apps Script API Layer
- * Replace APPS_SCRIPT_URL with your deployed Web App URL
- */
-// https://script.google.com/macros/s/AKfycbxz8ch-nFHoJvLahvfFHqF5nhg438sXFV9YCWRk4t11Y8ba6DGVRBT1yoVZcYIEYamIPA/exec
 
 const API = (() => {
-  // ── CONFIGURATION ──────────────────────────────────────────
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJmuFHeIeReuWeUGVpAUOkyxhCAKywXePWL6I7b9zyuDgtME2HiF-LkTDqEqkozL1o/exec';
-  // https://script.google.com/macros/s/AKfycbwG303adlpEtglLRp0D8kAbuXoc6kRB1JzQGVJACktXFic38Ci5mQnZ4yMbBHQlp9mE/exec
-
-  // Toggle for demo/offline mode (uses mock data when true)
+  
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxs5HRWN1s79IzGIT4TuwSotFkXXwreWoF_tRIpPL-pNTDJt-Ptw15C_89EdpFylTPL/exec';
+ 
   const DEMO_MODE = false;
 
-  // ── DEMO DATA ───────────────────────────────────────────────
+  
   const DEMO = {
     users: [
       { id: 'U001', username: 'admin',  password: 'admin123',  role: 'admin',      technicianName: 'Admin User',   mobile: '9000000000' },
@@ -44,7 +37,7 @@ const API = (() => {
   let _techs  = [...DEMO.technicians];
   let _nextId = 7;
 
-  // ── HELPERS ──────────────────────────────────────────────────
+
   async function request(action, payload = {}) {
     if (DEMO_MODE) return demoHandler(action, payload);
     try {
@@ -64,7 +57,6 @@ const API = (() => {
 
   function demoHandler(action, payload) {
     return new Promise(resolve => {
-      // Simulate async
       setTimeout(() => {
         switch (action) {
           case 'login': {
@@ -131,14 +123,13 @@ const API = (() => {
     });
   }
 
-  // ── PUBLIC API ────────────────────────────────────────────────
   return {
     login:              (username, password)    => request('login', { username, password }),
     getTasks:           ()                      => request('getTasks'),
     addTask:            (task)                  => request('addTask', { task }),
     updateTask:         (id, data)              => request('updateTask', { id, data }),
     deleteTask:         (id)                    => request('deleteTask', { id }),
-    completeTask:       (id, remarks, image,amount)    => request('completeTask', { id, remarks, image, amount }),
+    completeTask:       (id, remarks, image,amount, partsAmount)    => request('completeTask', { id, remarks, image, amount , partsAmount}),
     getTechnicians:     ()                      => request('getTechnicians'),
     addTechnician:      (tech)                  => request('addTechnician', { tech }),
     updateTechnician:   (id, data)              => request('updateTechnician', { id, data }),
@@ -148,161 +139,4 @@ const API = (() => {
   };
 })();
 
-
-/* ─── GOOGLE APPS SCRIPT CODE provide Complete Code ──────────────────── */
- 
-  // function doPost(e) {
-  //   const data = JSON.parse(e.postData.contents);
-  //   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  //   const action = data.action;
- 
-  //   let result;
-  //   switch(action) {
-  //     case 'login':
-  //       result = handleLogin(ss, data);
-  //       break;
-  //     case 'getTasks':
-  //       result = getTasks(ss);
-  //       break;
-  //     case 'addTask':
-  //       result = addTask(ss, data.task);
-  //       break;
-  //     case 'updateTask':
-  //       result = updateTask(ss, data.id, data.data);
-  //       break;
-  //     case 'deleteTask':
-  //       result = deleteTask(ss, data.id);
-  //       break;
-  //     case 'completeTask':
-  //       result = completeTask(ss, data.id, data.remarks, data.image, data.amount);
-  //       break;
-  //     case 'getTechnicians':
-  //       result = getTechnicians(ss);
-  //       break;
-  //     case 'addTechnician':
-  //       result = addTechnician(ss, data.tech);
-  //       break;
-  //     case 'updateTechnician':
-  //       result = updateTechnician(ss, data.id, data.data);
-  //       break;
-  //     case 'deleteTechnician':
-  //       result = deleteTechnician(ss, data.id);
-  //       break;
-  //     default:
-  //       result = { success: false, message: 'Unknown action' };
-  //   }
- 
-  //   return ContentService
-  //     .createTextOutput(JSON.stringify(result))
-  //     .setMimeType(ContentService.MimeType.JSON);
-  // }
- 
-  // function handleLogin(ss, data) {
-  //   const sheet = ss.getSheetByName('Users');
-  //   const rows  = sheet.getDataRange().getValues();
-  //   for (let i = 1; i < rows.length; i++) {
-  //     if (rows[i][1] === data.username && rows[i][2] === data.password) {
-  //       return { success: true, user: {
-  //         id: rows[i][0], username: rows[i][1],
-  //         role: rows[i][3], name: rows[i][4], mobile: rows[i][5]
-  //       }};
-  //     }
-  //   }
-  //   return { success: false, message: 'Invalid credentials' };
-  // }
-
-  // function getTasks(ss) {
-  //   const sheet = ss.getSheetByName('Tasks');
-  //   const rows  = sheet.getDataRange().getValues();
-  //   const tasks = [];
-  //   for (let i = 1; i < rows.length; i++) {
-  //     tasks.push({
-  //       id: rows[i][0], title: rows[i][1],
-  //       description: rows[i][2], status: rows[i][3],
-  //       serviceDate: rows[i][4], technician: rows[i][5],
-  //       createdAt: rows[i][6], updatedAt: rows[i][7]
-  //     });
-  //   }
-  //   return { success: true, tasks };
-  // }
-
-  // function addTask(ss, task) {
-  //   const sheet = ss.getSheetByName('Tasks');
-  //   const lastRow = sheet.getLastRow();
-  //   sheet.getRange(lastRow + 1, 1).setValue(task.id);
-  //   sheet.getRange(lastRow + 1, 2).setValue(task.title);
-  //   sheet.getRange(lastRow + 1, 3).setValue(task.description);
-  //   sheet.getRange(lastRow + 1, 4).setValue(task.status);
-  //   sheet.getRange(lastRow + 1, 5).setValue(task.serviceDate);
-  //   sheet.getRange(lastRow + 1, 6).setValue(task.technician);
-  //   sheet.getRange(lastRow + 1, 7).setValue(task.createdAt);
-  //   sheet.getRange(lastRow + 1, 8).setValue(task.updatedAt);
-  //   return { success: true, task };
-  // }
-
-  // function updateTask(ss, id, data) {
-  //   const sheet = ss.getSheetByName('Tasks');
-  //   const row = sheet.getRange(`A${id + 1}:H${id + 1}`).getValues()[0];
-  //   row[1] = data.title;
-  //   row[2] = data.description;
-  //   row[3] = data.status;
-  //   row[4] = data.serviceDate;
-  //   row[5] = data.technician;
-  //   row[6] = data.createdAt;
-  //   row[7] = data.updatedAt;
-  //   sheet.getRange(`A${id + 1}:H${id + 1}`).setValues([row]);
-  //   return { success: true, task: { id, ...data } };
-  // }
-
-  // function deleteTask(ss, id) {
-  //   const sheet = ss.getSheetByName('Tasks');
-  //   sheet.deleteRow(id + 1);
-  //   return { success: true };
-  // }
-
-  // function completeTask(ss, id, remarks, image) {
-  //   const sheet = ss.getSheetByName('Tasks');
-  //   const row = sheet.getRange(`A${id + 1}:H${id + 1}`).getValues()[0];
-  //   row[3] = 'Completed';
-  //   row[7] = new Date().toISOString();
-  //   sheet.getRange(`A${id + 1}:H${id + 1}`).setValues([row]);
-  //   return { success: true, task: { id, remarks, image } };
-  // }
-
-  // function getTechnicians(ss) {
-  //   const sheet = ss.getSheetByName('Technicians');
-  //   const rows  = sheet.getDataRange().getValues();
-  //   const technicians = [];
-  //   for (let i = 1; i < rows.length; i++) {
-  //     technicians.push({
-  //       id: rows[i][0], name: rows[i][1], mobile: rows[i][2]
-  //     });
-  //   }
-  //   return { success: true, technicians };
-  // }
-  // function addTechnician(ss, tech) {
-  //   const sheet = ss.getSheetByName('Technicians');
-  //   const lastRow = sheet.getLastRow();
-  //   sheet.getRange(lastRow + 1, 1).setValue(tech.id);
-  //   sheet.getRange(lastRow + 1, 2).setValue(tech.name);
-  //   sheet.getRange(lastRow + 1, 3).setValue(tech.mobile);
-  //   return { success: true, technician: tech };
-  // }
-  // function updateTechnician(ss, id, data) {
-  //   const sheet = ss.getSheetByName('Technicians');
-  //   const row = sheet.getRange(`A${id + 1}:C${id + 1}`).getValues()[0];
-  //   row[1] = data.name;
-  //   row[2] = data.mobile;
-  //   sheet.getRange(`A${id + 1}:C${id + 1}`).setValues([row]);
-  //   return { success: true, technician: { id, ...data } };
-  // }
-
-  // function deleteTechnician(ss, id) {
-  //   const sheet = ss.getSheetByName('Technicians');
-  //   sheet.deleteRow(id + 1);
-  //   return { success: true };
-  // }
-
-
-  // ... implement other handlers similarly
- 
+  

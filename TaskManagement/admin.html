@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ServicePro — Admin Dashboard</title>
+  <title>Home Service — Admin Dashboard</title>
   <meta name="theme-color" content="#080d14">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
    <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
   <link href="style.css" rel="stylesheet">
   <style>
     /* ── Extra admin styles ── */
@@ -98,6 +99,9 @@
     }
     .toggle-switch.on { background: var(--accent); border-color: var(--accent); }
     .toggle-switch.on::after { left: calc(100% - 19px); background: #fff; }
+    #ui-datepicker-div{
+      z-index: 100 !important;
+    }
   </style>
 </head>
 <body>
@@ -115,7 +119,7 @@
       <!-- <i class="bi bi-gear-wide-connected"></i> -->
       <img src="android-chrome-192x192.png" alt="Logo" style="width:36px;height:30px;">
     </div>
-    <div class="brand-name">ServicePro<span>Admin Panel</span></div>
+    <div class="brand-name">Home Service<span>Admin Panel</span></div>
   </div>
 
   <div class="sidebar-user">
@@ -148,6 +152,9 @@
     <div class="nav-item" data-section="technicians">
       <i class="bi bi-people"></i> Technicians
     </div>
+    <div class="nav-item" data-section="technician-summary">
+      <i class="bi bi-people"></i> Technician Summary
+    </div>
     <div class="nav-item" data-section="reports">
       <i class="bi bi-bar-chart-line"></i> Reports
     </div>
@@ -163,7 +170,7 @@
   </nav>
 
   <div class="sidebar-footer">
-    <div style="font-size:11px;color:var(--text-muted);text-align:center">ServicePro v2.0</div>
+    <div style="font-size:11px;color:var(--text-muted);text-align:center">Home Service v2.0</div>
   </div>
 </aside>
 
@@ -378,6 +385,9 @@
               <button class="btn btn-outline-primary w-100" onclick="switchSection('technicians')">
                 <i class="bi bi-person-plus"></i> Add Technician
               </button>
+              <button class="btn btn-outline-primary w-100" onclick="switchSection('technician-summary')">
+                <i class="bi bi-people"></i> Technician Summary
+              </button>
               <button class="btn btn-outline-primary w-100" onclick="switchSection('worklist')">
                 <i class="bi bi-list-task"></i> View Work List
               </button>
@@ -533,12 +543,13 @@
         <div class="card-header" style="flex-wrap:wrap;gap:10px">
           <span class="card-title">All Jobs</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;align-items:center">
-            <input type="text" class="form-control" id="jobSearch" placeholder="Search jobs…" style="width:180px;height:34px" oninput="filterJobs()">
-            <select class="form-select" id="statusFilter" style="width:140px;height:34px" onchange="filterJobs()">
+            <input type="text" class="form-control" id="Date-picker" readonly style="width:180px;" oninput="filterJobs()">
+            <input type="text" class="form-control" id="jobSearch" placeholder="Search jobs…" style="width:180px;" oninput="filterJobs()">
+            <select class="form-select" id="statusFilter" style="width:140px;" onchange="filterJobs()">
               <option value="">All Status</option>
               <option>Pending</option><option>In Progress</option><option>Completed</option><option>Cancelled</option>
             </select>
-            <select class="form-select" id="techFilter" style="width:160px;height:34px" onchange="filterJobs()">
+            <select class="form-select" id="techFilter" style="width:160px;" onchange="filterJobs()">
               <option value="">All Technicians</option>
             </select>
             <button class="btn btn-outline-primary btn-sm" onclick="exportJobsCSV()">
@@ -560,6 +571,8 @@
                 <th>Image</th>
                 <th>Priority</th>
                 <th>Status</th>
+                <th>Amount</th>
+                <th>Parts Amount</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -575,6 +588,55 @@
         </div>
       </div>
     </div>
+
+    <div class="section-view" id="technician-summary">
+    <div class="page-header">
+        <h1 class="page-title">Technician Summary</h1>
+        <p class="page-subtitle">
+            Technician-wise collection and parts amount summary
+        </p>
+    </div>
+
+    <div class="card">
+        <div class="card-header" style="flex-wrap:wrap;gap:10px">
+            <span class="card-title">Technician Collection Report</span>
+        </div>
+
+        <div class="table-wrap">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>Technician Name</th>
+                        <th>Mobile No.</th>
+                        <th>Total Amount</th>
+                        <th>Total Parts Amount</th>
+                    </tr>
+                </thead>
+
+                <tbody id="technicianSummaryTbody">
+                    <tr>
+                        <td colspan="4">
+                            <div class="skeleton skeleton-row"
+                                 style="height:36px;margin:4px 0"></div>
+                        </td>
+                    </tr>
+                </tbody>
+
+                <tfoot>
+                    <tr style="font-weight:600;">
+                        <td colspan="2">Grand Total</td>
+                        <td id="grandTotalAmount">₹0</td>
+                        <td id="grandTotalPartsAmount">₹0</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="card-footer d-flex justify-content-end">
+            <div id="technicianSummaryPagination"></div>
+        </div>
+    </div>
+</div>
 
     <!-- ── COMPLETED WORK ───────────────────────────── -->
     <div class="section-view" id="completed">
@@ -706,6 +768,7 @@
     <div class="mobile-nav-item" data-section="assign"><i class="bi bi-plus-circle"></i><span>Assign</span></div>
     <div class="mobile-nav-item" data-section="worklist"><i class="bi bi-list-task"></i><span>Jobs</span></div>
     <div class="mobile-nav-item" data-section="technicians"><i class="bi bi-people"></i><span>Team</span></div>
+    <div class="mobile-nav-item" data-section="technician-summary"><i class="bi bi-people"></i><span>Technician Summary</span></div>
     <div class="mobile-nav-item" data-section="reports"><i class="bi bi-bar-chart"></i><span>Reports</span></div>
   </div>
 </nav>
@@ -819,15 +882,31 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
 <script src="api.js"></script>
 <script src="app.js"></script>
+
+<script>
+$(document).ready(function () {
+    $("#Date-picker").datepicker({
+        dateFormat: "dd-mm-yy",
+        changeMonth: true,
+        changeYear: true,
+        onSelect: function(dateText) {
+            filterJobs(); 
+        }
+    });
+    $("#Date-picker").datepicker("setDate", new Date());
+});
+</script>
 <script>
 /* ── ADMIN APP STATE ─────────────────────────────────────────── */
 let allTasks = [];
 let allTechs = [];
 let filteredJobs = [];
 let jobsPager;
-const SECTIONS = ['dashboard','assign','worklist','completed','technicians','reports','settings'];
+const SECTIONS = ['dashboard','assign','worklist','technician-summary','completed','technicians','reports','settings'];
 
 /* ── INIT ────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -873,14 +952,15 @@ async function loadAll() {
   const [tRes, techRes] = await Promise.all([API.getTasks(), API.getTechnicians()]);
   if (tRes.success)    { allTasks = tRes.data;  }
   if (techRes.success) { allTechs = techRes.data; }
-  console.log('Loaded tasks:', tRes);
-  console.log('Loaded technicians:', allTechs);
+  // console.log('Loaded tasks:', tRes);
+  // console.log('Loaded technicians:', allTechs);
   renderAll();
 }
 
 function renderAll() {
   renderDashboard();
   renderJobsTable();
+  renderTechnicianSummary();
   renderCompleted();
   renderTechGrid();
   renderReports();
@@ -1021,6 +1101,7 @@ function renderJobsTable() {
   const search     = (document.getElementById('jobSearch')?.value || '').toLowerCase();
   const statusF    = document.getElementById('statusFilter')?.value || '';
   const techF      = document.getElementById('techFilter')?.value || '';
+  const dateF      = document.getElementById('Date-picker')?.value || '';
 
   filteredJobs = allTasks.filter(t => {
     const matchSearch = !search ||
@@ -1030,7 +1111,18 @@ function renderJobsTable() {
       t.location.toLowerCase().includes(search);
     const matchStatus = !statusF || t.status === statusF;
     const matchTech   = !techF   || t.technician === techF;
-    return matchSearch && matchStatus && matchTech;
+    let matchDate = true;
+    if (dateF) {
+         const d = new Date(t.createdAt);
+
+        const taskDate =
+            String(d.getDate()).padStart(2, '0') + '-' +
+            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+            d.getFullYear();
+
+        matchDate = taskDate === dateF;
+    }
+    return matchSearch && matchStatus && matchTech && matchDate;
   });
 
   if (!jobsPager) { jobsPager = new Paginator(filteredJobs, 10); }
@@ -1112,6 +1204,8 @@ function renderJobsTable() {
         <td>${priorityBadge(t.priority)}</td>
 
         <td>${statusBadge(t.status)}</td>
+        <td>${t.amount ? '₹' + t.amount : '-'}</td>
+        <td>${t.partsAmount ? '₹' + t.partsAmount : '-'}</td>
 
         <td>
             <div style="display:flex;gap:4px">
@@ -1131,6 +1225,77 @@ function renderJobsTable() {
 }).join('');
   }
   jobsPager.renderControls('jobsPagination', renderJobsTable);
+}
+
+function renderTechnicianSummary() {
+
+    const dateF = document.getElementById('summaryDatePicker')?.value || '';
+    const techF = document.getElementById('summaryTechFilter')?.value || '';
+
+    const summary = {};
+
+    allTasks
+        .filter(t => {
+
+            const matchTech = !techF || t.technician === techF;
+
+            let matchDate = true;
+
+            if (dateF) {
+                const d = new Date(t.createdAt);
+
+                const taskDate =
+                    String(d.getDate()).padStart(2, '0') + '-' +
+                    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                    d.getFullYear();
+
+                matchDate = taskDate === dateF;
+            }
+
+            return matchTech && matchDate;
+        })
+        .forEach(t => {
+
+            const tech = t.technician || 'Unknown';
+
+            if (!summary[tech]) {
+                summary[tech] = {
+                    technician: tech,
+                    mobile: t.technicianMobile || '',
+                    amount: 0,
+                    partsAmount: 0
+                };
+            }
+
+            summary[tech].amount += Number(t.amount || 0);
+            summary[tech].partsAmount += Number(t.partsAmount || 0);
+        });
+
+    const rows = Object.values(summary);
+
+    let grandAmount = 0;
+    let grandPartsAmount = 0;
+
+    rows.forEach(r => {
+        grandAmount += r.amount;
+        grandPartsAmount += r.partsAmount;
+    });
+
+    document.getElementById('technicianSummaryTbody').innerHTML =
+        rows.map(r => `
+            <tr>
+                <td>${r.technician}</td>
+                <td>${r.mobile}</td>
+                <td>₹${r.amount.toFixed(2)}</td>
+                <td>₹${r.partsAmount.toFixed(2)}</td>
+            </tr>
+        `).join('');
+
+    document.getElementById('grandTotalAmount').textContent =
+        '₹' + grandAmount.toFixed(2);
+
+    document.getElementById('grandTotalPartsAmount').textContent =
+        '₹' + grandPartsAmount.toFixed(2);
 }
 
 function downloadImage(base64, filename) {
@@ -1239,6 +1404,8 @@ function viewJob(id) {
       <div class="col-6"><div class="form-label">Tech Mobile</div>${t.technicianMobile}</div>
       <div class="col-6"><div class="form-label">Service Date</div>${fmtDate(t.serviceDate)}</div>
       <div class="col-6"><div class="form-label">Created</div>${fmtDate(t.createdAt)}</div>
+      <div class="col-6"><div class="form-label">Amount</div>${fmtDate(t.amount)}</div>
+      <div class="col-6"><div class="form-label">Parts Amount</div>${fmtDate(t.partsAmount)}</div>
       ${t.remarks ? `<div class="col-12"><div class="form-label">Remarks</div>${t.remarks}</div>` : ''}
       ${t.completedAt ? `<div class="col-12"><div class="form-label">Completed</div>${fmtDate(t.completedAt)}</div>` : ''}
     </div>`;
