@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeIgniter 4 – Complete Concept Guide</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --red: #EF4444;
+    --orange: #f0883e;
+    --green: #56d364;
+    --blue: #60a5fa;
+    --purple: #d2a8ff;
+    --yellow: #e3b341;
+    --code-kw: #ff7b72;
+    --code-fn: #d2a8ff;
+    --code-str: #a5d6ff;
+    --code-var: #56d364;
+    --code-cm: #8b949e;
+    --code-ns: #f0883e;
+    --code-cl: #ffa657;
+    --code-ht: #79c0ff;
+    --radius: 10px;
+    --font: 'Segoe UI', system-ui, sans-serif;
+    --mono: 'Courier New', 'Consolas', monospace;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.5; }
+
+  /* ── GLOBAL HEADER ── */
+  .site-header {
+    background: #111827;
+    border-bottom: 3px solid var(--orange);
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .site-header h1 { font-size: clamp(18px, 4vw, 28px); font-weight: 700; color: #f9fafb; }
+  .site-header p  { font-size: 13px; color: var(--orange); text-transform: uppercase; letter-spacing: 1.2px; margin-top: 4px; }
+  .ci4-pill {
+    display: inline-block; background: #1f0d0d; color: var(--red);
+    border: 1px solid #7f1d1d; font-size: 11px; font-weight: 700;
+    padding: 2px 10px; border-radius: 20px; margin-top: 8px;
+  }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 14px 16px; background: #0a0e14;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .tab-btn {
+    background: var(--bg2); color: var(--muted); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+  }
+  .tab-btn:hover  { color: var(--text); border-color: #555; }
+  .tab-btn.active { color: #0d1117; border-color: transparent; }
+  .tab-btn[data-sec="1"].active  { background: var(--red); }
+  .tab-btn[data-sec="2"].active  { background: var(--orange); }
+  .tab-btn[data-sec="3"].active  { background: var(--green); }
+  .tab-btn[data-sec="4"].active  { background: var(--blue); }
+  .tab-btn[data-sec="5"].active  { background: var(--purple); }
+  .tab-btn[data-sec="6"].active  { background: var(--yellow); }
+
+  /* ── SECTIONS ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── SECTION HEADER ── */
+  .sec-hdr {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    background: #111827;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .sec-num {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; flex-shrink: 0;
+  }
+  .sec-hdr h2 { font-size: clamp(16px, 3vw, 21px); font-weight: 700; color: #f9fafb; }
+  .sec-hdr p  { font-size: 11px; text-transform: uppercase; letter-spacing: 1.1px; font-weight: 600; margin-top: 2px; }
+
+  /* ── BODY GRID ── */
+  .body-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 14px;
+    padding: 16px;
+  }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .panel-hdr {
+    padding: 10px 14px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;
+  }
+  .panel-hdr.blue   { background: #0d1a2d; color: var(--blue); }
+  .panel-hdr.green  { background: #0d2d1a; color: var(--green); }
+  .panel-hdr.orange { background: #2d1a0d; color: var(--orange); }
+  .panel-hdr.purple { background: #1a0d2d; color: var(--purple); }
+  .panel-hdr.yellow { background: #2d2200; color: var(--yellow); }
+  .panel-hdr.red    { background: #2d0d0d; color: var(--code-kw); }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: clamp(10px, 2.2vw, 11px);
+    line-height: 1.8;
+    overflow-x: auto;
+    background: #010409;
+    white-space: pre;
+  }
+  .kw  { color: var(--code-kw); }
+  .fn  { color: var(--code-fn); }
+  .str { color: var(--code-str); }
+  .var { color: var(--code-var); }
+  .cm  { color: var(--code-cm); }
+  .ns  { color: var(--code-ns); }
+  .cl  { color: var(--code-cl); }
+  .ht  { color: var(--code-ht); }
+  .mt  { color: var(--code-ht); }
+
+  /* ── BADGE ── */
+  .nb {
+    background: #0d2d1a; color: var(--green); border: 1px solid #238636;
+    font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px;
+    white-space: nowrap;
+  }
+  .nb-p { background: #1a0d2d; color: var(--purple); border: 1px solid #6e40c9; }
+
+  /* ── DIR TREE ── */
+  .dir-tree {
+    padding: 12px 14px; font-family: var(--mono);
+    font-size: clamp(10px, 2.2vw, 11.5px); color: var(--muted); line-height: 2;
+    background: var(--bg);
+  }
+  .fo { color: var(--orange); }
+  .fi { color: var(--blue); }
+  .hi { color: var(--green); font-weight: 700; }
+
+  /* ── ENV BOX ── */
+  .env-code {
+    padding: 12px 14px; font-family: var(--mono);
+    font-size: clamp(10px, 2.2vw, 10.5px); line-height: 1.8;
+    background: var(--bg); overflow-x: auto; white-space: pre;
+  }
+  .ek { color: var(--purple); }
+  .ev { color: var(--code-str); }
+  .ec { color: var(--muted); }
+
+  /* ── FLOW BAR ── */
+  .flow-bar {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px; margin: 0 16px 16px;
+  }
+  .fb {
+    flex: 1; min-width: 70px; text-align: center;
+    font-size: clamp(10px, 2vw, 12px); color: var(--text); background: #1f2937;
+    border-radius: 6px; padding: 6px 6px;
+  }
+  .fb span { display: block; font-size: 9px; color: var(--muted); margin-top: 2px; }
+  .fa { color: var(--orange); font-size: 14px; flex-shrink: 0; }
+
+  /* ── STEP CARDS ── */
+  .steps { display: flex; flex-direction: column; gap: 11px; }
+  .step {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 13px 15px;
+    display: flex; gap: 13px; align-items: flex-start;
+    transition: border-color .2s;
+  }
+  .step:hover { border-color: var(--red); }
+  .sn {
+    width: 26px; height: 26px; border-radius: 50%; font-size: 12px;
+    font-weight: 700; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px; color: #fff;
+  }
+  .st h3 { font-size: 13px; font-weight: 600; color: #f9fafb; margin-bottom: 3px; }
+  .st p   { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+  .st a   { color: #60a5fa; font-size: 11px; text-decoration: none; }
+  .inline-code {
+    background: var(--bg); color: var(--orange);
+    padding: 1px 5px; border-radius: 3px; font-family: var(--mono); font-size: 10.5px;
+  }
+  .cmd-line {
+    background: var(--bg); border-radius: 6px; padding: 7px 10px; margin-top: 6px;
+    font-family: var(--mono); font-size: 10.5px; color: var(--green); display: block;
+  }
+
+  /* ── ROUTE ROWS ── */
+  .route-row {
+    display: flex; align-items: center; padding: 6px 14px;
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 10.5px;
+    flex-wrap: wrap; gap: 4px;
+  }
+  .route-row:last-child { border-bottom: none; }
+  .route-path    { color: var(--code-str); flex: 1; min-width: 100px; }
+  .route-handler { color: var(--muted); font-size: 9.5px; }
+  .badge-get  { background: #0d2d1a; color: var(--green); border: 1px solid #238636; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+  .badge-post { background: #2d2200; color: var(--yellow); border: 1px solid #9e6a03; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+  .badge-put  { background: #0d1a2d; color: var(--blue); border: 1px solid #1f6feb; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+  .badge-del  { background: #2d0d0d; color: var(--code-kw); border: 1px solid #da3633; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+
+  /* ── MINI GRID (queries, services, security) ── */
+  .mini-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: 10px; padding: 14px 16px;
+  }
+  .mini-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 11px 13px;
+  }
+  .mini-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+  .mini-label.b { color: var(--blue); }
+  .mini-label.g { color: var(--green); }
+  .mini-label.r { color: var(--code-kw); }
+  .mini-card code {
+    font-family: var(--mono); font-size: 10px; color: var(--green); display: block; line-height: 1.6;
+  }
+  .mini-card p { font-size: 11px; color: var(--muted); line-height: 1.5; margin: 0; }
+
+  /* ── SERVICE CARDS ── */
+  .svc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px; padding: 0 16px 16px;
+  }
+  .svc-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px; text-align: center;
+  }
+  .svc-icon  { font-size: 22px; margin-bottom: 6px; }
+  .svc-name  { font-size: 12px; font-weight: 700; color: var(--purple); margin-bottom: 4px; }
+  .svc-call  { font-family: var(--mono); font-size: 9.5px; color: var(--green); }
+
+  /* ── MVC COLS on mobile becomes stacked ── */
+  .mvc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: 12px; padding: 16px;
+  }
+  .mvc-col { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  .mvc-hdr { padding: 10px 12px 6px; text-align: center; border-bottom: 1px solid var(--border); }
+  .mvc-hdr.c { background: #1a2640; }
+  .mvc-hdr.c h3 { color: var(--blue); }
+  .mvc-hdr.m { background: #0d2d1a; }
+  .mvc-hdr.m h3 { color: var(--green); }
+  .mvc-hdr.v { background: #2d1a2d; }
+  .mvc-hdr.v h3 { color: var(--purple); }
+  .mvc-hdr h3 { font-size: 13px; font-weight: 700; }
+  .mvc-hdr p  { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .mvc-path { padding: 4px 10px 6px; font-size: 9.5px; font-family: var(--mono); text-align: center; border-bottom: 1px solid var(--border); background: var(--bg); }
+  .mvc-path.c { color: var(--blue); }
+  .mvc-path.m { color: var(--green); }
+  .mvc-path.v { color: var(--purple); }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    background: #111827; border-top: 1px solid var(--border);
+    text-align: center; padding: 20px 16px;
+    font-size: 12px; color: var(--muted);
+  }
+  .site-footer span { color: var(--orange); font-weight: 700; }
+
+  /* ── MOBILE TWEAKS ── */
+  @media (max-width: 480px) {
+    .nav-tabs { gap: 5px; padding: 10px 12px; }
+    .tab-btn  { padding: 5px 10px; font-size: 11px; }
+    .sec-hdr  { padding: 14px 14px 12px; }
+    .body-grid, .mvc-grid, .mini-grid, .svc-grid { padding: 12px; gap: 10px; }
+    .flow-bar { margin: 0 12px 12px; padding: 10px 10px; }
+    .fb { min-width: 60px; font-size: 9px; }
+    .fa { font-size: 11px; }
+    .code-block, .env-code, .dir-tree { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>CodeIgniter 4 — Complete Concept Guide</h1>
+  <p>Setup · MVC · Routing · Database · Services · Security</p>
+  <div class="ci4-pill">CI4 — PHP 8.0+ Required</div>
+</header>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs" aria-label="Sections">
+  <button class="tab-btn active" data-sec="1">1. Getting Started</button>
+  <button class="tab-btn" data-sec="2">2. MVC Architecture</button>
+  <button class="tab-btn" data-sec="3">3. Routing</button>
+  <button class="tab-btn" data-sec="4">4. Database &amp; Models</button>
+  <button class="tab-btn" data-sec="5">5. Services &amp; Request</button>
+  <button class="tab-btn" data-sec="6">6. Session &amp; Security</button>
+</nav>
+
+<!-- ══════════════ SECTION 1 ══════════════ -->
+<section class="section active" id="sec-1" aria-labelledby="s1-title">
+
+  <div class="sec-hdr">
+    <div class="sec-num" style="background:var(--red);color:#fff;">1</div>
+    <div>
+      <h2 id="s1-title">Getting Started with CodeIgniter 4</h2>
+      <p style="color:var(--red);">Installation &amp; Project Setup</p>
+    </div>
+  </div>
+
+  <div class="body-grid">
+    <!-- STEPS -->
+    <div class="steps">
+      <div class="step">
+        <div class="sn" style="background:var(--red);">1</div>
+        <div class="st">
+          <h3>Install via Composer (Recommended)</h3>
+          <p>CI4 requires PHP 8.0+ and Composer. Run in terminal:</p>
+          <code class="cmd-line">composer create-project codeigniter4/appstarter myapp</code>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn" style="background:var(--red);">2</div>
+        <div class="st">
+          <h3>Or Manual Download</h3>
+          <p>Download the framework zip from the official site and extract to your web server root.</p>
+          <a href="https://codeigniter.com/download" target="_blank" rel="noopener">https://codeigniter.com/download</a>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn" style="background:var(--red);">3</div>
+        <div class="st">
+          <h3>Configure .env File</h3>
+          <p>Copy <span class="inline-code">env</span> to <span class="inline-code">.env</span> and update settings:</p>
+          <code class="cmd-line">cp env .env</code>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn" style="background:var(--red);">4</div>
+        <div class="st">
+          <h3>Set Base URL &amp; Database</h3>
+          <p>Edit <span class="inline-code">.env</span> — no more editing PHP config files directly. All settings live in one place.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn" style="background:var(--red);">5</div>
+        <div class="st">
+          <h3>Run Built-in Dev Server</h3>
+          <p>CI4 ships with a built-in PHP dev server — no Apache needed locally:</p>
+          <code class="cmd-line">php spark serve</code>
+          <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COL -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="panel">
+        <div class="panel-hdr orange" style="background:#1a1200;">
+          📁 CI4 Directory Structure <span class="nb">NEW</span>
+        </div>
+        <div class="dir-tree"><span class="hi">app/</span> <span class="nb">NEW</span>
+  ├── <span class="fo">Config/</span>
+  ├── <span class="fo">Controllers/</span>
+  ├── <span class="fo">Models/</span>
+  ├── <span class="fo">Views/</span>
+  ├── <span class="fo">Filters/</span>
+  └── <span class="fo">Libraries/</span>
+<span class="fo">public/</span> <span class="nb">NEW</span>
+  └── <span class="fi">index.php</span>
+<span class="fo">system/</span>
+<span class="fo">writable/</span>
+<span class="hi">.env</span> <span class="nb">NEW</span>
+<span class="fi">spark</span> <span class="nb">CLI</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr purple">.env Configuration</div>
+        <div class="env-code"><span class="ec"># Environment</span>
+<span class="ek">CI_ENVIRONMENT</span> = <span class="ev">development</span>
+
+<span class="ec"># Base URL</span>
+<span class="ek">app.baseURL</span> = <span class="ev">'http://localhost:8080/'</span>
+
+<span class="ec"># Database</span>
+<span class="ek">database.default.hostname</span> = <span class="ev">localhost</span>
+<span class="ek">database.default.database</span> = <span class="ev">mydb</span>
+<span class="ek">database.default.username</span> = <span class="ev">root</span>
+<span class="ek">database.default.password</span> = <span class="ev">secret</span>
+<span class="ek">database.default.DBDriver</span> = <span class="ev">MySQLi</span></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════════ SECTION 2 ══════════════ -->
+<section class="section" id="sec-2" aria-labelledby="s2-title">
+
+  <div class="sec-hdr">
+    <div class="sec-num" style="background:var(--orange);color:#0d1117;">2</div>
+    <div>
+      <h2 id="s2-title">MVC Architecture in CI4</h2>
+      <p style="color:var(--orange);">Namespaced Controller · Model · View</p>
+    </div>
+  </div>
+
+  <div class="mvc-grid">
+    <div class="mvc-col">
+      <div class="mvc-hdr c"><h3>CONTROLLER</h3><p>Handles HTTP Request &amp; Response</p></div>
+      <div class="mvc-path c">app/Controllers/User.php</div>
+      <div class="code-block"><span class="cm">&lt;?php</span>
+<span class="kw">namespace</span> <span class="ns">App\Controllers</span>; <span class="nb">NEW</span>
+
+<span class="kw">use</span> <span class="ns">App\Models\UserModel</span>;
+
+<span class="kw">class</span> <span class="cl">User</span> <span class="kw">extends</span> <span class="cl">BaseController</span>
+{
+  <span class="kw">public function</span> <span class="fn">index</span>(): <span class="cl">string</span>
+  {
+    <span class="var">$model</span> = <span class="kw">new</span> <span class="cl">UserModel</span>();
+    <span class="var">$data</span>[<span class="str">'users'</span>] =
+      <span class="var">$model</span>-&gt;<span class="fn">findAll</span>();
+    <span class="kw">return</span> <span class="fn">view</span>(
+      <span class="str">'user_list'</span>, <span class="var">$data</span>
+    );
+  }
+}</div>
+    </div>
+
+    <div class="mvc-col">
+      <div class="mvc-hdr m"><h3>MODEL</h3><p>Extends CI4 Model (ORM-style)</p></div>
+      <div class="mvc-path m">app/Models/UserModel.php</div>
+      <div class="code-block"><span class="cm">&lt;?php</span>
+<span class="kw">namespace</span> <span class="ns">App\Models</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Model</span>;
+
+<span class="kw">class</span> <span class="cl">UserModel</span>
+  <span class="kw">extends</span> <span class="cl">Model</span> {
+
+  <span class="kw">protected</span> <span class="var">$table</span>
+    = <span class="str">'users'</span>;
+  <span class="kw">protected</span> <span class="var">$allowedFields</span>
+    = [<span class="str">'name'</span>, <span class="str">'email'</span>];
+  <span class="kw">protected</span> <span class="var">$useTimestamps</span>
+    = <span class="kw">true</span>;
+}</div>
+    </div>
+
+    <div class="mvc-col">
+      <div class="mvc-hdr v"><h3>VIEW</h3><p>Displays Data (PHP template)</p></div>
+      <div class="mvc-path v">app/Views/user_list.php</div>
+      <div class="code-block"><span class="ht">&lt;table&gt;</span>
+<span class="ht">&lt;thead&gt;&lt;tr&gt;</span>
+  <span class="ht">&lt;th&gt;</span>ID<span class="ht">&lt;/th&gt;</span>
+  <span class="ht">&lt;th&gt;</span>Name<span class="ht">&lt;/th&gt;</span>
+  <span class="ht">&lt;th&gt;</span>Email<span class="ht">&lt;/th&gt;</span>
+<span class="ht">&lt;/tr&gt;&lt;/thead&gt;</span>
+<span class="kw">&lt;?php foreach</span>(
+  <span class="var">$users</span> <span class="kw">as</span> <span class="var">$u</span>
+): <span class="kw">?&gt;</span>
+<span class="ht">&lt;tr&gt;</span>
+  <span class="ht">&lt;td&gt;</span><span class="fn">&lt;?= esc</span>(<span class="var">$u</span>[<span class="str">'id'</span>])<span class="fn"> ?&gt;</span><span class="ht">&lt;/td&gt;</span>
+  <span class="ht">&lt;td&gt;</span><span class="fn">&lt;?= esc</span>(<span class="var">$u</span>[<span class="str">'name'</span>])<span class="fn"> ?&gt;</span><span class="ht">&lt;/td&gt;</span>
+<span class="ht">&lt;/tr&gt;</span>
+<span class="kw">&lt;?php endforeach; ?&gt;</span>
+<span class="ht">&lt;/table&gt;</span></div>
+    </div>
+  </div>
+
+  <div class="flow-bar">
+    <div class="fb">Browser<span>Request</span></div>
+    <div class="fa">→</div>
+    <div class="fb">public/<br>index.php<span>Entry</span></div>
+    <div class="fa">→</div>
+    <div class="fb">Router<span>Routes.php</span></div>
+    <div class="fa">→</div>
+    <div class="fb">Controller<span>Logic</span></div>
+    <div class="fa">→</div>
+    <div class="fb">Model<span>Data</span></div>
+    <div class="fa">→</div>
+    <div class="fb">View<span>HTML</span></div>
+    <div class="fa">→</div>
+    <div class="fb">Browser<span>Response</span></div>
+  </div>
+
+</section>
+
+<!-- ══════════════ SECTION 3 ══════════════ -->
+<section class="section" id="sec-3" aria-labelledby="s3-title">
+
+  <div class="sec-hdr">
+    <div class="sec-num" style="background:var(--green);color:#0d1117;">3</div>
+    <div>
+      <h2 id="s3-title">Routing in CodeIgniter 4</h2>
+      <p style="color:var(--green);">Routes.php · RESTful · Filters · Spark CLI</p>
+    </div>
+  </div>
+
+  <div class="body-grid">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="panel">
+        <div class="panel-hdr green">app/Config/Routes.php <span class="nb">CI4 WAY</span></div>
+        <div class="code-block"><span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'/'</span>, <span class="str">'Home::index'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'users'</span>, <span class="str">'User::index'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'users/(:num)'</span>, <span class="str">'User::show/$1'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">post</span>(<span class="str">'users/create'</span>, <span class="str">'User::create'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">put</span>(<span class="str">'users/(:num)'</span>, <span class="str">'User::update/$1'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">delete</span>(<span class="str">'users/(:num)'</span>, <span class="str">'User::delete/$1'</span>);
+
+<span class="cm">// Route Groups with Filter</span>
+<span class="var">$routes</span>-&gt;<span class="fn">group</span>(<span class="str">'admin'</span>, [<span class="str">'filter'</span><span class="cm">=&gt;</span><span class="str">'auth'</span>],
+  <span class="kw">function</span>(<span class="var">$routes</span>) {
+    <span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'dashboard'</span>,
+      <span class="str">'Admin\Dashboard::index'</span>);
+  }
+);</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr orange">Resource Routes (RESTful Auto)</div>
+        <div class="code-block"><span class="cm">// One line = full CRUD routes!</span>
+<span class="var">$routes</span>-&gt;<span class="fn">resource</span>(<span class="str">'users'</span>);</div>
+        <div class="route-row"><span class="badge-get">GET</span><span class="route-path">/users</span><span class="route-handler">::index</span></div>
+        <div class="route-row"><span class="badge-get">GET</span><span class="route-path">/users/new</span><span class="route-handler">::new</span></div>
+        <div class="route-row"><span class="badge-post">POST</span><span class="route-path">/users</span><span class="route-handler">::create</span></div>
+        <div class="route-row"><span class="badge-get">GET</span><span class="route-path">/users/(:id)</span><span class="route-handler">::show</span></div>
+        <div class="route-row"><span class="badge-put">PUT</span><span class="route-path">/users/(:id)</span><span class="route-handler">::update</span></div>
+        <div class="route-row"><span class="badge-del">DELETE</span><span class="route-path">/users/(:id)</span><span class="route-handler">::delete</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="panel">
+        <div class="panel-hdr purple">Filters (Middleware) — CI4 Feature</div>
+        <div class="code-block"><span class="cm">// app/Filters/AuthFilter.php</span>
+<span class="kw">namespace</span> <span class="ns">App\Filters</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Filters\FilterInterface</span>;
+
+<span class="kw">class</span> <span class="cl">AuthFilter</span>
+  <span class="kw">implements</span> <span class="cl">FilterInterface</span>
+{
+  <span class="kw">public function</span> <span class="fn">before</span>(<span class="var">$request</span>, <span class="var">$args</span>)
+  {
+    <span class="kw">if</span> (! <span class="fn">session</span>()-&gt;<span class="fn">get</span>(<span class="str">'user_id'</span>)) {
+      <span class="kw">return</span> <span class="fn">redirect</span>()
+        -&gt;<span class="fn">to</span>(<span class="str">'/login'</span>);
+    }
+  }
+}</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr blue">Spark CLI — Route Inspection</div>
+        <div class="code-block"><span class="cm"># List all registered routes</span>
+<span class="var">php spark routes</span>
+
+<span class="cm"># Create a new controller</span>
+<span class="var">php spark make:controller User</span>
+
+<span class="cm"># Create a new filter</span>
+<span class="var">php spark make:filter AuthFilter</span>
+
+<span class="cm"># Run migrations</span>
+<span class="var">php spark migrate</span></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════════ SECTION 4 ══════════════ -->
+<section class="section" id="sec-4" aria-labelledby="s4-title">
+
+  <div class="sec-hdr">
+    <div class="sec-num" style="background:var(--blue);color:#0d1117;">4</div>
+    <div>
+      <h2 id="s4-title">Database, Model &amp; Migrations</h2>
+      <p style="color:var(--blue);">Query Builder · Entity · Migrations</p>
+    </div>
+  </div>
+
+  <div class="body-grid">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="panel">
+        <div class="panel-hdr green">CI4 Model — app/Models/UserModel.php <span class="nb">POWERFUL</span></div>
+        <div class="code-block"><span class="kw">namespace</span> <span class="ns">App\Models</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Model</span>;
+
+<span class="kw">class</span> <span class="cl">UserModel</span> <span class="kw">extends</span> <span class="cl">Model</span> {
+  <span class="kw">protected</span> <span class="var">$table</span>      = <span class="str">'users'</span>;
+  <span class="kw">protected</span> <span class="var">$primaryKey</span> = <span class="str">'id'</span>;
+  <span class="kw">protected</span> <span class="var">$returnType</span> = <span class="str">'array'</span>;
+  <span class="kw">protected</span> <span class="var">$allowedFields</span> =
+    [<span class="str">'name'</span>, <span class="str">'email'</span>, <span class="str">'password'</span>];
+  <span class="kw">protected</span> <span class="var">$useTimestamps</span> = <span class="kw">true</span>;
+  <span class="kw">protected</span> <span class="var">$validationRules</span> = [
+    <span class="str">'email'</span> <span class="cm">=&gt;</span> <span class="str">'required|valid_email'</span>,
+    <span class="str">'name'</span>  <span class="cm">=&gt;</span> <span class="str">'required|min_length[3]'</span>
+  ];
+}</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr orange">Migration — app/Database/Migrations/</div>
+        <div class="code-block"><span class="kw">namespace</span> <span class="ns">App\Database\Migrations</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Database\Migration</span>;
+
+<span class="kw">class</span> <span class="cl">CreateUsersTable</span>
+  <span class="kw">extends</span> <span class="cl">Migration</span> {
+  <span class="kw">public function</span> <span class="fn">up</span>() {
+    <span class="var">$this</span>-&gt;forge-&gt;<span class="fn">addField</span>([
+      <span class="str">'id'</span>    <span class="cm">=&gt;</span> [<span class="str">'type'</span><span class="cm">=&gt;</span><span class="str">'INT'</span>,<span class="str">'auto_increment'</span><span class="cm">=&gt;</span><span class="kw">true</span>],
+      <span class="str">'name'</span>  <span class="cm">=&gt;</span> [<span class="str">'type'</span><span class="cm">=&gt;</span><span class="str">'VARCHAR'</span>,<span class="str">'constraint'</span><span class="cm">=&gt;</span><span class="str">'100'</span>],
+      <span class="str">'email'</span> <span class="cm">=&gt;</span> [<span class="str">'type'</span><span class="cm">=&gt;</span><span class="str">'VARCHAR'</span>,<span class="str">'constraint'</span><span class="cm">=&gt;</span><span class="str">'150'</span>]
+    ]);
+    <span class="var">$this</span>-&gt;forge-&gt;<span class="fn">createTable</span>(<span class="str">'users'</span>);
+  }
+  <span class="kw">public function</span> <span class="fn">down</span>() {
+    <span class="var">$this</span>-&gt;forge-&gt;<span class="fn">dropTable</span>(<span class="str">'users'</span>);
+  }
+}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="panel">
+        <div class="panel-hdr blue">Query Builder in Controller</div>
+        <div class="code-block"><span class="var">$model</span> = <span class="kw">new</span> <span class="cl">UserModel</span>();
+
+<span class="cm">// Fetch all / find one</span>
+<span class="var">$users</span> = <span class="var">$model</span>-&gt;<span class="fn">findAll</span>();
+<span class="var">$user</span>  = <span class="var">$model</span>-&gt;<span class="fn">find</span>(1);
+
+<span class="cm">// Insert with validation</span>
+<span class="var">$model</span>-&gt;<span class="fn">insert</span>([
+  <span class="str">'name'</span>  <span class="cm">=&gt;</span> <span class="str">'Alice'</span>,
+  <span class="str">'email'</span> <span class="cm">=&gt;</span> <span class="str">'alice@test.com'</span>
+]);
+
+<span class="cm">// Update &amp; Delete</span>
+<span class="var">$model</span>-&gt;<span class="fn">update</span>(1, [<span class="str">'name'</span><span class="cm">=&gt;</span><span class="str">'Bob'</span>]);
+<span class="var">$model</span>-&gt;<span class="fn">delete</span>(1);
+
+<span class="cm">// Chained query</span>
+<span class="var">$model</span>-&gt;<span class="fn">where</span>(<span class="str">'status'</span>, <span class="str">'active'</span>)
+      -&gt;<span class="fn">orderBy</span>(<span class="str">'name'</span>, <span class="str">'ASC'</span>)
+      -&gt;<span class="fn">findAll</span>();</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr purple">Spark Migration Commands</div>
+        <div class="code-block"><span class="cm"># Create migration file</span>
+<span class="var">php spark make:migration CreateUsersTable</span>
+
+<span class="cm"># Run all pending migrations</span>
+<span class="var">php spark migrate</span>
+
+<span class="cm"># Rollback last batch</span>
+<span class="var">php spark migrate:rollback</span>
+
+<span class="cm"># Seed the database</span>
+<span class="var">php spark db:seed UserSeeder</span>
+
+<span class="cm"># Create a model</span>
+<span class="var">php spark make:model UserModel</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mini-grid">
+    <div class="mini-card"><div class="mini-label b">Select + where</div><code>$model->where('age >', 18)->findAll();</code></div>
+    <div class="mini-card"><div class="mini-label b">Pagination</div><code>$model->paginate(10); // auto pager</code></div>
+    <div class="mini-card"><div class="mini-label b">Count</div><code>$model->where('active',1)->countAllResults();</code></div>
+  </div>
+
+</section>
+
+<!-- ══════════════ SECTION 5 ══════════════ -->
+<section class="section" id="sec-5" aria-labelledby="s5-title">
+
+  <div class="sec-hdr">
+    <div class="sec-num" style="background:var(--purple);color:#0d1117;">5</div>
+    <div>
+      <h2 id="s5-title">Services, Request &amp; Response</h2>
+      <p style="color:var(--purple);">Service Container · HTTP Layer · Validation</p>
+    </div>
+  </div>
+
+  <div class="body-grid">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="panel">
+        <div class="panel-hdr purple">Services Container <span class="nb nb-p">CI4 CORE</span></div>
+        <div class="code-block"><span class="kw">use</span> <span class="ns">Config\Services</span>;
+
+<span class="cm">// Get any service anywhere</span>
+<span class="var">$session</span>  = <span class="cl">Services</span>::<span class="fn">session</span>();
+<span class="var">$email</span>    = <span class="cl">Services</span>::<span class="fn">email</span>();
+<span class="var">$logger</span>   = <span class="cl">Services</span>::<span class="fn">logger</span>();
+<span class="var">$cache</span>    = <span class="cl">Services</span>::<span class="fn">cache</span>();
+
+<span class="cm">// Or use helper functions</span>
+<span class="var">$session</span> = <span class="fn">session</span>();
+<span class="var">$cache</span>   = <span class="fn">cache</span>();</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr blue">Request Object — IncomingRequest</div>
+        <div class="code-block"><span class="cm">// $this->request auto-injected in Controller</span>
+<span class="var">$name</span> = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getPost</span>(<span class="str">'name'</span>);
+<span class="var">$id</span>   = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getGet</span>(<span class="str">'id'</span>);
+<span class="var">$json</span> = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getJSON</span>();
+
+<span class="cm">// Get headers</span>
+<span class="var">$token</span> = <span class="var">$this</span>-&gt;request
+  -&gt;<span class="fn">getHeaderLine</span>(<span class="str">'Authorization'</span>);
+
+<span class="cm">// Detect request type</span>
+<span class="kw">if</span> (<span class="var">$this</span>-&gt;request-&gt;<span class="fn">isAJAX</span>()) { ... }
+<span class="kw">if</span> (<span class="var">$this</span>-&gt;request-&gt;<span class="fn">is</span>(<span class="str">'post'</span>))  { ... }</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="panel">
+        <div class="panel-hdr green">Response Object</div>
+        <div class="code-block"><span class="cm">// Return JSON API response</span>
+<span class="kw">return</span> <span class="var">$this</span>-&gt;response
+  -&gt;<span class="fn">setStatusCode</span>(200)
+  -&gt;<span class="fn">setJSON</span>([<span class="str">'status'</span> <span class="cm">=&gt;</span> <span class="str">'ok'</span>]);
+
+<span class="cm">// Redirect</span>
+<span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">to</span>(<span class="str">'/dashboard'</span>);
+<span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">back</span>()
+  -&gt;<span class="fn">with</span>(<span class="str">'error'</span>, <span class="str">'Invalid login'</span>);
+
+<span class="cm">// Download file</span>
+<span class="kw">return</span> <span class="var">$this</span>-&gt;response
+  -&gt;<span class="fn">download</span>(<span class="str">'report.pdf'</span>, <span class="var">$data</span>);</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr orange">Validation — Built into CI4</div>
+        <div class="code-block"><span class="var">$rules</span> = [
+  <span class="str">'name'</span>  <span class="cm">=&gt;</span> <span class="str">'required|min_length[3]'</span>,
+  <span class="str">'email'</span> <span class="cm">=&gt;</span> <span class="str">'required|valid_email'</span>,
+  <span class="str">'age'</span>   <span class="cm">=&gt;</span> <span class="str">'required|integer|greater_than[17]'</span>
+];
+
+<span class="kw">if</span> (! <span class="var">$this</span>-&gt;<span class="fn">validate</span>(<span class="var">$rules</span>)) {
+  <span class="kw">return</span> <span class="fn">view</span>(<span class="str">'form'</span>, [
+    <span class="str">'errors'</span> <span class="cm">=&gt;</span>
+      <span class="var">$this</span>-&gt;validator-&gt;<span class="fn">getErrors</span>()
+  ]);
+}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="svc-grid">
+    <div class="svc-card"><div class="svc-icon">📧</div><div class="svc-name">Email</div><div class="svc-call">Services::email()</div></div>
+    <div class="svc-card"><div class="svc-icon">🗄️</div><div class="svc-name">Cache</div><div class="svc-call">Services::cache()</div></div>
+    <div class="svc-card"><div class="svc-icon">🔐</div><div class="svc-name">Session</div><div class="svc-call">Services::session()</div></div>
+    <div class="svc-card"><div class="svc-icon">📝</div><div class="svc-name">Logger</div><div class="svc-call">Services::logger()</div></div>
+  </div>
+
+</section>
+
+<!-- ══════════════ SECTION 6 ══════════════ -->
+<section class="section" id="sec-6" aria-labelledby="s6-title">
+
+  <div class="sec-hdr">
+    <div class="sec-num" style="background:var(--yellow);color:#0d1117;">6</div>
+    <div>
+      <h2 id="s6-title">Session, Cookies &amp; Security</h2>
+      <p style="color:var(--yellow);">CI4 Session API · Cookie Class · CSRF · Escaping</p>
+    </div>
+  </div>
+
+  <div class="body-grid">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="panel">
+        <div class="panel-hdr yellow">Session — CI4 Way <span class="nb">UPDATED</span></div>
+        <div class="code-block"><span class="cm">// Get session service</span>
+<span class="var">$session</span> = <span class="fn">session</span>();
+
+<span class="cm">// Set session data</span>
+<span class="var">$session</span>-&gt;<span class="fn">set</span>([
+  <span class="str">'user_id'</span>   <span class="cm">=&gt;</span> 1,
+  <span class="str">'username'</span>  <span class="cm">=&gt;</span> <span class="str">'Alice'</span>,
+  <span class="str">'logged_in'</span> <span class="cm">=&gt;</span> <span class="kw">true</span>
+]);
+
+<span class="cm">// Get session value</span>
+<span class="var">$id</span>   = <span class="var">$session</span>-&gt;<span class="fn">get</span>(<span class="str">'user_id'</span>);
+<span class="var">$name</span> = <span class="var">$session</span>-&gt;username;
+
+<span class="cm">// Flashdata — show once only</span>
+<span class="var">$session</span>-&gt;<span class="fn">setFlashdata</span>(<span class="str">'msg'</span>, <span class="str">'Saved!'</span>);
+<span class="var">$msg</span> = <span class="var">$session</span>-&gt;<span class="fn">getFlashdata</span>(<span class="str">'msg'</span>);
+
+<span class="cm">// Remove &amp; destroy</span>
+<span class="var">$session</span>-&gt;<span class="fn">remove</span>(<span class="str">'username'</span>);
+<span class="var">$session</span>-&gt;<span class="fn">destroy</span>();</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr blue">Cookies — CI4 Cookie Class <span class="nb">UPDATED</span></div>
+        <div class="code-block"><span class="kw">use</span> <span class="ns">CodeIgniter\Cookie\Cookie</span>;
+
+<span class="cm">// Create &amp; set a cookie (OOP)</span>
+<span class="var">$cookie</span> = <span class="kw">new</span> <span class="cl">Cookie</span>(<span class="str">'theme'</span>, <span class="str">'dark'</span>, [
+  <span class="str">'expires'</span>  <span class="cm">=&gt;</span> <span class="str">'+30 days'</span>,
+  <span class="str">'samesite'</span> <span class="cm">=&gt;</span> <span class="cl">Cookie</span>::<span class="fn">SAMESITE_LAX</span>,
+  <span class="str">'secure'</span>   <span class="cm">=&gt;</span> <span class="kw">true</span>
+]);
+<span class="var">$this</span>-&gt;response-&gt;<span class="fn">setCookie</span>(<span class="var">$cookie</span>);
+
+<span class="cm">// Get &amp; delete cookie</span>
+<span class="var">$theme</span> = <span class="var">$this</span>-&gt;request
+  -&gt;<span class="fn">getCookie</span>(<span class="str">'theme'</span>);
+<span class="var">$this</span>-&gt;response-&gt;<span class="fn">deleteCookie</span>(<span class="str">'theme'</span>);</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="panel">
+        <div class="panel-hdr red">CSRF Protection — Auto in CI4</div>
+        <div class="code-block"><span class="cm">// app/Config/Security.php</span>
+<span class="kw">public</span> <span class="var">$csrfProtection</span> = <span class="str">'cookie'</span>;
+<span class="kw">public</span> <span class="var">$tokenName</span>    = <span class="str">'csrf_test_name'</span>;
+<span class="kw">public</span> <span class="var">$headerName</span>   = <span class="str">'X-CSRF-TOKEN'</span>;
+<span class="kw">public</span> <span class="var">$regenerate</span>   = <span class="kw">true</span>;
+
+<span class="cm">// In your form — auto hidden token</span>
+&lt;?= <span class="fn">csrf_field</span>() ?&gt;
+
+<span class="cm">// For AJAX requests</span>
+<span class="var">$token</span> = <span class="fn">csrf_hash</span>();
+<span class="var">$name</span>  = <span class="fn">csrf_token</span>();</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr green">Output Escaping — XSS Prevention</div>
+        <div class="code-block"><span class="cm">// In views — always escape output</span>
+&lt;?= <span class="fn">esc</span>(<span class="var">$name</span>) ?&gt;          <span class="cm">// HTML</span>
+&lt;?= <span class="fn">esc</span>(<span class="var">$url</span>, <span class="str">'url'</span>) ?&gt;  <span class="cm">// URL</span>
+&lt;?= <span class="fn">esc</span>(<span class="var">$js</span>, <span class="str">'js'</span>) ?&gt;   <span class="cm">// JS</span>
+&lt;?= <span class="fn">esc</span>(<span class="var">$css</span>, <span class="str">'css'</span>) ?&gt; <span class="cm">// CSS</span>
+
+<span class="cm">// Hash passwords</span>
+<span class="var">$hash</span> = <span class="fn">password_hash</span>(
+  <span class="var">$pass</span>, <span class="cl">PASSWORD_DEFAULT</span>
+);
+<span class="fn">password_verify</span>(<span class="var">$pass</span>, <span class="var">$hash</span>);</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mini-grid">
+    <div class="mini-card">
+      <div class="mini-label r">CSRF Token</div>
+      <p>Auto-regenerated per request. Use <code style="font-family:var(--mono);font-size:10px;color:var(--green);">csrf_field()</code> in every form to stay protected.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label g">XSS via esc()</div>
+      <p>Always wrap output in <code style="font-family:var(--mono);font-size:10px;color:var(--green);">esc()</code> — context-aware escaping built in to CI4.</p>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label b">Secure Cookies</div>
+      <p>CI4 Cookie class supports <code style="font-family:var(--mono);font-size:10px;color:var(--green);">HttpOnly</code>, <code style="font-family:var(--mono);font-size:10px;color:var(--green);">Secure</code>, <code style="font-family:var(--mono);font-size:10px;color:var(--green);">SameSite</code> flags natively.</p>
+    </div>
+  </div>
+
+</section>
+
+<footer class="site-footer">
+  <span>CodeIgniter 4</span> — Simple. Powerful. Elegant. &nbsp;|&nbsp; PHP 8.0+ Required
+</footer>
+
+<script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const sections = document.querySelectorAll('.section');
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sec = btn.dataset.sec;
+      tabs.forEach(t => t.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('sec-' + sec).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>
