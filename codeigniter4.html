@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeIgniter 4 — Complete Developer Guide</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--bg4:#21262d;
+  --border:#30363d;--border2:#21262d;
+  --text:#e6edf3;--text2:#c9d1d9;--muted:#8b949e;
+  --accent:#EF4444;--orange:#f0883e;--green:#56d364;
+  --blue:#79c0ff;--purple:#d2a8ff;--yellow:#e3b341;
+  --teal:#39d353;--pink:#ff7b9c;
+  --kw:#ff7b72;--fn:#d2a8ff;--str:#a5d6ff;--var:#56d364;
+  --cm:#8b949e;--ns:#f0883e;--cl:#ffa657;--ht:#79c0ff;
+  --sidebar-w:260px;
+  --font:"Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"Cascadia Code","Fira Code","Courier New",monospace;
+  --radius:8px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;font-size:14px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;right:28px;background:var(--green);color:#0d1117;padding:10px 20px;border-radius:24px;font-weight:700;font-size:13px;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;z-index:9999;}
+#toast.show{opacity:1;transform:translateY(0);}
+
+/* PROGRESS */
+#progress-bar{position:fixed;top:56px;left:0;right:0;height:3px;background:var(--accent);transform-origin:left;transform:scaleX(0);z-index:300;transition:transform .1s;}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,17,23,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border2);height:56px;display:flex;align-items:center;padding:0 20px;gap:16px;}
+.topbar-logo{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;}
+.topbar-logo .ci4{color:var(--accent);}
+.topbar-spacer{flex:1;}
+.topbar-badge{background:#1a0505;color:var(--accent);border:1px solid #7f1d1d;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.menu-btn{display:none;background:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);cursor:pointer;font-size:18px;}
+
+/* LAYOUT */
+.layout{display:flex;margin-top:56px;min-height:calc(100vh - 56px);}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;position:fixed;top:56px;left:0;height:calc(100vh - 56px);overflow-y:auto;background:var(--bg2);border-right:1px solid var(--border2);padding:12px 0;transition:transform .3s;z-index:100;}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.sidebar-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);padding:10px 16px 4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;font-size:13px;color:var(--muted);border-left:3px solid transparent;transition:all .15s;text-decoration:none;}
+.nav-item:hover{color:var(--text);background:var(--bg3);}
+.nav-item.active{color:var(--text);background:var(--bg3);border-left-color:var(--accent);}
+.nav-icon{font-size:14px;width:18px;flex-shrink:0;}
+.nav-badge{margin-left:auto;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;}
+.nb-new{background:#0d2d1a;color:var(--green);border:1px solid #238636;}
+.nb-cli{background:#1a0d2d;color:var(--purple);border:1px solid #6e40c9;}
+
+/* SIDEBAR OVERLAY */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;min-width:0;}
+
+/* SECTION */
+.doc-section{border-bottom:1px solid var(--border2);padding-bottom:40px;}
+.sec-hero{padding:28px 32px 20px;border-bottom:1px solid var(--border2);background:var(--bg2);}
+.sec-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.sec-hero h2{font-size:clamp(18px,3vw,26px);font-weight:700;color:#f0f6fc;letter-spacing:-.3px;margin-bottom:10px;}
+.sec-hero .overview{font-size:13px;color:var(--text2);max-width:700px;line-height:1.7;}
+.sec-hero .overview code{background:var(--bg4);color:var(--orange);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:11.5px;}
+.sec-content{padding:22px 32px;}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px;margin-bottom:18px;}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px;margin-bottom:18px;}
+
+/* HEADINGS */
+.doc-h3{font-size:13.5px;font-weight:700;color:var(--text);margin:22px 0 9px;display:flex;align-items:center;gap:8px;}
+.doc-h3::before{content:"";display:block;width:3px;height:14px;background:var(--accent);border-radius:2px;}
+.doc-p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:12px;max-width:740px;}
+.doc-p code,.doc-p strong code{background:var(--bg4);color:var(--orange);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:11.5px;}
+
+/* CALLOUTS */
+.callout{border-radius:var(--radius);padding:12px 16px;margin:12px 0;font-size:12.5px;line-height:1.6;display:flex;gap:10px;align-items:flex-start;}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.callout.info{background:#0d1a2d;border:1px solid #1f6feb;color:var(--blue);}
+.callout.warning{background:#1a1400;border:1px solid #9e6a03;color:var(--yellow);}
+.callout.success{background:#0d2d1a;border:1px solid #238636;color:var(--green);}
+.callout.danger{background:#1a0505;border:1px solid #da3633;color:var(--kw);}
+.callout strong{font-weight:700;}
+
+/* CODE BLOCKS */
+.code-wrap{position:relative;background:#010409;border:1px solid var(--border2);border-radius:var(--radius);margin:10px 0;overflow:hidden;}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:#0d1117;border-bottom:1px solid var(--border2);font-size:11px;color:var(--muted);}
+.code-lang{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-weight:600;}
+.copy-btn{background:var(--bg4);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.copy-btn:hover,.copy-btn.copied{background:var(--green);color:#0d1117;border-color:var(--green);}
+pre.code-body{padding:14px 16px;font-family:var(--mono);font-size:clamp(10.5px,1.8vw,12px);line-height:1.85;overflow-x:auto;white-space:pre;margin:0;}
+.kw{color:var(--kw);}.fn{color:var(--fn);}.str{color:var(--str);}
+.var{color:var(--var);}.cm{color:var(--cm);font-style:italic;}
+.ns{color:var(--ns);}.cl{color:var(--cl);}.ht{color:var(--ht);}
+.num{color:#79c0ff;}
+
+/* PANELS */
+.panel{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;}
+.panel-hdr{padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}
+.ph-blue{background:#0d1a2d;color:var(--blue);}
+.ph-green{background:#0d2d1a;color:var(--green);}
+.ph-orange{background:#1a1200;color:var(--orange);}
+.ph-purple{background:#1a0d2d;color:var(--purple);}
+.ph-yellow{background:#1a1400;color:var(--yellow);}
+.ph-red{background:#1a0505;color:var(--kw);}
+.ph-teal{background:#041a14;color:var(--teal);}
+.panel-body{padding:14px;}
+
+/* FEATURE CARDS */
+.feat-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:16px;transition:border-color .2s,transform .2s;}
+.feat-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.feat-icon{font-size:26px;margin-bottom:10px;}
+.feat-card h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.feat-card p{font-size:12px;color:var(--muted);line-height:1.5;}
+.feat-badge{display:inline-block;margin-top:10px;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+.fb-green{background:#0d2d1a;color:var(--green);border:1px solid #238636;}
+.fb-blue{background:#0d1a2d;color:var(--blue);border:1px solid #1f6feb;}
+.fb-orange{background:#1a1200;color:var(--orange);border:1px solid #9e6a03;}
+.fb-purple{background:#1a0d2d;color:var(--purple);border:1px solid #6e40c9;}
+.fb-red{background:#1a0505;color:var(--kw);border:1px solid #da3633;}
+.fb-yellow{background:#1a1400;color:var(--yellow);border:1px solid #9e6a03;}
+
+/* DIR TREE */
+.dir-tree{font-family:var(--mono);font-size:clamp(10.5px,1.8vw,12px);line-height:2;color:var(--muted);padding:14px 16px;background:#010409;overflow-x:auto;}
+.fo{color:var(--orange);}.fi{color:var(--blue);}.hi{color:var(--green);font-weight:700;}.di{color:var(--muted);}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:11px;}
+.step{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:13px 15px;display:flex;gap:13px;align-items:flex-start;transition:border-color .2s;}
+.step:hover{border-color:var(--accent);}
+.step-num{color:#fff;width:28px;height:28px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-body h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.step-body p{font-size:12px;color:var(--muted);line-height:1.5;}
+.step-body a{color:var(--blue);font-size:11.5px;}
+.icod{background:var(--bg4);color:var(--orange);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:11px;}
+
+/* TABLES */
+.doc-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.5px;overflow-x:auto;display:block;}
+.doc-table th{background:var(--bg3);color:var(--text2);font-weight:700;padding:8px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;border-bottom:2px solid var(--accent);}
+.doc-table td{padding:8px 12px;border-bottom:1px solid var(--border2);color:var(--text2);vertical-align:top;}
+.doc-table tr:hover td{background:var(--bg3);}
+.doc-table code{background:var(--bg4);color:var(--orange);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:11px;}
+
+/* FLOW BAR */
+.flow-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin:14px 0;}
+.flow-step{flex:1;min-width:80px;text-align:center;background:var(--bg3);border-radius:6px;padding:8px 6px;font-size:11.5px;color:var(--text);border:1px solid var(--border2);}
+.flow-step span{display:block;font-size:9.5px;color:var(--muted);margin-top:3px;}
+.flow-arr{color:var(--accent);font-size:16px;flex-shrink:0;}
+
+/* ROUTE ROWS */
+.route-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:7px 14px;border-bottom:1px solid var(--border2);font-family:var(--mono);font-size:11.5px;}
+.route-row:last-child{border-bottom:none;}
+.route-path{color:var(--str);flex:1;min-width:120px;}
+.route-handler{color:var(--muted);font-size:11px;}
+.m-get{background:#0d2d1a;color:var(--green);border:1px solid #238636;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.m-post{background:#1a1400;color:var(--yellow);border:1px solid #9e6a03;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.m-put{background:#0d1a2d;color:var(--blue);border:1px solid #1f6feb;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.m-del{background:#1a0505;color:var(--kw);border:1px solid #da3633;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.m-patch{background:#1a0d2d;color:var(--purple);border:1px solid #6e40c9;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;}
+
+/* BADGE INLINE */
+.badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px;vertical-align:middle;margin-left:5px;}
+.badge-new{background:#0d2d1a;color:var(--green);border:1px solid #238636;}
+.badge-cli{background:#1a0d2d;color:var(--purple);border:1px solid #6e40c9;}
+
+/* SERVICE CARDS */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0;}
+.svc-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center;}
+.svc-icon{font-size:22px;margin-bottom:6px;}
+.svc-name{font-size:11.5px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+.svc-call{font-family:var(--mono);font-size:9.5px;color:var(--green);}
+
+/* BACK TO TOP */
+.back-top{position:fixed;bottom:28px;left:calc(var(--sidebar-w) + 16px);background:var(--bg3);border:1px solid var(--border);color:var(--muted);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;opacity:0;transition:all .2s;pointer-events:none;}
+.back-top.visible{opacity:1;pointer-events:all;}
+.back-top:hover{color:var(--text);border-color:var(--accent);}
+
+/* FOOTER */
+.site-footer{background:var(--bg2);border-top:1px solid var(--border2);padding:22px 32px;text-align:center;}
+.site-footer p{color:var(--muted);font-size:12px;}
+.site-footer a{color:var(--blue);}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay{display:block;opacity:0;pointer-events:none;transition:opacity .3s;}
+  .sidebar-overlay.show{opacity:1;pointer-events:all;}
+  .main{margin-left:0;}
+  .menu-btn{display:block;}
+  .sec-hero{padding:18px 16px 14px;}
+  .sec-content{padding:16px;}
+  .back-top{left:16px;}
+  .site-footer{padding:18px 16px;}
+}
+@media(max-width:480px){
+  .sec-hero h2{font-size:17px;}
+  pre.code-body{font-size:10.5px;}
+  .flow-step{min-width:60px;font-size:10px;}
+  .doc-table{font-size:11px;}
+}
+</style>
+</head>
+<body>
+<div id="toast">&#10003; Copied!</div>
+<div id="progress-bar"></div>
+
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">&#9776;</button>
+  <div class="topbar-logo">
+    <span>&#128293;</span>
+    <span><span class="ci4">CodeIgniter 4</span> &mdash; Complete Developer Guide</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-badge">PHP 8.0+ Required</div>
+</header>
+
+<div class="sidebar-overlay" id="overlay"></div>
+<button class="back-top" id="backTop" title="Back to top">&#8593;</button>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-label">Getting Started</div>
+  <a class="nav-item active" href="#sec-1"><span class="nav-icon">&#128640;</span>Installation &amp; Setup<span class="nav-badge nb-new">NEW</span></a>
+  <a class="nav-item" href="#sec-2"><span class="nav-icon">&#128193;</span>Directory Structure</a>
+
+  <div class="sidebar-label">Core Concepts</div>
+  <a class="nav-item" href="#sec-3"><span class="nav-icon">&#127959;</span>MVC Architecture</a>
+  <a class="nav-item" href="#sec-4"><span class="nav-icon">&#128256;</span>Routing<span class="nav-badge nb-new">NEW</span></a>
+  <a class="nav-item" href="#sec-5"><span class="nav-icon">&#127918;</span>Controllers</a>
+  <a class="nav-item" href="#sec-6"><span class="nav-icon">&#128228;</span>Models &amp; Database</a>
+  <a class="nav-item" href="#sec-7"><span class="nav-icon">&#128065;</span>Views &amp; Templates</a>
+
+  <div class="sidebar-label">Advanced</div>
+  <a class="nav-item" href="#sec-8"><span class="nav-icon">&#128737;</span>Filters (Middleware)<span class="nav-badge nb-new">NEW</span></a>
+  <a class="nav-item" href="#sec-9"><span class="nav-icon">&#9989;</span>Validation</a>
+  <a class="nav-item" href="#sec-10"><span class="nav-icon">&#128274;</span>Session &amp; Cookies</a>
+  <a class="nav-item" href="#sec-11"><span class="nav-icon">&#128275;</span>Security</a>
+  <a class="nav-item" href="#sec-12"><span class="nav-icon">&#128230;</span>Services &amp; DI</a>
+
+  <div class="sidebar-label">Tools</div>
+  <a class="nav-item" href="#sec-13"><span class="nav-icon">&#9889;</span>Spark CLI<span class="nav-badge nb-cli">CLI</span></a>
+  <a class="nav-item" href="#sec-14"><span class="nav-icon">&#128451;</span>Migrations &amp; Seeds</a>
+
+  <div style="padding:18px 16px;border-top:1px solid var(--border2);margin-top:10px;">
+    <div style="font-size:11px;color:var(--muted);">CodeIgniter <strong style="color:var(--accent);">v4.x</strong><br>PHP 8.0+ &bull; MIT License</div>
+    <a href="https://codeigniter.com/user_guide" target="_blank" rel="noopener" style="color:var(--blue);font-size:11px;text-decoration:none;display:block;margin-top:6px;">Official Docs &#8599;</a>
+  </div>
+</nav>
+
+<main class="main" id="mainContent">
+
+<!-- ===== SEC 1: INSTALLATION ===== -->
+<section class="doc-section" id="sec-1">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--accent);">&#128640; Section 01</div>
+  <h2>Installation &amp; Setup</h2>
+  <p class="overview">CodeIgniter 4 requires PHP 8.0 or higher and supports installation via
+  Composer (recommended) or manual download. CI4 introduces a <code>.env</code> configuration
+  file, a built-in dev server via <code>php spark serve</code>, and the <code>spark</code> CLI
+  tool &mdash; all significant improvements over CI3.</p>
+</div>
+<div class="sec-content">
+  <div class="callout info"><span class="callout-icon">&#8505;&#65039;</span>
+    <div><strong>Requirements:</strong> PHP 8.0+, extensions: intl, mbstring, json, mysqlnd. Composer 2.x strongly recommended.</div>
+  </div>
+
+  <div class="doc-h3">Method 1 &mdash; Composer Install (Recommended)</div>
+  <p class="doc-p">Composer handles dependencies and PSR-4 autoloading automatically. Preferred for all new CI4 projects.</p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-lang">&#128187; Terminal</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+    <pre class="code-body"># Create new project
+composer create-project codeigniter4/appstarter my-project
+
+# Navigate into project
+cd my-project
+
+# Copy env file and open it
+cp env .env
+
+# Start built-in dev server (http://localhost:8080)
+php spark serve</pre>
+  </div>
+
+  <div class="doc-h3">Method 2 &mdash; Manual Download</div>
+  <p class="doc-p">Download zip from <a href="https://codeigniter.com/download" target="_blank" style="color:var(--blue);">codeigniter.com/download</a>, extract, and configure virtual host to point to the <code>public/</code> folder.</p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-lang">&#128187; Apache / Nginx Config</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+    <pre class="code-body"># Apache — set DocumentRoot to /path/to/project/public
+# Ensure mod_rewrite is enabled, AllowOverride All is set
+
+# Nginx example
+server {
+    listen 80;
+    server_name myapp.local;
+    root /var/www/my-project/public;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    }
+}</pre>
+  </div>
+
+  <div class="doc-h3">Configure .env File</div>
+  <p class="doc-p">The <code>.env</code> file replaces CI3 config PHP files for environment-specific settings. <strong>Never commit this file to version control.</strong></p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-lang">&#128196; .env</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+    <pre class="code-body"># ── Environment ──────────────────────────────
+CI_ENVIRONMENT = development   # development | testing | production
+
+# ── App ──────────────────────────────────────
+app.baseURL      = 'http://localhost:8080/'
+app.forceGlobalSecureRequests = false
+
+# ── Database ─────────────────────────────────
+database.default.hostname = localhost
+database.default.database = my_database
+database.default.username = root
+database.default.password = secret
+database.default.DBDriver = MySQLi
+database.default.DBPrefix =
+database.default.port     = 3306
+
+# ── Session ──────────────────────────────────
+app.sessionExpiration = 7200
+
+# ── Encryption Key (run: php spark key:generate) ─
+encryption.key = hex2bin(yourGeneratedKeyHere)</pre>
+  </div>
+
+  <div class="doc-h3">Generate Encryption Key</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-lang">&#128187; Terminal</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+    <pre class="code-body"># Auto-generate and write key to .env
+php spark key:generate
+
+# Verify everything is OK
+php spark --version
+php spark env</pre>
+  </div>
+  <div class="callout success"><span class="callout-icon">&#9989;</span>
+    <div>After setup, open <strong>http://localhost:8080</strong> &mdash; you should see the CI4 welcome page with a green environment indicator.</div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SEC 2: DIRECTORY STRUCTURE ===== -->
+<section class="doc-section" id="sec-2">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--orange);">&#128193; Section 02</div>
+  <h2>Directory Structure</h2>
+  <p class="overview">CI4 separates application code from the web root. Only <code>public/</code> is exposed
+  to the web &mdash; everything else stays private. This is a critical security improvement over CI3.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div class="panel">
+    <div class="panel-hdr ph-orange">&#128193; Full Project Structure</div>
+    <div class="dir-tree"><span class="hi">my-project/</span>
+&#9500;&#9472;&#9472; <span class="hi">app/</span>                <span class="di">&larr; Your code lives here</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">Config/</span>         <span class="di">&larr; All config classes</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="fi">App.php</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="fi">Database.php</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="fi">Routes.php</span>
+&#9474;   &#9474;   &#9500;&#9472;&#9472; <span class="fi">Filters.php</span>
+&#9474;   &#9474;   &#9492;&#9472;&#9472; <span class="fi">Security.php</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">Controllers/</span>    <span class="di">&larr; HTTP controllers</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">Models/</span>         <span class="di">&larr; Data models</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">Views/</span>          <span class="di">&larr; HTML templates</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">Filters/</span>        <span class="di">&larr; Middleware</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">Libraries/</span>      <span class="di">&larr; Custom libraries</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">Helpers/</span>        <span class="di">&larr; Helper functions</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">Language/</span>       <span class="di">&larr; i18n files</span>
+&#9474;   &#9492;&#9472;&#9472; <span class="fo">Database/</span>
+&#9474;       &#9500;&#9472;&#9472; <span class="fo">Migrations/</span> <span class="di">&larr; DB schema versions</span>
+&#9474;       &#9492;&#9472;&#9472; <span class="fo">Seeds/</span>      <span class="di">&larr; DB seeders</span>
+&#9500;&#9472;&#9472; <span class="hi">public/</span>             <span class="di">&larr; WEB ROOT ONLY!</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fi">index.php</span>       <span class="di">&larr; Entry point</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">assets/</span>         <span class="di">&larr; CSS, JS, images</span>
+&#9474;   &#9492;&#9472;&#9472; <span class="fi">.htaccess</span>
+&#9500;&#9472;&#9472; <span class="fo">system/</span>             <span class="di">&larr; CI4 core (do not edit)</span>
+&#9500;&#9472;&#9472; <span class="fo">vendor/</span>             <span class="di">&larr; Composer packages</span>
+&#9500;&#9472;&#9472; <span class="fo">writable/</span>           <span class="di">&larr; Logs, cache, sessions</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">cache/</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="fo">logs/</span>
+&#9474;   &#9492;&#9472;&#9472; <span class="fo">session/</span>
+&#9500;&#9472;&#9472; <span class="fi">.env</span>                <span class="di">&larr; Environment config</span>
+&#9500;&#9472;&#9472; <span class="fi">spark</span>               <span class="di">&larr; CLI tool</span>
+&#9492;&#9472;&#9472; <span class="fi">composer.json</span></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="panel">
+      <div class="panel-hdr ph-blue">Key Folders</div>
+      <table class="doc-table">
+        <tr><th>Folder</th><th>Purpose</th></tr>
+        <tr><td><code>app/</code></td><td>All your application code</td></tr>
+        <tr><td><code>public/</code></td><td>Only this folder faces the internet</td></tr>
+        <tr><td><code>system/</code></td><td>CI4 core &mdash; never modify</td></tr>
+        <tr><td><code>writable/</code></td><td>Must be writable by web server</td></tr>
+        <tr><td><code>vendor/</code></td><td>Composer dependencies</td></tr>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr ph-green">Config Files in app/Config/</div>
+      <table class="doc-table">
+        <tr><th>File</th><th>Controls</th></tr>
+        <tr><td><code>App.php</code></td><td>Base URL, timezone, charset</td></tr>
+        <tr><td><code>Database.php</code></td><td>DB connections</td></tr>
+        <tr><td><code>Routes.php</code></td><td>URL routing rules</td></tr>
+        <tr><td><code>Filters.php</code></td><td>Global middleware registration</td></tr>
+        <tr><td><code>Security.php</code></td><td>CSRF, XSS settings</td></tr>
+        <tr><td><code>Session.php</code></td><td>Session driver &amp; options</td></tr>
+        <tr><td><code>Cache.php</code></td><td>Cache driver configuration</td></tr>
+      </table>
+    </div>
+    <div class="callout warning"><span class="callout-icon">&#9888;&#65039;</span>
+      <div><strong>Security:</strong> Configure your web server so ONLY <code>public/</code> is accessible. Never expose <code>app/</code>, <code>system/</code>, or <code>writable/</code>.</div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 3: MVC ===== -->
+<section class="doc-section" id="sec-3">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--blue);">&#127959; Section 03</div>
+  <h2>MVC Architecture</h2>
+  <p class="overview">CI4 uses the Model-View-Controller pattern with full PSR-4 namespacing under
+  <code>App\</code>. The <strong>Controller</strong> handles HTTP, the <strong>Model</strong> manages data,
+  the <strong>View</strong> renders HTML. All classes extend CI4 base classes with typed properties and return types.</p>
+</div>
+<div class="sec-content">
+  <div class="flow-bar">
+    <div class="flow-step">&#127760; Browser<span>HTTP Request</span></div>
+    <div class="flow-arr">&rarr;</div>
+    <div class="flow-step">public/index.php<span>Entry Point</span></div>
+    <div class="flow-arr">&rarr;</div>
+    <div class="flow-step">Router<span>Routes.php</span></div>
+    <div class="flow-arr">&rarr;</div>
+    <div class="flow-step">&#9881;&#65039; Controller<span>Handles Logic</span></div>
+    <div class="flow-arr">&rarr;</div>
+    <div class="flow-step">&#128228; Model<span>Data Layer</span></div>
+    <div class="flow-arr">&rarr;</div>
+    <div class="flow-step">&#128065;&#65039; View<span>Renders HTML</span></div>
+    <div class="flow-arr">&rarr;</div>
+    <div class="flow-step">&#127760; Browser<span>Response</span></div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="doc-h3">Controller &mdash; app/Controllers/User.php</div>
+      <div class="code-wrap">
+        <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Controller</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+        <pre class="code-body"><span class="cm">&lt;?php</span>
+<span class="kw">namespace</span> <span class="ns">App\Controllers</span>;
+
+<span class="kw">use</span> <span class="ns">App\Models\UserModel</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Exceptions\PageNotFoundException</span>;
+
+<span class="kw">class</span> <span class="cl">User</span> <span class="kw">extends</span> <span class="cl">BaseController</span>
+{
+    <span class="cm">/** List all users */</span>
+    <span class="kw">public function</span> <span class="fn">index</span>(): <span class="cl">string</span>
+    {
+        <span class="var">$model</span> = <span class="kw">new</span> <span class="cl">UserModel</span>();
+        <span class="kw">return</span> <span class="fn">view</span>(<span class="str">'users/index'</span>, [
+            <span class="str">'title'</span> <span class="cm">=&gt;</span> <span class="str">'All Users'</span>,
+            <span class="str">'users'</span> <span class="cm">=&gt;</span> <span class="var">$model</span>-&gt;<span class="fn">findAll</span>(),
+        ]);
+    }
+
+    <span class="cm">/** Show single user */</span>
+    <span class="kw">public function</span> <span class="fn">show</span>(<span class="cl">int</span> <span class="var">$id</span>): <span class="cl">string</span>
+    {
+        <span class="var">$model</span> = <span class="kw">new</span> <span class="cl">UserModel</span>();
+        <span class="var">$user</span>  = <span class="var">$model</span>-&gt;<span class="fn">find</span>(<span class="var">$id</span>);
+        <span class="kw">if</span> (<span class="var">$user</span> === <span class="kw">null</span>) {
+            <span class="kw">throw new</span> <span class="cl">PageNotFoundException</span>(
+                <span class="str">"User {$id} not found"</span>
+            );
+        }
+        <span class="kw">return</span> <span class="fn">view</span>(<span class="str">'users/show'</span>, [<span class="str">'user'</span> <span class="cm">=&gt;</span> <span class="var">$user</span>]);
+    }
+
+    <span class="cm">/** Handle POST form to create user */</span>
+    <span class="kw">public function</span> <span class="fn">create</span>()
+    {
+        <span class="kw">if</span> (! <span class="var">$this</span>-&gt;<span class="fn">validate</span>([
+            <span class="str">'name'</span>  <span class="cm">=&gt;</span> <span class="str">'required|min_length[3]'</span>,
+            <span class="str">'email'</span> <span class="cm">=&gt;</span> <span class="str">'required|valid_email'</span>,
+        ])) {
+            <span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">back</span>()
+                -&gt;<span class="fn">withInput</span>()
+                -&gt;<span class="fn">with</span>(<span class="str">'errors'</span>,
+                    <span class="var">$this</span>-&gt;validator-&gt;<span class="fn">getErrors</span>());
+        }
+        (<span class="kw">new</span> <span class="cl">UserModel</span>())-&gt;<span class="fn">insert</span>(
+            <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getPost</span>()
+        );
+        <span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">to</span>(<span class="str">'/users'</span>)
+            -&gt;<span class="fn">with</span>(<span class="str">'success'</span>, <span class="str">'User created!'</span>);
+    }
+}</pre>
+      </div>
+    </div>
+    <div>
+      <div class="doc-h3">Model &mdash; app/Models/UserModel.php</div>
+      <div class="code-wrap">
+        <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Model</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+        <pre class="code-body"><span class="cm">&lt;?php</span>
+<span class="kw">namespace</span> <span class="ns">App\Models</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Model</span>;
+
+<span class="kw">class</span> <span class="cl">UserModel</span> <span class="kw">extends</span> <span class="cl">Model</span>
+{
+    <span class="kw">protected</span> <span class="var">$table</span>         = <span class="str">'users'</span>;
+    <span class="kw">protected</span> <span class="var">$primaryKey</span>    = <span class="str">'id'</span>;
+    <span class="kw">protected</span> <span class="var">$returnType</span>    = <span class="str">'array'</span>;
+    <span class="kw">protected</span> <span class="var">$allowedFields</span> = [
+        <span class="str">'name'</span>, <span class="str">'email'</span>, <span class="str">'password'</span>,
+    ];
+    <span class="cm">// Auto-manage created_at &amp; updated_at</span>
+    <span class="kw">protected</span> <span class="var">$useTimestamps</span>  = <span class="kw">true</span>;
+    <span class="kw">protected</span> <span class="var">$useSoftDeletes</span> = <span class="kw">true</span>;
+
+    <span class="cm">// Built-in validation</span>
+    <span class="kw">protected</span> <span class="var">$validationRules</span> = [
+        <span class="str">'name'</span>  <span class="cm">=&gt;</span> <span class="str">'required|min_length[3]'</span>,
+        <span class="str">'email'</span> <span class="cm">=&gt;</span> <span class="str">'required|valid_email|is_unique[users.email]'</span>,
+    ];
+    <span class="kw">protected</span> <span class="var">$validationMessages</span> = [
+        <span class="str">'email'</span> <span class="cm">=&gt;</span> [
+            <span class="str">'is_unique'</span> <span class="cm">=&gt;</span> <span class="str">'This email is already registered.'</span>,
+        ],
+    ];
+}</span></pre>
+      </div>
+
+      <div class="doc-h3">View &mdash; app/Views/users/index.php</div>
+      <div class="code-wrap">
+        <div class="code-header"><div class="code-lang">&#127760; PHP/HTML &mdash; View</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+        <pre class="code-body"><span class="ht">&lt;h1&gt;</span><span class="fn">&lt;?= esc</span>(<span class="var">$title</span>)<span class="fn"> ?&gt;</span><span class="ht">&lt;/h1&gt;</span>
+
+<span class="kw">&lt;?php if</span> (<span class="fn">session</span>()-&gt;<span class="fn">getFlashdata</span>(<span class="str">'success'</span>)): <span class="kw">?&gt;</span>
+  <span class="ht">&lt;div</span> class=<span class="str">"alert-success"</span><span class="ht">&gt;</span>
+    <span class="fn">&lt;?= session()-&gt;getFlashdata</span>(<span class="str">'success'</span>)<span class="fn"> ?&gt;</span>
+  <span class="ht">&lt;/div&gt;</span>
+<span class="kw">&lt;?php endif; ?&gt;</span>
+
+<span class="ht">&lt;table&gt;</span>
+<span class="ht">&lt;thead&gt;&lt;tr&gt;</span>
+  <span class="ht">&lt;th&gt;</span>ID<span class="ht">&lt;/th&gt;&lt;th&gt;</span>Name<span class="ht">&lt;/th&gt;&lt;th&gt;</span>Email<span class="ht">&lt;/th&gt;</span>
+<span class="ht">&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;</span>
+<span class="kw">&lt;?php foreach</span> (<span class="var">$users</span> <span class="kw">as</span> <span class="var">$u</span>): <span class="kw">?&gt;</span>
+<span class="ht">&lt;tr&gt;</span>
+  <span class="ht">&lt;td&gt;</span><span class="fn">&lt;?= esc</span>(<span class="var">$u</span>[<span class="str">'id'</span>])<span class="fn"> ?&gt;</span><span class="ht">&lt;/td&gt;</span>
+  <span class="ht">&lt;td&gt;</span><span class="fn">&lt;?= esc</span>(<span class="var">$u</span>[<span class="str">'name'</span>])<span class="fn"> ?&gt;</span><span class="ht">&lt;/td&gt;</span>
+  <span class="ht">&lt;td&gt;</span><span class="fn">&lt;?= esc</span>(<span class="var">$u</span>[<span class="str">'email'</span>])<span class="fn"> ?&gt;</span><span class="ht">&lt;/td&gt;</span>
+<span class="ht">&lt;/tr&gt;</span>
+<span class="kw">&lt;?php endforeach; ?&gt;</span>
+<span class="ht">&lt;/tbody&gt;&lt;/table&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SEC 4: ROUTING ===== -->
+<section class="doc-section" id="sec-4">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--green);">&#128256; Section 04</div>
+  <h2>Routing</h2>
+  <p class="overview">CI4 uses HTTP-verb based routing in <code>app/Config/Routes.php</code>.
+  It supports RESTful resource routes, named routes, route groups with filters, closures, and
+  wildcard placeholders &mdash; far more expressive than CI3's single array routing.</p>
+</div>
+<div class="sec-content">
+  <div class="doc-h3">Basic Routes &mdash; app/Config/Routes.php</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Routes.php</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+    <pre class="code-body"><span class="cm">&lt;?php</span>
+<span class="kw">use</span> <span class="ns">CodeIgniter\Router\RouteCollection</span>;
+<span class="cm">/** @var RouteCollection $routes */</span>
+
+<span class="cm">// Basic HTTP verb routing</span>
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'/'</span>, <span class="str">'Home::index'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'users'</span>, <span class="str">'User::index'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'users/(:num)'</span>, <span class="str">'User::show/$1'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'users/(:num)/edit'</span>, <span class="str">'User::edit/$1'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">post</span>(<span class="str">'users'</span>, <span class="str">'User::create'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">put</span>(<span class="str">'users/(:num)'</span>, <span class="str">'User::update/$1'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">patch</span>(<span class="str">'users/(:num)'</span>, <span class="str">'User::patch/$1'</span>);
+<span class="var">$routes</span>-&gt;<span class="fn">delete</span>(<span class="str">'users/(:num)'</span>, <span class="str">'User::delete/$1'</span>);
+
+<span class="cm">// Match multiple methods</span>
+<span class="var">$routes</span>-&gt;<span class="fn">match</span>([<span class="str">'get'</span>, <span class="str">'post'</span>], <span class="str">'contact'</span>, <span class="str">'Contact::index'</span>);
+
+<span class="cm">// Named route (use in views: route_to('user.show', 5))</span>
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'users/(:num)'</span>, <span class="str">'User::show/$1'</span>,
+    [<span class="str">'as'</span> <span class="cm">=&gt;</span> <span class="str">'user.show'</span>]);
+
+<span class="cm">// Redirect route</span>
+<span class="var">$routes</span>-&gt;<span class="fn">addRedirect</span>(<span class="str">'old-path'</span>, <span class="str">'new-path'</span>, <span class="num">301</span>);</pre>
+  </div>
+
+  <div class="doc-h3">Route Placeholders</div>
+  <table class="doc-table">
+    <tr><th>Placeholder</th><th>Matches</th><th>Example URL</th></tr>
+    <tr><td><code>(:num)</code></td><td>Numbers only (0-9)</td><td><code>users/42</code></td></tr>
+    <tr><td><code>(:alpha)</code></td><td>Letters only (a-z A-Z)</td><td><code>category/news</code></td></tr>
+    <tr><td><code>(:alphanum)</code></td><td>Letters &amp; numbers</td><td><code>post/abc123</code></td></tr>
+    <tr><td><code>(:segment)</code></td><td>Any URL segment (no slashes)</td><td><code>page/my-post</code></td></tr>
+    <tr><td><code>(:any)</code></td><td>Everything including slashes</td><td><code>path/a/b/c</code></td></tr>
+    <tr><td><code>(:hash)</code></td><td>Alphanumeric + dash/underscore</td><td><code>slug-value_1</code></td></tr>
+  </table>
+
+  <div class="grid-2" style="margin-top:16px;">
+    <div>
+      <div class="doc-h3">Resource Routes (RESTful)</div>
+      <div class="code-wrap">
+        <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Resource</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+        <pre class="code-body"><span class="cm">// One line generates all CRUD routes</span>
+<span class="var">$routes</span>-&gt;<span class="fn">resource</span>(<span class="str">'users'</span>);
+
+<span class="cm">// Limit to specific methods only</span>
+<span class="var">$routes</span>-&gt;<span class="fn">resource</span>(<span class="str">'photos'</span>, [
+    <span class="str">'only'</span> <span class="cm">=&gt;</span> [<span class="str">'index'</span>, <span class="str">'show'</span>, <span class="str">'create'</span>],
+]);
+
+<span class="cm">// Exclude specific methods</span>
+<span class="var">$routes</span>-&gt;<span class="fn">resource</span>(<span class="str">'tags'</span>, [
+    <span class="str">'except'</span> <span class="cm">=&gt;</span> [<span class="str">'delete'</span>],
+]);</pre>
+      </div>
+      <div class="panel" style="margin-top:10px;">
+        <div class="panel-hdr ph-green">Auto-Generated from resource('users')</div>
+        <div class="route-row"><span class="m-get">GET</span><span class="route-path">/users</span><span class="route-handler">::index()</span></div>
+        <div class="route-row"><span class="m-get">GET</span><span class="route-path">/users/new</span><span class="route-handler">::new()</span></div>
+        <div class="route-row"><span class="m-post">POST</span><span class="route-path">/users</span><span class="route-handler">::create()</span></div>
+        <div class="route-row"><span class="m-get">GET</span><span class="route-path">/users/(:id)</span><span class="route-handler">::show($id)</span></div>
+        <div class="route-row"><span class="m-get">GET</span><span class="route-path">/users/(:id)/edit</span><span class="route-handler">::edit($id)</span></div>
+        <div class="route-row"><span class="m-put">PUT</span><span class="route-path">/users/(:id)</span><span class="route-handler">::update($id)</span></div>
+        <div class="route-row"><span class="m-del">DELETE</span><span class="route-path">/users/(:id)</span><span class="route-handler">::delete($id)</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="doc-h3">Route Groups with Filters</div>
+      <div class="code-wrap">
+        <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Groups</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+        <pre class="code-body"><span class="cm">// Admin group &mdash; protected by auth filter</span>
+<span class="var">$routes</span>-&gt;<span class="fn">group</span>(<span class="str">'admin'</span>,
+    [<span class="str">'filter'</span> <span class="cm">=&gt;</span> <span class="str">'auth'</span>],
+    <span class="kw">function</span>(<span class="var">$routes</span>) {
+        <span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'dashboard'</span>,
+            <span class="str">'Admin\Dashboard::index'</span>);
+        <span class="var">$routes</span>-&gt;<span class="fn">resource</span>(<span class="str">'users'</span>, [
+            <span class="str">'namespace'</span> <span class="cm">=&gt;</span> <span class="str">'Admin'</span>,
+        ]);
+    }
+);
+
+<span class="cm">// API v1 group with throttle</span>
+<span class="var">$routes</span>-&gt;<span class="fn">group</span>(<span class="str">'api/v1'</span>, [
+    <span class="str">'namespace'</span> <span class="cm">=&gt;</span> <span class="str">'App\Controllers\Api'</span>,
+    <span class="str">'filter'</span>    <span class="cm">=&gt;</span> <span class="str">'throttle:60,1'</span>,
+    ], <span class="kw">function</span>(<span class="var">$routes</span>) {
+        <span class="var">$routes</span>-&gt;<span class="fn">resource</span>(<span class="str">'users'</span>);
+        <span class="var">$routes</span>-&gt;<span class="fn">resource</span>(<span class="str">'products'</span>);
+    }
+);
+
+<span class="cm">// Use named route in controller</span>
+<span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">route</span>(<span class="str">'user.show'</span>, [<span class="num">42</span>]);
+
+<span class="cm">// Use named route in view</span>
+<span class="ht">&lt;a</span> href=<span class="str">"&lt;?= route_to('user.show', 42) ?&gt;"</span><span class="ht">&gt;</span>View<span class="ht">&lt;/a&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== SEC 5: CONTROLLERS ===== -->
+<section class="doc-section" id="sec-5">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--purple);">&#127918; Section 05</div>
+  <h2>Controllers</h2>
+  <p class="overview">Controllers extend <code>BaseController</code> which auto-injects
+  <code>$this->request</code>, <code>$this->response</code>, and <code>$this->logger</code>.
+  CI4 supports typed parameters, return types, <code>initController()</code> for setup,
+  and direct JSON responses for API development.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Request Object &mdash; $this->request</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; IncomingRequest</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">// ── POST data ─────────────────────────</span>
+<span class="var">$name</span>  = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getPost</span>(<span class="str">'name'</span>);
+<span class="var">$email</span> = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getPost</span>(<span class="str">'email'</span>);
+<span class="var">$all</span>   = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getPost</span>();
+
+<span class="cm">// ── GET / query params ────────────────</span>
+<span class="var">$id</span>    = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getGet</span>(<span class="str">'id'</span>);
+<span class="var">$page</span>  = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getGet</span>(<span class="str">'page'</span>, <span class="num">1</span>);
+
+<span class="cm">// ── JSON body (APIs) ──────────────────</span>
+<span class="var">$json</span>  = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getJSON</span>(<span class="kw">true</span>);
+
+<span class="cm">// ── Headers ───────────────────────────</span>
+<span class="var">$auth</span>  = <span class="var">$this</span>-&gt;request
+    -&gt;<span class="fn">getHeaderLine</span>(<span class="str">'Authorization'</span>);
+
+<span class="cm">// ── Detect request type ───────────────</span>
+<span class="var">$this</span>-&gt;request-&gt;<span class="fn">is</span>(<span class="str">'post'</span>);   <span class="cm">// bool</span>
+<span class="var">$this</span>-&gt;request-&gt;<span class="fn">isAJAX</span>();     <span class="cm">// bool</span>
+<span class="var">$this</span>-&gt;request-&gt;<span class="fn">isCLI</span>();      <span class="cm">// bool</span>
+<span class="var">$this</span>-&gt;request-&gt;<span class="fn">isSecure</span>();   <span class="cm">// HTTPS?</span>
+
+<span class="cm">// ── Get user IP ───────────────────────</span>
+<span class="var">$ip</span> = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getIPAddress</span>();
+
+<span class="cm">// ── File upload ───────────────────────</span>
+<span class="var">$file</span> = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getFile</span>(<span class="str">'avatar'</span>);
+<span class="kw">if</span> (<span class="var">$file</span>-&gt;<span class="fn">isValid</span>() &amp;&amp; ! <span class="var">$file</span>-&gt;<span class="fn">hasMoved</span>()) {
+    <span class="var">$file</span>-&gt;<span class="fn">move</span>(WRITEPATH . <span class="str">'uploads'</span>);
+}</pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Response Object &mdash; $this->response</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Response</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">// ── JSON API response ─────────────────</span>
+<span class="kw">return</span> <span class="var">$this</span>-&gt;response
+    -&gt;<span class="fn">setStatusCode</span>(<span class="num">200</span>)
+    -&gt;<span class="fn">setJSON</span>([
+        <span class="str">'status'</span> <span class="cm">=&gt;</span> <span class="str">'ok'</span>,
+        <span class="str">'data'</span>   <span class="cm">=&gt;</span> <span class="var">$users</span>,
+    ]);
+
+<span class="cm">// ── 404 / error responses ─────────────</span>
+<span class="kw">return</span> <span class="var">$this</span>-&gt;response
+    -&gt;<span class="fn">setStatusCode</span>(<span class="num">404</span>)
+    -&gt;<span class="fn">setJSON</span>([<span class="str">'error'</span> <span class="cm">=&gt;</span> <span class="str">'Not found'</span>]);
+
+<span class="cm">// ── Set headers ───────────────────────</span>
+<span class="var">$this</span>-&gt;response-&gt;<span class="fn">setHeader</span>(
+    <span class="str">'X-Custom-Header'</span>, <span class="str">'value'</span>
+);
+
+<span class="cm">// ── Redirect helpers ──────────────────</span>
+<span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">to</span>(<span class="str">'/dashboard'</span>);
+<span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">back</span>()
+    -&gt;<span class="fn">withInput</span>()
+    -&gt;<span class="fn">with</span>(<span class="str">'error'</span>, <span class="str">'Invalid data'</span>);
+<span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">route</span>(<span class="str">'user.show'</span>, [<span class="num">42</span>]);
+
+<span class="cm">// ── Force file download ───────────────</span>
+<span class="kw">return</span> <span class="var">$this</span>-&gt;response
+    -&gt;<span class="fn">download</span>(<span class="str">'report.pdf'</span>, <span class="var">$fileContent</span>);</pre>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 6: MODELS & DATABASE ===== -->
+<section class="doc-section" id="sec-6">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--blue);">&#128228; Section 06</div>
+  <h2>Models &amp; Database</h2>
+  <p class="overview">CI4's Model class provides built-in CRUD, pagination, soft deletes, timestamps,
+  and inline validation. The Query Builder offers a fluent interface for complex queries.
+  Database config lives in <code>.env</code> or <code>app/Config/Database.php</code>.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Model CRUD Methods</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Model Operations</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="var">$model</span> = <span class="kw">new</span> <span class="cl">UserModel</span>();
+
+<span class="cm">// ── READ ──────────────────────────────</span>
+<span class="var">$all</span>    = <span class="var">$model</span>-&gt;<span class="fn">findAll</span>();
+<span class="var">$user</span>   = <span class="var">$model</span>-&gt;<span class="fn">find</span>(<span class="num">1</span>);
+<span class="var">$users</span>  = <span class="var">$model</span>-&gt;<span class="fn">find</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]);
+<span class="var">$first</span>  = <span class="var">$model</span>-&gt;<span class="fn">first</span>();
+<span class="var">$count</span>  = <span class="var">$model</span>-&gt;<span class="fn">countAll</span>();
+
+<span class="cm">// ── WHERE + CHAINING ──────────────────</span>
+<span class="var">$active</span> = <span class="var">$model</span>
+    -&gt;<span class="fn">where</span>(<span class="str">'status'</span>, <span class="str">'active'</span>)
+    -&gt;<span class="fn">where</span>(<span class="str">'age &gt;'</span>, <span class="num">18</span>)
+    -&gt;<span class="fn">orderBy</span>(<span class="str">'name'</span>, <span class="str">'ASC'</span>)
+    -&gt;<span class="fn">limit</span>(<span class="num">10</span>, <span class="num">0</span>)
+    -&gt;<span class="fn">findAll</span>();
+
+<span class="cm">// ── INSERT ────────────────────────────</span>
+<span class="var">$id</span> = <span class="var">$model</span>-&gt;<span class="fn">insert</span>([
+    <span class="str">'name'</span>  <span class="cm">=&gt;</span> <span class="str">'Alice'</span>,
+    <span class="str">'email'</span> <span class="cm">=&gt;</span> <span class="str">'alice@example.com'</span>,
+]);
+
+<span class="cm">// ── UPDATE ────────────────────────────</span>
+<span class="var">$model</span>-&gt;<span class="fn">update</span>(<span class="var">$id</span>, [<span class="str">'name'</span> <span class="cm">=&gt;</span> <span class="str">'Alice Smith'</span>]);
+
+<span class="cm">// ── DELETE ────────────────────────────</span>
+<span class="var">$model</span>-&gt;<span class="fn">delete</span>(<span class="var">$id</span>);           <span class="cm">// hard delete</span>
+<span class="var">$model</span>-&gt;<span class="fn">withDeleted</span>()-&gt;<span class="fn">findAll</span>(); <span class="cm">// include soft</span>
+<span class="var">$model</span>-&gt;<span class="fn">purgeDeleted</span>();          <span class="cm">// truly remove</span>
+
+<span class="cm">// ── PAGINATION ────────────────────────</span>
+<span class="var">$users</span> = <span class="var">$model</span>-&gt;<span class="fn">paginate</span>(<span class="num">15</span>); <span class="cm">// 15 per page</span>
+<span class="var">$pager</span> = <span class="var">$model</span>-&gt;pager;
+<span class="cm">// In view: &lt;?= $pager-&gt;links() ?&gt;</span></pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Raw Query Builder</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Query Builder ($db)</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="var">$db</span> = <span class="fn">db_connect</span>(); <span class="cm">// or $this->db in model</span>
+
+<span class="cm">// SELECT with JOIN</span>
+<span class="var">$data</span> = <span class="var">$db</span>-&gt;<span class="fn">table</span>(<span class="str">'users u'</span>)
+    -&gt;<span class="fn">select</span>(<span class="str">'u.*, r.name as role_name'</span>)
+    -&gt;<span class="fn">join</span>(<span class="str">'roles r'</span>, <span class="str">'r.id = u.role_id'</span>)
+    -&gt;<span class="fn">where</span>(<span class="str">'u.active'</span>, <span class="num">1</span>)
+    -&gt;<span class="fn">orderBy</span>(<span class="str">'u.name'</span>)
+    -&gt;<span class="fn">get</span>()-&gt;<span class="fn">getResultArray</span>();
+
+<span class="cm">// Raw parameterized query (safe)</span>
+<span class="var">$q</span> = <span class="var">$db</span>-&gt;<span class="fn">query</span>(
+    <span class="str">'SELECT * FROM users WHERE id = ? AND active = ?'</span>,
+    [<span class="var">$id</span>, <span class="num">1</span>]
+);
+<span class="var">$result</span> = <span class="var">$q</span>-&gt;<span class="fn">getResultArray</span>();
+
+<span class="cm">// INSERT BATCH</span>
+<span class="var">$db</span>-&gt;<span class="fn">table</span>(<span class="str">'logs'</span>)-&gt;<span class="fn">insertBatch</span>([
+    [<span class="str">'action'</span> <span class="cm">=&gt;</span> <span class="str">'login'</span>,  <span class="str">'user_id'</span> <span class="cm">=&gt;</span> <span class="num">1</span>],
+    [<span class="str">'action'</span> <span class="cm">=&gt;</span> <span class="str">'logout'</span>, <span class="str">'user_id'</span> <span class="cm">=&gt;</span> <span class="num">2</span>],
+]);
+<span class="var">$insertId</span> = <span class="var">$db</span>-&gt;<span class="fn">insertID</span>();
+
+<span class="cm">// TRANSACTIONS</span>
+<span class="var">$db</span>-&gt;<span class="fn">transStart</span>();
+    <span class="var">$db</span>-&gt;<span class="fn">table</span>(<span class="str">'orders'</span>)-&gt;<span class="fn">insert</span>(<span class="var">$orderData</span>);
+    <span class="var">$db</span>-&gt;<span class="fn">table</span>(<span class="str">'items'</span>)-&gt;<span class="fn">insert</span>(<span class="var">$itemData</span>);
+<span class="var">$db</span>-&gt;<span class="fn">transComplete</span>();
+
+<span class="kw">if</span> (<span class="var">$db</span>-&gt;<span class="fn">transStatus</span>() === <span class="kw">false</span>) {
+    <span class="cm">// Transaction failed, handle error</span>
+}</pre>
+    </div>
+    <div class="callout info"><span class="callout-icon">&#8505;&#65039;</span>
+      <div>Use <code>getResultArray()</code> for arrays, <code>getResult()</code> for objects, <code>getRow()</code> for a single row.</div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 7: VIEWS ===== -->
+<section class="doc-section" id="sec-7">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--yellow);">&#128065; Section 07</div>
+  <h2>Views &amp; Templates</h2>
+  <p class="overview">CI4 views are PHP files in <code>app/Views/</code>. CI4 adds a
+  <strong>View Layouts</strong> system for master page inheritance and <strong>View Cells</strong>
+  for reusable components. Always use <code>esc()</code> to escape output &mdash; this is
+  CI4's primary XSS defence in views.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Layout (app/Views/layouts/main.php)</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#127760; PHP/HTML &mdash; Master Layout</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="ht">&lt;!DOCTYPE html&gt;</span>
+<span class="ht">&lt;html</span> lang=<span class="str">"en"</span><span class="ht">&gt;</span>
+<span class="ht">&lt;head&gt;</span>
+  <span class="ht">&lt;title&gt;</span><span class="fn">&lt;?= esc</span>(<span class="var">$title</span> ?? <span class="str">'App'</span>)<span class="fn"> ?&gt;</span><span class="ht">&lt;/title&gt;</span>
+  <span class="ht">&lt;link</span> rel=<span class="str">"stylesheet"</span>
+    href=<span class="str">"&lt;?= base_url('assets/css/app.css') ?&gt;"</span><span class="ht">&gt;</span>
+<span class="ht">&lt;/head&gt;</span>
+<span class="ht">&lt;body&gt;</span>
+  <span class="ht">&lt;nav&gt;</span>
+    <span class="cm">&lt;!-- shared nav --&gt;</span>
+  <span class="ht">&lt;/nav&gt;</span>
+  <span class="ht">&lt;main&gt;</span>
+    <span class="cm">&lt;?= $this-&gt;renderSection('content') ?&gt;</span>
+  <span class="ht">&lt;/main&gt;</span>
+  <span class="cm">&lt;?= $this-&gt;renderSection('scripts') ?&gt;</span>
+<span class="ht">&lt;/body&gt;</span>
+<span class="ht">&lt;/html&gt;</span></pre>
+    </div>
+
+    <div class="doc-h3">Child View Using Layout</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#127760; PHP/HTML &mdash; Child View</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">&lt;?= $this-&gt;extend('layouts/main') ?&gt;</span>
+<span class="cm">&lt;?= $this-&gt;section('content') ?&gt;</span>
+
+<span class="ht">&lt;h1&gt;</span>Welcome, <span class="fn">&lt;?= esc</span>(<span class="var">$name</span>)<span class="fn"> ?&gt;</span><span class="ht">&lt;/h1&gt;</span>
+
+<span class="cm">&lt;?php if (session()->getFlashdata('success')): ?&gt;</span>
+  <span class="ht">&lt;div</span> class=<span class="str">"success"</span><span class="ht">&gt;</span>
+    <span class="fn">&lt;?= session()-&gt;getFlashdata</span>(<span class="str">'success'</span>)<span class="fn"> ?&gt;</span>
+  <span class="ht">&lt;/div&gt;</span>
+<span class="cm">&lt;?php endif; ?&gt;</span>
+
+<span class="cm">&lt;?= $this-&gt;include('partials/user-table', [</span>
+<span class="cm">    'users' =&gt; $users</span>
+<span class="cm">]) ?&gt;</span>
+
+<span class="cm">&lt;?= $this-&gt;endSection() ?&gt;</span>
+
+<span class="cm">&lt;?= $this-&gt;section('scripts') ?&gt;</span>
+  <span class="ht">&lt;script</span> src=<span class="str">"app.js"</span><span class="ht">&gt;&lt;/script&gt;</span>
+<span class="cm">&lt;?= $this-&gt;endSection() ?&gt;</span></pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Output Escaping (Always Required)</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#127760; PHP &mdash; esc() Contexts</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">&lt;!-- HTML content (default) --&gt;</span>
+<span class="fn">&lt;?= esc</span>(<span class="var">$name</span>)<span class="fn"> ?&gt;</span>
+
+<span class="cm">&lt;!-- HTML attribute --&gt;</span>
+<span class="ht">&lt;input</span> value=<span class="str">"&lt;?= esc($value, 'attr') ?&gt;"</span><span class="ht">&gt;</span>
+
+<span class="cm">&lt;!-- URL --&gt;</span>
+<span class="ht">&lt;a</span> href=<span class="str">"&lt;?= esc($url, 'url') ?&gt;"</span><span class="ht">&gt;</span>Click<span class="ht">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- JavaScript --&gt;</span>
+<span class="ht">&lt;script&gt;</span>
+  var name = "<span class="fn">&lt;?= esc</span>(<span class="var">$name</span>, <span class="str">'js'</span>)<span class="fn"> ?&gt;</span>";
+<span class="ht">&lt;/script&gt;</span>
+
+<span class="cm">&lt;!-- View helpers --&gt;</span>
+<span class="fn">&lt;?= base_url</span>(<span class="str">'assets/img/logo.png'</span>)<span class="fn"> ?&gt;</span>
+<span class="fn">&lt;?= site_url</span>(<span class="str">'users/create'</span>)<span class="fn"> ?&gt;</span>
+<span class="fn">&lt;?= current_url</span>()<span class="fn"> ?&gt;</span>
+<span class="fn">&lt;?= previous_url</span>()<span class="fn"> ?&gt;</span>
+<span class="fn">&lt;?= csrf_field</span>()<span class="fn"> ?&gt;</span>    <span class="cm">&lt;!-- CSRF token --&gt;</span>
+<span class="fn">&lt;?= old</span>(<span class="str">'email'</span>)<span class="fn"> ?&gt;</span>    <span class="cm">&lt;!-- re-fill old input --&gt;</span></pre>
+    </div>
+
+    <div class="doc-h3">View Cells (Reusable Components)</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; View Cell</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">// app/Cells/AlertCell.php</span>
+<span class="kw">namespace</span> <span class="ns">App\Cells</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\View\Cells\Cell</span>;
+
+<span class="kw">class</span> <span class="cl">AlertCell</span> <span class="kw">extends</span> <span class="cl">Cell</span>
+{
+    <span class="kw">public</span> <span class="cl">string</span> <span class="var">$type</span>    = <span class="str">'info'</span>;
+    <span class="kw">public</span> <span class="cl">string</span> <span class="var">$message</span> = <span class="str">''</span>;
+}
+
+<span class="cm">// app/Views/cells/alert_cell.php:</span>
+<span class="ht">&lt;div</span> class=<span class="str">"alert alert-&lt;?= esc($type) ?&gt;"</span><span class="ht">&gt;</span>
+  <span class="fn">&lt;?= esc</span>(<span class="var">$message</span>)<span class="fn"> ?&gt;</span>
+<span class="ht">&lt;/div&gt;</span>
+
+<span class="cm">// Use in any view:</span>
+<span class="fn">&lt;?= view_cell</span>(<span class="str">'\App\Cells\AlertCell'</span>, [
+    <span class="str">'type'</span>    <span class="cm">=&gt;</span> <span class="str">'success'</span>,
+    <span class="str">'message'</span> <span class="cm">=&gt;</span> <span class="str">'Profile saved!'</span>,
+])<span class="fn"> ?&gt;</span></pre>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 8: FILTERS ===== -->
+<section class="doc-section" id="sec-8">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--teal);">&#128737; Section 08</div>
+  <h2>Filters (Middleware)</h2>
+  <p class="overview">Filters run before or after a controller executes. Common uses: authentication,
+  rate limiting, CORS headers, logging. Register in <code>app/Config/Filters.php</code> and apply
+  globally, per HTTP method, or per route pattern.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Create a Filter</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; app/Filters/AuthFilter.php</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">&lt;?php</span>
+<span class="kw">namespace</span> <span class="ns">App\Filters</span>;
+
+<span class="kw">use</span> <span class="ns">CodeIgniter\Filters\FilterInterface</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\HTTP\RequestInterface</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\HTTP\ResponseInterface</span>;
+
+<span class="kw">class</span> <span class="cl">AuthFilter</span> <span class="kw">implements</span> <span class="cl">FilterInterface</span>
+{
+    <span class="kw">public function</span> <span class="fn">before</span>(
+        <span class="cl">RequestInterface</span> <span class="var">$request</span>,
+        <span class="var">$arguments</span> = <span class="kw">null</span>
+    ) {
+        <span class="kw">if</span> (! <span class="fn">session</span>()-&gt;<span class="fn">get</span>(<span class="str">'user_id'</span>)) {
+            <span class="kw">return</span> <span class="fn">redirect</span>()
+                -&gt;<span class="fn">to</span>(<span class="str">'/login'</span>)
+                -&gt;<span class="fn">with</span>(<span class="str">'error'</span>, <span class="str">'Please log in first'</span>);
+        }
+    }
+
+    <span class="kw">public function</span> <span class="fn">after</span>(
+        <span class="cl">RequestInterface</span> <span class="var">$request</span>,
+        <span class="cl">ResponseInterface</span> <span class="var">$response</span>,
+        <span class="var">$arguments</span> = <span class="kw">null</span>
+    ) {
+        <span class="cm">// Add security headers after response</span>
+        <span class="var">$response</span>-&gt;<span class="fn">setHeader</span>(
+            <span class="str">'X-Frame-Options'</span>, <span class="str">'DENY'</span>
+        );
+    }
+}</pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Register in app/Config/Filters.php</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Filters.php</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">// Register your filters with an alias</span>
+<span class="kw">public array</span> <span class="var">$aliases</span> = [
+    <span class="str">'csrf'</span>     <span class="cm">=&gt;</span> <span class="cl">CSRF</span>::<span class="kw">class</span>,
+    <span class="str">'toolbar'</span>  <span class="cm">=&gt;</span> <span class="cl">DebugToolbar</span>::<span class="kw">class</span>,
+    <span class="str">'auth'</span>     <span class="cm">=&gt;</span> <span class="cl">\App\Filters\AuthFilter</span>::<span class="kw">class</span>,
+    <span class="str">'api-auth'</span> <span class="cm">=&gt;</span> <span class="cl">\App\Filters\ApiAuthFilter</span>::<span class="kw">class</span>,
+    <span class="str">'role'</span>     <span class="cm">=&gt;</span> <span class="cl">\App\Filters\RoleFilter</span>::<span class="kw">class</span>,
+];
+
+<span class="cm">// Apply globally to ALL routes</span>
+<span class="kw">public array</span> <span class="var">$globals</span> = [
+    <span class="str">'before'</span> <span class="cm">=&gt;</span> [<span class="str">'honeypot'</span>, <span class="str">'csrf'</span>],
+    <span class="str">'after'</span>  <span class="cm">=&gt;</span> [<span class="str">'toolbar'</span>],
+];
+
+<span class="cm">// Apply to specific HTTP methods</span>
+<span class="kw">public array</span> <span class="var">$methods</span> = [
+    <span class="str">'post'</span>   <span class="cm">=&gt;</span> [<span class="str">'csrf'</span>],
+    <span class="str">'delete'</span> <span class="cm">=&gt;</span> [<span class="str">'auth'</span>],
+];
+
+<span class="cm">// Apply to route URL patterns</span>
+<span class="kw">public array</span> <span class="var">$filters</span> = [
+    <span class="str">'auth'</span>     <span class="cm">=&gt;</span> [<span class="str">'before'</span> <span class="cm">=&gt;</span> [<span class="str">'admin/*'</span>]],
+    <span class="str">'api-auth'</span> <span class="cm">=&gt;</span> [<span class="str">'before'</span> <span class="cm">=&gt;</span> [<span class="str">'api/*'</span>]],
+];
+
+<span class="cm">// Apply in Routes.php (per route)</span>
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'admin/dash'</span>, <span class="str">'Admin::index'</span>,
+    [<span class="str">'filter'</span> <span class="cm">=&gt;</span> <span class="str">'auth'</span>]);
+
+<span class="cm">// Multiple filters on one route</span>
+<span class="var">$routes</span>-&gt;<span class="fn">get</span>(<span class="str">'admin/users'</span>, <span class="str">'Admin::users'</span>,
+    [<span class="str">'filter'</span> <span class="cm">=&gt;</span> [<span class="str">'auth'</span>, <span class="str">'role:admin'</span>]]);</pre>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 9: VALIDATION ===== -->
+<section class="doc-section" id="sec-9">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--orange);">&#9989; Section 09</div>
+  <h2>Validation</h2>
+  <p class="overview">CI4 includes 30+ built-in validation rules, custom error messages, grouped rules,
+  and model-level validation. Validate in controllers with <code>$this->validate()</code>, use
+  <code>withInput()</code> to re-fill forms, and display errors from session flashdata.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Controller Validation</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; validate()</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="kw">public function</span> <span class="fn">register</span>()
+{
+    <span class="var">$rules</span> = [
+        <span class="str">'name'</span> <span class="cm">=&gt;</span> [
+            <span class="str">'label'</span>  <span class="cm">=&gt;</span> <span class="str">'Full Name'</span>,
+            <span class="str">'rules'</span>  <span class="cm">=&gt;</span> <span class="str">'required|min_length[3]|max_length[50]'</span>,
+            <span class="str">'errors'</span> <span class="cm">=&gt;</span> [
+                <span class="str">'required'</span>   <span class="cm">=&gt;</span> <span class="str">'Name cannot be empty'</span>,
+                <span class="str">'min_length'</span> <span class="cm">=&gt;</span> <span class="str">'At least 3 characters needed'</span>,
+            ],
+        ],
+        <span class="str">'email'</span>    <span class="cm">=&gt;</span> <span class="str">'required|valid_email|is_unique[users.email]'</span>,
+        <span class="str">'password'</span> <span class="cm">=&gt;</span> <span class="str">'required|min_length[8]'</span>,
+        <span class="str">'confirm'</span>  <span class="cm">=&gt;</span> <span class="str">'required|matches[password]'</span>,
+        <span class="str">'age'</span>      <span class="cm">=&gt;</span> <span class="str">'permit_empty|integer|greater_than[17]'</span>,
+        <span class="str">'role'</span>     <span class="cm">=&gt;</span> <span class="str">'required|in_list[admin,user,editor]'</span>,
+    ];
+
+    <span class="kw">if</span> (! <span class="var">$this</span>-&gt;<span class="fn">validate</span>(<span class="var">$rules</span>)) {
+        <span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">back</span>()
+            -&gt;<span class="fn">withInput</span>()
+            -&gt;<span class="fn">with</span>(<span class="str">'errors'</span>,
+                <span class="var">$this</span>-&gt;validator-&gt;<span class="fn">getErrors</span>());
+    }
+    <span class="cm">// Passed — process data</span>
+    <span class="var">$data</span> = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getPost</span>();
+}</pre>
+    </div>
+
+    <div class="doc-h3">Show Errors in View</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#127760; PHP/HTML &mdash; Error Display</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">&lt;?php if (session()-&gt;has('errors')): ?&gt;</span>
+<span class="ht">&lt;ul</span> class=<span class="str">"errors"</span><span class="ht">&gt;</span>
+  <span class="cm">&lt;?php foreach (session('errors') as $e): ?&gt;</span>
+  <span class="ht">&lt;li&gt;</span><span class="fn">&lt;?= esc</span>(<span class="var">$e</span>)<span class="fn"> ?&gt;</span><span class="ht">&lt;/li&gt;</span>
+  <span class="cm">&lt;?php endforeach; ?&gt;</span>
+<span class="ht">&lt;/ul&gt;</span>
+<span class="cm">&lt;?php endif; ?&gt;</span>
+
+<span class="cm">&lt;!-- Repopulate form with old input --&gt;</span>
+<span class="ht">&lt;form</span> method=<span class="str">"post"</span> action=<span class="str">"/register"</span><span class="ht">&gt;</span>
+  <span class="fn">&lt;?= csrf_field() ?&gt;</span>
+  <span class="ht">&lt;input</span> type=<span class="str">"text"</span> name=<span class="str">"name"</span>
+    value=<span class="str">"&lt;?= old('name') ?&gt;"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;input</span> type=<span class="str">"email"</span> name=<span class="str">"email"</span>
+    value=<span class="str">"&lt;?= old('email') ?&gt;"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;button</span> type=<span class="str">"submit"</span><span class="ht">&gt;</span>Register<span class="ht">&lt;/button&gt;</span>
+<span class="ht">&lt;/form&gt;</span></pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Validation Rules Reference</div>
+    <table class="doc-table">
+      <tr><th>Rule</th><th>Description</th></tr>
+      <tr><td><code>required</code></td><td>Field must not be empty</td></tr>
+      <tr><td><code>permit_empty</code></td><td>Allow empty, skip other rules if so</td></tr>
+      <tr><td><code>min_length[n]</code></td><td>Minimum n characters</td></tr>
+      <tr><td><code>max_length[n]</code></td><td>Maximum n characters</td></tr>
+      <tr><td><code>exact_length[n]</code></td><td>Exactly n characters</td></tr>
+      <tr><td><code>valid_email</code></td><td>Must be valid email address</td></tr>
+      <tr><td><code>valid_url</code></td><td>Must be valid URL</td></tr>
+      <tr><td><code>valid_date[format]</code></td><td>Must be valid date</td></tr>
+      <tr><td><code>is_unique[table.field]</code></td><td>Must not exist in DB</td></tr>
+      <tr><td><code>matches[field]</code></td><td>Must match another field value</td></tr>
+      <tr><td><code>differs[field]</code></td><td>Must differ from another field</td></tr>
+      <tr><td><code>integer</code></td><td>Must be integer</td></tr>
+      <tr><td><code>numeric</code></td><td>Must be numeric (int/float)</td></tr>
+      <tr><td><code>greater_than[n]</code></td><td>Numeric greater than n</td></tr>
+      <tr><td><code>less_than[n]</code></td><td>Numeric less than n</td></tr>
+      <tr><td><code>in_list[a,b,c]</code></td><td>Must be one of list values</td></tr>
+      <tr><td><code>alpha</code></td><td>Letters only</td></tr>
+      <tr><td><code>alpha_numeric</code></td><td>Letters &amp; numbers</td></tr>
+      <tr><td><code>alpha_dash</code></td><td>Letters, numbers, dash, underscore</td></tr>
+      <tr><td><code>regex_match[/pattern/]</code></td><td>Must match regex pattern</td></tr>
+      <tr><td><code>uploaded[field]</code></td><td>File was uploaded</td></tr>
+      <tr><td><code>max_size[field,kb]</code></td><td>File max size in KB</td></tr>
+      <tr><td><code>mime_in[field,image/jpeg,...]</code></td><td>File MIME type check</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 10: SESSION & COOKIES ===== -->
+<section class="doc-section" id="sec-10">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--yellow);">&#128274; Section 10</div>
+  <h2>Session &amp; Cookies</h2>
+  <p class="overview">CI4 sessions support multiple drivers (files, database, Redis, Memcached).
+  The new OOP Cookie class adds proper <code>SameSite</code>, <code>Secure</code>, <code>HttpOnly</code>
+  flags &mdash; far more secure than CI3's simple cookie helper. Configure sessions via <code>.env</code>.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Session &mdash; Complete API</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Session</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="var">$session</span> = <span class="fn">session</span>(); <span class="cm">// helper fn</span>
+
+<span class="cm">// ── SET ───────────────────────────────</span>
+<span class="var">$session</span>-&gt;<span class="fn">set</span>(<span class="str">'user_id'</span>, <span class="num">42</span>);
+<span class="var">$session</span>-&gt;<span class="fn">set</span>([
+    <span class="str">'user_id'</span>   <span class="cm">=&gt;</span> <span class="num">42</span>,
+    <span class="str">'username'</span>  <span class="cm">=&gt;</span> <span class="str">'alice'</span>,
+    <span class="str">'role'</span>      <span class="cm">=&gt;</span> <span class="str">'admin'</span>,
+    <span class="str">'logged_in'</span> <span class="cm">=&gt;</span> <span class="kw">true</span>,
+]);
+
+<span class="cm">// ── GET ───────────────────────────────</span>
+<span class="var">$id</span>   = <span class="var">$session</span>-&gt;<span class="fn">get</span>(<span class="str">'user_id'</span>);
+<span class="var">$name</span> = <span class="var">$session</span>-&gt;username; <span class="cm">// magic prop</span>
+<span class="var">$all</span>  = <span class="var">$session</span>-&gt;<span class="fn">get</span>();
+
+<span class="cm">// Check key exists</span>
+<span class="kw">if</span> (<span class="var">$session</span>-&gt;<span class="fn">has</span>(<span class="str">'user_id'</span>)) { ... }
+
+<span class="cm">// ── FLASHDATA (shows once) ────────────</span>
+<span class="var">$session</span>-&gt;<span class="fn">setFlashdata</span>(<span class="str">'success'</span>, <span class="str">'Saved!'</span>);
+<span class="var">$msg</span> = <span class="var">$session</span>-&gt;<span class="fn">getFlashdata</span>(<span class="str">'success'</span>);
+<span class="var">$session</span>-&gt;<span class="fn">keepFlashdata</span>(<span class="str">'success'</span>); <span class="cm">// keep it</span>
+
+<span class="cm">// ── TEMPDATA (auto-expires) ───────────</span>
+<span class="var">$session</span>-&gt;<span class="fn">setTempdata</span>(<span class="str">'token'</span>, <span class="str">'abc'</span>, <span class="num">300</span>);
+
+<span class="cm">// ── REMOVE &amp; DESTROY ─────────────────</span>
+<span class="var">$session</span>-&gt;<span class="fn">remove</span>(<span class="str">'username'</span>);
+<span class="var">$session</span>-&gt;<span class="fn">remove</span>([<span class="str">'username'</span>, <span class="str">'role'</span>]);
+<span class="var">$session</span>-&gt;<span class="fn">destroy</span>(); <span class="cm">// full logout</span></pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Cookies &mdash; OOP Cookie Class</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Cookie</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="kw">use</span> <span class="ns">CodeIgniter\Cookie\Cookie</span>;
+
+<span class="cm">// ── SET (OOP style) ───────────────────</span>
+<span class="var">$cookie</span> = <span class="kw">new</span> <span class="cl">Cookie</span>(<span class="str">'theme'</span>, <span class="str">'dark'</span>, [
+    <span class="str">'expires'</span>  <span class="cm">=&gt;</span> <span class="str">'+30 days'</span>,
+    <span class="str">'path'</span>     <span class="cm">=&gt;</span> <span class="str">'/'</span>,
+    <span class="str">'secure'</span>   <span class="cm">=&gt;</span> <span class="kw">true</span>,      <span class="cm">// HTTPS only</span>
+    <span class="str">'httponly'</span> <span class="cm">=&gt;</span> <span class="kw">true</span>,      <span class="cm">// No JS access</span>
+    <span class="str">'samesite'</span> <span class="cm">=&gt;</span> <span class="cl">Cookie</span>::<span class="fn">SAMESITE_LAX</span>,
+]);
+<span class="var">$this</span>-&gt;response-&gt;<span class="fn">setCookie</span>(<span class="var">$cookie</span>);
+
+<span class="cm">// Shorthand helper</span>
+<span class="fn">set_cookie</span>(<span class="str">'theme'</span>, <span class="str">'dark'</span>, <span class="num">86400</span>);
+
+<span class="cm">// ── GET ───────────────────────────────</span>
+<span class="var">$theme</span> = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getCookie</span>(<span class="str">'theme'</span>);
+<span class="var">$all</span>   = <span class="var">$this</span>-&gt;request-&gt;<span class="fn">getCookie</span>(); <span class="cm">// all</span>
+
+<span class="cm">// ── DELETE ────────────────────────────</span>
+<span class="var">$this</span>-&gt;response-&gt;<span class="fn">deleteCookie</span>(<span class="str">'theme'</span>);
+<span class="fn">delete_cookie</span>(<span class="str">'theme'</span>); <span class="cm">// helper</span></pre>
+    </div>
+    <div class="callout warning"><span class="callout-icon">&#9888;&#65039;</span>
+      <div><strong>Never</strong> store sensitive data (user IDs, roles, tokens) in cookies. Cookies are client-side and can be read/modified. Use sessions for sensitive data.</div>
+    </div>
+    <div class="callout info"><span class="callout-icon">&#8505;&#65039;</span>
+      <div>Session drivers: <code>files</code> (default), <code>database</code>, <code>redis</code>, <code>memcached</code>. Set in <code>.env</code> via <code>app.sessionDriver</code>.</div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 11: SECURITY ===== -->
+<section class="doc-section" id="sec-11">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--kw);">&#128275; Section 11</div>
+  <h2>Security &mdash; CSRF, XSS &amp; Passwords</h2>
+  <p class="overview">CI4 provides CSRF token protection auto-wired to forms, context-aware output
+  escaping via <code>esc()</code>, and PHP native password hashing. Enable CSRF in
+  <code>app/Config/Security.php</code> and always hash passwords with <code>password_hash()</code>.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">CSRF Config &mdash; app/Config/Security.php</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Security.php</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="kw">public</span> <span class="cl">string</span> <span class="var">$csrfProtection</span> = <span class="str">'cookie'</span>;
+<span class="cm">// 'cookie' | 'session'</span>
+
+<span class="kw">public</span> <span class="cl">bool</span>   <span class="var">$tokenRandomize</span> = <span class="kw">true</span>;
+<span class="kw">public</span> <span class="cl">string</span> <span class="var">$tokenName</span>    = <span class="str">'csrf_test_name'</span>;
+<span class="kw">public</span> <span class="cl">string</span> <span class="var">$headerName</span>   = <span class="str">'X-CSRF-TOKEN'</span>;
+<span class="kw">public</span> <span class="cl">string</span> <span class="var">$cookieName</span>   = <span class="str">'csrf_cookie_name'</span>;
+<span class="kw">public</span> <span class="cl">int</span>    <span class="var">$expires</span>       = <span class="num">7200</span>;
+<span class="kw">public</span> <span class="cl">bool</span>   <span class="var">$regenerate</span>   = <span class="kw">true</span>;
+<span class="kw">public</span> <span class="cl">bool</span>   <span class="var">$redirect</span>     = <span class="kw">true</span>;</pre>
+    </div>
+
+    <div class="doc-h3">CSRF in Forms &amp; AJAX</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#127760; HTML + JS &mdash; CSRF Usage</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">&lt;!-- HTML Form -- csrf_field() adds hidden input --&gt;</span>
+<span class="ht">&lt;form</span> method=<span class="str">"post"</span> action=<span class="str">"/users"</span><span class="ht">&gt;</span>
+  <span class="fn">&lt;?= csrf_field() ?&gt;</span>
+  <span class="ht">&lt;!-- your fields --&gt;</span>
+<span class="ht">&lt;/form&gt;</span>
+
+<span class="cm">// AJAX (fetch API)</span>
+const res = await fetch('/api/users', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-CSRF-TOKEN': getCookieValue('csrf_cookie_name'),
+  },
+  body: JSON.stringify(data),
+});
+
+<span class="cm">// Get token values in PHP</span>
+<span class="var">$token</span> = <span class="fn">csrf_hash</span>();   <span class="cm">// token value</span>
+<span class="var">$name</span>  = <span class="fn">csrf_token</span>(); <span class="cm">// token field name</span></pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Password Hashing</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Passwords</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">// ── HASH on registration ──────────────</span>
+<span class="var">$hash</span> = <span class="fn">password_hash</span>(
+    <span class="var">$plainPassword</span>,
+    <span class="cl">PASSWORD_BCRYPT</span>,
+    [<span class="str">'cost'</span> <span class="cm">=&gt;</span> <span class="num">12</span>] <span class="cm">// higher = slower = safer</span>
+);
+<span class="cm">// Store $hash in database, NEVER $plainPassword</span>
+
+<span class="cm">// ── VERIFY on login ───────────────────</span>
+<span class="var">$user</span> = (<span class="kw">new</span> <span class="cl">UserModel</span>())
+    -&gt;<span class="fn">where</span>(<span class="str">'email'</span>, <span class="var">$email</span>)-&gt;<span class="fn">first</span>();
+
+<span class="kw">if</span> (<span class="var">$user</span> &amp;&amp; <span class="fn">password_verify</span>(
+    <span class="var">$inputPassword</span>, <span class="var">$user</span>[<span class="str">'password'</span>]
+)) {
+    <span class="fn">session</span>()-&gt;<span class="fn">set</span>([
+        <span class="str">'user_id'</span>   <span class="cm">=&gt;</span> <span class="var">$user</span>[<span class="str">'id'</span>],
+        <span class="str">'logged_in'</span> <span class="cm">=&gt;</span> <span class="kw">true</span>,
+    ]);
+    <span class="kw">return</span> <span class="fn">redirect</span>()-&gt;<span class="fn">to</span>(<span class="str">'/dashboard'</span>);
+}
+
+<span class="cm">// ── REHASH if cost changes ────────────</span>
+<span class="kw">if</span> (<span class="fn">password_needs_rehash</span>(
+    <span class="var">$user</span>[<span class="str">'password'</span>],
+    <span class="cl">PASSWORD_BCRYPT</span>, [<span class="str">'cost'</span> <span class="cm">=&gt;</span> <span class="num">12</span>]
+)) {
+    <span class="var">$newHash</span> = <span class="fn">password_hash</span>(
+        <span class="var">$inputPassword</span>, <span class="cl">PASSWORD_BCRYPT</span>
+    );
+    <span class="var">$model</span>-&gt;<span class="fn">update</span>(<span class="var">$user</span>[<span class="str">'id'</span>], [
+        <span class="str">'password'</span> <span class="cm">=&gt;</span> <span class="var">$newHash</span>
+    ]);
+}</pre>
+    </div>
+    <div class="callout danger"><span class="callout-icon">&#128721;</span>
+      <div><strong>Never</strong> store plain-text passwords. Never use MD5/SHA1 for passwords. Always use <code>password_hash()</code> with <code>PASSWORD_BCRYPT</code> or <code>PASSWORD_ARGON2ID</code>.</div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 12: SERVICES ===== -->
+<section class="doc-section" id="sec-12">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--purple);">&#128230; Section 12</div>
+  <h2>Services &amp; Dependency Injection</h2>
+  <p class="overview">The <code>Services</code> class is CI4's service locator / simple DI container.
+  Access framework services like email, cache, session, and logger. Register custom services
+  and share singleton instances. Override in tests easily.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Using Built-in Services</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Services</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="kw">use</span> <span class="ns">Config\Services</span>;
+
+<span class="cm">// ── EMAIL ─────────────────────────────</span>
+<span class="var">$email</span> = <span class="cl">Services</span>::<span class="fn">email</span>();
+<span class="var">$email</span>-&gt;<span class="fn">setTo</span>(<span class="str">'user@example.com'</span>);
+<span class="var">$email</span>-&gt;<span class="fn">setFrom</span>(<span class="str">'no-reply@app.com'</span>, <span class="str">'My App'</span>);
+<span class="var">$email</span>-&gt;<span class="fn">setSubject</span>(<span class="str">'Welcome!'</span>);
+<span class="var">$email</span>-&gt;<span class="fn">setMessage</span>(<span class="fn">view</span>(<span class="str">'emails/welcome'</span>));
+<span class="var">$email</span>-&gt;<span class="fn">send</span>();
+
+<span class="cm">// ── CACHE ─────────────────────────────</span>
+<span class="fn">cache</span>()-&gt;<span class="fn">save</span>(<span class="str">'users_all'</span>, <span class="var">$data</span>, <span class="num">3600</span>);
+<span class="var">$cached</span> = <span class="fn">cache</span>(<span class="str">'users_all'</span>);
+<span class="fn">cache</span>()-&gt;<span class="fn">delete</span>(<span class="str">'users_all'</span>);
+<span class="fn">cache</span>()-&gt;<span class="fn">clean</span>(); <span class="cm">// clear all</span>
+
+<span class="cm">// Cache with remember pattern</span>
+<span class="var">$users</span> = <span class="fn">cache</span>()-&gt;<span class="fn">remember</span>(<span class="str">'users_all'</span>, <span class="num">3600</span>,
+    <span class="kw">function</span>() {
+        <span class="kw">return</span> (<span class="kw">new</span> <span class="cl">UserModel</span>())-&gt;<span class="fn">findAll</span>();
+    }
+);
+
+<span class="cm">// ── LOGGER ────────────────────────────</span>
+<span class="fn">log_message</span>(<span class="str">'debug'</span>, <span class="str">'Debug info'</span>);
+<span class="fn">log_message</span>(<span class="str">'info'</span>,  <span class="str">'User {name} logged in'</span>,
+    [<span class="str">'name'</span> <span class="cm">=&gt;</span> <span class="var">$name</span>]);
+<span class="fn">log_message</span>(<span class="str">'error'</span>, <span class="str">'Payment failed: {msg}'</span>,
+    [<span class="str">'msg'</span> <span class="cm">=&gt;</span> <span class="var">$e</span>-&gt;<span class="fn">getMessage</span>()]);
+<span class="cm">// Levels: emergency|alert|critical|error|
+//         warning|notice|info|debug</span></pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Register a Custom Service</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Custom Service</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">// app/Config/Services.php</span>
+<span class="kw">namespace</span> <span class="ns">Config</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Config\BaseService</span>;
+<span class="kw">use</span> <span class="ns">App\Services\PaymentService</span>;
+<span class="kw">use</span> <span class="ns">App\Services\NotificationService</span>;
+
+<span class="kw">class</span> <span class="cl">Services</span> <span class="kw">extends</span> <span class="cl">BaseService</span>
+{
+    <span class="kw">public static function</span> <span class="fn">payment</span>(
+        <span class="cl">bool</span> <span class="var">$getShared</span> = <span class="kw">true</span>
+    ): <span class="cl">PaymentService</span> {
+        <span class="kw">if</span> (<span class="var">$getShared</span>) {
+            <span class="kw">return static</span>::<span class="fn">getSharedInstance</span>(<span class="str">'payment'</span>);
+        }
+        <span class="kw">return new</span> <span class="cl">PaymentService</span>(
+            <span class="fn">config</span>(<span class="str">'Payment'</span>)
+        );
+    }
+
+    <span class="kw">public static function</span> <span class="fn">notify</span>(
+        <span class="cl">bool</span> <span class="var">$getShared</span> = <span class="kw">true</span>
+    ): <span class="cl">NotificationService</span> {
+        <span class="kw">if</span> (<span class="var">$getShared</span>) {
+            <span class="kw">return static</span>::<span class="fn">getSharedInstance</span>(<span class="str">'notify'</span>);
+        }
+        <span class="kw">return new</span> <span class="cl">NotificationService</span>();
+    }
+}
+
+<span class="cm">// Use anywhere in your app:</span>
+<span class="var">$pay</span>    = <span class="cl">Services</span>::<span class="fn">payment</span>();
+<span class="var">$result</span> = <span class="var">$pay</span>-&gt;<span class="fn">charge</span>(<span class="num">99.99</span>, <span class="str">'usd'</span>);</pre>
+    </div>
+    <div class="svc-grid">
+      <div class="svc-card"><div class="svc-icon">&#128231;</div><div class="svc-name">Email</div><div class="svc-call">Services::email()</div></div>
+      <div class="svc-card"><div class="svc-icon">&#128451;</div><div class="svc-name">Cache</div><div class="svc-call">Services::cache()</div></div>
+      <div class="svc-card"><div class="svc-icon">&#128274;</div><div class="svc-name">Session</div><div class="svc-call">Services::session()</div></div>
+      <div class="svc-card"><div class="svc-icon">&#128221;</div><div class="svc-name">Logger</div><div class="svc-call">Services::logger()</div></div>
+      <div class="svc-card"><div class="svc-icon">&#9989;</div><div class="svc-name">Validation</div><div class="svc-call">Services::validation()</div></div>
+      <div class="svc-card"><div class="svc-icon">&#128256;</div><div class="svc-name">Router</div><div class="svc-call">Services::router()</div></div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 13: SPARK CLI ===== -->
+<section class="doc-section" id="sec-13">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--teal);">&#9889; Section 13</div>
+  <h2>Spark CLI Tool</h2>
+  <p class="overview"><code>spark</code> is CI4's command-line tool (similar to Laravel Artisan).
+  Generate controllers, models, migrations, filters, and more. Run the dev server, inspect routes,
+  run database operations &mdash; all from the terminal.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Server &amp; Info Commands</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128187; Terminal &mdash; Server</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"># Start dev server (http://localhost:8080)
+php spark serve
+
+# Custom host and port
+php spark serve --host=0.0.0.0 --port=9000
+
+# Check environment
+php spark env
+
+# Show version
+php spark --version
+
+# List all available commands
+php spark list
+
+# List all registered routes
+php spark routes
+
+# Generate encryption key (auto-saves to .env)
+php spark key:generate</pre>
+    </div>
+
+    <div class="doc-h3">Code Generation (make:*)</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128187; Terminal &mdash; Generators</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"># Controller
+php spark make:controller User
+php spark make:controller Admin/Dashboard   # nested
+
+# Model
+php spark make:model UserModel
+
+# Filter (Middleware)
+php spark make:filter AuthFilter
+
+# Migration
+php spark make:migration CreateUsersTable
+
+# Seeder
+php spark make:seeder UserSeeder
+
+# Entity class
+php spark make:entity User
+
+# Custom CLI command
+php spark make:command SendEmails
+
+# Full CRUD controller (resource methods)
+php spark make:controller User --restful</pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Database Commands</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128187; Terminal &mdash; Database</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"># Run all pending migrations
+php spark migrate
+
+# Rollback the last batch
+php spark migrate:rollback
+
+# Rollback all (full reset)
+php spark migrate:refresh
+
+# Drop all + re-migrate (fresh start)
+php spark migrate:fresh
+
+# Check migration status
+php spark migrate:status
+
+# Run a specific seeder
+php spark db:seed UserSeeder
+
+# Run the main DatabaseSeeder
+php spark db:seed
+
+# Full reset and re-seed in one command
+php spark migrate:fresh --seed</pre>
+    </div>
+
+    <div class="doc-h3">Custom Spark Command</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Custom Command</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">// app/Commands/SendEmails.php</span>
+<span class="kw">namespace</span> <span class="ns">App\Commands</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\CLI\BaseCommand</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\CLI\CLI</span>;
+
+<span class="kw">class</span> <span class="cl">SendEmails</span> <span class="kw">extends</span> <span class="cl">BaseCommand</span>
+{
+    <span class="kw">protected</span> <span class="var">$group</span>       = <span class="str">'App'</span>;
+    <span class="kw">protected</span> <span class="var">$name</span>        = <span class="str">'emails:send'</span>;
+    <span class="kw">protected</span> <span class="var">$description</span> = <span class="str">'Send pending emails'</span>;
+
+    <span class="kw">public function</span> <span class="fn">run</span>(<span class="cl">array</span> <span class="var">$params</span>): <span class="cl">void</span>
+    {
+        <span class="cl">CLI</span>::<span class="fn">write</span>(<span class="str">'Sending emails...'</span>, <span class="str">'green'</span>);
+        <span class="cm">// Your logic here</span>
+        <span class="cl">CLI</span>::<span class="fn">write</span>(<span class="str">'Done!'</span>, <span class="str">'yellow'</span>);
+    }
+}
+<span class="cm">// php spark emails:send</span></pre>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ===== SEC 14: MIGRATIONS ===== -->
+<section class="doc-section" id="sec-14">
+<div class="sec-hero">
+  <div class="sec-eyebrow" style="color:var(--orange);">&#128451; Section 14</div>
+  <h2>Migrations &amp; Seeders</h2>
+  <p class="overview">Migrations version-control your database schema. Seeders populate tables
+  with initial or test data. Together: <code>php spark migrate:fresh --seed</code> sets up
+  a complete fresh database in one command &mdash; critical for team development and CI/CD.</p>
+</div>
+<div class="sec-content">
+<div class="grid-2">
+  <div>
+    <div class="doc-h3">Complete Migration Example</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Migration</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">&lt;?php</span>
+<span class="kw">namespace</span> <span class="ns">App\Database\Migrations</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Database\Migration</span>;
+
+<span class="kw">class</span> <span class="cl">CreateUsersTable</span> <span class="kw">extends</span> <span class="cl">Migration</span>
+{
+    <span class="kw">public function</span> <span class="fn">up</span>(): <span class="cl">void</span>
+    {
+        <span class="var">$this</span>-&gt;forge-&gt;<span class="fn">addField</span>([
+            <span class="str">'id'</span> <span class="cm">=&gt;</span> [
+                <span class="str">'type'</span>           <span class="cm">=&gt;</span> <span class="str">'INT'</span>,
+                <span class="str">'constraint'</span>     <span class="cm">=&gt;</span> <span class="num">11</span>,
+                <span class="str">'unsigned'</span>       <span class="cm">=&gt;</span> <span class="kw">true</span>,
+                <span class="str">'auto_increment'</span> <span class="cm">=&gt;</span> <span class="kw">true</span>,
+            ],
+            <span class="str">'name'</span> <span class="cm">=&gt;</span> [
+                <span class="str">'type'</span>       <span class="cm">=&gt;</span> <span class="str">'VARCHAR'</span>,
+                <span class="str">'constraint'</span> <span class="cm">=&gt;</span> <span class="str">'100'</span>,
+            ],
+            <span class="str">'email'</span> <span class="cm">=&gt;</span> [
+                <span class="str">'type'</span>       <span class="cm">=&gt;</span> <span class="str">'VARCHAR'</span>,
+                <span class="str">'constraint'</span> <span class="cm">=&gt;</span> <span class="str">'150'</span>,
+                <span class="str">'unique'</span>     <span class="cm">=&gt;</span> <span class="kw">true</span>,
+            ],
+            <span class="str">'password'</span> <span class="cm">=&gt;</span> [
+                <span class="str">'type'</span>       <span class="cm">=&gt;</span> <span class="str">'VARCHAR'</span>,
+                <span class="str">'constraint'</span> <span class="cm">=&gt;</span> <span class="str">'255'</span>,
+            ],
+            <span class="str">'role'</span> <span class="cm">=&gt;</span> [
+                <span class="str">'type'</span>       <span class="cm">=&gt;</span> <span class="str">'ENUM'</span>,
+                <span class="str">'constraint'</span> <span class="cm">=&gt;</span> [<span class="str">'user'</span>, <span class="str">'admin'</span>],
+                <span class="str">'default'</span>    <span class="cm">=&gt;</span> <span class="str">'user'</span>,
+            ],
+            <span class="str">'active'</span> <span class="cm">=&gt;</span> [
+                <span class="str">'type'</span>       <span class="cm">=&gt;</span> <span class="str">'TINYINT'</span>,
+                <span class="str">'constraint'</span> <span class="cm">=&gt;</span> <span class="num">1</span>,
+                <span class="str">'default'</span>    <span class="cm">=&gt;</span> <span class="num">1</span>,
+            ],
+            <span class="str">'created_at'</span> <span class="cm">=&gt;</span> [<span class="str">'type'</span><span class="cm">=&gt;</span><span class="str">'DATETIME'</span>, <span class="str">'null'</span><span class="cm">=&gt;</span><span class="kw">true</span>],
+            <span class="str">'updated_at'</span> <span class="cm">=&gt;</span> [<span class="str">'type'</span><span class="cm">=&gt;</span><span class="str">'DATETIME'</span>, <span class="str">'null'</span><span class="cm">=&gt;</span><span class="kw">true</span>],
+            <span class="str">'deleted_at'</span> <span class="cm">=&gt;</span> [<span class="str">'type'</span><span class="cm">=&gt;</span><span class="str">'DATETIME'</span>, <span class="str">'null'</span><span class="cm">=&gt;</span><span class="kw">true</span>],
+        ]);
+
+        <span class="var">$this</span>-&gt;forge-&gt;<span class="fn">addPrimaryKey</span>(<span class="str">'id'</span>);
+        <span class="var">$this</span>-&gt;forge-&gt;<span class="fn">addKey</span>(<span class="str">'email'</span>);
+        <span class="var">$this</span>-&gt;forge-&gt;<span class="fn">createTable</span>(<span class="str">'users'</span>);
+    }
+
+    <span class="kw">public function</span> <span class="fn">down</span>(): <span class="cl">void</span>
+    {
+        <span class="var">$this</span>-&gt;forge-&gt;<span class="fn">dropTable</span>(<span class="str">'users'</span>);
+    }
+}</pre>
+    </div>
+  </div>
+  <div>
+    <div class="doc-h3">Seeder Example</div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128024; PHP &mdash; Seeder</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"><span class="cm">&lt;?php</span>
+<span class="kw">namespace</span> <span class="ns">App\Database\Seeds</span>;
+<span class="kw">use</span> <span class="ns">CodeIgniter\Database\Seeder</span>;
+
+<span class="kw">class</span> <span class="cl">UserSeeder</span> <span class="kw">extends</span> <span class="cl">Seeder</span>
+{
+    <span class="kw">public function</span> <span class="fn">run</span>(): <span class="cl">void</span>
+    {
+        <span class="var">$this</span>-&gt;db-&gt;<span class="fn">table</span>(<span class="str">'users'</span>)
+            -&gt;<span class="fn">insertBatch</span>([
+            [
+                <span class="str">'name'</span>     <span class="cm">=&gt;</span> <span class="str">'Admin User'</span>,
+                <span class="str">'email'</span>    <span class="cm">=&gt;</span> <span class="str">'admin@example.com'</span>,
+                <span class="str">'password'</span> <span class="cm">=&gt;</span> <span class="fn">password_hash</span>(
+                    <span class="str">'secret'</span>, <span class="cl">PASSWORD_DEFAULT</span>),
+                <span class="str">'role'</span>     <span class="cm">=&gt;</span> <span class="str">'admin'</span>,
+            ],
+            [
+                <span class="str">'name'</span>     <span class="cm">=&gt;</span> <span class="str">'Alice Smith'</span>,
+                <span class="str">'email'</span>    <span class="cm">=&gt;</span> <span class="str">'alice@example.com'</span>,
+                <span class="str">'password'</span> <span class="cm">=&gt;</span> <span class="fn">password_hash</span>(
+                    <span class="str">'password'</span>, <span class="cl">PASSWORD_DEFAULT</span>),
+                <span class="str">'role'</span>     <span class="cm">=&gt;</span> <span class="str">'user'</span>,
+            ],
+        ]);
+
+        <span class="cm">// Call another seeder</span>
+        <span class="var">$this</span>-&gt;<span class="fn">call</span>(<span class="str">'RoleSeeder'</span>);
+    }
+}</pre>
+    </div>
+    <div class="callout success"><span class="callout-icon">&#9989;</span>
+      <div>Always write a <code>down()</code> method that exactly reverses <code>up()</code>. This ensures safe rollbacks in production deployments.</div>
+    </div>
+    <div class="callout warning"><span class="callout-icon">&#9888;&#65039;</span>
+      <div>Never edit a migration that has already been run. Create a <em>new</em> migration to alter existing tables instead.</div>
+    </div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-lang">&#128187; Terminal &mdash; Full Fresh Setup</div><button class="copy-btn" onclick="copyCode(this)">&#10138; Copy</button></div>
+      <pre class="code-body"># Complete fresh setup (drop all, migrate, seed)
+php spark migrate:fresh --seed
+
+# Check what has been migrated
+php spark migrate:status
+
+# Run in production (careful!)
+php spark migrate --env=production</pre>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<footer class="site-footer">
+  <p>&#128293; <strong style="color:var(--accent);">CodeIgniter 4</strong> &mdash; Complete Developer Guide &nbsp;&bull;&nbsp;
+  PHP 8.0+ &nbsp;&bull;&nbsp; MIT License &nbsp;&bull;&nbsp;
+  <a href="https://codeigniter.com/user_guide/index.html" target="_blank" rel="noopener">Official Docs &#8599;</a></p>
+</footer>
+</main>
+</div>
+
+<script>
+/* ── COPY CODE ────────────────────────── */
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre.code-body');
+  const text = pre.innerText;
+  const doIt = () => {
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      btn.textContent = '⎘ Copy';
+      btn.classList.remove('copied');
+    }, 2200);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(doIt).catch(() => fallback(text, doIt));
+  } else { fallback(text, doIt); }
+}
+function fallback(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+/* ── SIDEBAR TOGGLE (mobile) ─────────── */
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+menuBtn.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+});
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+});
+document.querySelectorAll('.nav-item').forEach(a => {
+  a.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+});
+
+/* ── SCROLL SPY + PROGRESS ───────────── */
+const navItems  = document.querySelectorAll('.nav-item[href]');
+const sections  = document.querySelectorAll('.doc-section[id]');
+const progBar   = document.getElementById('progress-bar');
+const backTop   = document.getElementById('backTop');
+
+function onScroll() {
+  /* progress */
+  const scrolled = window.scrollY;
+  const total    = document.documentElement.scrollHeight - window.innerHeight;
+  progBar.style.transform = `scaleX(${total > 0 ? scrolled / total : 0})`;
+
+  /* back-to-top */
+  backTop.classList.toggle('visible', scrolled > 400);
+
+  /* active nav */
+  let current = '';
+  sections.forEach(s => {
+    if (scrolled >= s.offsetTop - 80) current = s.id;
+  });
+  navItems.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+onScroll();
+</script>
+</body>
+</html>
