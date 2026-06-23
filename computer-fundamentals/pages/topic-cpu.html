@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CPU Architecture | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    /* CPU block diagram */
+    .cpu-block {
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      position: relative;
+    }
+    .cpu-block-title {
+      font-family: var(--font-display); font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      position: absolute; top: -10px; left: 14px;
+      background: var(--bg-primary); padding: 0 8px;
+    }
+    .cpu-inner-block {
+      border: 1.5px solid; border-radius: var(--radius-md);
+      padding: 12px 14px; text-align: center;
+      font-weight: 700; font-size: 0.85rem;
+      transition: all var(--transition);
+    }
+    .cpu-inner-block:hover { transform: scale(1.03); }
+
+    /* Instruction cycle */
+    .ic-step {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      margin-bottom: 6px;
+      border: 1px solid var(--border-color);
+      transition: all var(--transition);
+    }
+    .ic-step:hover { box-shadow: var(--shadow-sm); border-color: var(--step-color); }
+    .ic-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
+      flex-shrink: 0; color: #fff;
+    }
+    .ic-title { font-weight: 700; font-size: 0.9rem; }
+    .ic-desc  { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+
+    /* Register table */
+    .reg-table { width:100%; border-collapse:separate; border-spacing:0; font-size:0.84rem; }
+    .reg-table th { padding:10px 14px; background:var(--bg-primary); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; }
+    .reg-table th:first-child { border-radius:var(--radius-md) 0 0 0; }
+    .reg-table th:last-child  { border-radius:0 var(--radius-md) 0 0; }
+    .reg-table td { padding:10px 14px; border-top:1px solid var(--border-color); color:var(--text-secondary); vertical-align:top; }
+    .reg-table tr:hover td { background:rgba(59,91,219,0.03); }
+    .reg-abbr { font-family:var(--font-mono); font-weight:700; color:var(--accent-blue); }
+  </style>
+</head>
+<body data-topic-id="cpu-architecture">
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span><span>Advanced Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">CPU Architecture</span>
+    </div>
+    <div class="topic-hero-icon icon-teal" style="background:rgba(14,165,233,0.15)">
+      <i class="bi bi-cpu"></i>
+    </div>
+    <h1 class="topic-hero-title">CPU Architecture</h1>
+    <p class="topic-hero-desc">
+      Explore the brain of a computer — ALU, Control Unit, Registers, the Fetch-Decode-Execute
+      instruction cycle, clock speed, RISC vs CISC, and modern multi-core processors.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-rose"><i class="bi bi-3-circle me-1"></i>Advanced Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>15 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#cpu-diagram"><i class="bi bi-cpu"></i> CPU Block Diagram</a></li>
+              <li><a href="#alu"><i class="bi bi-calculator"></i> ALU</a></li>
+              <li><a href="#cu"><i class="bi bi-diagram-2"></i> Control Unit</a></li>
+              <li><a href="#registers"><i class="bi bi-table"></i> Registers</a></li>
+              <li><a href="#instruction-cycle"><i class="bi bi-arrow-repeat"></i> Instruction Cycle</a></li>
+              <li><a href="#risc-cisc"><i class="bi bi-arrows-collapse"></i> RISC vs CISC</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>The <strong>CPU (Central Processing Unit)</strong> is the "brain" of a computer. Every calculation, logical decision, and instruction execution happens here. The CPU sits on the <strong>motherboard</strong> and is connected to RAM, storage, and all I/O devices through buses.</p>
+            <p>A CPU is made up of three main components: the <strong>ALU</strong> (Arithmetic Logic Unit — performs calculations), the <strong>Control Unit (CU)</strong> (manages data flow and instruction execution), and <strong>Registers</strong> (tiny ultra-fast storage inside the CPU).</p>
+            <p>The CPU works in a repeating cycle called the <strong>Fetch-Decode-Execute cycle</strong> (also called the Instruction Cycle). This cycle happens billions of times per second in modern processors — that speed is measured in <strong>GHz (Gigahertz)</strong>, where 1 GHz = 1 billion cycles per second.</p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p><strong>CPU (Central Processing Unit)</strong> कंप्यूटर का "मस्तिष्क" है। हर गणना, तार्किक निर्णय और निर्देश का निष्पादन यहाँ होता है। CPU <strong>मदरबोर्ड</strong> पर होता है और बसों (Buses) के माध्यम से RAM, स्टोरेज और सभी I/O डिवाइस से जुड़ा होता है।</p>
+            <p>CPU तीन मुख्य घटकों से बना है: <strong>ALU</strong> (अरिथमेटिक लॉजिक यूनिट — गणनाएं करता है), <strong>Control Unit (CU)</strong> (डेटा प्रवाह और निर्देश निष्पादन का प्रबंधन करता है), और <strong>Registers</strong> (CPU के अंदर अति-तीव्र छोटी मेमोरी)।</p>
+            <p>CPU एक चक्र में कार्य करता है जिसे <strong>Fetch-Decode-Execute चक्र</strong> कहते हैं। यह चक्र आधुनिक प्रोसेसर में प्रति सेकंड अरबों बार होता है। यह गति <strong>GHz (गीगाहर्ट्ज)</strong> में मापी जाती है — 1 GHz = 1 अरब चक्र प्रति सेकंड।</p>
+          </div>
+        </div>
+
+        <!-- ② CPU Block Diagram -->
+        <div class="content-section reveal" id="cpu-diagram">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-cpu-fill"></i></div>
+            <div><div class="cs-title">CPU Internal Block Diagram</div><div class="cs-subtitle">How the CPU components connect</div></div>
+          </div>
+          <div class="diagram-box">
+            <p class="mb-4" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700">CPU Architecture — Internal View</p>
+            <div class="cpu-block" style="border-color:var(--accent-blue);max-width:520px;margin:0 auto;padding:24px 16px">
+              <div class="cpu-block-title" style="color:var(--accent-blue)">CPU</div>
+              <div class="row g-3 mb-3">
+                <div class="col-6">
+                  <div class="cpu-inner-block" style="border-color:var(--accent-violet);color:var(--accent-violet);background:rgba(112,72,232,0.08)">
+                    ⚙️ Control Unit<br/><span style="font-size:0.7rem;font-weight:400;color:var(--text-muted)">Manages execution</span>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="cpu-inner-block" style="border-color:var(--accent-rose);color:var(--accent-rose);background:rgba(244,63,94,0.08)">
+                    🔢 ALU<br/><span style="font-size:0.7rem;font-weight:400;color:var(--text-muted)">Math + Logic ops</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-4">
+                  <div class="cpu-inner-block" style="border-color:var(--accent-amber);color:var(--accent-amber);background:rgba(245,158,11,0.08);font-size:0.75rem;padding:8px">
+                    PC<br/><span style="font-size:0.65rem;font-weight:400;color:var(--text-muted)">Program Counter</span>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="cpu-inner-block" style="border-color:var(--accent-emerald);color:var(--accent-emerald);background:rgba(16,185,129,0.08);font-size:0.75rem;padding:8px">
+                    IR<br/><span style="font-size:0.65rem;font-weight:400;color:var(--text-muted)">Instruction Register</span>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="cpu-inner-block" style="border-color:var(--accent-teal);color:var(--accent-teal);background:rgba(14,165,233,0.08);font-size:0.75rem;padding:8px">
+                    ACC<br/><span style="font-size:0.65rem;font-weight:400;color:var(--text-muted)">Accumulator</span>
+                  </div>
+                </div>
+              </div>
+              <div class="cpu-inner-block mb-3" style="border-color:var(--accent-blue);color:var(--accent-blue);background:rgba(59,91,219,0.08)">
+                ⚡ Cache Memory (L1 / L2 / L3)
+              </div>
+              <div style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">↕ System Bus (Data Bus · Address Bus · Control Bus)</div>
+            </div>
+            <div class="row g-2 mt-3" style="max-width:520px;margin:0 auto">
+              <div class="col-4">
+                <div style="text-align:center;padding:10px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);font-size:0.78rem;font-weight:600;color:var(--text-secondary)">🧠 RAM</div>
+              </div>
+              <div class="col-4">
+                <div style="text-align:center;padding:10px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);font-size:0.78rem;font-weight:600;color:var(--text-secondary)">💾 Storage</div>
+              </div>
+              <div class="col-4">
+                <div style="text-align:center;padding:10px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);font-size:0.78rem;font-weight:600;color:var(--text-secondary)">🖥️ I/O Devices</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ ALU -->
+        <div class="content-section reveal" id="alu">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-calculator-fill"></i></div>
+            <div><div class="cs-title">ALU — Arithmetic Logic Unit</div><div class="cs-subtitle">The calculation engine of the CPU</div></div>
+          </div>
+          <div class="prose mb-3">
+            <p>The <strong>ALU</strong> performs all arithmetic and logical operations. It takes inputs from registers, performs the operation, and stores the result back in a register (typically the Accumulator).</p>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="key-note" style="border-color:var(--accent-rose);background:rgba(244,63,94,0.06);flex-direction:column;gap:6px">
+                <div style="display:flex;gap:8px;align-items:center"><i class="bi bi-plus-slash-minus" style="color:var(--accent-rose);font-size:1.1rem"></i><strong style="color:var(--accent-rose)">Arithmetic Operations</strong></div>
+                <span>Addition (+), Subtraction (−), Multiplication (×), Division (÷), Increment (++), Decrement (−−), Modulus (%)</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="key-note" style="border-color:var(--accent-violet);background:rgba(112,72,232,0.06);flex-direction:column;gap:6px">
+                <div style="display:flex;gap:8px;align-items:center"><i class="bi bi-diagram-3" style="color:var(--accent-violet);font-size:1.1rem"></i><strong style="color:var(--accent-violet)">Logical Operations</strong></div>
+                <span>AND, OR, NOT, XOR, NAND, NOR — used for comparisons and decision making in programs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ Control Unit -->
+        <div class="content-section reveal" id="cu">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-diagram-2-fill"></i></div>
+            <div><div class="cs-title">Control Unit (CU)</div><div class="cs-subtitle">The manager/director of the CPU</div></div>
+          </div>
+          <div class="prose">
+            <p>The <strong>Control Unit</strong> does not perform calculations itself. Instead, it <strong>directs and coordinates</strong> the activities of all other components. It reads instructions from memory, decodes them, and sends signals to the ALU, registers, and memory telling them what to do.</p>
+          </div>
+          <div class="d-flex flex-column gap-2 mt-3">
+            <div class="key-note"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-violet)"></i>Fetches the next instruction from RAM using the Program Counter (PC)</div>
+            <div class="key-note"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-violet)"></i>Decodes the instruction to determine what operation needs to be done</div>
+            <div class="key-note"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-violet)"></i>Sends control signals to ALU, registers, memory, and I/O devices</div>
+            <div class="key-note"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-violet)"></i>Manages the system bus — Data Bus, Address Bus, and Control Bus</div>
+          </div>
+        </div>
+
+        <!-- ⑤ Registers -->
+        <div class="content-section reveal" id="registers">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-table"></i></div>
+            <div><div class="cs-title">CPU Registers</div><div class="cs-subtitle">Ultra-fast temporary storage inside the CPU</div></div>
+          </div>
+          <div class="key-note mb-3"><i class="bi bi-info-circle-fill"></i>Registers are the <strong>fastest</strong> storage in a computer — even faster than cache. They are built directly into the CPU chip and hold data being actively processed.</div>
+          <div class="table-responsive">
+            <table class="reg-table">
+              <thead>
+                <tr>
+                  <th style="color:var(--accent-blue)">Register</th>
+                  <th style="color:var(--accent-blue)">Full Name</th>
+                  <th style="color:var(--accent-blue)">Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="reg-abbr">PC</span></td><td>Program Counter</td><td>Holds the memory address of the <em>next</em> instruction to be fetched</td></tr>
+                <tr><td><span class="reg-abbr">IR</span></td><td>Instruction Register</td><td>Holds the instruction <em>currently</em> being decoded and executed</td></tr>
+                <tr><td><span class="reg-abbr">ACC</span></td><td>Accumulator</td><td>Stores the result of ALU operations (arithmetic/logic results)</td></tr>
+                <tr><td><span class="reg-abbr">MAR</span></td><td>Memory Address Register</td><td>Holds the address in RAM where data is to be read from or written to</td></tr>
+                <tr><td><span class="reg-abbr">MDR</span></td><td>Memory Data Register</td><td>Holds the actual data being transferred to/from RAM (also called MBR)</td></tr>
+                <tr><td><span class="reg-abbr">SP</span></td><td>Stack Pointer</td><td>Points to the top of the current program stack in memory</td></tr>
+                <tr><td><span class="reg-abbr">FLAGS</span></td><td>Flag/Status Register</td><td>Stores condition flags: Zero (Z), Carry (C), Overflow (O), Sign (S)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ⑥ Instruction Cycle -->
+        <div class="content-section reveal" id="instruction-cycle">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-arrow-repeat"></i></div>
+            <div><div class="cs-title">Fetch–Decode–Execute Cycle</div><div class="cs-subtitle">How the CPU runs every instruction</div></div>
+          </div>
+          <div class="ic-step" style="--step-color:var(--accent-blue)">
+            <div class="ic-num" style="background:var(--accent-blue)">1</div>
+            <div>
+              <div class="ic-title" style="color:var(--accent-blue)">FETCH</div>
+              <div class="ic-desc">The Control Unit reads the next instruction from RAM at the address stored in the Program Counter (PC). The instruction is loaded into the Instruction Register (IR). PC is incremented to point to the next instruction.</div>
+            </div>
+          </div>
+          <div style="text-align:center;color:var(--text-muted);font-size:1.3rem;margin:2px 0">↓</div>
+          <div class="ic-step" style="--step-color:var(--accent-violet)">
+            <div class="ic-num" style="background:var(--accent-violet)">2</div>
+            <div>
+              <div class="ic-title" style="color:var(--accent-violet)">DECODE</div>
+              <div class="ic-desc">The Control Unit interprets (decodes) the instruction in IR to determine what operation is needed, which operands are required, and which registers/memory locations are involved.</div>
+            </div>
+          </div>
+          <div style="text-align:center;color:var(--text-muted);font-size:1.3rem;margin:2px 0">↓</div>
+          <div class="ic-step" style="--step-color:var(--accent-rose)">
+            <div class="ic-num" style="background:var(--accent-rose)">3</div>
+            <div>
+              <div class="ic-title" style="color:var(--accent-rose)">EXECUTE</div>
+              <div class="ic-desc">The ALU or other hardware unit performs the decoded operation. The result is stored in a register (Accumulator) or written back to RAM. Then the cycle repeats from step 1.</div>
+            </div>
+          </div>
+          <div class="key-note mt-3" style="border-color:var(--accent-amber)"><i class="bi bi-star-fill" style="color:var(--accent-amber)"></i>Some textbooks add a <strong>STORE</strong> step after Execute — writing results back to memory. The combined name is sometimes <strong>Fetch–Decode–Execute–Store</strong> or <strong>FDE cycle</strong>.</div>
+        </div>
+
+        <!-- ⑦ RISC vs CISC -->
+        <div class="content-section reveal" id="risc-cisc">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-arrows-collapse"></i></div>
+            <div><div class="cs-title">RISC vs CISC</div><div class="cs-subtitle">Two CPU design philosophies</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="vs-card" style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:22px;height:100%">
+                <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--accent-blue);margin-bottom:14px"><i class="bi bi-lightning-charge-fill me-2"></i>RISC</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;font-weight:600">Reduced Instruction Set Computer</div>
+                <div class="vs-row"><span class="vs-label">Instructions</span><span class="vs-val">Few, simple</span></div>
+                <div class="vs-row"><span class="vs-label">Execution</span><span class="vs-val">1 cycle per instruction</span></div>
+                <div class="vs-row"><span class="vs-label">Power use</span><span class="vs-val">Low (ideal for mobile)</span></div>
+                <div class="vs-row"><span class="vs-label">Speed</span><span class="vs-val">Very fast</span></div>
+                <div class="vs-row"><span class="vs-label">Examples</span><span class="vs-val">ARM (phones), Apple M-series, RISC-V</span></div>
+                <div class="vs-row"><span class="vs-label">Used in</span><span class="vs-val">Smartphones, tablets, IoT devices</span></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="vs-card" style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:22px;height:100%">
+                <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--accent-violet);margin-bottom:14px"><i class="bi bi-gear-fill me-2"></i>CISC</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;font-weight:600">Complex Instruction Set Computer</div>
+                <div class="vs-row"><span class="vs-label">Instructions</span><span class="vs-val">Many, complex</span></div>
+                <div class="vs-row"><span class="vs-label">Execution</span><span class="vs-val">Multiple cycles per instruction</span></div>
+                <div class="vs-row"><span class="vs-label">Power use</span><span class="vs-val">Higher</span></div>
+                <div class="vs-row"><span class="vs-label">Speed</span><span class="vs-val">Slower per cycle but powerful</span></div>
+                <div class="vs-row"><span class="vs-label">Examples</span><span class="vs-val">Intel x86, AMD Ryzen, Intel Core i-series</span></div>
+                <div class="vs-row"><span class="vs-label">Used in</span><span class="vs-val">Desktop PCs, laptops, servers</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑧ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>CPU speed is measured in <strong>GHz</strong>. 1 GHz = 1 billion clock cycles per second. 3.5 GHz CPU can theoretically process 3.5 billion operations per second.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Word size</strong> = amount of data CPU processes in one instruction cycle. 32-bit CPU processes 32 bits; 64-bit CPU processes 64 bits (can address more RAM).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Multi-core CPU:</strong> Dual-core = 2 CPUs on one chip, Quad-core = 4, Octa-core = 8. Each core can execute instructions independently — true parallelism.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>System Buses:</strong> Data Bus (carries data), Address Bus (carries memory addresses), Control Bus (carries control signals). Width of address bus determines max RAM addressable.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Intel invented the first commercial microprocessor — <strong>Intel 4004</strong> (1971), 4-bit, 740 KHz. Modern Intel Core i9 (2024) is 24-core, 6 GHz.</div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — CPU Architecture</div>
+          <p class="summary-text">The CPU has three main parts: <strong>ALU</strong> (arithmetic + logic operations), <strong>Control Unit</strong> (fetches, decodes, executes instructions), and <strong>Registers</strong> (PC, IR, ACC, MAR, MDR, SP, FLAGS — ultra-fast in-CPU storage). The CPU works in the <strong>Fetch→Decode→Execute cycle</strong> (FDE cycle). Speed is in <strong>GHz</strong>. <strong>RISC</strong> (ARM — simple instructions, low power, phones) vs <strong>CISC</strong> (x86/Intel — complex instructions, desktops). Multi-core CPUs (Dual/Quad/Octa-core) allow true parallel processing. Three buses: Data, Address, Control.</p>
+        </div>
+
+        <!-- Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What are the three main components of a CPU?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">1. ALU (Arithmetic Logic Unit) — performs arithmetic (+, −, ×, ÷) and logical (AND, OR, NOT) operations. 2. Control Unit (CU) — fetches instructions from memory, decodes them, and controls execution. 3. Registers — small, ultra-fast storage units inside the CPU (PC, IR, ACC, MAR, MDR).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>Explain the Fetch-Decode-Execute cycle.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">FETCH: CU reads the next instruction from RAM at the address in the Program Counter (PC); loads it into the Instruction Register (IR); PC increments. DECODE: CU interprets the instruction in IR. EXECUTE: ALU or other unit performs the operation; result stored in Accumulator or RAM. Cycle repeats.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is the role of the Program Counter (PC)?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">The Program Counter (PC) is a register that holds the memory address of the next instruction to be fetched from RAM. After each fetch, the PC is automatically incremented to point to the next instruction, keeping track of program execution sequence.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What is the difference between RISC and CISC?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">RISC (Reduced Instruction Set Computer): few simple instructions, 1 cycle per instruction, low power, fast — used in smartphones (ARM processors, Apple M1/M2). CISC (Complex Instruction Set Computer): many complex instructions, multiple cycles per instruction, higher power — used in desktops/laptops (Intel x86, AMD).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>What are the three types of system buses?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">1. Data Bus: carries actual data between CPU, RAM, and I/O devices. Width (8/16/32/64-bit) determines how much data is transferred per cycle. 2. Address Bus: carries memory addresses — its width determines the maximum RAM the CPU can address. 3. Control Bus: carries control signals (read, write, interrupt) from the Control Unit.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click an option to check your answer</div></div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. Which component of the CPU performs arithmetic and logical operations?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Control Unit</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> ALU</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Program Counter</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Cache Memory</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. The register that holds the address of the NEXT instruction is ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Accumulator (ACC)</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Instruction Register (IR)</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Program Counter (PC)</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Stack Pointer (SP)</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. 1 GHz means the CPU executes how many cycles per second?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 1 Million</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> 100 Million</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> 1 Billion</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 1 Trillion</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. ARM processors (used in smartphones) are based on which architecture?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">A</span> RISC</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> CISC</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> VLIW</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> EPIC</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. The correct order of the CPU instruction cycle is ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Execute → Fetch → Decode</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Decode → Execute → Fetch</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Fetch → Decode → Execute</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Fetch → Execute → Decode</div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i> Take Full Module Quiz
+            </a>
+          </div>
+        </div>
+
+        <div class="topic-nav reveal">
+          <a href="topic-os.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Operating System</div></div>
+          </a>
+          <a href="topic-generations.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Next Topic</div><div class="nav-title">Computer Generations</div></div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cyber Security | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    .threat-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 20px;
+      border-left: 3px solid var(--tc, var(--accent-rose));
+      transition: all var(--transition); margin-bottom: 10px;
+    }
+    .threat-card:hover { box-shadow: var(--shadow-sm); transform: translateX(4px); }
+    .threat-icon  { font-size: 1.5rem; margin-right: 12px; flex-shrink: 0; }
+    .threat-name  { font-weight: 700; font-size: 0.92rem; margin-bottom: 3px; }
+    .threat-desc  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; }
+    .threat-ex    { font-size: 0.72rem; color: var(--text-muted); margin-top: 5px; }
+
+    /* Encryption visual */
+    .enc-flow {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .enc-box {
+      padding: 14px 18px; border-radius: var(--radius-md);
+      text-align: center; font-family: var(--font-mono);
+      font-weight: 700; font-size: 0.85rem; flex: 1; min-width: 120px;
+    }
+    .enc-arrow { font-size: 1.3rem; color: var(--text-muted); flex-shrink: 0; }
+
+    /* CIA triad */
+    .cia-card {
+      background: var(--bg-primary); border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl); padding: 28px; text-align: center;
+      transition: all var(--transition); height: 100%;
+    }
+    .cia-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+    .cia-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+    .cia-name { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
+    .cia-desc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; }
+  </style>
+</head>
+<body data-topic-id="cyber-security">
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Advanced Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Cyber Security</span>
+    </div>
+    <div class="topic-hero-icon icon-rose" style="background:rgba(244,63,94,0.15)">
+      <i class="bi bi-shield-lock-fill"></i>
+    </div>
+    <h1 class="topic-hero-title">Cyber Security</h1>
+    <p class="topic-hero-desc">
+      Learn to protect digital systems — CIA triad, common threats (malware, phishing,
+      ransomware), encryption (symmetric/asymmetric), firewalls, and ethical hacking basics.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-rose"><i class="bi bi-3-circle me-1"></i>Advanced Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>16 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#cia"><i class="bi bi-shield"></i> CIA Triad</a></li>
+              <li><a href="#threats"><i class="bi bi-bug"></i> Cyber Threats</a></li>
+              <li><a href="#encryption"><i class="bi bi-lock"></i> Encryption</a></li>
+              <li><a href="#firewall"><i class="bi bi-bricks"></i> Firewall &amp; IDS</a></li>
+              <li><a href="#hacking"><i class="bi bi-person-badge"></i> Ethical Hacking</a></li>
+              <li><a href="#best-practices"><i class="bi bi-check-circle"></i> Best Practices</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+          <div class="lang-content visible prose" data-lang="en">
+            <p><strong>Cyber Security</strong> is the practice of protecting computers, servers, mobile devices, networks, and data from digital attacks, unauthorized access, damage, or theft. As the world becomes more connected, cyber threats are one of the biggest risks facing governments, businesses, and individuals.</p>
+            <p>The foundation of cyber security is the <strong>CIA Triad</strong>: <strong>Confidentiality</strong> (only authorized people can access data), <strong>Integrity</strong> (data is accurate and unaltered), and <strong>Availability</strong> (systems are accessible when needed). Every security measure exists to protect one or more of these three properties.</p>
+            <p>Key areas include: threat prevention (firewalls, antivirus), detection (IDS/IPS), encryption (protecting data in transit and at rest), authentication (passwords, 2FA, biometrics), and incident response. India's nodal cyber security agency is <strong>CERT-In</strong> (Indian Computer Emergency Response Team).</p>
+          </div>
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p><strong>साइबर सुरक्षा</strong> कंप्यूटर, सर्वर, मोबाइल डिवाइस, नेटवर्क और डेटा को डिजिटल हमलों, अनधिकृत पहुंच, क्षति या चोरी से बचाने का अभ्यास है। जैसे-जैसे दुनिया अधिक जुड़ी होती जा रही है, साइबर खतरे सरकारों, व्यवसायों और व्यक्तियों के लिए सबसे बड़े जोखिमों में से एक हैं।</p>
+            <p>साइबर सुरक्षा की नींव <strong>CIA त्रय</strong> है: <strong>गोपनीयता</strong> (केवल अधिकृत लोग डेटा तक पहुंच सकते हैं), <strong>अखंडता</strong> (डेटा सटीक और अपरिवर्तित है), और <strong>उपलब्धता</strong> (जरूरत पड़ने पर सिस्टम सुलभ है)। भारत की नोडल साइबर सुरक्षा एजेंसी <strong>CERT-In</strong> है।</p>
+          </div>
+        </div>
+
+        <!-- ② CIA Triad -->
+        <div class="content-section reveal" id="cia">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-shield-fill-check"></i></div>
+            <div><div class="cs-title">The CIA Triad — Core Security Goals</div><div class="cs-subtitle">Every security control protects one or more of these</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="cia-card">
+                <span class="cia-icon">🔒</span>
+                <div class="cia-name" style="color:var(--accent-blue)">Confidentiality</div>
+                <div class="cia-desc">Only authorized users can access sensitive data. Achieved through: encryption, access controls, passwords, authentication, and need-to-know policies.</div>
+                <div class="key-note mt-2" style="padding:6px 10px;font-size:0.72rem;border-color:var(--accent-blue)"><i class="bi bi-shield-check" style="color:var(--accent-blue)"></i> Violated by: data breaches, unauthorized access, eavesdropping</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="cia-card">
+                <span class="cia-icon">✅</span>
+                <div class="cia-name" style="color:var(--accent-emerald)">Integrity</div>
+                <div class="cia-desc">Data is accurate, complete, and unaltered. Only authorized users can modify it. Achieved through: hashing, digital signatures, checksums, audit logs.</div>
+                <div class="key-note mt-2" style="padding:6px 10px;font-size:0.72rem;border-color:var(--accent-emerald)"><i class="bi bi-shield-check" style="color:var(--accent-emerald)"></i> Violated by: man-in-the-middle attacks, data tampering, SQL injection</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="cia-card">
+                <span class="cia-icon">⚡</span>
+                <div class="cia-name" style="color:var(--accent-amber)">Availability</div>
+                <div class="cia-desc">Systems, services, and data are accessible to authorized users when needed. Achieved through: redundancy, backups, DDoS protection, load balancing, disaster recovery.</div>
+                <div class="key-note mt-2" style="padding:6px 10px;font-size:0.72rem;border-color:var(--accent-amber)"><i class="bi bi-shield-check" style="color:var(--accent-amber)"></i> Violated by: DDoS attacks, hardware failure, ransomware</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ Cyber Threats -->
+        <div class="content-section reveal" id="threats">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-bug-fill"></i></div>
+            <div><div class="cs-title">Common Cyber Threats</div><div class="cs-subtitle">Know your enemy to defend against it</div></div>
+          </div>
+
+          <div class="threat-card" style="--tc:var(--accent-rose)">
+            <div class="d-flex align-items-start gap-3">
+              <span class="threat-icon">🦠</span>
+              <div>
+                <div class="threat-name" style="color:var(--accent-rose)">Malware</div>
+                <div class="threat-desc">Malicious software designed to harm, disrupt, or gain unauthorized access. Umbrella term covering: Virus (attaches to files, spreads), Worm (self-replicates across network), Trojan (disguised as legitimate software), Spyware (steals data silently), Adware (unwanted ads).</div>
+                <div class="threat-ex">🛡️ Prevention: Antivirus, OS updates, avoid unknown downloads</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="threat-card" style="--tc:var(--accent-amber)">
+            <div class="d-flex align-items-start gap-3">
+              <span class="threat-icon">🎣</span>
+              <div>
+                <div class="threat-name" style="color:var(--accent-amber)">Phishing</div>
+                <div class="threat-desc">Fraudulent emails/messages/websites that trick users into revealing credentials, personal info, or installing malware. Spear phishing = targeted at specific individuals. Smishing = via SMS. Vishing = via voice call. One of the most common attack vectors worldwide.</div>
+                <div class="threat-ex">🛡️ Prevention: Check sender email carefully, never click suspicious links, use 2FA</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="threat-card" style="--tc:var(--accent-violet)">
+            <div class="d-flex align-items-start gap-3">
+              <span class="threat-icon">🔐</span>
+              <div>
+                <div class="threat-name" style="color:var(--accent-violet)">Ransomware</div>
+                <div class="threat-desc">Malware that encrypts the victim's files and demands a ransom (usually cryptocurrency) for the decryption key. Famous attacks: WannaCry (2017, affected 230,000 computers), Petya/NotPetya (2017). Can cripple hospitals, governments, and businesses.</div>
+                <div class="threat-ex">🛡️ Prevention: Regular offline backups, patched OS, email filtering</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="threat-card" style="--tc:var(--accent-rose)">
+            <div class="d-flex align-items-start gap-3">
+              <span class="threat-icon">💥</span>
+              <div>
+                <div class="threat-name" style="color:var(--accent-rose)">DDoS Attack</div>
+                <div class="threat-desc"><strong>Distributed Denial of Service</strong> — floods a server/network with massive traffic from thousands of compromised devices (botnet) until it crashes and becomes unavailable to legitimate users. Violates Availability.</div>
+                <div class="threat-ex">🛡️ Prevention: CDN, rate limiting, DDoS protection services (Cloudflare)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="threat-card" style="--tc:var(--accent-teal)">
+            <div class="d-flex align-items-start gap-3">
+              <span class="threat-icon">🕵️</span>
+              <div>
+                <div class="threat-name" style="color:var(--accent-teal)">Man-in-the-Middle (MitM)</div>
+                <div class="threat-desc">Attacker secretly intercepts and potentially alters communication between two parties who think they are communicating directly. Example: Attacker on public Wi-Fi intercepts your login credentials. Violates both Confidentiality and Integrity.</div>
+                <div class="threat-ex">🛡️ Prevention: HTTPS, VPN, avoid unsecured public Wi-Fi</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="threat-card" style="--tc:var(--accent-blue)">
+            <div class="d-flex align-items-start gap-3">
+              <span class="threat-icon">💉</span>
+              <div>
+                <div class="threat-name" style="color:var(--accent-blue)">SQL Injection</div>
+                <div class="threat-desc">Attacker inserts malicious SQL code into a web form input to manipulate the backend database — bypass login, steal data, drop tables. Example: entering <code style="color:var(--accent-rose)">' OR '1'='1</code> as username to bypass authentication.</div>
+                <div class="threat-ex">🛡️ Prevention: Parameterized queries, prepared statements, input validation</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="threat-card" style="--tc:#64748B">
+            <div class="d-flex align-items-start gap-3">
+              <span class="threat-icon">🌐</span>
+              <div>
+                <div class="threat-name" style="color:var(--text-secondary)">XSS — Cross-Site Scripting</div>
+                <div class="threat-desc">Attacker injects malicious JavaScript into a trusted website that executes in victims' browsers — can steal cookies, session tokens, redirect users. Very common in web apps.</div>
+                <div class="threat-ex">🛡️ Prevention: Input sanitization, Content Security Policy (CSP) headers, output encoding</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ Encryption -->
+        <div class="content-section reveal" id="encryption">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-lock-fill"></i></div>
+            <div><div class="cs-title">Encryption</div><div class="cs-subtitle">Converting data into unreadable form to protect it</div></div>
+          </div>
+
+          <div class="diagram-box mb-4">
+            <p class="mb-3" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:0.08em">Encryption Process</p>
+            <div class="enc-flow">
+              <div class="enc-box" style="background:rgba(16,185,129,0.1);color:var(--accent-emerald);border:1px solid rgba(16,185,129,0.3)">
+                📄 Plaintext<br/><span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)">"Hello World"</span>
+              </div>
+              <span class="enc-arrow">+🔑</span>
+              <div class="enc-box" style="background:rgba(59,91,219,0.1);color:var(--accent-blue);border:1px solid rgba(59,91,219,0.3)">
+                ⚙️ Encryption<br/><span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)">Algorithm + Key</span>
+              </div>
+              <span class="enc-arrow">→</span>
+              <div class="enc-box" style="background:rgba(244,63,94,0.1);color:var(--accent-rose);border:1px solid rgba(244,63,94,0.3)">
+                🔒 Ciphertext<br/><span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)">"X7k#mP9@qR"</span>
+              </div>
+              <span class="enc-arrow">🔑→</span>
+              <div class="enc-box" style="background:rgba(16,185,129,0.1);color:var(--accent-emerald);border:1px solid rgba(16,185,129,0.3)">
+                📄 Plaintext<br/><span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)">"Hello World"</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:22px;height:100%">
+                <div style="font-family:var(--font-display);font-weight:700;color:var(--accent-blue);font-size:0.95rem;margin-bottom:4px">🔑 Symmetric Encryption</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:700;margin-bottom:12px">Same key for encrypt &amp; decrypt</div>
+                <div style="font-size:0.83rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px">One secret key shared between sender and receiver. Very fast — suitable for encrypting large amounts of data. Problem: securely sharing the key.</div>
+                <div class="key-note" style="padding:6px 10px;font-size:0.75rem;border-color:var(--accent-blue)"><i class="bi bi-info-circle" style="color:var(--accent-blue)"></i> Algorithms: AES (Advanced Encryption Standard — most widely used), DES (old), 3DES, RC4</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:22px;height:100%">
+                <div style="font-family:var(--font-display);font-weight:700;color:var(--accent-violet);font-size:0.95rem;margin-bottom:4px">🔑🔓 Asymmetric Encryption</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:700;margin-bottom:12px">Public key + Private key pair</div>
+                <div style="font-size:0.83rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px">Two mathematically linked keys: Public key (anyone can use to encrypt) and Private key (only owner uses to decrypt). Solves key distribution problem. Slower than symmetric.</div>
+                <div class="key-note" style="padding:6px 10px;font-size:0.75rem;border-color:var(--accent-violet)"><i class="bi bi-info-circle" style="color:var(--accent-violet)"></i> Algorithms: RSA (most common), ECC (Elliptic Curve), DSA. Used in: SSL/TLS, digital signatures, HTTPS</div>
+              </div>
+            </div>
+          </div>
+          <div class="key-note mt-3" style="border-color:var(--accent-emerald)"><i class="bi bi-info-circle-fill" style="color:var(--accent-emerald)"></i><strong>Hashing</strong> is NOT encryption — it is a one-way function (MD5, SHA-256) that converts data into a fixed-size digest. Used for password storage, file integrity checks. Cannot be reversed.</div>
+        </div>
+
+        <!-- ⑤ Firewall & IDS -->
+        <div class="content-section reveal" id="firewall">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-bricks"></i></div>
+            <div><div class="cs-title">Firewall, IDS &amp; IPS</div><div class="cs-subtitle">Your network's security gatekeepers</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box" style="background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.3)">
+              <div class="example-icon">🧱</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-amber)">Firewall</div>
+                <p class="example-text">A network security device (hardware or software) that monitors and filters incoming/outgoing network traffic based on predefined security rules (ACL — Access Control List). Acts as a barrier between trusted internal network and untrusted external networks. Types: Packet Filter, Stateful Inspection, Application-Layer (WAF — Web Application Firewall), Next-Gen Firewall (NGFW).</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(59,91,219,0.06);border-color:rgba(59,91,219,0.3)">
+              <div class="example-icon">🔍</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-blue)">IDS — Intrusion Detection System</div>
+                <p class="example-text">Monitors network traffic for suspicious activity and known attack patterns, then <strong>alerts</strong> administrators. <em>Passive</em> — detects and reports but does NOT block traffic automatically. Signature-based (known threats) or anomaly-based (deviation from baseline).</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.3)">
+              <div class="example-icon">🛡️</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-emerald)">IPS — Intrusion Prevention System</div>
+                <p class="example-text">Like IDS but <strong>active</strong> — it detects AND automatically blocks malicious traffic in real time. Sits inline in the network path. Can drop packets, reset connections, and block IP addresses. More advanced than a firewall alone.</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(112,72,232,0.06);border-color:rgba(112,72,232,0.3)">
+              <div class="example-icon">🌐</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-violet)">VPN — Virtual Private Network</div>
+                <p class="example-text">Creates an encrypted "tunnel" over the internet, allowing secure remote access to a private network. Hides your IP address and encrypts all traffic. Uses protocols: OpenVPN, IPSec, WireGuard. Used by: corporate remote workers, privacy-conscious users, bypassing geo-restrictions.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ Ethical Hacking -->
+        <div class="content-section reveal" id="hacking">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-person-badge-fill"></i></div>
+            <div><div class="cs-title">Ethical Hacking &amp; Hacker Types</div><div class="cs-subtitle">Using hacking skills for defence</div></div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:var(--radius-lg);padding:18px;text-align:center;height:100%">
+                <div style="font-size:2rem;margin-bottom:8px">⚪</div>
+                <div style="font-weight:700;color:var(--accent-emerald);margin-bottom:6px">White Hat Hacker</div>
+                <div style="font-size:0.8rem;color:var(--text-secondary)">Ethical hackers. Use hacking skills with permission to find vulnerabilities and improve security. Also called Penetration Testers. CEH (Certified Ethical Hacker) certified professionals.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div style="background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.3);border-radius:var(--radius-lg);padding:18px;text-align:center;height:100%">
+                <div style="font-size:2rem;margin-bottom:8px">⚫</div>
+                <div style="font-weight:700;color:var(--accent-rose);margin-bottom:6px">Black Hat Hacker</div>
+                <div style="font-size:0.8rem;color:var(--text-secondary)">Malicious hackers. Break into systems without permission for personal gain, data theft, disruption, or financial fraud. Criminal activity — illegal worldwide.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div style="background:rgba(100,116,139,0.08);border:1px solid rgba(100,116,139,0.3);border-radius:var(--radius-lg);padding:18px;text-align:center;height:100%">
+                <div style="font-size:2rem;margin-bottom:8px">🩶</div>
+                <div style="font-weight:700;color:var(--text-secondary);margin-bottom:6px">Grey Hat Hacker</div>
+                <div style="font-size:0.8rem;color:var(--text-secondary)">Between white and black hat. May hack without permission but reports the vulnerability to the owner (sometimes for a fee). Intent is not purely malicious but still unauthorized.</div>
+              </div>
+            </div>
+          </div>
+          <div class="key-note" style="border-color:var(--accent-teal)"><i class="bi bi-info-circle-fill" style="color:var(--accent-teal)"></i><strong>Penetration Testing (Pen Test)</strong> phases: Reconnaissance → Scanning → Gaining Access → Maintaining Access → Covering Tracks. Tools: Kali Linux, Metasploit, Nmap, Wireshark, Burp Suite.</div>
+        </div>
+
+        <!-- ⑦ Best Practices -->
+        <div class="content-section reveal" id="best-practices">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-check-circle-fill"></i></div>
+            <div><div class="cs-title">Cyber Security Best Practices</div><div class="cs-subtitle">Essential habits for everyone</div></div>
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6"><div class="key-note" style="border-color:var(--accent-emerald)"><i class="bi bi-check-circle-fill" style="color:var(--accent-emerald)"></i><div><strong>Strong Passwords</strong>: Min 12 chars, mix of uppercase, lowercase, numbers, symbols. Never reuse passwords. Use a Password Manager (Bitwarden, 1Password).</div></div></div>
+            <div class="col-sm-6"><div class="key-note" style="border-color:var(--accent-blue)"><i class="bi bi-phone-fill" style="color:var(--accent-blue)"></i><div><strong>Two-Factor Authentication (2FA)</strong>: Even if password is stolen, attacker needs a second factor (OTP, authenticator app). Enable on all important accounts.</div></div></div>
+            <div class="col-sm-6"><div class="key-note" style="border-color:var(--accent-violet)"><i class="bi bi-cloud-arrow-up-fill" style="color:var(--accent-violet)"></i><div><strong>Regular Backups</strong>: Follow 3-2-1 rule: 3 copies, 2 different media, 1 offsite/cloud. Protects against ransomware and hardware failure.</div></div></div>
+            <div class="col-sm-6"><div class="key-note" style="border-color:var(--accent-amber)"><i class="bi bi-patch-check-fill" style="color:var(--accent-amber)"></i><div><strong>Keep Software Updated</strong>: OS, browser, apps — patches fix known vulnerabilities. Enable auto-updates. Outdated software = open door for attackers.</div></div></div>
+            <div class="col-sm-6"><div class="key-note" style="border-color:var(--accent-teal)"><i class="bi bi-envelope-slash-fill" style="color:var(--accent-teal)"></i><div><strong>Email Safety</strong>: Never click suspicious links. Verify sender identity. Attachments can contain malware. Legitimate organizations never ask for passwords via email.</div></div></div>
+            <div class="col-sm-6"><div class="key-note" style="border-color:var(--accent-rose)"><i class="bi bi-wifi-off" style="color:var(--accent-rose)"></i><div><strong>Avoid Public Wi-Fi</strong> for sensitive tasks. Use a VPN if necessary. Attackers can set up evil twin hotspots with the same name as a legitimate network.</div></div></div>
+          </div>
+        </div>
+
+        <!-- Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>CIA Triad: <strong>C</strong>onfidentiality + <strong>I</strong>ntegrity + <strong>A</strong>vailability — the three core security goals. DAD (Disclosure, Alteration, Denial) is the opposite/threat.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>AES</strong> (Advanced Encryption Standard) = most widely used symmetric encryption. Key sizes: 128, 192, 256 bits. Replaced DES (broken).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>RSA</strong> = most common asymmetric algorithm. Based on difficulty of factoring large prime numbers. Used in HTTPS, digital certificates, SSH.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>SSL/TLS</strong>: SSL is old/deprecated; TLS (1.2, 1.3) is current. Both provide HTTPS encryption. TLS 1.3 is the latest and most secure.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>India's IT Act: <strong>IT Act 2000</strong> (and 2008 amendment) — governs cyber crimes in India. Section 66 (hacking), Section 67 (obscene material), Section 43 (damage to computers).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Social Engineering</strong> = manipulating humans (not computers) to gain unauthorized access. Most common form = Phishing. "The human is always the weakest link."</div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Cyber Security</div>
+          <p class="summary-text"><strong>CIA Triad</strong>: Confidentiality (encryption, access control), Integrity (hashing, digital signatures), Availability (backups, DDoS protection). Threats: <strong>Malware</strong> (virus/worm/trojan), <strong>Phishing</strong> (fake emails), <strong>Ransomware</strong> (encrypts files for ransom), <strong>DDoS</strong> (overwhelms server), <strong>MitM</strong> (intercepts communication), <strong>SQL Injection</strong>, <strong>XSS</strong>. Encryption: <strong>Symmetric</strong> (AES — one key, fast), <strong>Asymmetric</strong> (RSA — public+private key pair, HTTPS). Hashing: MD5, SHA-256 (one-way, cannot decrypt). <strong>Firewall</strong> (filters traffic), <strong>IDS</strong> (detects, alerts), <strong>IPS</strong> (detects + blocks), <strong>VPN</strong> (encrypted tunnel). Hacker types: White hat (ethical), Black hat (malicious), Grey hat. India's IT Act 2000 governs cybercrime.</p>
+        </div>
+
+        <!-- Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is the CIA Triad in cyber security?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">CIA Triad = Confidentiality (only authorized users access data — via encryption, passwords), Integrity (data is accurate and unaltered — via hashing, digital signatures), Availability (systems accessible when needed — via backups, redundancy, DDoS protection). Every security control protects one or more of these three properties.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What is the difference between symmetric and asymmetric encryption?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Symmetric: one shared secret key used for both encryption and decryption. Fast, good for bulk data. Problem: securely sharing the key. Algorithm: AES. Asymmetric: a key pair — public key (anyone can encrypt) + private key (only owner decrypts). Solves key sharing problem. Slower. Algorithm: RSA. Used in HTTPS, digital signatures, SSL/TLS.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is a firewall and how does it differ from an IDS?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Firewall: network security device that monitors and filters traffic based on rules (ACL) — blocks or allows traffic. Preventive. IDS (Intrusion Detection System): monitors traffic for suspicious patterns and ALERTS administrators — passive, does not block. IPS (Intrusion Prevention System): like IDS but actively blocks threats in real time. Firewall = gatekeeper; IDS = alarm; IPS = security guard.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What is phishing? How is it different from spear phishing?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Phishing: mass fraudulent emails/messages impersonating legitimate organizations to trick users into revealing credentials or installing malware. Spear Phishing: targeted phishing attack aimed at a specific individual or organization using personalized information — much more convincing and dangerous. Other variants: Smishing (SMS), Vishing (voice calls), Whaling (targets executives).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>What is the difference between hashing and encryption?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Encryption: two-way process — data can be encrypted (with key) and decrypted (with key). Designed for data confidentiality during transmission. Algorithms: AES, RSA. Hashing: one-way function — converts data to a fixed-size digest (hash). Cannot be reversed. Used for password storage and file integrity verification. Algorithms: MD5 (broken), SHA-256, SHA-3.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click to check your answer</div></div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. The CIA triad in cyber security stands for ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Central Intelligence Agency</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Confidentiality, Integrity, Availability</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Control, Integrity, Authorization</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Confidentiality, Identity, Access</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. Which encryption algorithm is most widely used for symmetric encryption?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> RSA</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> AES</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> MD5</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> SHA-256</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Ransomware attacks primarily violate which CIA property?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Confidentiality</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Integrity</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Availability</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Authentication</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. An ethical hacker is also called a ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Black Hat Hacker</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Grey Hat Hacker</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> White Hat Hacker / Pen Tester</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Script Kiddie</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. Hashing is different from encryption because it is ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Faster</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Uses two keys</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> A one-way function — cannot be reversed</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Only used for images</div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex"><i class="bi bi-collection-play-fill"></i> Take Full Module Quiz</a>
+          </div>
+        </div>
+
+        <div class="topic-nav reveal">
+          <a href="topic-internet.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Internet &amp; Web Technologies</div></div>
+          </a>
+          <a href="quiz.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Test Your Knowledge</div><div class="nav-title">Take the Full Quiz →</div></div>
+            <i class="bi bi-patch-question-fill" style="font-size:1.2rem;color:var(--accent-violet)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

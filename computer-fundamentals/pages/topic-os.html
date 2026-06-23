@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Operating System | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    /* OS Layer Diagram */
+    .os-layer {
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      transition: all var(--transition);
+      cursor: default;
+    }
+    .os-layer:hover { transform: scaleX(1.015); filter: brightness(1.1); }
+
+    /* Process state diagram */
+    .process-states {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .p-state {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.78rem;
+      text-align: center; gap: 4px;
+      border: 2px solid;
+      transition: all var(--transition);
+    }
+    .p-state:hover { transform: scale(1.08); }
+    .p-arrow-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 2px;
+      padding: 0 6px;
+    }
+    .p-arrow { font-size: 1.1rem; color: var(--text-muted); }
+    .p-arrow-label { font-size: 0.6rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+
+    /* OS type cards */
+    .os-type-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--card-color, var(--accent-blue));
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      transition: all var(--transition);
+    }
+    .os-type-card:hover { background: var(--bg-card); box-shadow: var(--shadow-sm); }
+    .os-type-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
+    .os-type-desc  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; }
+    .os-examples   { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .os-ex-badge {
+      font-size: 0.68rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 100px; background: var(--bg-card);
+      border: 1px solid var(--border-color); color: var(--text-muted);
+    }
+  </style>
+</head>
+<body data-topic-id="operating-system">
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Advanced Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Operating System</span>
+    </div>
+    <div class="topic-hero-icon icon-violet" style="background:rgba(112,72,232,0.15)">
+      <i class="bi bi-windows"></i>
+    </div>
+    <h1 class="topic-hero-title">Operating System</h1>
+    <p class="topic-hero-desc">
+      Learn what an OS does, its types (Batch, Time-Sharing, Real-Time, Distributed),
+      key functions — process management, memory management, file systems — and real-world examples.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-rose"><i class="bi bi-3-circle me-1"></i>Advanced Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>16 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- SIDEBAR -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#os-layers"><i class="bi bi-layers"></i> OS Layer Diagram</a></li>
+              <li><a href="#os-types"><i class="bi bi-grid"></i> Types of OS</a></li>
+              <li><a href="#functions"><i class="bi bi-gear"></i> Functions of OS</a></li>
+              <li><a href="#process"><i class="bi bi-diagram-2"></i> Process Management</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>An <strong>Operating System (OS)</strong> is the most important software on a computer. It acts as an <strong>interface (bridge) between the user and the hardware</strong>. Without an OS, you cannot use a computer — you would have to write machine-level code for every action.</p>
+            <p>The OS manages all hardware resources — CPU time, memory, storage, and I/O devices — and ensures that multiple programs can run at the same time without conflicts. It also provides a user interface (UI) so that people can interact with the computer easily, either through a <strong>GUI</strong> (Graphical User Interface, like Windows) or a <strong>CLI</strong> (Command Line Interface, like Linux Terminal).</p>
+            <p>Examples of popular operating systems: <strong>Windows 11</strong> (Microsoft), <strong>macOS Ventura</strong> (Apple), <strong>Ubuntu/Kali Linux</strong> (open-source), <strong>Android</strong> (Google, for phones), <strong>iOS</strong> (Apple, for iPhone).</p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p><strong>ऑपरेटिंग सिस्टम (OS)</strong> कंप्यूटर का सबसे महत्वपूर्ण सॉफ्टवेयर है। यह <strong>उपयोगकर्ता और हार्डवेयर के बीच एक इंटरफेस (सेतु)</strong> के रूप में कार्य करता है। OS के बिना, आप कंप्यूटर का उपयोग नहीं कर सकते।</p>
+            <p>OS सभी हार्डवेयर संसाधनों का प्रबंधन करता है — CPU समय, मेमोरी, स्टोरेज और I/O डिवाइस — और यह सुनिश्चित करता है कि कई प्रोग्राम एक साथ बिना किसी टकराव के चल सकें। यह उपयोगकर्ता इंटरफेस (UI) भी प्रदान करता है — <strong>GUI</strong> (ग्राफिकल यूजर इंटरफेस, जैसे Windows) या <strong>CLI</strong> (कमांड लाइन इंटरफेस, जैसे Linux Terminal)।</p>
+            <p>लोकप्रिय ऑपरेटिंग सिस्टम के उदाहरण: <strong>Windows 11</strong> (Microsoft), <strong>macOS</strong> (Apple), <strong>Ubuntu Linux</strong> (ओपन-सोर्स), <strong>Android</strong> (Google, मोबाइल के लिए), <strong>iOS</strong> (Apple, iPhone के लिए)।</p>
+          </div>
+        </div>
+
+        <!-- ② OS Layer Diagram -->
+        <div class="content-section reveal" id="os-layers">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-layers-fill"></i></div>
+            <div><div class="cs-title">Computer System — Layer Diagram</div><div class="cs-subtitle">Where the OS sits in the computer architecture</div></div>
+          </div>
+          <div class="diagram-box">
+            <p class="mb-4" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700">Computer System Layers (Top = User, Bottom = Hardware)</p>
+            <div style="max-width:480px;margin:0 auto">
+              <div class="os-layer" style="background:rgba(59,91,219,0.15);color:var(--accent-blue);border:1px solid rgba(59,91,219,0.3)">
+                👤 &nbsp; User / End User
+              </div>
+              <div style="text-align:center;color:var(--text-muted);font-size:1.2rem;margin:2px 0">↕</div>
+              <div class="os-layer" style="background:rgba(112,72,232,0.15);color:var(--accent-violet);border:1px solid rgba(112,72,232,0.3)">
+                📱 &nbsp; Application Software &nbsp; (MS Word, Chrome, VLC)
+              </div>
+              <div style="text-align:center;color:var(--text-muted);font-size:1.2rem;margin:2px 0">↕</div>
+              <div class="os-layer" style="background:rgba(245,158,11,0.18);color:var(--accent-amber);border:2px solid rgba(245,158,11,0.5);font-size:1rem">
+                ⚙️ &nbsp; OPERATING SYSTEM &nbsp; (Windows / Linux / macOS)
+              </div>
+              <div style="text-align:center;color:var(--text-muted);font-size:1.2rem;margin:2px 0">↕</div>
+              <div class="os-layer" style="background:rgba(14,165,233,0.12);color:var(--accent-teal);border:1px solid rgba(14,165,233,0.3)">
+                🔧 &nbsp; Device Drivers &amp; Firmware (BIOS/UEFI)
+              </div>
+              <div style="text-align:center;color:var(--text-muted);font-size:1.2rem;margin:2px 0">↕</div>
+              <div class="os-layer" style="background:rgba(16,185,129,0.12);color:var(--accent-emerald);border:1px solid rgba(16,185,129,0.3)">
+                💻 &nbsp; Hardware &nbsp; (CPU · RAM · HDD · I/O Devices)
+              </div>
+            </div>
+            <p class="mt-4 mb-0" style="font-size:0.78rem;color:var(--text-muted)"><i class="bi bi-info-circle me-1"></i>The OS sits between software and hardware — it translates high-level app commands into hardware instructions.</p>
+          </div>
+        </div>
+
+        <!-- ③ Types of OS -->
+        <div class="content-section reveal" id="os-types">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div><div class="cs-title">Types of Operating Systems</div><div class="cs-subtitle">Classified by usage and working method</div></div>
+          </div>
+
+          <div class="os-type-card" style="--card-color:var(--accent-blue)">
+            <div class="os-type-title" style="color:var(--accent-blue)">1. Batch Operating System</div>
+            <div class="os-type-desc">Jobs are collected in groups (batches) and processed one by one without user interaction. No real-time feedback. Used in early computers and still in payroll, bank statements.</div>
+            <div class="os-examples"><span class="os-ex-badge">IBM OS/360</span><span class="os-ex-badge">EXEC-8</span><span class="os-ex-badge">Bank payroll</span></div>
+          </div>
+
+          <div class="os-type-card" style="--card-color:var(--accent-violet)">
+            <div class="os-type-title" style="color:var(--accent-violet)">2. Time-Sharing OS (Multitasking)</div>
+            <div class="os-type-desc">CPU time is divided into small slices (quantum) given to each user/process in turns. Gives the illusion that all users are served simultaneously. Also called Multitasking OS.</div>
+            <div class="os-examples"><span class="os-ex-badge">Windows</span><span class="os-ex-badge">UNIX</span><span class="os-ex-badge">Linux</span><span class="os-ex-badge">macOS</span></div>
+          </div>
+
+          <div class="os-type-card" style="--card-color:var(--accent-rose)">
+            <div class="os-type-title" style="color:var(--accent-rose)">3. Real-Time OS (RTOS)</div>
+            <div class="os-type-desc">Processes data and responds within a guaranteed time limit. Critical for systems where a delay can cause failure. Two types: Hard RTOS (strict deadlines) and Soft RTOS (flexible).</div>
+            <div class="os-examples"><span class="os-ex-badge">VxWorks</span><span class="os-ex-badge">FreeRTOS</span><span class="os-ex-badge">Aircraft control</span><span class="os-ex-badge">Medical devices</span></div>
+          </div>
+
+          <div class="os-type-card" style="--card-color:var(--accent-emerald)">
+            <div class="os-type-title" style="color:var(--accent-emerald)">4. Distributed OS</div>
+            <div class="os-type-desc">Manages a group of independent computers that appear as one unified system to the user. Resources are shared across the network. Used in cloud computing and supercomputers.</div>
+            <div class="os-examples"><span class="os-ex-badge">Google Cloud OS</span><span class="os-ex-badge">LOCUS</span><span class="os-ex-badge">Amoeba</span></div>
+          </div>
+
+          <div class="os-type-card" style="--card-color:var(--accent-amber)">
+            <div class="os-type-title" style="color:var(--accent-amber)">5. Multi-User OS</div>
+            <div class="os-type-desc">Allows multiple users to access the same computer system simultaneously, each with their own session. Used in mainframes, university servers, and corporate systems.</div>
+            <div class="os-examples"><span class="os-ex-badge">UNIX</span><span class="os-ex-badge">Linux Server</span><span class="os-ex-badge">Windows Server</span></div>
+          </div>
+
+          <div class="os-type-card" style="--card-color:var(--accent-teal)">
+            <div class="os-type-title" style="color:var(--accent-teal)">6. Mobile OS</div>
+            <div class="os-type-desc">Designed specifically for smartphones and tablets. Optimized for touch input, battery life, and mobile connectivity. App stores and notifications are key features.</div>
+            <div class="os-examples"><span class="os-ex-badge">Android 14</span><span class="os-ex-badge">iOS 17</span><span class="os-ex-badge">HarmonyOS</span></div>
+          </div>
+        </div>
+
+        <!-- ④ Functions of OS -->
+        <div class="content-section reveal" id="functions">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-gear-wide-connected"></i></div>
+            <div><div class="cs-title">Main Functions of an Operating System</div><div class="cs-subtitle">What the OS manages and controls</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(59,91,219,0.06);border-color:rgba(59,91,219,0.2)">
+                <div class="example-icon">⚙️</div>
+                <div>
+                  <div class="example-title" style="color:var(--accent-blue)">1. Process Management</div>
+                  <p class="example-text">Creates, schedules, and terminates processes. Decides which process gets CPU time using scheduling algorithms (FCFS, Round Robin, SJF).</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(112,72,232,0.06);border-color:rgba(112,72,232,0.2)">
+                <div class="example-icon">🧠</div>
+                <div>
+                  <div class="example-title" style="color:var(--accent-violet)">2. Memory Management</div>
+                  <p class="example-text">Allocates RAM to programs, keeps track of used/free memory, handles paging and segmentation. Prevents one process from accessing another's memory.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.2)">
+                <div class="example-icon">📁</div>
+                <div>
+                  <div class="example-title" style="color:var(--accent-emerald)">3. File System Management</div>
+                  <p class="example-text">Organizes data into files and folders. Manages reading, writing, and deleting files. File systems: NTFS (Windows), ext4 (Linux), APFS (macOS).</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.2)">
+                <div class="example-icon">🔌</div>
+                <div>
+                  <div class="example-title" style="color:var(--accent-amber)">4. Device Management</div>
+                  <p class="example-text">Controls I/O devices through device drivers. Manages communication between the computer and peripheral devices like printers, keyboards, and cameras.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(244,63,94,0.06);border-color:rgba(244,63,94,0.2)">
+                <div class="example-icon">🔐</div>
+                <div>
+                  <div class="example-title" style="color:var(--accent-rose)">5. Security &amp; Protection</div>
+                  <p class="example-text">Provides user authentication (passwords, biometrics), access control (read/write permissions), and protects against unauthorized access and viruses.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(14,165,233,0.06);border-color:rgba(14,165,233,0.2)">
+                <div class="example-icon">🖥️</div>
+                <div>
+                  <div class="example-title" style="color:var(--accent-teal)">6. User Interface</div>
+                  <p class="example-text">Provides GUI (icons, windows, mouse) or CLI (text commands). GUI examples: Windows Desktop. CLI examples: Linux Terminal, Windows PowerShell.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ Process Management -->
+        <div class="content-section reveal" id="process">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-diagram-2-fill"></i></div>
+            <div><div class="cs-title">Process States — Life Cycle of a Process</div><div class="cs-subtitle">How the OS manages running programs</div></div>
+          </div>
+          <div class="diagram-box">
+            <p class="mb-4" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700">Process State Transition Diagram</p>
+            <div class="process-states">
+              <div class="p-state" style="background:rgba(16,185,129,0.12);border-color:var(--accent-emerald);color:var(--accent-emerald)">
+                <i class="bi bi-plus-circle-fill" style="font-size:1.2rem"></i>
+                <span>NEW</span>
+                <span style="font-size:0.6rem;opacity:0.8">Created</span>
+              </div>
+              <div class="p-arrow-wrap">
+                <span class="p-arrow">→</span>
+                <span class="p-arrow-label">Admitted</span>
+              </div>
+              <div class="p-state" style="background:rgba(59,91,219,0.12);border-color:var(--accent-blue);color:var(--accent-blue)">
+                <i class="bi bi-hourglass-split" style="font-size:1.2rem"></i>
+                <span>READY</span>
+                <span style="font-size:0.6rem;opacity:0.8">Waiting for CPU</span>
+              </div>
+              <div class="p-arrow-wrap">
+                <span class="p-arrow">→</span>
+                <span class="p-arrow-label">Dispatched</span>
+              </div>
+              <div class="p-state" style="background:rgba(245,158,11,0.12);border-color:var(--accent-amber);color:var(--accent-amber)">
+                <i class="bi bi-lightning-charge-fill" style="font-size:1.2rem"></i>
+                <span>RUNNING</span>
+                <span style="font-size:0.6rem;opacity:0.8">CPU executing</span>
+              </div>
+              <div class="p-arrow-wrap">
+                <span class="p-arrow">→</span>
+                <span class="p-arrow-label">Completes</span>
+              </div>
+              <div class="p-state" style="background:rgba(244,63,94,0.12);border-color:var(--accent-rose);color:var(--accent-rose)">
+                <i class="bi bi-x-circle-fill" style="font-size:1.2rem"></i>
+                <span>TERMINATED</span>
+                <span style="font-size:0.6rem;opacity:0.8">Finished</span>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:16px">
+              <span style="font-size:0.75rem;color:var(--text-muted)">Running → </span>
+              <span class="p-state d-inline-flex" style="width:auto;height:auto;border-radius:var(--radius-md);padding:6px 14px;background:rgba(112,72,232,0.12);border-color:var(--accent-violet);color:var(--accent-violet);font-size:0.78rem;gap:6px">
+                <i class="bi bi-pause-circle-fill"></i> WAITING / BLOCKED (waiting for I/O)
+              </span>
+              <span style="font-size:0.75rem;color:var(--text-muted)"> → Ready</span>
+            </div>
+          </div>
+          <div class="key-note mt-3" style="border-color:var(--accent-violet)">
+            <i class="bi bi-info-circle-fill" style="color:var(--accent-violet)"></i>
+            <div><strong>CPU Scheduling Algorithms:</strong> FCFS (First Come First Serve), SJF (Shortest Job First), Round Robin (time quantum slices), Priority Scheduling. Round Robin is most commonly used in time-sharing systems.</div>
+          </div>
+        </div>
+
+        <!-- ⑥ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div><div class="cs-title">Real-Life Examples</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">🏢</div>
+              <div>
+                <div class="example-title">OS as an Office Manager</div>
+                <p class="example-text">Think of the OS as the <strong>office manager</strong> of a company. The hardware (CPU, RAM, I/O) are the employees. The OS tells each employee what to do, schedules their work, ensures they don't interfere with each other, and handles communication between departments.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">📱</div>
+              <div>
+                <div class="example-title">Using Your Smartphone</div>
+                <p class="example-text">When you open WhatsApp (process created → READY → RUNNING), while playing music in background (WAITING/BLOCKED), and get a notification (I/O interrupt) — your <strong>Android OS</strong> manages all of this simultaneously through multitasking and process scheduling.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">✈️</div>
+              <div>
+                <div class="example-title">Aircraft Autopilot — Real-Time OS</div>
+                <p class="example-text">An aircraft autopilot uses a <strong>Hard Real-Time OS</strong> (like VxWorks). If the OS misses a deadline by even a few milliseconds — for example, adjusting a control surface during turbulence — it could be catastrophic. No delays are acceptable.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑦ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>OS is called the <strong>"System Software"</strong> — it is the first software loaded when computer starts (booting).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>The process of loading OS into RAM when computer starts is called <strong>Booting</strong>. Cold Boot = power on from off; Warm Boot = restart.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Kernel</strong> is the core/heart of the OS — it directly communicates with hardware. The rest of the OS wraps around the kernel.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>File systems: <strong>NTFS</strong> (Windows), <strong>ext4</strong> (Linux), <strong>APFS</strong> (macOS), <strong>FAT32</strong> (older, USB drives, cross-platform).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Multitasking</strong> = one CPU runs many tasks by switching rapidly. <strong>Multiprocessing</strong> = truly multiple CPUs running tasks simultaneously.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Linux is <strong>open-source</strong> (free, modifiable). Windows is <strong>proprietary</strong> (paid, source code closed). macOS is <strong>proprietary, Unix-based</strong>.</div>
+        </div>
+
+        <!-- ⑧ Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Operating System</div>
+          <p class="summary-text">An <strong>Operating System</strong> is system software that acts as a bridge between user and hardware. It manages: <strong>processes</strong> (scheduling: FCFS, Round Robin, SJF), <strong>memory</strong> (allocation, paging), <strong>file system</strong> (NTFS/ext4/APFS), <strong>devices</strong> (drivers), and <strong>security</strong> (authentication, permissions). Types: Batch, Time-Sharing (multitasking), Real-Time (RTOS), Distributed, Multi-User, Mobile. The <strong>Kernel</strong> is the OS core. Booting loads the OS into RAM. Examples: Windows, Linux, macOS, Android, iOS.</p>
+        </div>
+
+        <!-- ⑨ Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is an Operating System? What are its main functions?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">An OS is system software that manages hardware and software resources, providing services to application programs. Main functions: Process management, Memory management, File system management, Device management, Security &amp; protection, and User interface.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What is the difference between multitasking and multiprocessing?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Multitasking: One CPU rapidly switches between multiple tasks, giving the illusion of simultaneous execution. Multiprocessing: Multiple CPUs/cores execute different processes simultaneously — true parallelism. Modern computers do both.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is a Kernel? What is its role?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">The Kernel is the core of the OS that directly interfaces with hardware. It manages CPU scheduling, memory allocation, device drivers, and system calls. The kernel runs in privileged "kernel mode" while applications run in "user mode" for security.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What is a Real-Time OS? Give two examples.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">A Real-Time OS (RTOS) processes inputs and responds within a guaranteed time limit. Hard RTOS: strict deadlines (aircraft autopilot, medical pacemakers). Soft RTOS: deadlines important but not fatal if missed (online video streaming). Examples: VxWorks, FreeRTOS.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>List the five states of a process in an OS.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">1. New – process is being created. 2. Ready – waiting to be assigned to CPU. 3. Running – currently being executed by CPU. 4. Waiting/Blocked – waiting for I/O operation to complete. 5. Terminated – process has finished execution.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click an option to check your answer</div></div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. Which of the following is NOT a function of an Operating System?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Memory Management</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Process Management</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Designing web pages</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Device Management</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. The core of the Operating System is called ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Shell</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Kernel</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Driver</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Compiler</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Which OS type is best suited for aircraft control systems?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Batch OS</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Distributed OS</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Real-Time OS</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Mobile OS</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. Which file system does Windows primarily use?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> ext4</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> APFS</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> NTFS</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> HFS+</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. The process of loading the OS into RAM when a computer starts is called ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Compiling</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Booting</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Formatting</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Partitioning</div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i> Take Full Module Quiz
+            </a>
+          </div>
+        </div>
+
+        <!-- Topic Nav -->
+        <div class="topic-nav reveal">
+          <a href="topic-number-systems.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Number Systems</div></div>
+          </a>
+          <a href="topic-cpu.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Next Topic</div><div class="nav-title">CPU Architecture</div></div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

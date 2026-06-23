@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Number Systems | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    /* Number system cards */
+    .ns-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      height: 100%;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .ns-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .ns-card::after {
+      content: attr(data-base);
+      position: absolute; bottom: -10px; right: 10px;
+      font-family: var(--font-display); font-size: 5rem;
+      font-weight: 900; opacity: 0.05; line-height: 1;
+      color: var(--ns-color, var(--accent-blue));
+      pointer-events: none;
+    }
+    .ns-base { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+    .ns-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .ns-digits { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+    .ns-example { background: var(--bg-primary); border-radius: var(--radius-sm); padding: 10px 14px; font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; }
+
+    /* Conversion steps */
+    .conv-step {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 12px 16px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    .conv-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent-blue); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .conv-math { color: var(--text-secondary); line-height: 1.6; }
+    .conv-result { color: var(--accent-blue); font-weight: 700; }
+
+    /* Conversion table */
+    .conv-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem; }
+    .conv-table th { padding: 10px 14px; background: var(--bg-primary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .conv-table th:first-child { border-radius: var(--radius-md) 0 0 0; }
+    .conv-table th:last-child  { border-radius: 0 var(--radius-md) 0 0; }
+    .conv-table td { padding: 9px 14px; border-top: 1px solid var(--border-color); font-family: var(--font-mono); }
+    .conv-table tr:hover td { background: rgba(59,91,219,0.04); }
+
+    /* Interactive converter */
+    .converter-box {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 26px;
+    }
+    .conv-input {
+      background: var(--bg-primary); border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 10px 16px;
+      color: var(--text-primary); font-family: var(--font-mono); font-size: 1rem;
+      width: 100%; outline: none; transition: all var(--transition);
+    }
+    .conv-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59,91,219,0.15); }
+    .conv-output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .conv-out-item {
+      background: var(--bg-primary); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 12px 14px;
+    }
+    .conv-out-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .conv-out-val { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: var(--text-primary); word-break: break-all; }
+  </style>
+</head>
+<body data-topic-id="number-systems">
+
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Intermediate Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Number Systems</span>
+    </div>
+    <div class="topic-hero-icon icon-emerald" style="background:rgba(16,185,129,0.15)">
+      <i class="bi bi-123"></i>
+    </div>
+    <h1 class="topic-hero-title">Number Systems</h1>
+    <p class="topic-hero-desc">
+      Understand how computers count — Binary (Base-2), Octal (Base-8), Decimal (Base-10),
+      and Hexadecimal (Base-16) — with step-by-step conversions and an interactive converter.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-amber"><i class="bi bi-2-circle me-1"></i>Intermediate Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>15 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-emerald"><i class="bi bi-calculator me-1"></i>Live Converter</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#four-systems"><i class="bi bi-grid-2x2"></i> 4 Number Systems</a></li>
+              <li><a href="#binary"><i class="bi bi-toggle-on"></i> Binary (Base-2)</a></li>
+              <li><a href="#conversion"><i class="bi bi-arrow-repeat"></i> Conversions</a></li>
+              <li><a href="#conv-table"><i class="bi bi-table"></i> Conversion Table</a></li>
+              <li><a href="#live-converter"><i class="bi bi-calculator"></i> Live Converter</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>
+              A <strong>number system</strong> is a way of representing numbers using a specific set of symbols (digits)
+              and a base (radix). The <strong>base</strong> tells us how many unique digits the system uses.
+            </p>
+            <p>
+              We humans naturally use the <strong>Decimal system (Base-10)</strong> because we have 10 fingers.
+              Computers, however, work with <strong>electricity</strong> — which is either ON (1) or OFF (0).
+              That's why computers use the <strong>Binary system (Base-2)</strong>. Every image, video, letter,
+              or sound stored on a computer is ultimately a sequence of 0s and 1s.
+            </p>
+            <p>
+              Because long binary strings are hard to read, humans also use <strong>Octal (Base-8)</strong> and
+              <strong>Hexadecimal (Base-16)</strong> as shorthand — they group binary digits more compactly.
+              For example, the color red in HTML is written as <code style="color:var(--accent-rose)">#FF0000</code>
+              — that's hexadecimal!
+            </p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p>
+              <strong>संख्या प्रणाली</strong> एक विशिष्ट प्रतीकों (अंकों) और आधार (Base) का उपयोग करके
+              संख्याओं को दर्शाने का तरीका है। <strong>आधार (Base)</strong> हमें बताता है कि
+              सिस्टम में कितने अद्वितीय अंक हैं।
+            </p>
+            <p>
+              हम मनुष्य स्वाभाविक रूप से <strong>दशमलव प्रणाली (Base-10)</strong> का उपयोग करते हैं
+              क्योंकि हमारे 10 उंगलियाँ हैं।
+              लेकिन कंप्यूटर <strong>विद्युत</strong> के साथ काम करते हैं — जो या तो चालू (1) या बंद (0) होती है।
+              इसीलिए कंप्यूटर <strong>द्विआधारी प्रणाली (Binary, Base-2)</strong> का उपयोग करते हैं।
+              कंप्यूटर में संग्रहीत हर चित्र, वीडियो, अक्षर या ध्वनि अंततः 0 और 1 का अनुक्रम है।
+            </p>
+            <p>
+              क्योंकि लंबी बाइनरी स्ट्रिंग पढ़ना कठिन है, इसलिए मनुष्य
+              <strong>ऑक्टल (Base-8)</strong> और <strong>हेक्साडेसिमल (Base-16)</strong> का भी उपयोग करते हैं
+              — ये बाइनरी अंकों को अधिक संक्षिप्त रूप में समूहित करते हैं।
+              उदाहरण के लिए, HTML में लाल रंग को <code style="color:var(--accent-rose)">#FF0000</code> लिखते हैं
+              — यह हेक्साडेसिमल है!
+            </p>
+          </div>
+        </div>
+
+        <!-- ② Four Number Systems -->
+        <div class="content-section reveal" id="four-systems">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-grid-2x2-fill"></i></div>
+            <div><div class="cs-title">The 4 Number Systems</div><div class="cs-subtitle">At a glance</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="ns-card" style="--ns-color:var(--accent-rose)" data-base="2">
+                <div class="ns-base" style="color:var(--accent-rose)">Base-2</div>
+                <div class="ns-name" style="color:var(--accent-rose)">Binary</div>
+                <div class="ns-digits">Digits: <strong>0, 1</strong></div>
+                <div class="ns-example" style="color:var(--accent-rose)">1010<sub>2</sub> = 10<sub>10</sub></div>
+                <p style="font-size:0.78rem;color:var(--text-muted);margin:10px 0 0">Used internally by all computers and digital circuits.</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="ns-card" style="--ns-color:var(--accent-blue)" data-base="10">
+                <div class="ns-base" style="color:var(--accent-blue)">Base-10</div>
+                <div class="ns-name" style="color:var(--accent-blue)">Decimal</div>
+                <div class="ns-digits">Digits: <strong>0–9</strong></div>
+                <div class="ns-example" style="color:var(--accent-blue)">255<sub>10</sub></div>
+                <p style="font-size:0.78rem;color:var(--text-muted);margin:10px 0 0">The number system humans use in everyday life.</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="ns-card" style="--ns-color:var(--accent-emerald)" data-base="8">
+                <div class="ns-base" style="color:var(--accent-emerald)">Base-8</div>
+                <div class="ns-name" style="color:var(--accent-emerald)">Octal</div>
+                <div class="ns-digits">Digits: <strong>0–7</strong></div>
+                <div class="ns-example" style="color:var(--accent-emerald)">377<sub>8</sub> = 255<sub>10</sub></div>
+                <p style="font-size:0.78rem;color:var(--text-muted);margin:10px 0 0">Used in Unix file permissions (e.g., chmod 755).</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="ns-card" style="--ns-color:var(--accent-amber)" data-base="16">
+                <div class="ns-base" style="color:var(--accent-amber)">Base-16</div>
+                <div class="ns-name" style="color:var(--accent-amber)">Hexadecimal</div>
+                <div class="ns-digits">Digits: <strong>0–9, A–F</strong></div>
+                <div class="ns-example" style="color:var(--accent-amber)">FF<sub>16</sub> = 255<sub>10</sub></div>
+                <p style="font-size:0.78rem;color:var(--text-muted);margin:10px 0 0">Used in colors (#RRGGBB), memory addresses, HTML.</p>
+              </div>
+            </div>
+          </div>
+          <div class="key-note mt-3"><i class="bi bi-info-circle-fill"></i> Hex uses letters A=10, B=11, C=12, D=13, E=14, F=15 to represent values 10–15 with a single digit.</div>
+        </div>
+
+        <!-- ③ Binary in Detail -->
+        <div class="content-section reveal" id="binary">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-toggle-on"></i></div>
+            <div><div class="cs-title">Binary System — How Computers Think</div><div class="cs-subtitle">The language of all digital electronics</div></div>
+          </div>
+          <div class="prose mb-4">
+            <p>In binary, each digit is called a <strong>bit</strong> (binary digit). A group of 8 bits is called a <strong>byte</strong>.</p>
+            <p>The <strong>positional value</strong> of each bit is a power of 2, starting from 2⁰ on the right:</p>
+          </div>
+          <div class="diagram-box">
+            <p class="mb-3" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700">Binary 1010 = ? in Decimal</p>
+            <div style="display:flex;justify-content:center;gap:0;flex-wrap:wrap">
+              <!-- bit positions -->
+              <div style="text-align:center;padding:0 12px;">
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">Bit 3</div>
+                <div style="width:52px;height:52px;background:rgba(59,91,219,0.15);border:2px solid var(--accent-blue);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--accent-blue)">1</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px">× 2³ = 8</div>
+              </div>
+              <div style="text-align:center;padding:0 12px;">
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">Bit 2</div>
+                <div style="width:52px;height:52px;background:rgba(148,163,184,0.08);border:2px solid var(--border-color);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--text-muted)">0</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px">× 2² = 0</div>
+              </div>
+              <div style="text-align:center;padding:0 12px;">
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">Bit 1</div>
+                <div style="width:52px;height:52px;background:rgba(59,91,219,0.15);border:2px solid var(--accent-blue);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--accent-blue)">1</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px">× 2¹ = 2</div>
+              </div>
+              <div style="text-align:center;padding:0 12px;">
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">Bit 0</div>
+                <div style="width:52px;height:52px;background:rgba(148,163,184,0.08);border:2px solid var(--border-color);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--text-muted)">0</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px">× 2⁰ = 0</div>
+              </div>
+              <div style="display:flex;align-items:center;padding:0 16px;font-size:1.5rem;color:var(--text-muted)">→</div>
+              <div style="text-align:center;padding:0 12px;display:flex;flex-direction:column;justify-content:center">
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">Result</div>
+                <div style="width:68px;height:52px;background:var(--gradient-badge);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:#fff">10</div>
+                <div style="font-size:0.72rem;color:var(--accent-emerald);margin-top:6px;font-weight:700">8+0+2+0 = 10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ Conversion Methods -->
+        <div class="content-section reveal" id="conversion">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-arrow-repeat"></i></div>
+            <div><div class="cs-title">Step-by-Step Conversions</div><div class="cs-subtitle">Methods with worked examples</div></div>
+          </div>
+
+          <!-- Decimal to Binary -->
+          <p class="mb-2" style="font-size:0.85rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">
+            1. Decimal → Binary (Divide by 2, collect remainders bottom-up)
+          </p>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px">Example: Convert <strong>13</strong> to Binary</p>
+          <div class="mb-4">
+            <div class="conv-step"><span class="conv-num">1</span><div class="conv-math">13 ÷ 2 = 6, remainder <span class="conv-result">1</span></div></div>
+            <div class="conv-step"><span class="conv-num">2</span><div class="conv-math">6  ÷ 2 = 3, remainder <span class="conv-result">0</span></div></div>
+            <div class="conv-step"><span class="conv-num">3</span><div class="conv-math">3  ÷ 2 = 1, remainder <span class="conv-result">1</span></div></div>
+            <div class="conv-step"><span class="conv-num">4</span><div class="conv-math">1  ÷ 2 = 0, remainder <span class="conv-result">1</span></div></div>
+            <div class="key-note" style="border-color:var(--accent-emerald)"><i class="bi bi-check-circle-fill" style="color:var(--accent-emerald)"></i>Read remainders <strong>bottom to top</strong>: 13<sub>10</sub> = <strong>1101<sub>2</sub></strong></div>
+          </div>
+
+          <!-- Binary to Decimal -->
+          <p class="mb-2" style="font-size:0.85rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">
+            2. Binary → Decimal (Multiply each bit by its power of 2)
+          </p>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px">Example: Convert <strong>1101</strong> to Decimal</p>
+          <div class="mb-4">
+            <div class="conv-step"><span class="conv-num" style="background:var(--accent-violet)">→</span><div class="conv-math">1×2³ + 1×2² + 0×2¹ + 1×2⁰ = 8 + 4 + 0 + 1 = <span class="conv-result">13</span></div></div>
+            <div class="key-note" style="border-color:var(--accent-emerald)"><i class="bi bi-check-circle-fill" style="color:var(--accent-emerald)"></i>1101<sub>2</sub> = <strong>13<sub>10</sub></strong></div>
+          </div>
+
+          <!-- Decimal to Hex -->
+          <p class="mb-2" style="font-size:0.85rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">
+            3. Decimal → Hexadecimal (Divide by 16, collect remainders)
+          </p>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px">Example: Convert <strong>255</strong> to Hex</p>
+          <div class="mb-4">
+            <div class="conv-step"><span class="conv-num">1</span><div class="conv-math">255 ÷ 16 = 15, remainder <span class="conv-result">15 = F</span></div></div>
+            <div class="conv-step"><span class="conv-num">2</span><div class="conv-math">15  ÷ 16 = 0,  remainder <span class="conv-result">15 = F</span></div></div>
+            <div class="key-note" style="border-color:var(--accent-amber)"><i class="bi bi-check-circle-fill" style="color:var(--accent-amber)"></i>Read bottom to top: 255<sub>10</sub> = <strong>FF<sub>16</sub></strong></div>
+          </div>
+
+          <!-- Binary to Octal -->
+          <p class="mb-2" style="font-size:0.85rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">
+            4. Binary → Octal (Group binary digits in sets of 3 from right)
+          </p>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px">Example: Convert <strong>110101</strong> to Octal</p>
+          <div class="mb-2">
+            <div class="conv-step"><span class="conv-num" style="background:var(--accent-emerald)">→</span><div class="conv-math">110 101 → 110<sub>2</sub>=<span class="conv-result">6</span>, 101<sub>2</sub>=<span class="conv-result">5</span> → Octal = <span class="conv-result">65</span></div></div>
+            <div class="key-note" style="border-color:var(--accent-emerald)"><i class="bi bi-check-circle-fill" style="color:var(--accent-emerald)"></i>110101<sub>2</sub> = <strong>65<sub>8</sub></strong></div>
+          </div>
+
+          <div class="key-note mt-3" style="border-color:var(--accent-violet)"><i class="bi bi-info-circle-fill" style="color:var(--accent-violet)"></i><strong>Trick:</strong> Binary → Hex: group bits in sets of <strong>4</strong> (each group = one hex digit). Binary → Octal: group in sets of <strong>3</strong>.</div>
+        </div>
+
+        <!-- ⑤ Conversion Table -->
+        <div class="content-section reveal" id="conv-table">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-table"></i></div>
+            <div><div class="cs-title">Number System Conversion Table (0–16)</div><div class="cs-subtitle">Reference for exams</div></div>
+          </div>
+          <div class="table-responsive">
+            <table class="conv-table">
+              <thead>
+                <tr>
+                  <th style="color:var(--accent-blue)">Decimal</th>
+                  <th style="color:var(--accent-rose)">Binary</th>
+                  <th style="color:var(--accent-emerald)">Octal</th>
+                  <th style="color:var(--accent-amber)">Hexadecimal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>0</td><td>0000</td><td>0</td><td>0</td></tr>
+                <tr><td>1</td><td>0001</td><td>1</td><td>1</td></tr>
+                <tr><td>2</td><td>0010</td><td>2</td><td>2</td></tr>
+                <tr><td>3</td><td>0011</td><td>3</td><td>3</td></tr>
+                <tr><td>4</td><td>0100</td><td>4</td><td>4</td></tr>
+                <tr><td>5</td><td>0101</td><td>5</td><td>5</td></tr>
+                <tr><td>6</td><td>0110</td><td>6</td><td>6</td></tr>
+                <tr><td>7</td><td>0111</td><td>7</td><td>7</td></tr>
+                <tr><td>8</td><td>1000</td><td>10</td><td>8</td></tr>
+                <tr><td>9</td><td>1001</td><td>11</td><td>9</td></tr>
+                <tr><td>10</td><td>1010</td><td>12</td><td style="color:var(--accent-amber);font-weight:700">A</td></tr>
+                <tr><td>11</td><td>1011</td><td>13</td><td style="color:var(--accent-amber);font-weight:700">B</td></tr>
+                <tr><td>12</td><td>1100</td><td>14</td><td style="color:var(--accent-amber);font-weight:700">C</td></tr>
+                <tr><td>13</td><td>1101</td><td>15</td><td style="color:var(--accent-amber);font-weight:700">D</td></tr>
+                <tr><td>14</td><td>1110</td><td>16</td><td style="color:var(--accent-amber);font-weight:700">E</td></tr>
+                <tr><td>15</td><td>1111</td><td>17</td><td style="color:var(--accent-amber);font-weight:700">F</td></tr>
+                <tr><td>16</td><td>10000</td><td>20</td><td>10</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ⑥ Live Converter -->
+        <div class="content-section reveal" id="live-converter">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-calculator-fill"></i></div>
+            <div><div class="cs-title">Live Number Converter</div><div class="cs-subtitle">Type a decimal number to see all conversions instantly</div></div>
+          </div>
+          <div class="converter-box">
+            <label style="font-size:0.82rem;font-weight:700;color:var(--text-muted);margin-bottom:8px;display:block">Enter a Decimal Number (0–65535):</label>
+            <input type="number" id="decInput" class="conv-input" placeholder="e.g. 255" min="0" max="65535" value="255"/>
+            <div class="conv-output-grid">
+              <div class="conv-out-item">
+                <div class="conv-out-label" style="color:var(--accent-blue)"><i class="bi bi-hash"></i> Decimal (Base-10)</div>
+                <div class="conv-out-val" id="outDec">255</div>
+              </div>
+              <div class="conv-out-item">
+                <div class="conv-out-label" style="color:var(--accent-rose)"><i class="bi bi-toggle-on"></i> Binary (Base-2)</div>
+                <div class="conv-out-val" id="outBin" style="color:var(--accent-rose)">11111111</div>
+              </div>
+              <div class="conv-out-item">
+                <div class="conv-out-label" style="color:var(--accent-emerald)"><i class="bi bi-8-circle"></i> Octal (Base-8)</div>
+                <div class="conv-out-val" id="outOct" style="color:var(--accent-emerald)">377</div>
+              </div>
+              <div class="conv-out-item">
+                <div class="conv-out-label" style="color:var(--accent-amber)"><i class="bi bi-hexagon"></i> Hexadecimal (Base-16)</div>
+                <div class="conv-out-val" id="outHex" style="color:var(--accent-amber)">FF</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑦ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div><div class="cs-title">Real-Life Examples</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">🎨</div>
+              <div>
+                <div class="example-title">Website Colors — Hex in Action</div>
+                <p class="example-text">Every color on a webpage is written in Hex. <strong>#FF0000</strong> = Red (R=255, G=0, B=0). <strong>#00FF00</strong> = Green. <strong>#0000FF</strong> = Blue. <strong>#FFFFFF</strong> = White (all 255). <strong>#000000</strong> = Black (all 0).</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🔐</div>
+              <div>
+                <div class="example-title">Unix File Permissions — Octal</div>
+                <p class="example-text"><code>chmod 755 file</code> — the 755 is <strong>octal</strong>. 7=111 (rwx=read+write+execute), 5=101 (r-x=read+execute). Binary groups of 3 bits map perfectly to octal — that's why it's used.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">💾</div>
+              <div>
+                <div class="example-title">Computer Memory Addresses — Hex</div>
+                <p class="example-text">Memory addresses in programs are written in hex: <strong>0x1A3F</strong>. The "0x" prefix means hexadecimal. Hex compresses what would be very long binary numbers into short, readable codes.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑧ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Bit</strong> = smallest unit (0 or 1). <strong>Nibble</strong> = 4 bits. <strong>Byte</strong> = 8 bits. <strong>Word</strong> = 16/32/64 bits (depends on CPU).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Hex digits A=10, B=11, C=12, D=13, E=14, F=15 — must memorize for exams.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Maximum value of 8-bit (1 byte) binary = <strong>11111111<sub>2</sub> = 255<sub>10</sub> = FF<sub>16</sub></strong>.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>To convert Binary to Octal: group 3 bits from right. Binary to Hex: group <strong>4 bits</strong> from right.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>All computers use Binary internally. Octal and Hex are just human-readable shortcuts for binary.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>The binary representation of a character is determined by <strong>ASCII</strong> (American Standard Code for Information Interchange). Example: 'A' = 65<sub>10</sub> = 01000001<sub>2</sub>.</div>
+        </div>
+
+        <!-- ⑨ Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Number Systems</div>
+          <p class="summary-text">
+            Four number systems: <strong>Decimal</strong> (Base-10, digits 0–9, human use), <strong>Binary</strong> (Base-2, digits 0–1, computers), <strong>Octal</strong> (Base-8, digits 0–7, Unix permissions), <strong>Hexadecimal</strong> (Base-16, digits 0–9 and A–F, colors/memory). Conversions: Decimal→Binary: divide by 2, collect remainders bottom-up. Binary→Decimal: multiply each bit by 2 to the power of its position. Hex→Binary: each hex digit = 4 binary bits. 1 byte = 8 bits, max value = 255 = FF. ASCII maps characters to binary (A=65=01000001).
+          </p>
+        </div>
+
+        <!-- Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>Why do computers use Binary (Base-2) instead of Decimal (Base-10)?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Computers use binary because they are built from electronic transistors that have only two states: ON (represented as 1) and OFF (represented as 0). Binary maps perfectly to these two states, making it simple and reliable for electronic circuits to process.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>Convert 45 (decimal) to Binary.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">45 ÷ 2 = 22 R 1, 22 ÷ 2 = 11 R 0, 11 ÷ 2 = 5 R 1, 5 ÷ 2 = 2 R 1, 2 ÷ 2 = 1 R 0, 1 ÷ 2 = 0 R 1. Reading remainders bottom-to-top: 45₁₀ = 101101₂</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is the decimal value of hexadecimal 2F?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">2F₁₆ = (2 × 16¹) + (F × 16⁰) = (2 × 16) + (15 × 1) = 32 + 15 = 47₁₀</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What is ASCII? Give an example.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">ASCII (American Standard Code for Information Interchange) is a character encoding standard that assigns a unique number to each character. Example: 'A' = 65 = 01000001₂, 'a' = 97 = 01100001₂, '0' = 48 = 00110000₂. It uses 7 bits (128 characters).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>Convert binary 11001100 to Hexadecimal.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Group into sets of 4 bits from right: 1100 | 1100. Convert each: 1100₂ = 12₁₀ = C. So 11001100₂ = CC₁₆.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click an option to check your answer</div></div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. What is the decimal value of binary 1010?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 12</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> 10</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> 8</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 15</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. Hexadecimal F represents which decimal value?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 14</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> 15</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> 16</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 12</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. How many bits are in one byte?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 4</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> 8</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> 16</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 2</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. To convert binary to octal, you group bits in sets of ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 2</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> 3</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> 4</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 8</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. The ASCII value of uppercase letter 'A' is ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 97</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> 48</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> 65</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 41</div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i> Take Full Quiz
+            </a>
+          </div>
+        </div>
+
+        <!-- Topic Nav -->
+        <div class="topic-nav reveal">
+          <a href="topic-storage.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Storage Devices</div></div>
+          </a>
+          <a href="../index.html#topics" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Back to</div><div class="nav-title">All Topics</div></div>
+            <i class="bi bi-grid" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<script>
+  // Live Number Converter
+  const decInput = document.getElementById('decInput');
+  const outDec = document.getElementById('outDec');
+  const outBin = document.getElementById('outBin');
+  const outOct = document.getElementById('outOct');
+  const outHex = document.getElementById('outHex');
+
+  function convertNumber() {
+    const val = parseInt(decInput.value, 10);
+    if (isNaN(val) || val < 0 || val > 65535) {
+      outDec.textContent = outBin.textContent = outOct.textContent = outHex.textContent = '—';
+      return;
+    }
+    outDec.textContent = val.toString(10);
+    outBin.textContent = val.toString(2);
+    outOct.textContent = val.toString(8);
+    outHex.textContent = val.toString(16).toUpperCase();
+  }
+
+  decInput.addEventListener('input', convertNumber);
+  convertNumber(); // run on load
+</script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>What is a Computer? | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+</head>
+<body data-topic-id="computer-basics">
+
+<!-- Progress Bar -->
+<div id="progressBar"></div>
+
+<!-- ── NAVBAR ── -->
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ── TOPIC HERO ── -->
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Basic Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">What is a Computer?</span>
+    </div>
+    <div class="topic-hero-icon icon-blue" style="background:rgba(59,91,219,0.15)">
+      <i class="bi bi-pc-display-horizontal"></i>
+    </div>
+    <h1 class="topic-hero-title">What is a Computer?</h1>
+    <p class="topic-hero-desc">
+      Learn the definition, history, and working of a computer. Understand the IPO Cycle
+      — the foundation of all computing.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-emerald"><i class="bi bi-1-circle me-1"></i>Basic Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>10 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOPIC BODY ── -->
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- ── SIDEBAR TOC ── -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#key-points"><i class="bi bi-check2-circle"></i> Key Points</a></li>
+              <li><a href="#diagram"><i class="bi bi-diagram-2"></i> IPO Diagram</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MAIN CONTENT ── -->
+      <div class="col-lg-9">
+
+        <!-- ① Explanation: English + Hindi -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-book-fill"></i></div>
+            <div>
+              <div class="cs-title">Topic Explanation</div>
+              <div class="cs-subtitle">Read in your preferred language</div>
+            </div>
+          </div>
+
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <!-- English -->
+          <div class="lang-content visible prose" data-lang="en">
+            <p>
+              A <strong>computer</strong> is an electronic device that can receive data (input),
+              process it according to a set of instructions (program), and produce a result (output).
+              The word "computer" comes from the Latin word <em>computare</em>, meaning "to calculate."
+            </p>
+            <p>
+              Computers work on a simple three-step cycle called the <strong>IPO Cycle</strong>:
+              <strong>Input → Processing → Output</strong>.
+              Everything a computer does — from playing a video to solving a math problem — follows this cycle.
+            </p>
+            <p>
+              A computer is made up of two main parts: <strong>Hardware</strong> (physical components you can touch,
+              like the keyboard, CPU, and monitor) and <strong>Software</strong> (programs and instructions that tell
+              the hardware what to do, like Windows or MS Word).
+            </p>
+            <p>
+              Modern computers can perform billions of calculations per second, store vast amounts of data,
+              and communicate with other computers over networks. They are used in every field —
+              medicine, education, banking, entertainment, and more.
+            </p>
+          </div>
+
+          <!-- Hindi -->
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p>
+              <strong>कंप्यूटर</strong> एक इलेक्ट्रॉनिक उपकरण है जो डेटा (इनपुट) को ग्रहण करता है,
+              निर्देशों (प्रोग्राम) के अनुसार उसे संसाधित (प्रोसेस) करता है, और परिणाम (आउटपुट) प्रदान करता है।
+              "कंप्यूटर" शब्द लैटिन शब्द <em>computare</em> से बना है, जिसका अर्थ है "गणना करना।"
+            </p>
+            <p>
+              कंप्यूटर एक सरल तीन-चरण प्रक्रिया पर कार्य करता है, जिसे <strong>IPO चक्र</strong> कहते हैं:
+              <strong>इनपुट → प्रोसेसिंग → आउटपुट</strong>।
+              कंप्यूटर की हर गतिविधि — चाहे वीडियो चलाना हो या गणित की समस्या हल करना — इसी चक्र पर आधारित है।
+            </p>
+            <p>
+              कंप्यूटर दो मुख्य भागों से मिलकर बना है: <strong>हार्डवेयर</strong> (भौतिक घटक जिन्हें हम छू सकते हैं,
+              जैसे कीबोर्ड, CPU और मॉनिटर) और <strong>सॉफ्टवेयर</strong> (प्रोग्राम और निर्देश जो हार्डवेयर को
+              बताते हैं कि क्या करना है, जैसे Windows या MS Word)।
+            </p>
+            <p>
+              आधुनिक कंप्यूटर एक सेकंड में अरबों गणनाएँ कर सकते हैं, बड़ी मात्रा में डेटा संग्रहीत कर सकते हैं,
+              और नेटवर्क के माध्यम से अन्य कंप्यूटरों से संचार कर सकते हैं।
+              इनका उपयोग चिकित्सा, शिक्षा, बैंकिंग, मनोरंजन आदि हर क्षेत्र में होता है।
+            </p>
+          </div>
+        </div>
+
+        <!-- ② Key Points -->
+        <div class="content-section reveal" id="key-points">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-check2-all"></i></div>
+            <div>
+              <div class="cs-title">Key Points to Remember</div>
+              <div class="cs-subtitle">Important facts for exam preparation</div>
+            </div>
+          </div>
+          <ul class="key-points">
+            <li><i class="bi bi-dot"></i>A computer is an <strong>electronic device</strong> — it works on electrical signals.</li>
+            <li><i class="bi bi-dot"></i>It follows the <strong>IPO Cycle</strong>: Input → Processing → Output.</li>
+            <li><i class="bi bi-dot"></i>A computer can only do what it is <strong>programmed</strong> (instructed) to do — it has no intelligence of its own.</li>
+            <li><i class="bi bi-dot"></i>It has two main components: <strong>Hardware</strong> and <strong>Software</strong>.</li>
+            <li><i class="bi bi-dot"></i>The brain of a computer is the <strong>CPU (Central Processing Unit)</strong>.</li>
+            <li><i class="bi bi-dot"></i>Computers work with <strong>binary numbers</strong> (0 and 1), called bits.</li>
+            <li><i class="bi bi-dot"></i>The first electronic computer was <strong>ENIAC</strong> (1945), built in the USA.</li>
+            <li><i class="bi bi-dot"></i>Charles Babbage is called the <strong>"Father of the Computer"</strong> for inventing the Analytical Engine.</li>
+          </ul>
+        </div>
+
+        <!-- ③ IPO Diagram -->
+        <div class="content-section reveal" id="diagram">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-diagram-2-fill"></i></div>
+            <div>
+              <div class="cs-title">IPO Cycle — Diagram</div>
+              <div class="cs-subtitle">How a computer processes information</div>
+            </div>
+          </div>
+
+          <div class="diagram-box">
+            <p class="mb-3" style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700">
+              Computer Working Model — IPO Cycle
+            </p>
+            <div class="ipo-flow">
+              <div class="ipo-box ipo-input">
+                <div class="ipo-label">Step 1</div>
+                <div class="ipo-name">INPUT</div>
+                <div class="ipo-example">Keyboard · Mouse<br/>Scanner · Mic</div>
+              </div>
+              <div class="ipo-arrow">→</div>
+              <div class="ipo-box ipo-process">
+                <div class="ipo-label">Step 2</div>
+                <div class="ipo-name">PROCESS</div>
+                <div class="ipo-example">CPU · RAM<br/>ALU · CU</div>
+              </div>
+              <div class="ipo-arrow">→</div>
+              <div class="ipo-box ipo-output">
+                <div class="ipo-label">Step 3</div>
+                <div class="ipo-name">OUTPUT</div>
+                <div class="ipo-example">Monitor · Printer<br/>Speaker · Projector</div>
+              </div>
+            </div>
+            <p class="mt-4 mb-0" style="font-size:0.78rem;color:var(--text-muted)">
+              <i class="bi bi-info-circle me-1"></i>
+              Data is also stored in <strong>Memory (RAM/ROM)</strong> and <strong>Storage (HDD/SSD)</strong> during processing.
+            </p>
+          </div>
+        </div>
+
+        <!-- ④ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div>
+              <div class="cs-title">Real-Life Examples</div>
+              <div class="cs-subtitle">Relate the concept to everyday life</div>
+            </div>
+          </div>
+
+          <div class="d-flex flex-column gap-3">
+
+            <div class="example-box">
+              <div class="example-icon">⌨️</div>
+              <div>
+                <div class="example-title">Example 1 — Typing in MS Word</div>
+                <p class="example-text">
+                  <strong>Input:</strong> You press keys on the keyboard →
+                  <strong>Process:</strong> CPU converts keystrokes into characters →
+                  <strong>Output:</strong> Text appears on your monitor screen.
+                  This is the IPO cycle happening in real time.
+                </p>
+              </div>
+            </div>
+
+            <div class="example-box">
+              <div class="example-icon">🧮</div>
+              <div>
+                <div class="example-title">Example 2 — Using a Calculator App</div>
+                <p class="example-text">
+                  <strong>Input:</strong> You type "5 + 3" using the keyboard →
+                  <strong>Process:</strong> CPU's ALU (Arithmetic Logic Unit) performs the addition →
+                  <strong>Output:</strong> "8" is displayed on screen.
+                </p>
+              </div>
+            </div>
+
+            <div class="example-box">
+              <div class="example-icon">🏥</div>
+              <div>
+                <div class="example-title">Example 3 — Hospital (Real World)</div>
+                <p class="example-text">
+                  <strong>Input:</strong> Patient's data is entered by the doctor →
+                  <strong>Process:</strong> Computer analyzes data using diagnostic software →
+                  <strong>Output:</strong> A medical report is printed. The same IPO model applies!
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ⑤ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div>
+              <div class="cs-title">Key Notes</div>
+              <div class="cs-subtitle">Important exam tips — don't miss these!</div>
+            </div>
+          </div>
+
+          <div class="key-note"><i class="bi bi-star-fill"></i> <strong>ENIAC</strong> (Electronic Numerical Integrator and Computer) was the world's first general-purpose electronic computer, built in 1945 at the University of Pennsylvania.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> <strong>Charles Babbage</strong> designed the "Analytical Engine" in 1837 — the concept that became the modern computer. He is called the <strong>Father of the Computer</strong>.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> <strong>Ada Lovelace</strong> wrote the world's first algorithm for Babbage's engine. She is called the <strong>First Programmer</strong>.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> Computers work in <strong>binary (0 and 1)</strong> — all data, including text, images, and audio, is ultimately represented in these two digits.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> Full form: <strong>CPU</strong> = Central Processing Unit. It is the "brain" of the computer.</div>
+        </div>
+
+        <!-- ⑥ Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title">
+            <i class="bi bi-journal-check" style="color:var(--accent-blue)"></i>
+            Summary — What is a Computer?
+          </div>
+          <p class="summary-text">
+            A <strong>computer</strong> is an electronic device that processes data using the <strong>IPO Cycle</strong>
+            (Input → Processing → Output). It consists of <strong>hardware</strong> (physical parts) and
+            <strong>software</strong> (programs). The <strong>CPU</strong> is the brain, <strong>RAM</strong> is
+            temporary memory, and storage devices (HDD/SSD) hold data permanently.
+            Computers work in <strong>binary (0s and 1s)</strong>.
+            Charles Babbage is the <strong>Father of the Computer</strong>, and <strong>ENIAC</strong> was the
+            first electronic computer (1945). Computers are used in every field of modern life.
+          </p>
+        </div>
+
+        <!-- ⑦ Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div>
+              <div class="cs-title">Interview / Viva Questions</div>
+              <div class="cs-subtitle">Click each question to reveal the answer</div>
+            </div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+
+            <div class="interview-q">
+              <div class="q-header">
+                <span class="q-num">1</span>
+                What is a computer? Give its basic definition.
+                <i class="bi bi-chevron-right q-arrow"></i>
+              </div>
+              <div class="q-answer">
+                A computer is an electronic device that accepts data as input, processes it according to a
+                set of instructions (software), and produces the result as output. It can store data and
+                retrieve it when required.
+              </div>
+            </div>
+
+            <div class="interview-q">
+              <div class="q-header">
+                <span class="q-num">2</span>
+                What is the IPO Cycle? Explain with an example.
+                <i class="bi bi-chevron-right q-arrow"></i>
+              </div>
+              <div class="q-answer">
+                IPO stands for Input → Processing → Output. Example: When you type on a keyboard (Input),
+                the CPU processes the keystrokes (Processing), and the text appears on the monitor (Output).
+              </div>
+            </div>
+
+            <div class="interview-q">
+              <div class="q-header">
+                <span class="q-num">3</span>
+                Who is called the "Father of the Computer" and why?
+                <i class="bi bi-chevron-right q-arrow"></i>
+              </div>
+              <div class="q-answer">
+                Charles Babbage (1791–1871) is called the Father of the Computer. He designed the
+                "Difference Engine" and the "Analytical Engine" — mechanical devices that were
+                the conceptual ancestors of modern computers.
+              </div>
+            </div>
+
+            <div class="interview-q">
+              <div class="q-header">
+                <span class="q-num">4</span>
+                What is ENIAC and what is its significance?
+                <i class="bi bi-chevron-right q-arrow"></i>
+              </div>
+              <div class="q-answer">
+                ENIAC (Electronic Numerical Integrator and Computer) was the world's first general-purpose
+                electronic digital computer, built in 1945 at the University of Pennsylvania by J. Presper
+                Eckert and John Mauchly.
+              </div>
+            </div>
+
+            <div class="interview-q">
+              <div class="q-header">
+                <span class="q-num">5</span>
+                What does CPU stand for and what is its role?
+                <i class="bi bi-chevron-right q-arrow"></i>
+              </div>
+              <div class="q-answer">
+                CPU stands for Central Processing Unit. It is the "brain" of the computer that performs
+                all arithmetic, logical, and control operations. It consists of the ALU (Arithmetic Logic Unit)
+                and the Control Unit (CU).
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ⑧ MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div>
+              <div class="cs-title">Multiple Choice Questions</div>
+              <div class="cs-subtitle">Click an option to check your answer</div>
+            </div>
+          </div>
+
+          <!-- MCQ 1 -->
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. What does the "P" in the IPO Cycle stand for?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Printing</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Processing</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Programming</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Power</div>
+            </div>
+          </div>
+
+          <!-- MCQ 2 -->
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. Who is called the "Father of the Computer"?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Alan Turing</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Ada Lovelace</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Charles Babbage</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Bill Gates</div>
+            </div>
+          </div>
+
+          <!-- MCQ 3 -->
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. What is the full form of CPU?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Computer Processing Unit</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Central Processing Unit</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Control Processing Unit</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Core Processing Unit</div>
+            </div>
+          </div>
+
+          <!-- MCQ 4 -->
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. In which year was ENIAC built?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 1932</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> 1951</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> 1945</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 1960</div>
+            </div>
+          </div>
+
+          <!-- MCQ 5 -->
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. Computers work in which number system?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Decimal (0–9)</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Binary (0 and 1)</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Octal (0–7)</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Hexadecimal (0–F)</div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i>
+              Take Full Quiz (25 Questions)
+            </a>
+          </div>
+        </div>
+
+        <!-- Topic Nav -->
+        <div class="topic-nav reveal">
+          <a href="../index.html#topics" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div>
+              <div class="nav-label">Back to</div>
+              <div class="nav-title">All Topics</div>
+            </div>
+          </a>
+          <a href="topic-hardware-software.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div>
+              <div class="nav-label">Next Topic</div>
+              <div class="nav-title">Hardware vs Software</div>
+            </div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div><!-- /col main -->
+    </div><!-- /row -->
+  </div><!-- /container -->
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-text">
+      <p class="mb-1"><strong style="color:var(--text-primary)">CompFund</strong> — Computer Fundamentals Learning Platform</p>
+      <p><a href="../index.html">← Back to Home</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memory: RAM &amp; ROM | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    /* Memory hierarchy pyramid */
+    .mem-pyramid { display:flex; flex-direction:column; align-items:center; gap:4px; padding:20px 0; }
+    .mem-level {
+      display:flex; align-items:center; justify-content:center;
+      border-radius: var(--radius-sm);
+      font-size:0.82rem; font-weight:700; color:#fff;
+      transition: all var(--transition);
+      cursor:default;
+    }
+    .mem-level:hover { filter: brightness(1.15); transform: scaleX(1.02); }
+    .mem-side {
+      font-size:0.7rem; color:var(--text-muted); font-weight:500;
+      white-space:nowrap;
+    }
+    .mem-row { display:flex; align-items:center; gap:14px; width:100%; justify-content:center; }
+
+    /* RAM vs ROM comparison cards */
+    .vs-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      height:100%;
+      transition: all var(--transition);
+    }
+    .vs-card:hover { box-shadow: var(--shadow-md); }
+    .vs-card-title {
+      font-family: var(--font-display);
+      font-size:1.05rem; font-weight:700;
+      margin-bottom:14px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .vs-row {
+      display:flex; justify-content:space-between; align-items:flex-start;
+      padding:8px 0; border-bottom:1px solid var(--border-color);
+      font-size:0.83rem; gap:12px;
+    }
+    .vs-row:last-child { border-bottom:none; }
+    .vs-label { color:var(--text-muted); font-weight:600; min-width:90px; flex-shrink:0; }
+    .vs-val   { color:var(--text-secondary); text-align:right; }
+
+    /* Memory types badges */
+    .type-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 14px; border-radius:100px;
+      font-size:0.75rem; font-weight:700;
+      margin:4px;
+    }
+  </style>
+</head>
+<body data-topic-id="memory-ram-rom">
+
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Intermediate Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Memory: RAM &amp; ROM</span>
+    </div>
+    <div class="topic-hero-icon icon-amber" style="background:rgba(245,158,11,0.15)">
+      <i class="bi bi-memory"></i>
+    </div>
+    <h1 class="topic-hero-title">Memory: RAM &amp; ROM</h1>
+    <p class="topic-hero-desc">
+      Understand primary memory — how RAM temporarily holds running data, how ROM stores
+      permanent firmware, and the complete memory hierarchy of a computer.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-amber"><i class="bi bi-2-circle me-1"></i>Intermediate Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>14 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- SIDEBAR -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#hierarchy"><i class="bi bi-triangle"></i> Memory Hierarchy</a></li>
+              <li><a href="#ram-detail"><i class="bi bi-lightning"></i> RAM in Detail</a></li>
+              <li><a href="#rom-detail"><i class="bi bi-lock"></i> ROM in Detail</a></li>
+              <li><a href="#comparison"><i class="bi bi-table"></i> RAM vs ROM</a></li>
+              <li><a href="#cache"><i class="bi bi-speedometer2"></i> Cache Memory</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>
+              <strong>Memory</strong> in a computer refers to the storage space where data and instructions
+              are held while being used. Without memory, a computer cannot process or run any program.
+              Computer memory is broadly classified into two types: <strong>Primary Memory</strong> (directly
+              accessed by the CPU) and <strong>Secondary Memory</strong> (storage devices like HDD/SSD).
+            </p>
+            <p>
+              <strong>RAM (Random Access Memory)</strong> is the most important primary memory. It is
+              <em>volatile</em> — meaning all data stored in RAM is lost when the computer is switched off.
+              RAM is the computer's "working space" — it holds the operating system, currently open programs,
+              and data being processed right now.
+            </p>
+            <p>
+              <strong>ROM (Read-Only Memory)</strong> is also primary memory but it is <em>non-volatile</em>
+              — its data is permanently stored and is not lost when power is turned off. ROM stores
+              the computer's firmware — the basic startup instructions (called BIOS) that run when you
+              press the power button. You can only <em>read</em> from ROM, not write to it (normally).
+            </p>
+            <p>
+              Think of RAM as a <strong>whiteboard</strong> — you write on it while working, and erase it
+              when done. ROM is like a <strong>printed instruction manual</strong> — always there, always
+              readable, but you cannot change what's printed.
+            </p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p>
+              कंप्यूटर में <strong>मेमोरी</strong> वह स्थान है जहाँ डेटा और निर्देश उपयोग के दौरान संग्रहीत होते हैं।
+              मेमोरी के बिना, कंप्यूटर कोई भी प्रोग्राम चला नहीं सकता।
+              कंप्यूटर मेमोरी को दो मुख्य प्रकारों में वर्गीकृत किया जाता है:
+              <strong>प्राथमिक मेमोरी</strong> (CPU द्वारा सीधे एक्सेस की जाती है) और
+              <strong>द्वितीयक मेमोरी</strong> (HDD/SSD जैसे स्टोरेज उपकरण)।
+            </p>
+            <p>
+              <strong>RAM (रैंडम एक्सेस मेमोरी)</strong> सबसे महत्वपूर्ण प्राथमिक मेमोरी है।
+              यह <em>अस्थायी (Volatile)</em> होती है — अर्थात कंप्यूटर बंद होने पर RAM में संग्रहीत
+              सभी डेटा नष्ट हो जाता है। RAM कंप्यूटर का "कार्यक्षेत्र" है — यह ऑपरेटिंग सिस्टम,
+              खुले प्रोग्रामों और वर्तमान में संसाधित हो रहे डेटा को रखती है।
+            </p>
+            <p>
+              <strong>ROM (रीड-ओनली मेमोरी)</strong> भी प्राथमिक मेमोरी है लेकिन यह
+              <em>स्थायी (Non-Volatile)</em> होती है — बिजली बंद होने पर भी इसका डेटा नष्ट नहीं होता।
+              ROM में कंप्यूटर का फर्मवेयर संग्रहीत होता है — वे बुनियादी स्टार्टअप निर्देश (BIOS)
+              जो पावर बटन दबाने पर चलते हैं। ROM से केवल <em>पढ़ा</em> जा सकता है, लिखा नहीं।
+            </p>
+            <p>
+              RAM को एक <strong>श्यामपट्ट (Whiteboard)</strong> समझें — काम करते समय आप लिखते हैं,
+              काम खत्म होने पर मिटा देते हैं। ROM एक <strong>मुद्रित निर्देश पुस्तिका</strong> की तरह है —
+              हमेशा वहाँ, हमेशा पढ़ने योग्य, लेकिन आप जो छपा है उसे नहीं बदल सकते।
+            </p>
+          </div>
+        </div>
+
+        <!-- ② Memory Hierarchy -->
+        <div class="content-section reveal" id="hierarchy">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-triangle-fill"></i></div>
+            <div><div class="cs-title">Memory Hierarchy</div><div class="cs-subtitle">From fastest/costliest to slowest/cheapest</div></div>
+          </div>
+          <div class="diagram-box">
+            <p class="mb-4" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700">
+              Memory Speed ↑ (top = fastest) &nbsp;|&nbsp; Memory Size ↑ (bottom = largest)
+            </p>
+            <div class="mem-pyramid">
+              <div class="mem-row">
+                <span class="mem-side" style="text-align:right;width:90px">Fastest<br>Most Expensive</span>
+                <div class="mem-level" style="width:130px;height:44px;background:linear-gradient(135deg,#F43F5E,#FB7185)">
+                  Registers
+                </div>
+                <span class="mem-side" style="width:90px">Inside CPU<br>Few bytes</span>
+              </div>
+              <div class="mem-row">
+                <span class="mem-side" style="text-align:right;width:90px">Very Fast</span>
+                <div class="mem-level" style="width:190px;height:44px;background:linear-gradient(135deg,#7048E8,#9775FA)">
+                  Cache Memory (L1/L2/L3)
+                </div>
+                <span class="mem-side" style="width:90px">KB–MB<br>On CPU chip</span>
+              </div>
+              <div class="mem-row">
+                <span class="mem-side" style="text-align:right;width:90px">Fast</span>
+                <div class="mem-level" style="width:260px;height:44px;background:linear-gradient(135deg,#3B5BDB,#4C6EF5)">
+                  RAM (Primary Memory)
+                </div>
+                <span class="mem-side" style="width:90px">4 GB–64 GB<br>Volatile</span>
+              </div>
+              <div class="mem-row">
+                <span class="mem-side" style="text-align:right;width:90px">Permanent</span>
+                <div class="mem-level" style="width:260px;height:44px;background:linear-gradient(135deg,#0EA5E9,#38BDF8)">
+                  ROM (Firmware)
+                </div>
+                <span class="mem-side" style="width:90px">MB<br>Non-Volatile</span>
+              </div>
+              <div class="mem-row">
+                <span class="mem-side" style="text-align:right;width:90px">Slower</span>
+                <div class="mem-level" style="width:330px;height:44px;background:linear-gradient(135deg,#10B981,#34D399)">
+                  Secondary Storage (HDD / SSD)
+                </div>
+                <span class="mem-side" style="width:90px">TB range<br>Non-Volatile</span>
+              </div>
+              <div class="mem-row">
+                <span class="mem-side" style="text-align:right;width:90px">Slowest<br>Cheapest</span>
+                <div class="mem-level" style="width:400px;height:44px;background:linear-gradient(135deg,#64748B,#94A3B8)">
+                  Tertiary / Offline Storage (CD, DVD, Tape)
+                </div>
+                <span class="mem-side" style="width:90px">Archival<br>Removable</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ RAM in Detail -->
+        <div class="content-section reveal" id="ram-detail">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-lightning-charge-fill"></i></div>
+            <div><div class="cs-title">RAM — Random Access Memory</div><div class="cs-subtitle">The computer's working memory</div></div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-12">
+              <div class="key-note" style="border-color:var(--accent-blue);background:rgba(59,91,219,0.06)">
+                <i class="bi bi-info-circle-fill" style="color:var(--accent-blue)"></i>
+                <div>RAM is <strong>volatile</strong> — all data is erased when power is off. It is directly accessed by the CPU. More RAM = can run more programs simultaneously without slowing down.</div>
+              </div>
+            </div>
+          </div>
+
+          <p style="font-size:0.85rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px">Types of RAM</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="vs-card">
+                <div class="vs-card-title" style="color:var(--accent-blue)">
+                  <span style="font-size:1.4rem">⚡</span> DRAM
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin:0">
+                  <strong>Dynamic RAM</strong> — must be refreshed thousands of times per second to retain data.
+                  Slower but cheaper. Used as main system RAM. Example: DDR4, DDR5 in laptops/desktops.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="vs-card">
+                <div class="vs-card-title" style="color:var(--accent-violet)">
+                  <span style="font-size:1.4rem">🚀</span> SRAM
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin:0">
+                  <strong>Static RAM</strong> — does not need refreshing; holds data as long as power is on.
+                  Much faster but expensive. Used as <strong>Cache Memory</strong> (L1/L2) inside or near the CPU.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="vs-card">
+                <div class="vs-card-title" style="color:var(--accent-teal)">
+                  <span style="font-size:1.4rem">📦</span> SDRAM
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin:0">
+                  <strong>Synchronous DRAM</strong> — synchronized with the CPU clock for faster data transfer.
+                  Modern standard: DDR (Double Data Rate) versions — DDR3, DDR4, DDR5.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="vs-card">
+                <div class="vs-card-title" style="color:var(--accent-emerald)">
+                  <span style="font-size:1.4rem">💡</span> DDR RAM
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin:0">
+                  <strong>Double Data Rate RAM</strong> — transfers data on both the rising and falling edges of
+                  the clock cycle, doubling the speed. DDR5 is the latest generation (2021+).
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ ROM in Detail -->
+        <div class="content-section reveal" id="rom-detail">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-lock-fill"></i></div>
+            <div><div class="cs-title">ROM — Read Only Memory</div><div class="cs-subtitle">Permanent firmware memory</div></div>
+          </div>
+
+          <div class="key-note" style="border-color:var(--accent-rose);background:rgba(244,63,94,0.06);margin-bottom:20px">
+            <i class="bi bi-info-circle-fill" style="color:var(--accent-rose)"></i>
+            <div>ROM is <strong>non-volatile</strong> — data persists even without power. It stores BIOS/UEFI firmware. Normally <strong>read-only</strong>, but some types allow controlled writing.</div>
+          </div>
+
+          <p style="font-size:0.85rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px">Types of ROM</p>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box" style="background:rgba(244,63,94,0.05);border-color:rgba(244,63,94,0.2)">
+              <div class="example-icon">🔒</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-rose)">MROM — Mask ROM</div>
+                <p class="example-text">Programmed during manufacturing. Contents can NEVER be changed. Used in calculators and older game cartridges. Cheapest type.</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(112,72,232,0.05);border-color:rgba(112,72,232,0.2)">
+              <div class="example-icon">✍️</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-violet)">PROM — Programmable ROM</div>
+                <p class="example-text">Blank when manufactured; can be programmed <strong>once</strong> by the user using a special device called a PROM burner. After writing, content is permanent.</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(14,165,233,0.05);border-color:rgba(14,165,233,0.2)">
+              <div class="example-icon">🔆</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-teal)">EPROM — Erasable Programmable ROM</div>
+                <p class="example-text">Can be erased by exposing to <strong>ultraviolet (UV) light</strong> and then reprogrammed. Has a small quartz window on the chip to allow UV exposure.</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.2)">
+              <div class="example-icon">⚡</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-emerald)">EEPROM — Electrically Erasable Programmable ROM</div>
+                <p class="example-text">Can be erased and reprogrammed <strong>electrically</strong> (no UV needed). Used in BIOS chips, smart cards, and USB devices. Flash memory (Pen Drive, SSD) is a type of EEPROM.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ RAM vs ROM Comparison -->
+        <div class="content-section reveal" id="comparison">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-table"></i></div>
+            <div><div class="cs-title">RAM vs ROM — Comparison Table</div><div class="cs-subtitle">Quick reference for exams</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="vs-card" style="border-color:rgba(59,91,219,0.3)">
+                <div class="vs-card-title" style="color:var(--accent-blue)"><i class="bi bi-lightning-charge-fill"></i> RAM</div>
+                <div class="vs-row"><span class="vs-label">Full Form</span><span class="vs-val">Random Access Memory</span></div>
+                <div class="vs-row"><span class="vs-label">Volatile?</span><span class="vs-val">Yes — lost on power off</span></div>
+                <div class="vs-row"><span class="vs-label">Speed</span><span class="vs-val">Very fast</span></div>
+                <div class="vs-row"><span class="vs-label">Writable?</span><span class="vs-val">Yes — read &amp; write</span></div>
+                <div class="vs-row"><span class="vs-label">Capacity</span><span class="vs-val">4 GB – 64 GB (typical)</span></div>
+                <div class="vs-row"><span class="vs-label">Cost</span><span class="vs-val">More expensive per GB</span></div>
+                <div class="vs-row"><span class="vs-label">Use</span><span class="vs-val">Running programs, OS</span></div>
+                <div class="vs-row"><span class="vs-label">Example</span><span class="vs-val">DDR4, DDR5 RAM stick</span></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="vs-card" style="border-color:rgba(244,63,94,0.3)">
+                <div class="vs-card-title" style="color:var(--accent-rose)"><i class="bi bi-lock-fill"></i> ROM</div>
+                <div class="vs-row"><span class="vs-label">Full Form</span><span class="vs-val">Read Only Memory</span></div>
+                <div class="vs-row"><span class="vs-label">Volatile?</span><span class="vs-val">No — data is permanent</span></div>
+                <div class="vs-row"><span class="vs-label">Speed</span><span class="vs-val">Slower than RAM</span></div>
+                <div class="vs-row"><span class="vs-label">Writable?</span><span class="vs-val">No (or limited)</span></div>
+                <div class="vs-row"><span class="vs-label">Capacity</span><span class="vs-val">MB range (firmware)</span></div>
+                <div class="vs-row"><span class="vs-label">Cost</span><span class="vs-val">Cheaper</span></div>
+                <div class="vs-row"><span class="vs-label">Use</span><span class="vs-val">BIOS/UEFI firmware</span></div>
+                <div class="vs-row"><span class="vs-label">Example</span><span class="vs-val">BIOS chip, EEPROM</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ Cache Memory -->
+        <div class="content-section reveal" id="cache">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-speedometer2"></i></div>
+            <div><div class="cs-title">Cache Memory</div><div class="cs-subtitle">The ultra-fast bridge between CPU and RAM</div></div>
+          </div>
+          <div class="prose mb-3">
+            <p>
+              <strong>Cache memory</strong> is a small, extremely fast memory built into or very close to the CPU.
+              It stores frequently used data and instructions so the CPU doesn't have to wait to fetch them
+              from the slower RAM. Cache is made of <strong>SRAM</strong>.
+            </p>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="key-note" style="border-color:var(--accent-rose)">
+                <i class="bi bi-1-circle-fill" style="color:var(--accent-rose)"></i>
+                <div><strong style="color:var(--accent-rose)">L1 Cache</strong><br/>Smallest (32–64 KB), fastest, located directly inside CPU core. First to be checked.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="key-note" style="border-color:var(--accent-amber)">
+                <i class="bi bi-2-circle-fill" style="color:var(--accent-amber)"></i>
+                <div><strong style="color:var(--accent-amber)">L2 Cache</strong><br/>Medium (256 KB – 4 MB), slightly slower. Can be per-core or shared.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="key-note" style="border-color:var(--accent-emerald)">
+                <i class="bi bi-3-circle-fill" style="color:var(--accent-emerald)"></i>
+                <div><strong style="color:var(--accent-emerald)">L3 Cache</strong><br/>Largest (8–64 MB), shared across all CPU cores. Slowest of the three but still faster than RAM.</div>
+              </div>
+            </div>
+          </div>
+          <div class="key-note mt-3" style="border-color:var(--accent-violet)">
+            <i class="bi bi-star-fill" style="color:var(--accent-violet)"></i>
+            <div>Order of checking: CPU first looks in <strong>L1 → L2 → L3 → RAM → Storage</strong>. A "cache hit" means the data was found in cache; a "cache miss" means it must be fetched from RAM.</div>
+          </div>
+        </div>
+
+        <!-- ⑦ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div><div class="cs-title">Real-Life Examples</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">📚</div>
+              <div>
+                <div class="example-title">Study Desk Analogy</div>
+                <p class="example-text">Your <strong>study desk surface</strong> = RAM (limited workspace for current work). Your <strong>bookshelf</strong> = Hard Disk (stores everything permanently). Your <strong>mental memory</strong> of recently read pages = Cache (fastest access). The <strong>printed textbook</strong> = ROM (you only read from it, can't change it).</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">💻</div>
+              <div>
+                <div class="example-title">Opening a Browser</div>
+                <p class="example-text">When you open Chrome: the browser program is loaded from <strong>HDD/SSD → RAM</strong>. Frequently used browser tabs stay in <strong>Cache</strong> for faster reloading. Your BIOS (in <strong>ROM</strong>) already ran when you pressed the power button to start everything.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">📱</div>
+              <div>
+                <div class="example-title">Smartphone Memory</div>
+                <p class="example-text">Your phone's <strong>"RAM"</strong> (e.g., 8 GB) keeps apps open and running. Your phone's <strong>internal storage</strong> (e.g., 128 GB) is like a hard disk — stores photos, apps, and files permanently. The phone's <strong>bootloader firmware</strong> in ROM starts the phone when powered on.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑧ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>RAM</strong> = Volatile, Read-Write, fast, temporary. <strong>ROM</strong> = Non-Volatile, Read-Only, permanent.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>BIOS stands for <strong>Basic Input Output System</strong> — stored in ROM, runs first when computer boots.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>UEFI (Unified Extensible Firmware Interface) is the modern replacement for BIOS — faster and supports larger disks.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Cache memory uses <strong>SRAM</strong>. Main RAM uses <strong>DRAM</strong>. SRAM is faster but more expensive.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Flash memory (Pen Drive, SSD) is a form of <strong>EEPROM</strong> — non-volatile but electrically rewritable.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>The unit of memory: 1 Byte = 8 bits → 1 KB = 1024 B → 1 MB = 1024 KB → 1 GB = 1024 MB → 1 TB = 1024 GB.</div>
+        </div>
+
+        <!-- ⑨ Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Memory: RAM &amp; ROM</div>
+          <p class="summary-text">
+            <strong>RAM</strong> (Random Access Memory) is volatile, fast, read-write primary memory used for running programs.
+            Types: DRAM (main RAM), SRAM (cache), DDR4/DDR5 (modern standard).
+            <strong>ROM</strong> (Read-Only Memory) is non-volatile, stores BIOS/firmware permanently.
+            Types: MROM, PROM, EPROM (UV erase), EEPROM (electrical erase — used in flash/SSDs).
+            <strong>Cache</strong> (L1→L2→L3) is ultra-fast SRAM between CPU and RAM.
+            Memory hierarchy: Registers → Cache → RAM → ROM → Secondary Storage.
+            1 KB = 1024 B, 1 MB = 1024 KB, 1 GB = 1024 MB, 1 TB = 1024 GB.
+          </p>
+        </div>
+
+        <!-- ⑩ Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is the difference between RAM and ROM?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">RAM is volatile (data lost on power off), fast, and read-write — used to run programs. ROM is non-volatile (data permanent), slower, and read-only — used to store BIOS/firmware.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What is BIOS and where is it stored?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">BIOS (Basic Input Output System) is the firmware that initializes hardware and boots the OS when you press the power button. It is stored in a ROM (EEPROM) chip on the motherboard.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is cache memory? Why is it needed?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Cache memory is very fast SRAM located close to the CPU. It stores frequently used data/instructions so the CPU doesn't have to wait for slower RAM. Levels: L1 (fastest, smallest) → L2 → L3 (slowest, largest of three).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What is the difference between SRAM and DRAM?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">SRAM (Static RAM) doesn't need periodic refresh, is faster and more expensive — used for cache. DRAM (Dynamic RAM) needs refresh thousands of times/second, is slower and cheaper — used for main system RAM.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>What is EEPROM? Give one practical use.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">EEPROM (Electrically Erasable Programmable ROM) is a type of ROM that can be erased and rewritten electrically. Practical uses: BIOS chips, USB pen drives, SSDs (Flash memory is a type of EEPROM).</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click an option to check your answer</div></div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. RAM is called "volatile" because ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> It is very expensive</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Its data is lost when power is off</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> It can only be read, not written</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> It is faster than Cache</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. Which type of ROM can be erased using Ultraviolet (UV) light?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> MROM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> PROM</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> EPROM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> EEPROM</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Cache memory is made of which type of RAM?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> DRAM</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> SRAM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> SDRAM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> DDR4</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. BIOS is stored in which memory?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> RAM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Hard Disk</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> ROM (EEPROM chip)</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Cache L1</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. 1 GB = _______ MB</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 100 MB</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> 1000 MB</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> 1024 MB</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 512 MB</div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i> Take Full Quiz
+            </a>
+          </div>
+        </div>
+
+        <!-- Topic Nav -->
+        <div class="topic-nav reveal">
+          <a href="topic-io-devices.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Input &amp; Output Devices</div></div>
+          </a>
+          <a href="topic-storage.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Next Topic</div><div class="nav-title">Storage Devices</div></div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Computer Fundamentals - Learn from Basic to Advanced. Perfect for BCA, MCA, Diploma and School students."/>
+  <title>Computer Fundamentals | Learn Computing</title>
+
+  <!-- Bootstrap 5.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/polish.css"/>
+</head>
+<body>
+
+<!-- ── Loading Screen ─────────────────────────────────────── -->
+<div id="loadingScreen">
+  <div class="loader-ring"></div>
+  <p class="loader-text">Loading Computer Fundamentals…</p>
+</div>
+
+<!-- ── Reading Progress Bar ──────────────────────────────── -->
+<div id="progressBar"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════════════════ -->
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+
+    <a class="navbar-brand" href="index.html">
+      <div class="brand-icon">
+        <i class="bi bi-cpu-fill text-white"></i>
+      </div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+
+    <button class="navbar-toggler border-0 shadow-none" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="bi bi-list" style="font-size:1.5rem; color:var(--text-primary)"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item">
+          <a class="nav-link active" href="#hero">
+            <i class="bi bi-house me-1"></i>Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#topics">
+            <i class="bi bi-journals me-1"></i>Topics
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="pages/quiz.html">
+            <i class="bi bi-patch-question me-1"></i>Quiz
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#progress">
+            <i class="bi bi-graph-up me-1"></i>Progress
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#about">
+            <i class="bi bi-info-circle me-1"></i>About
+          </a>
+        </li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <button id="themeToggle" data-bs-toggle="tooltip" title="Toggle Dark/Light Mode">
+            <i class="bi bi-sun-fill"></i>
+          </button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger">
+            <i class="bi bi-search"></i>
+            <span class="d-none d-lg-inline">Search topics…</span>
+            <kbd class="d-none d-lg-inline">Ctrl K</kbd>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO SECTION
+════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <!-- Ambient orbs -->
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
+
+  <div class="container">
+    <div class="row align-items-center">
+
+      <!-- Left: Text Content -->
+      <div class="col-lg-6 hero-content">
+
+        <div class="hero-badge">
+          <i class="bi bi-stars"></i>
+          BCA • MCA • Diploma • School Students
+        </div>
+
+        <h1 class="hero-title">
+          Master <span class="gradient-text">Computer<br/>Fundamentals</span><br/>
+          Step by Step
+        </h1>
+
+        <p class="hero-subtitle">
+          Learn computing concepts in simple English &amp; Hindi.
+          From hardware basics to advanced networking — everything exam-ready.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#topics" class="btn-primary-cta">
+            <i class="bi bi-play-circle-fill"></i>
+            Start Learning
+          </a>
+          <a href="pages/quiz.html" class="btn-secondary-cta">
+            <i class="bi bi-clipboard2-check"></i>
+            Take a Quiz
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-number" data-target="60" data-suffix="+">0+</div>
+            <div class="stat-label">Topics Covered</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div class="stat-number" data-target="500" data-suffix="+">0+</div>
+            <div class="stat-label">MCQs &amp; Quizzes</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div class="stat-number" data-target="3">0</div>
+            <div class="stat-label">Difficulty Levels</div>
+          </div>
+        </div>
+
+      </div><!-- /col -->
+
+      <!-- Right: Visual Card -->
+      <div class="col-lg-6 d-none d-lg-block hero-visual">
+        <div class="computer-card">
+
+          <!-- Floating tags -->
+          <div class="floating-tag floating-tag-1" style="color:var(--accent-emerald)">
+            <i class="bi bi-check-circle-fill"></i>
+            Exam Ready
+          </div>
+          <div class="floating-tag floating-tag-2" style="color:var(--accent-violet)">
+            <i class="bi bi-translate"></i>
+            English + Hindi
+          </div>
+
+          <div class="card-header-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+
+          <div class="code-block">
+            <div><span class="code-comment">// Computer Fundamentals — 6 Topics Live!</span></div>
+            <div><span class="code-keyword">const</span> <span class="code-var">topics</span> = [</div>
+            <div>&nbsp;&nbsp;<span class="code-string">"What is a Computer?"</span>,   <span class="code-comment">// ✅</span></div>
+            <div>&nbsp;&nbsp;<span class="code-string">"Hardware vs Software"</span>,  <span class="code-comment">// ✅</span></div>
+            <div>&nbsp;&nbsp;<span class="code-string">"I/O Devices"</span>,           <span class="code-comment">// ✅</span></div>
+            <div>&nbsp;&nbsp;<span class="code-string">"Memory: RAM &amp; ROM"</span>,   <span class="code-comment">// ✅</span></div>
+            <div>&nbsp;&nbsp;<span class="code-string">"Storage Devices"</span>,       <span class="code-comment">// ✅</span></div>
+            <div>&nbsp;&nbsp;<span class="code-string">"Number Systems"</span>,        <span class="code-comment">// ✅</span></div>
+            <div>];</div>
+            <div>&nbsp;</div>
+            <div><span class="code-comment">// 255₁₀ = FF₁₆ = 11111111₂</span></div>
+            <div><span class="code-keyword">function</span> <span class="code-var">learn</span>() {</div>
+            <div>&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">"🎓 Grade A++"</span>;</div>
+            <div>}</div>
+          </div>
+
+          <!-- Progress mini indicator -->
+          <div class="d-flex align-items-center gap-3 mt-4 pt-3" style="border-top:1px solid var(--border-color)">
+            <div style="flex:1">
+              <div class="d-flex justify-content-between mb-1">
+                <span style="font-size:0.75rem;font-weight:600;color:var(--text-secondary)">All Topics</span>
+                <span style="font-size:0.75rem;font-weight:700;color:var(--accent-emerald)">14 / 15</span>
+              </div>
+              <div class="progress" style="height:5px;border-radius:3px;background:var(--border-color)">
+                <div class="progress-bar" style="width:93%;background:var(--gradient-badge);border-radius:3px"></div>
+              </div>
+            </div>
+            <div style="font-size:1.3rem">🚀</div>
+          </div>
+
+        </div>
+      </div><!-- /col -->
+
+    </div><!-- /row -->
+  </div><!-- /container -->
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     WHY LEARN HERE
+════════════════════════════════════════════════════════ -->
+<section class="features-section section-pad" id="features">
+  <div class="container">
+
+    <div class="row align-items-center mb-5">
+      <div class="col-lg-5 mb-4 mb-lg-0 reveal">
+        <div class="section-eyebrow"><i class="bi bi-lightning-charge-fill"></i>Why This Site?</div>
+        <h2 class="section-title">Designed for Real<br/>Student Success</h2>
+        <p class="section-desc">
+          Every topic has dual-language explanations, real-life examples, interview questions,
+          and auto-graded quizzes — everything you need to ace your exams.
+        </p>
+      </div>
+      <div class="col-lg-7">
+        <div class="row g-2">
+
+          <div class="col-12 reveal">
+            <div class="feature-item">
+              <div class="feature-icon icon-blue"><i class="bi bi-translate"></i></div>
+              <div>
+                <div class="feature-title">English + हिंदी Explanations</div>
+                <div class="feature-desc">Every topic explained in both languages — no Hinglish, just clear pure-language content.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 reveal">
+            <div class="feature-item">
+              <div class="feature-icon icon-violet"><i class="bi bi-patch-question-fill"></i></div>
+              <div>
+                <div class="feature-title">25–50 MCQs Per Module</div>
+                <div class="feature-desc">Auto-graded quizzes with instant scores, percentage, grade, and downloadable PDF reports.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 reveal">
+            <div class="feature-item">
+              <div class="feature-icon icon-emerald"><i class="bi bi-mortarboard-fill"></i></div>
+              <div>
+                <div class="feature-title">Interview Ready Questions</div>
+                <div class="feature-desc">Each topic includes commonly asked interview and viva questions with model answers.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 reveal">
+            <div class="feature-item">
+              <div class="feature-icon icon-amber"><i class="bi bi-graph-up-arrow"></i></div>
+              <div>
+                <div class="feature-title">Track Your Progress</div>
+                <div class="feature-desc">LocalStorage-powered progress tracker so you always know where you left off.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TOPICS SECTION (Basic Concepts — First 3 Topics)
+════════════════════════════════════════════════════════ -->
+<section class="topics-section section-pad" id="topics">
+  <div class="container">
+
+    <div class="row mb-4 align-items-end reveal">
+      <div class="col-lg-7">
+        <div class="section-eyebrow"><i class="bi bi-journals"></i>All Topics</div>
+        <h2 class="section-title">Computer Fundamentals<br/>Curriculum</h2>
+        <p class="section-desc">Tap any card to dive deep into the topic with full explanations, examples and quizzes.</p>
+      </div>
+      <div class="col-lg-5 mt-3 mt-lg-0">
+        <!-- Level Filter Tabs -->
+        <div class="level-tabs justify-content-lg-end">
+          <button class="level-tab active" data-filter="all">All</button>
+          <button class="level-tab" data-filter="basic">Basic</button>
+          <button class="level-tab" data-filter="intermediate">Intermediate</button>
+          <button class="level-tab" data-filter="advanced">Advanced</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BASIC LEVEL HEADER ── -->
+    <div class="d-flex align-items-center gap-3 mb-3 reveal">
+      <span class="topic-level level-basic" style="font-size:0.8rem;padding:5px 14px">
+        <i class="bi bi-1-circle-fill me-1"></i>Basic Level
+      </span>
+      <div style="flex:1;height:1px;background:var(--border-color)"></div>
+    </div>
+
+    <div class="row g-4 mb-5">
+
+      <!-- Card 1: What is a Computer -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="basic">
+        <a href="pages/topic-computer.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-blue"><i class="bi bi-pc-display-horizontal"></i></div>
+          <div class="topic-title">What is a Computer?</div>
+          <p class="topic-desc">
+            Understand the definition, history and basic working of a computer.
+            Learn IPO Cycle — Input, Process, Output.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-basic">Basic</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 2: Hardware vs Software -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="basic">
+        <a href="pages/topic-hardware-software.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-violet"><i class="bi bi-motherboard"></i></div>
+          <div class="topic-title">Hardware vs Software</div>
+          <p class="topic-desc">
+            Explore the difference between physical components (Hardware) and programs (Software).
+            Types, examples, and real-life comparisons.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-basic">Basic</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 3: Input & Output Devices -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="basic">
+        <a href="pages/topic-io-devices.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-teal"><i class="bi bi-keyboard"></i></div>
+          <div class="topic-title">Input &amp; Output Devices</div>
+          <p class="topic-desc">
+            Keyboard, Mouse, Scanner, Monitor, Printer — learn which devices take information IN
+            and which give information OUT.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-basic">Basic</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+    </div><!-- /row basic -->
+
+    <!-- ── INTERMEDIATE LEVEL HEADER ── -->
+    <div class="d-flex align-items-center gap-3 mb-3 reveal">
+      <span class="topic-level level-intermediate" style="font-size:0.8rem;padding:5px 14px">
+        <i class="bi bi-2-circle-fill me-1"></i>Intermediate Level
+      </span>
+      <div style="flex:1;height:1px;background:var(--border-color)"></div>
+    </div>
+
+    <div class="row g-4 mb-5">
+
+      <!-- Card 4: Memory RAM & ROM -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="intermediate">
+        <a href="pages/topic-memory.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-amber"><i class="bi bi-memory"></i></div>
+          <div class="topic-title">Memory: RAM &amp; ROM</div>
+          <p class="topic-desc">
+            Primary memory types, volatile vs non-volatile, memory hierarchy, cache levels,
+            DRAM vs SRAM, BIOS, and EEPROM — with real-life analogies.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-intermediate">Intermediate</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 5: Storage Devices -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="intermediate">
+        <a href="pages/topic-storage.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-rose"><i class="bi bi-hdd-fill"></i></div>
+          <div class="topic-title">Storage Devices</div>
+          <p class="topic-desc">
+            HDD, SSD, Pen Drive, CD/DVD, Blu-ray — secondary storage with speed &amp;
+            capacity comparisons, NVMe vs SATA, and optical disc types.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-intermediate">Intermediate</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 6: Number Systems -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="intermediate">
+        <a href="pages/topic-number-systems.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-emerald"><i class="bi bi-123"></i></div>
+          <div class="topic-title">Number Systems</div>
+          <p class="topic-desc">
+            Binary, Decimal, Octal &amp; Hexadecimal — step-by-step conversions,
+            ASCII encoding, and a live interactive number converter tool.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-intermediate">Intermediate</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+    </div><!-- /row intermediate -->
+
+    <!-- ── ADVANCED LEVEL HEADER ── -->
+    <div class="d-flex align-items-center gap-3 mb-3 reveal">
+      <span class="topic-level level-advanced" style="font-size:0.8rem;padding:5px 14px">
+        <i class="bi bi-3-circle-fill me-1"></i>Advanced Level
+      </span>
+      <div style="flex:1;height:1px;background:var(--border-color)"></div>
+    </div>
+
+    <div class="row g-4 mb-5">
+
+      <!-- Card 7: Operating System -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="advanced">
+        <a href="pages/topic-os.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-violet"><i class="bi bi-windows"></i></div>
+          <div class="topic-title">Operating System</div>
+          <p class="topic-desc">
+            OS types (Batch, Real-Time, Distributed), functions, process states,
+            CPU scheduling algorithms, file systems, and kernel explained.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-advanced">Advanced</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 8: CPU Architecture -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="advanced">
+        <a href="pages/topic-cpu.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-teal"><i class="bi bi-cpu"></i></div>
+          <div class="topic-title">CPU Architecture</div>
+          <p class="topic-desc">
+            ALU, Control Unit, registers (PC, IR, ACC, MAR), Fetch-Decode-Execute cycle,
+            clock speed in GHz, RISC vs CISC, and multi-core processors.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-advanced">Advanced</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 9: Computer Generations -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="advanced">
+        <a href="pages/topic-generations.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-emerald"><i class="bi bi-clock-history"></i></div>
+          <div class="topic-title">Computer Generations</div>
+          <p class="topic-desc">
+            All 5 generations with technologies, examples, speed units, and timeline —
+            from ENIAC vacuum tubes to AI and ULSI. Includes Moore's Law.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-advanced">Advanced</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 10: Computer Networks -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="advanced">
+        <a href="pages/topic-networks.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-blue"><i class="bi bi-diagram-3-fill"></i></div>
+          <div class="topic-title">Computer Networks</div>
+          <p class="topic-desc">
+            LAN, WAN, MAN, PAN — network types, topologies (Bus, Star, Ring, Mesh),
+            OSI 7-layer model, TCP/IP model, and networking devices.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-advanced">Advanced</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 11: Database Fundamentals -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="advanced">
+        <a href="pages/topic-database.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-emerald"><i class="bi bi-database-fill"></i></div>
+          <div class="topic-title">Database Fundamentals</div>
+          <p class="topic-desc">
+            DBMS, RDBMS, tables, primary &amp; foreign keys, SQL queries, normalization
+            (1NF–3NF), ER diagrams, and RDBMS vs NoSQL comparison.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-advanced">Advanced</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 12: Software Engineering -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="advanced">
+        <a href="pages/topic-software-eng.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-violet"><i class="bi bi-code-square"></i></div>
+          <div class="topic-title">Software Engineering</div>
+          <p class="topic-desc">
+            SDLC phases, Waterfall vs Agile vs Spiral models, software testing (Black Box,
+            White Box, UAT, Regression), SRS, and DevOps basics.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-advanced">Advanced</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 13: Internet & Web Technologies -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="advanced">
+        <a href="pages/topic-internet.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-teal"><i class="bi bi-globe2"></i></div>
+          <div class="topic-title">Internet &amp; Web Technologies</div>
+          <p class="topic-desc">
+            HTTP/HTTPS, DNS, IP addressing (IPv4/IPv6), HTML/CSS/JavaScript basics,
+            cloud computing (IaaS/PaaS/SaaS), and key internet protocols.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-advanced">Advanced</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 14: Cyber Security -->
+      <div class="col-sm-6 col-xl-4 topic-card-wrap reveal" data-level="advanced">
+        <a href="pages/topic-cybersecurity.html" class="topic-card d-block h-100">
+          <div class="topic-icon icon-rose"><i class="bi bi-shield-lock-fill"></i></div>
+          <div class="topic-title">Cyber Security</div>
+          <p class="topic-desc">
+            CIA triad, malware, phishing, ransomware, DDoS, encryption (AES/RSA),
+            firewall, IDS/IPS, VPN, ethical hacking, and India's IT Act 2000.
+          </p>
+          <div class="topic-meta">
+            <span class="topic-level level-advanced">Advanced</span>
+            <span class="topic-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </a>
+      </div>
+
+    </div><!-- /row advanced -->
+
+    <!-- ── STUDENT PROGRESS TRACKER ── -->
+    <div id="progress" class="reveal" style="margin-bottom:24px">
+      <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:32px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-hero)"></div>
+
+        <div class="row align-items-center g-4">
+          <div class="col-lg-5">
+            <div class="section-eyebrow"><i class="bi bi-graph-up-arrow"></i>Your Progress</div>
+            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;margin-bottom:8px;color:var(--text-primary)">Track Your Learning Journey</h3>
+            <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:20px">Topics you've visited are automatically saved to your browser.</p>
+
+            <!-- Overall progress bar -->
+            <div style="margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:700;color:var(--text-muted);margin-bottom:6px">
+                <span>Overall Completion</span>
+                <span id="progressPct" style="color:var(--accent-blue)">0 / 11 topics</span>
+              </div>
+              <div style="height:8px;border-radius:4px;background:var(--border-color);overflow:hidden">
+                <div id="progressFill" style="height:100%;border-radius:4px;background:var(--gradient-badge);width:0%;transition:width 1s cubic-bezier(0.4,0,0.2,1)"></div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <button onclick="clearProgress()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-md);background:transparent;border:1.5px solid var(--border-color);color:var(--text-muted);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all var(--transition)" onmouseover="this.style.borderColor='var(--accent-rose)';this.style.color='var(--accent-rose)'" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-muted)'">
+                <i class="bi bi-trash3"></i> Reset Progress
+              </button>
+              <a href="pages/quiz.html" class="btn-primary-cta" style="padding:8px 18px;font-size:0.85rem">
+                <i class="bi bi-patch-question-fill"></i> Take Quiz
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px" id="progressGrid">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz history -->
+        <div id="quizHistoryWrap" style="display:none;margin-top:24px;padding-top:20px;border-top:1px solid var(--border-color)">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px"><i class="bi bi-clock-history me-1"></i>Recent Quiz Results</div>
+          <div id="quizHistory" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course stats banner -->
+    <div class="reveal">
+      <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:1.5rem">📚</span>
+          <div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem">14 Topics Published</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">Basic · Intermediate · Advanced — all levels covered</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--accent-emerald)">3</div>
+            <div style="font-size:0.68rem;color:var(--text-muted);font-weight:600;text-transform:uppercase">Basic</div>
+          </div>
+          <div style="width:1px;height:28px;background:var(--border-color)"></div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--accent-amber)">3</div>
+            <div style="font-size:0.68rem;color:var(--text-muted);font-weight:600;text-transform:uppercase">Intermediate</div>
+          </div>
+          <div style="width:1px;height:28px;background:var(--border-color)"></div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--accent-rose)">8</div>
+            <div style="font-size:0.68rem;color:var(--text-muted);font-weight:600;text-transform:uppercase">Advanced</div>
+          </div>
+          <div style="width:1px;height:28px;background:var(--border-color)"></div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--accent-violet)">150+</div>
+            <div style="font-size:0.68rem;color:var(--text-muted);font-weight:600;text-transform:uppercase">MCQs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ABOUT SECTION
+════════════════════════════════════════════════════════ -->
+<section class="features-section section-pad" id="about">
+  <div class="container">
+    <div class="row justify-content-center text-center">
+      <div class="col-lg-7 reveal">
+        <div class="section-eyebrow justify-content-center"><i class="bi bi-info-circle-fill"></i>About This Site</div>
+        <h2 class="section-title">Built for Students,<br/>By Students in Mind</h2>
+        <p class="section-desc mx-auto mb-4" style="max-width:520px">
+          This platform covers Computer Fundamentals from scratch — perfect for
+          BCA, MCA, Diploma, B.Sc CS, and school students preparing for exams or interviews.
+        </p>
+        <div class="d-flex gap-3 flex-wrap justify-content-center">
+          <span class="hero-badge" style="position:static;animation:none">
+            <i class="bi bi-mortarboard-fill"></i> Exam Oriented
+          </span>
+          <span class="hero-badge" style="position:static;animation:none;background:rgba(112,72,232,0.12);border-color:rgba(112,72,232,0.3);color:var(--accent-violet)">
+            <i class="bi bi-translate"></i> Bilingual Content
+          </span>
+          <span class="hero-badge" style="position:static;animation:none;background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--accent-emerald)">
+            <i class="bi bi-phone-fill"></i> Mobile Friendly
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-text">
+      <p class="mb-1">
+        <strong style="color:var(--text-primary)">CompFund</strong> — Computer Fundamentals Learning Platform
+      </p>
+      <p>
+        Built for BCA • MCA • Diploma • School Students &nbsp;|&nbsp;
+        <a href="#hero">Back to Top <i class="bi bi-arrow-up-circle"></i></a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- ── Search Overlay ── -->
+<div id="searchOverlay"></div>
+
+<!-- ── Search Modal ── -->
+<div id="searchModal" role="dialog" aria-label="Search Topics">
+  <div class="search-input-row">
+    <i class="bi bi-search"></i>
+    <input type="text" id="searchInput" placeholder="Search topics, concepts, keywords…" autocomplete="off" spellcheck="false"/>
+    <button id="searchClose" aria-label="Close search"><i class="bi bi-x"></i></button>
+  </div>
+  <div id="searchResults"></div>
+  <div class="search-footer">
+    <span><kbd>↵</kbd> to open</span>
+    <span><kbd>Esc</kbd> to close</span>
+    <span><kbd>Ctrl</kbd><kbd>K</kbd> to open anywhere</span>
+  </div>
+</div>
+
+<!-- ── Back to Top ── -->
+<button id="backToTop" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="bi bi-arrow-up"></i>
+</button>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Main JS -->
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script>
+/* ── Back to Top visibility ── */
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('backToTop');
+  btn?.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+
+/* ── Mark visited topic cards ── */
+(function markVisited() {
+  try {
+    const visited = JSON.parse(localStorage.getItem('cf_visited') || '{}');
+    document.querySelectorAll('.topic-card').forEach(card => {
+      const href = card.getAttribute('href') || '';
+      const id   = Object.keys(visited).find(k => href.includes(k.replace(/-/g,'')) || href.includes(k));
+      if (id && visited[id]) card.setAttribute('data-visited','true');
+    });
+  } catch(e) {}
+})();
+
+/* ── Homepage Progress Tracker ─────────────────────────── */
+const ALL_TOPICS = [
+  { id:'computer-basics',       label:'What is a Computer?',      href:'pages/topic-computer.html',         level:'basic',        icon:'🖥️' },
+  { id:'hardware-software',     label:'Hardware vs Software',      href:'pages/topic-hardware-software.html',level:'basic',        icon:'🔧' },
+  { id:'io-devices',            label:'Input & Output Devices',    href:'pages/topic-io-devices.html',       level:'basic',        icon:'⌨️' },
+  { id:'memory-ram-rom',        label:'Memory: RAM & ROM',         href:'pages/topic-memory.html',           level:'intermediate', icon:'🧠' },
+  { id:'storage-devices',       label:'Storage Devices',           href:'pages/topic-storage.html',          level:'intermediate', icon:'💾' },
+  { id:'number-systems',        label:'Number Systems',            href:'pages/topic-number-systems.html',   level:'intermediate', icon:'🔢' },
+  { id:'operating-system',      label:'Operating System',          href:'pages/topic-os.html',               level:'advanced',     icon:'⚙️' },
+  { id:'cpu-architecture',      label:'CPU Architecture',          href:'pages/topic-cpu.html',              level:'advanced',     icon:'💻' },
+  { id:'computer-generations',  label:'Computer Generations',      href:'pages/topic-generations.html',      level:'advanced',     icon:'📅' },
+  { id:'computer-networks',     label:'Computer Networks',         href:'pages/topic-networks.html',         level:'advanced',     icon:'🌐' },
+  { id:'database-fundamentals', label:'Database Fundamentals',     href:'pages/topic-database.html',         level:'advanced',     icon:'🗄️' },
+  { id:'software-engineering',  label:'Software Engineering',      href:'pages/topic-software-eng.html',     level:'advanced',     icon:'🛠️' },
+  { id:'internet-web',          label:'Internet & Web Tech',       href:'pages/topic-internet.html',         level:'advanced',     icon:'🌍' },
+  { id:'cyber-security',        label:'Cyber Security',            href:'pages/topic-cybersecurity.html',    level:'advanced',     icon:'🔒' },
+];
+
+const LEVEL_COLORS = { basic:'var(--accent-emerald)', intermediate:'var(--accent-amber)', advanced:'var(--accent-rose)' };
+
+function loadProgress() {
+  try { return JSON.parse(localStorage.getItem('cf_visited') || '{}'); } catch(e) { return {}; }
+}
+
+function renderProgressGrid() {
+  const visited = loadProgress();
+  const grid    = document.getElementById('progressGrid');
+  const pctEl   = document.getElementById('progressPct');
+  const fill    = document.getElementById('progressFill');
+  if (!grid) return;
+
+  const count = ALL_TOPICS.filter(t => visited[t.id]).length;
+  const pct   = Math.round((count / ALL_TOPICS.length) * 100);
+
+  if (pctEl) pctEl.textContent = `${count} / ${ALL_TOPICS.length} topics`;
+  if (fill)  fill.style.width  = pct + '%';
+
+  grid.innerHTML = ALL_TOPICS.map(t => {
+    const done  = !!visited[t.id];
+    const color = LEVEL_COLORS[t.level];
+    return `
+    <a href="${t.href}" style="text-decoration:none">
+      <div style="
+        padding:10px 12px;
+        border-radius:var(--radius-md);
+        border:1.5px solid ${done ? color : 'var(--border-color)'};
+        background:${done ? color + '14' : 'var(--bg-primary)'};
+        display:flex; align-items:center; gap:8px;
+        transition:all 0.2s; cursor:pointer;
+      " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow-sm)'"
+         onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <span style="font-size:1.1rem;flex-shrink:0">${done ? '✅' : t.icon}</span>
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;color:${done ? color : 'var(--text-primary)'};line-height:1.3">${t.label}</div>
+          <div style="font-size:0.63rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em">${t.level}</div>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+function renderQuizHistory() {
+  try {
+    const history = JSON.parse(localStorage.getItem('cf_quiz_history') || '[]');
+    const wrap    = document.getElementById('quizHistoryWrap');
+    const cont    = document.getElementById('quizHistory');
+    if (!history.length || !wrap) return;
+    wrap.style.display = 'block';
+    cont.innerHTML = history.slice(0, 6).map(h => `
+      <div style="padding:10px 14px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);min-width:140px">
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:2px">${h.date} · ${h.module}</div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--accent-blue)">${h.pct}% <span style="font-size:0.7rem;color:var(--text-muted)">Grade ${h.grade}</span></div>
+        <div style="font-size:0.72rem;color:var(--text-muted)">${h.score}/${h.total} · ${h.time}</div>
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+function clearProgress() {
+  if (!confirm('Reset all reading progress? Quiz history will also be cleared.')) return;
+  localStorage.removeItem('cf_visited');
+  localStorage.removeItem('cf_quiz_history');
+  renderProgressGrid();
+  const wrap = document.getElementById('quizHistoryWrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderProgressGrid();
+  renderQuizHistory();
+});
+</script>
+</body>
+</html>

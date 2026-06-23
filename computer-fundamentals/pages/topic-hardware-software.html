@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hardware vs Software | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+</head>
+<body data-topic-id="hardware-software">
+
+<div id="progressBar"></div>
+
+<!-- NAVBAR -->
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- TOPIC HERO -->
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Basic Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Hardware vs Software</span>
+    </div>
+    <div class="topic-hero-icon icon-violet" style="background:rgba(112,72,232,0.15)">
+      <i class="bi bi-motherboard"></i>
+    </div>
+    <h1 class="topic-hero-title">Hardware vs Software</h1>
+    <p class="topic-hero-desc">
+      Understand the difference between the physical components of a computer (Hardware)
+      and the programs that run on it (Software), with types and real-life examples.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-emerald"><i class="bi bi-1-circle me-1"></i>Basic Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>12 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<!-- TOPIC BODY -->
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- SIDEBAR -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#hw-types"><i class="bi bi-motherboard"></i> Types of Hardware</a></li>
+              <li><a href="#sw-types"><i class="bi bi-code-square"></i> Types of Software</a></li>
+              <li><a href="#comparison"><i class="bi bi-table"></i> Comparison Table</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-book-fill"></i></div>
+            <div>
+              <div class="cs-title">Topic Explanation</div>
+              <div class="cs-subtitle">Read in your preferred language</div>
+            </div>
+          </div>
+
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>
+              A computer system is made up of two essential components: <strong>Hardware</strong> and <strong>Software</strong>.
+              These two work together — neither can function without the other.
+            </p>
+            <p>
+              <strong>Hardware</strong> refers to all the physical, tangible parts of a computer that you can touch and feel.
+              Examples include the monitor, keyboard, mouse, CPU, RAM, hard disk, and printer. Hardware is permanent
+              and cannot be modified by simply changing software.
+            </p>
+            <p>
+              <strong>Software</strong> refers to the set of programs, instructions, and data that tell the hardware
+              what to do. You cannot touch software — it is intangible. Examples include Windows OS, MS Word,
+              Google Chrome, and antivirus programs. Software can be easily updated, copied, or deleted.
+            </p>
+            <p>
+              A simple analogy: think of a music player. The <strong>CD player device</strong> is the hardware,
+              while the <strong>music (songs)</strong> on the CD is the software. The player can't work without
+              songs, and songs have no use without the player.
+            </p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p>
+              एक कंप्यूटर सिस्टम दो आवश्यक घटकों से मिलकर बना है: <strong>हार्डवेयर</strong> और <strong>सॉफ्टवेयर</strong>।
+              ये दोनों मिलकर काम करते हैं — एक दूसरे के बिना कार्य नहीं कर सकते।
+            </p>
+            <p>
+              <strong>हार्डवेयर</strong> कंप्यूटर के उन सभी भौतिक भागों को कहते हैं जिन्हें हम छू और देख सकते हैं।
+              उदाहरण: मॉनिटर, कीबोर्ड, माउस, CPU, RAM, हार्ड डिस्क और प्रिंटर। हार्डवेयर स्थायी होता है
+              और इसे सॉफ्टवेयर बदलकर बदला नहीं जा सकता।
+            </p>
+            <p>
+              <strong>सॉफ्टवेयर</strong> उन प्रोग्रामों, निर्देशों और डेटा का समूह है जो हार्डवेयर को बताते हैं
+              कि क्या करना है। सॉफ्टवेयर अमूर्त होता है — आप इसे छू नहीं सकते।
+              उदाहरण: Windows OS, MS Word, Google Chrome, और एंटीवायरस प्रोग्राम।
+              सॉफ्टवेयर को आसानी से अपडेट, कॉपी या डिलीट किया जा सकता है।
+            </p>
+            <p>
+              एक सरल उदाहरण: एक म्यूजिक प्लेयर के बारे में सोचिए।
+              <strong>CD प्लेयर का उपकरण</strong> हार्डवेयर है, जबकि <strong>CD पर संगीत (गाने)</strong> सॉफ्टवेयर है।
+              प्लेयर बिना गानों के काम नहीं कर सकता, और गाने प्लेयर के बिना बेकार हैं।
+            </p>
+          </div>
+        </div>
+
+        <!-- ② Types of Hardware -->
+        <div class="content-section reveal" id="hw-types">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-motherboard-fill"></i></div>
+            <div>
+              <div class="cs-title">Types of Hardware</div>
+              <div class="cs-subtitle">Main hardware categories with examples</div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="key-note" style="border-color:var(--accent-blue)"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-blue)"></i>
+                <div><strong style="color:var(--accent-blue)">Input Devices</strong><br/>Keyboard, Mouse, Scanner, Microphone, Webcam, Joystick</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="key-note" style="border-color:var(--accent-emerald)"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-emerald)"></i>
+                <div><strong style="color:var(--accent-emerald)">Output Devices</strong><br/>Monitor, Printer, Speaker, Projector, Plotter</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="key-note" style="border-color:var(--accent-violet)"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-violet)"></i>
+                <div><strong style="color:var(--accent-violet)">Processing Unit</strong><br/>CPU (ALU + Control Unit + Registers)</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="key-note" style="border-color:var(--accent-rose)"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-rose)"></i>
+                <div><strong style="color:var(--accent-rose)">Memory</strong><br/>RAM (Primary), ROM (Firmware), Cache Memory</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="key-note" style="border-color:var(--accent-amber)"><i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-amber)"></i>
+                <div><strong style="color:var(--accent-amber)">Storage Devices</strong><br/>Hard Disk Drive (HDD), Solid State Drive (SSD), Pen Drive, CD/DVD</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ Types of Software -->
+        <div class="content-section reveal" id="sw-types">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-code-square"></i></div>
+            <div>
+              <div class="cs-title">Types of Software</div>
+              <div class="cs-subtitle">System software, application software, and more</div>
+            </div>
+          </div>
+
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box" style="background:rgba(59,91,219,0.06);border-color:rgba(59,91,219,0.2)">
+              <div class="example-icon">🖥️</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-blue)">System Software</div>
+                <p class="example-text">Controls and manages hardware resources. Examples: Operating Systems (Windows, Linux, macOS, Android), Device Drivers, BIOS/UEFI.</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(112,72,232,0.06);border-color:rgba(112,72,232,0.2)">
+              <div class="example-icon">📱</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-violet)">Application Software</div>
+                <p class="example-text">Designed for end users to perform specific tasks. Examples: MS Word (word processing), VLC (media player), Photoshop (image editing), Chrome (browser).</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.2)">
+              <div class="example-icon">🛠️</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-amber)">Utility Software</div>
+                <p class="example-text">Supports and maintains the computer. Examples: Antivirus (Avast), Disk Cleanup, WinZip (file compression), CCleaner.</p>
+              </div>
+            </div>
+            <div class="example-box" style="background:rgba(244,63,94,0.06);border-color:rgba(244,63,94,0.2)">
+              <div class="example-icon">⚙️</div>
+              <div>
+                <div class="example-title" style="color:var(--accent-rose)">Programming Software</div>
+                <p class="example-text">Tools used by developers to create programs. Examples: Compilers, Interpreters, IDEs (VS Code, Eclipse), Debuggers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ Comparison Table -->
+        <div class="content-section reveal" id="comparison">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-table"></i></div>
+            <div>
+              <div class="cs-title">Hardware vs Software — Comparison Table</div>
+              <div class="cs-subtitle">Quick reference for exams</div>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th style="color:var(--text-muted)">Feature</th>
+                  <th style="color:var(--accent-blue)"><i class="bi bi-motherboard me-1"></i>Hardware</th>
+                  <th style="color:var(--accent-violet)"><i class="bi bi-code-square me-1"></i>Software</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Definition</strong></td><td>Physical components of a computer</td><td>Programs and instructions for hardware</td></tr>
+                <tr><td><strong>Tangibility</strong></td><td>Tangible (can be touched)</td><td>Intangible (cannot be touched)</td></tr>
+                <tr><td><strong>Examples</strong></td><td>CPU, Monitor, Keyboard, RAM</td><td>Windows, MS Word, Photoshop</td></tr>
+                <tr><td><strong>Nature</strong></td><td>Permanent / Physical</td><td>Logical / Virtual</td></tr>
+                <tr><td><strong>Failure</strong></td><td>Wears out / Breaks down physically</td><td>Can be affected by viruses / bugs</td></tr>
+                <tr><td><strong>Copy</strong></td><td>Cannot be easily duplicated</td><td>Can be easily copied</td></tr>
+                <tr><td><strong>Dependency</strong></td><td>Needs software to function</td><td>Needs hardware to run</td></tr>
+                <tr><td><strong>Cost</strong></td><td>Generally expensive to replace</td><td>Some are free (Open Source)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ⑤ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div>
+              <div class="cs-title">Real-Life Examples</div>
+            </div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">📺</div>
+              <div>
+                <div class="example-title">TV Analogy</div>
+                <p class="example-text">The <strong>television set</strong> (screen, speakers, remote) is like Hardware. The <strong>TV channels and programs</strong> you watch are like Software. You need both to enjoy watching TV.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">📖</div>
+              <div>
+                <div class="example-title">Book Analogy</div>
+                <p class="example-text">The <strong>physical book</strong> (paper, cover, binding) is the Hardware. The <strong>knowledge and content</strong> inside the book is the Software. Without pages, there's no book; without content, the book is useless.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🚗</div>
+              <div>
+                <div class="example-title">Car Analogy</div>
+                <p class="example-text">The <strong>car's engine, body, and wheels</strong> are Hardware. The <strong>GPS navigation system and car computer software</strong> are Software. Modern cars use both to function efficiently.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> Hardware without software is a <strong>dead machine</strong> — it cannot do any useful work.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> Software without hardware has <strong>no existence</strong> — it cannot run.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> The Operating System (OS) is the most important software — it <strong>manages all hardware resources</strong>.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> Hardware is a <strong>one-time purchase</strong>; software can be <strong>licensed, subscribed, or free</strong>.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> Firmware is a special type of software <strong>stored permanently in hardware</strong> (e.g., BIOS in motherboard).</div>
+        </div>
+
+        <!-- ⑦ Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Hardware vs Software</div>
+          <p class="summary-text">
+            <strong>Hardware</strong> = Physical, tangible parts (Monitor, CPU, Keyboard, RAM).
+            <strong>Software</strong> = Intangible programs and instructions (Windows, MS Word, Antivirus).
+            Software is of three main types: <strong>System Software</strong> (OS, drivers),
+            <strong>Application Software</strong> (MS Word, Chrome), and <strong>Utility Software</strong> (Antivirus, Disk Cleanup).
+            Hardware and software are completely <strong>interdependent</strong> — neither works without the other.
+            Firmware is special software stored inside hardware chips (like BIOS).
+          </p>
+        </div>
+
+        <!-- ⑧ Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is the main difference between hardware and software?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Hardware is the physical, tangible component of a computer (e.g., CPU, Monitor) while Software is the intangible set of programs and instructions (e.g., Windows OS, MS Word). Hardware can be touched; software cannot.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What are the types of software? Give examples.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Software is of three types: (1) System Software – controls hardware (e.g., Windows, Linux), (2) Application Software – used by end users (e.g., MS Word, VLC), (3) Utility Software – maintains the system (e.g., Antivirus, Disk Cleanup).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is firmware? Where is it used?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Firmware is a permanent type of software stored in a hardware device's memory (ROM chip). It controls the device's basic functions. Example: BIOS (Basic Input Output System) stored in the motherboard's ROM chip controls the computer's startup process.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>Can a computer work without an operating system?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Without an OS, the computer hardware can still perform basic tasks through BIOS/firmware. However, without an OS, users cannot run application programs, use the file system, or interact with the computer easily. The OS acts as a bridge between user, application software, and hardware.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>Give an analogy to explain the relationship between hardware and software.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">A good analogy is a music player and music. The physical CD player (hardware) needs music/songs (software) to play. Without songs, the player is useless; without the player, the songs can't be heard. Similarly, hardware and software are interdependent.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑨ MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click an option to check your answer</div></div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. Which of the following is an example of Hardware?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> MS Word</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Windows OS</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Monitor</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Google Chrome</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. Which is the most important type of System Software?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> MS Excel</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Operating System</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Antivirus</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Media Player</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Firmware is stored in which type of memory?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> RAM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Hard Disk</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> ROM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Cache</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. Which of these is Application Software?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Linux Kernel</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Device Driver</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Adobe Photoshop</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> BIOS</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. Software can be _______ easily, unlike hardware.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Manufactured</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Copied / Duplicated</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Physically felt</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Repaired mechanically</div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i>
+              Take Full Quiz (25 Questions)
+            </a>
+          </div>
+        </div>
+
+        <!-- Topic Nav -->
+        <div class="topic-nav reveal">
+          <a href="topic-computer.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">What is a Computer?</div></div>
+          </a>
+          <a href="topic-io-devices.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Next Topic</div><div class="nav-title">Input &amp; Output Devices</div></div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-text">
+      <p class="mb-1"><strong style="color:var(--text-primary)">CompFund</strong> — Computer Fundamentals Learning Platform</p>
+      <p><a href="../index.html">← Back to Home</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

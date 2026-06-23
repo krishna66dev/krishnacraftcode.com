@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Database Fundamentals | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    /* DB Table visual */
+    .db-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 0.84rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); }
+    .db-table thead th { background: var(--accent-blue); color: #fff; padding: 10px 14px; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.05em; }
+    .db-table tbody td { padding: 9px 14px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+    .db-table tbody tr:hover td { background: rgba(59,91,219,0.04); }
+    .pk-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.65rem; font-weight: 700; background: rgba(59,91,219,0.15); color: var(--accent-blue); padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+
+    /* SQL code block */
+    .sql-block { background: var(--bg-code); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; font-family: var(--font-mono); font-size: 0.84rem; line-height: 1.9; overflow-x: auto; }
+    .sql-kw   { color: var(--accent-blue); font-weight: 700; }
+    .sql-str  { color: var(--accent-emerald); }
+    .sql-num  { color: var(--accent-amber); }
+    .sql-cmt  { color: #64748B; font-style: italic; }
+    .sql-fn   { color: var(--accent-violet); }
+    .sql-tbl  { color: var(--accent-teal); }
+
+    /* ER diagram */
+    .er-entity { background: rgba(59,91,219,0.12); border: 2px solid var(--accent-blue); border-radius: var(--radius-md); padding: 12px 18px; text-align: center; font-weight: 700; color: var(--accent-blue); font-family: var(--font-display); }
+    .er-attr   { background: rgba(16,185,129,0.1); border: 1.5px solid var(--accent-emerald); border-radius: 50%; padding: 8px 12px; text-align: center; font-size: 0.75rem; color: var(--accent-emerald); font-weight: 600; }
+    .er-rel    { background: rgba(245,158,11,0.12); border: 2px solid var(--accent-amber); transform: rotate(45deg); width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; }
+    .er-rel-text { transform: rotate(-45deg); font-size: 0.7rem; font-weight: 700; color: var(--accent-amber); text-align: center; line-height: 1.2; }
+
+    /* Normal form cards */
+    .nf-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px 18px; border-left: 3px solid var(--nf-color, var(--accent-blue)); transition: all var(--transition); margin-bottom: 10px; }
+    .nf-card:hover { box-shadow: var(--shadow-sm); }
+    .nf-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+    .nf-rule  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; }
+  </style>
+</head>
+<body data-topic-id="database-fundamentals">
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Advanced Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Database Fundamentals</span>
+    </div>
+    <div class="topic-hero-icon icon-emerald" style="background:rgba(16,185,129,0.15)">
+      <i class="bi bi-database-fill"></i>
+    </div>
+    <h1 class="topic-hero-title">Database Fundamentals</h1>
+    <p class="topic-hero-desc">
+      Learn DBMS concepts — tables, keys, SQL queries, ER diagrams, normalization (1NF to 3NF),
+      and the difference between RDBMS and NoSQL databases.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-rose"><i class="bi bi-3-circle me-1"></i>Advanced Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>18 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-emerald"><i class="bi bi-code-slash me-1"></i>SQL Examples</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#db-table"><i class="bi bi-table"></i> Tables &amp; Keys</a></li>
+              <li><a href="#sql"><i class="bi bi-code-slash"></i> SQL Basics</a></li>
+              <li><a href="#er"><i class="bi bi-diagram-3"></i> ER Diagram</a></li>
+              <li><a href="#normalization"><i class="bi bi-layers"></i> Normalization</a></li>
+              <li><a href="#rdbms"><i class="bi bi-grid-3x3"></i> RDBMS vs NoSQL</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>A <strong>Database</strong> is an organized collection of structured data stored and accessed electronically. A <strong>DBMS (Database Management System)</strong> is software that manages databases — allowing users to create, read, update, and delete data (CRUD operations).</p>
+            <p>The most common type is a <strong>Relational Database</strong>, where data is stored in <strong>tables</strong> (rows and columns), and tables are linked using <strong>keys</strong>. The language used to interact with relational databases is <strong>SQL (Structured Query Language)</strong>.</p>
+            <p>Popular RDBMS (Relational DBMS): <strong>MySQL, PostgreSQL, Oracle, Microsoft SQL Server, SQLite</strong>. Popular NoSQL databases (for unstructured/big data): <strong>MongoDB, Cassandra, Redis, Firebase</strong>.</p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p>एक <strong>डेटाबेस</strong> संरचित डेटा का एक संगठित संग्रह है जिसे इलेक्ट्रॉनिक रूप से संग्रहीत और एक्सेस किया जाता है। एक <strong>DBMS (डेटाबेस प्रबंधन प्रणाली)</strong> वह सॉफ्टवेयर है जो डेटाबेस का प्रबंधन करता है — उपयोगकर्ताओं को डेटा बनाने, पढ़ने, अपडेट करने और हटाने (CRUD संचालन) की अनुमति देता है।</p>
+            <p>सबसे सामान्य प्रकार <strong>रिलेशनल डेटाबेस</strong> है, जहाँ डेटा <strong>तालिकाओं</strong> (पंक्तियों और स्तंभों) में संग्रहीत होता है। डेटाबेस के साथ इंटरैक्ट करने के लिए उपयोग की जाने वाली भाषा <strong>SQL (स्ट्रक्चर्ड क्वेरी लैंग्वेज)</strong> है।</p>
+            <p>लोकप्रिय RDBMS: <strong>MySQL, PostgreSQL, Oracle, MS SQL Server</strong>। NoSQL: <strong>MongoDB, Cassandra, Redis, Firebase</strong>।</p>
+          </div>
+        </div>
+
+        <!-- ② Tables & Keys -->
+        <div class="content-section reveal" id="db-table">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-table"></i></div>
+            <div><div class="cs-title">Tables, Keys &amp; Relationships</div><div class="cs-subtitle">The building blocks of relational databases</div></div>
+          </div>
+
+          <p class="mb-3" style="font-size:0.88rem;color:var(--text-secondary)">Example: A <strong>Student</strong> table in a college database:</p>
+          <div class="table-responsive mb-4">
+            <table class="db-table">
+              <thead><tr><th>StudentID <span style="font-size:0.65rem;opacity:0.8">(PK)</span></th><th>Name</th><th>Age</th><th>CourseID <span style="font-size:0.65rem;opacity:0.8">(FK)</span></th><th>Email</th></tr></thead>
+              <tbody>
+                <tr><td><strong style="color:var(--accent-blue)">101</strong></td><td>Priya Sharma</td><td>20</td><td style="color:var(--accent-rose)">C01</td><td>priya@example.com</td></tr>
+                <tr><td><strong style="color:var(--accent-blue)">102</strong></td><td>Rahul Verma</td><td>21</td><td style="color:var(--accent-rose)">C02</td><td>rahul@example.com</td></tr>
+                <tr><td><strong style="color:var(--accent-blue)">103</strong></td><td>Anjali Singh</td><td>19</td><td style="color:var(--accent-rose)">C01</td><td>anjali@example.com</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="key-note" style="border-color:var(--accent-blue);flex-direction:column;gap:5px">
+                <div style="display:flex;gap:8px;align-items:center"><i class="bi bi-key-fill" style="color:var(--accent-blue)"></i><strong style="color:var(--accent-blue)">Primary Key (PK)</strong></div>
+                <span>Uniquely identifies each row in a table. Cannot be NULL or duplicate. Example: StudentID (101, 102, 103 — each unique).</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="key-note" style="border-color:var(--accent-rose);flex-direction:column;gap:5px">
+                <div style="display:flex;gap:8px;align-items:center"><i class="bi bi-link-45deg" style="color:var(--accent-rose)"></i><strong style="color:var(--accent-rose)">Foreign Key (FK)</strong></div>
+                <span>A field in one table that refers to the Primary Key of another table. Links tables together. Example: CourseID links Student table to Course table.</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="key-note" style="border-color:var(--accent-amber);flex-direction:column;gap:5px">
+                <div style="display:flex;gap:8px;align-items:center"><i class="bi bi-shield-check" style="color:var(--accent-amber)"></i><strong style="color:var(--accent-amber)">Candidate Key</strong></div>
+                <span>Any column (or set of columns) that CAN serve as the Primary Key — i.e., all values are unique and non-null. Example: StudentID, Email are both candidate keys.</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="key-note" style="border-color:var(--accent-emerald);flex-direction:column;gap:5px">
+                <div style="display:flex;gap:8px;align-items:center"><i class="bi bi-intersect" style="color:var(--accent-emerald)"></i><strong style="color:var(--accent-emerald)">Composite Key</strong></div>
+                <span>A Primary Key made of two or more columns together. Example: (StudentID + ExamDate) together uniquely identify an exam result record.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ SQL Basics -->
+        <div class="content-section reveal" id="sql">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-code-slash"></i></div>
+            <div><div class="cs-title">SQL — Structured Query Language</div><div class="cs-subtitle">The language of relational databases</div></div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-md-3">
+              <div style="text-align:center;padding:14px;background:rgba(59,91,219,0.08);border:1px solid rgba(59,91,219,0.2);border-radius:var(--radius-md)">
+                <div style="font-size:1.3rem;margin-bottom:4px">📋</div>
+                <div style="font-weight:700;font-size:0.8rem;color:var(--accent-blue)">DDL</div>
+                <div style="font-size:0.7rem;color:var(--text-muted)">Data Definition<br/>CREATE, DROP, ALTER</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <div style="text-align:center;padding:14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-md)">
+                <div style="font-size:1.3rem;margin-bottom:4px">✏️</div>
+                <div style="font-weight:700;font-size:0.8rem;color:var(--accent-emerald)">DML</div>
+                <div style="font-size:0.7rem;color:var(--text-muted)">Data Manipulation<br/>INSERT, UPDATE, DELETE</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <div style="text-align:center;padding:14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-md)">
+                <div style="font-size:1.3rem;margin-bottom:4px">🔍</div>
+                <div style="font-weight:700;font-size:0.8rem;color:var(--accent-amber)">DQL</div>
+                <div style="font-size:0.7rem;color:var(--text-muted)">Data Query<br/>SELECT</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <div style="text-align:center;padding:14px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:var(--radius-md)">
+                <div style="font-size:1.3rem;margin-bottom:4px">🔐</div>
+                <div style="font-weight:700;font-size:0.8rem;color:var(--accent-rose)">DCL</div>
+                <div style="font-size:0.7rem;color:var(--text-muted)">Data Control<br/>GRANT, REVOKE</div>
+              </div>
+            </div>
+          </div>
+
+          <p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Common SQL Queries with Examples:</p>
+          <div class="sql-block">
+<span class="sql-cmt">-- Create a table</span>
+<span class="sql-kw">CREATE TABLE</span> <span class="sql-tbl">Student</span> (
+  StudentID   <span class="sql-fn">INT</span> <span class="sql-kw">PRIMARY KEY</span>,
+  Name        <span class="sql-fn">VARCHAR</span>(<span class="sql-num">50</span>) <span class="sql-kw">NOT NULL</span>,
+  Age         <span class="sql-fn">INT</span>,
+  Email       <span class="sql-fn">VARCHAR</span>(<span class="sql-num">100</span>) <span class="sql-kw">UNIQUE</span>
+);
+
+<span class="sql-cmt">-- Insert a record</span>
+<span class="sql-kw">INSERT INTO</span> <span class="sql-tbl">Student</span> <span class="sql-kw">VALUES</span> (<span class="sql-num">101</span>, <span class="sql-str">'Priya Sharma'</span>, <span class="sql-num">20</span>, <span class="sql-str">'priya@example.com'</span>);
+
+<span class="sql-cmt">-- Select all students</span>
+<span class="sql-kw">SELECT</span> * <span class="sql-kw">FROM</span> <span class="sql-tbl">Student</span>;
+
+<span class="sql-cmt">-- Select with condition</span>
+<span class="sql-kw">SELECT</span> Name, Age <span class="sql-kw">FROM</span> <span class="sql-tbl">Student</span> <span class="sql-kw">WHERE</span> Age &gt; <span class="sql-num">19</span>;
+
+<span class="sql-cmt">-- Update a record</span>
+<span class="sql-kw">UPDATE</span> <span class="sql-tbl">Student</span> <span class="sql-kw">SET</span> Age = <span class="sql-num">21</span> <span class="sql-kw">WHERE</span> StudentID = <span class="sql-num">101</span>;
+
+<span class="sql-cmt">-- Delete a record</span>
+<span class="sql-kw">DELETE FROM</span> <span class="sql-tbl">Student</span> <span class="sql-kw">WHERE</span> StudentID = <span class="sql-num">103</span>;
+
+<span class="sql-cmt">-- Aggregate functions</span>
+<span class="sql-kw">SELECT</span> <span class="sql-fn">COUNT</span>(*), <span class="sql-fn">AVG</span>(Age), <span class="sql-fn">MAX</span>(Age) <span class="sql-kw">FROM</span> <span class="sql-tbl">Student</span>;
+
+<span class="sql-cmt">-- Order results</span>
+<span class="sql-kw">SELECT</span> * <span class="sql-kw">FROM</span> <span class="sql-tbl">Student</span> <span class="sql-kw">ORDER BY</span> Name <span class="sql-kw">ASC</span>;
+          </div>
+        </div>
+
+        <!-- ④ Normalization -->
+        <div class="content-section reveal" id="normalization">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-layers-fill"></i></div>
+            <div><div class="cs-title">Normalization (1NF → 2NF → 3NF)</div><div class="cs-subtitle">Organizing tables to reduce redundancy and improve integrity</div></div>
+          </div>
+          <div class="prose mb-3"><p><strong>Normalization</strong> is the process of organizing a database to reduce data redundancy (repeated data) and improve data integrity. It involves dividing large tables into smaller, related ones.</p></div>
+          <div class="nf-card" style="--nf-color:var(--accent-blue)">
+            <div class="nf-title" style="color:var(--accent-blue)">1NF — First Normal Form</div>
+            <div class="nf-rule">Rule: Each column must contain <strong>atomic (indivisible) values</strong> — no repeating groups or arrays. Each row must be unique. Example: Phone numbers should be in a separate row per number, not comma-separated in one cell.</div>
+          </div>
+          <div class="nf-card" style="--nf-color:var(--accent-violet)">
+            <div class="nf-title" style="color:var(--accent-violet)">2NF — Second Normal Form</div>
+            <div class="nf-rule">Rule: Must be in 1NF + <strong>no partial dependency</strong> — every non-key attribute must depend on the ENTIRE primary key (not just part of it). Applies to tables with composite keys.</div>
+          </div>
+          <div class="nf-card" style="--nf-color:var(--accent-emerald)">
+            <div class="nf-title" style="color:var(--accent-emerald)">3NF — Third Normal Form</div>
+            <div class="nf-rule">Rule: Must be in 2NF + <strong>no transitive dependency</strong> — non-key attributes must depend ONLY on the primary key, not on other non-key attributes. Example: If StudentID → DeptID → DeptName, then DeptName should be in a separate Department table.</div>
+          </div>
+          <div class="nf-card" style="--nf-color:var(--accent-amber)">
+            <div class="nf-title" style="color:var(--accent-amber)">BCNF — Boyce-Codd Normal Form</div>
+            <div class="nf-rule">Stricter version of 3NF. Every determinant must be a candidate key. Used when 3NF is still insufficient to remove anomalies.</div>
+          </div>
+        </div>
+
+        <!-- ⑤ RDBMS vs NoSQL -->
+        <div class="content-section reveal" id="rdbms">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div><div class="cs-title">RDBMS vs NoSQL</div><div class="cs-subtitle">When to use which type</div></div>
+          </div>
+          <div class="table-responsive">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th style="color:var(--text-muted)">Feature</th>
+                  <th style="color:var(--accent-blue)">RDBMS (SQL)</th>
+                  <th style="color:var(--accent-emerald)">NoSQL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Data Format</strong></td><td>Tables (rows &amp; columns)</td><td>Documents, Key-Value, Graph, Column</td></tr>
+                <tr><td><strong>Schema</strong></td><td>Fixed schema (structured)</td><td>Flexible/dynamic schema</td></tr>
+                <tr><td><strong>Language</strong></td><td>SQL</td><td>Varies (JSON queries, etc.)</td></tr>
+                <tr><td><strong>Scalability</strong></td><td>Vertical (bigger server)</td><td>Horizontal (more servers)</td></tr>
+                <tr><td><strong>ACID</strong></td><td>Fully ACID compliant</td><td>Often eventually consistent (BASE)</td></tr>
+                <tr><td><strong>Best For</strong></td><td>Structured, relational data (banking, ERP)</td><td>Big data, real-time apps, social media</td></tr>
+                <tr><td><strong>Examples</strong></td><td>MySQL, PostgreSQL, Oracle, SQL Server</td><td>MongoDB, Cassandra, Redis, Firebase</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ⑥ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div><div class="cs-title">Real-Life Examples</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">🏦</div>
+              <div><div class="example-title">Bank System = RDBMS (MySQL/Oracle)</div>
+              <p class="example-text">Your bank account data — Account table, Transaction table, Customer table — all linked by Primary/Foreign keys. Strict ACID compliance ensures ₹ is never lost. SQL queries generate your bank statement.</p></div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">📱</div>
+              <div><div class="example-title">Instagram = NoSQL (Cassandra + Redis)</div>
+              <p class="example-text">Instagram stores billions of photos and social connections. Uses <strong>Cassandra</strong> (NoSQL) for massive scale and <strong>Redis</strong> (in-memory key-value) for lightning-fast feed caching. Flexible schema handles varied post types (photo, video, reel, story).</p></div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🏫</div>
+              <div><div class="example-title">College Exam System</div>
+              <p class="example-text">Student table (StudentID PK, Name, Branch), Course table (CourseID PK, CourseName), Result table (StudentID FK, CourseID FK, Marks). SQL: <code style="color:var(--accent-blue)">SELECT Name, Marks FROM Student JOIN Result ON Student.StudentID = Result.StudentID WHERE Marks &gt; 60;</code></p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>DBMS</strong> vs <strong>RDBMS</strong>: DBMS stores data in files (no relationships); RDBMS stores in tables with relationships. MySQL is an RDBMS; early dBase was a DBMS.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>ACID</strong> properties of transactions: <strong>A</strong>tomicity (all or nothing), <strong>C</strong>onsistency (valid state), <strong>I</strong>solation (concurrent transactions don't interfere), <strong>D</strong>urability (committed data persists).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>SQL commands categories: DDL (CREATE, ALTER, DROP, TRUNCATE), DML (INSERT, UPDATE, DELETE), DQL (SELECT), DCL (GRANT, REVOKE), TCL (COMMIT, ROLLBACK, SAVEPOINT).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>JOIN types:</strong> INNER JOIN (matching rows only), LEFT JOIN (all from left + matching from right), RIGHT JOIN (vice versa), FULL OUTER JOIN (all rows from both).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>E.F. Codd proposed the <strong>relational model</strong> in 1970 and defined 12 rules for a true RDBMS. He is called the <strong>"Father of the Relational Database."</strong></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Database Fundamentals</div>
+          <p class="summary-text"><strong>Database</strong> = organized data collection. <strong>DBMS</strong> = software to manage it. <strong>RDBMS</strong> = stores in tables with keys (MySQL, Oracle, PostgreSQL). Keys: <strong>PK</strong> (unique row identifier), <strong>FK</strong> (links tables), Candidate, Composite. <strong>SQL</strong> categories: DDL (CREATE/DROP), DML (INSERT/UPDATE/DELETE), DQL (SELECT). Normalization: <strong>1NF</strong> (atomic values), <strong>2NF</strong> (no partial dependency), <strong>3NF</strong> (no transitive dependency). <strong>ACID</strong> = Atomicity, Consistency, Isolation, Durability. <strong>NoSQL</strong> (MongoDB, Cassandra) = flexible schema, horizontal scaling for big data. E.F. Codd = Father of Relational Database.</p>
+        </div>
+
+        <!-- Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is the difference between a Primary Key and a Foreign Key?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Primary Key: uniquely identifies each row in its own table; cannot be NULL or duplicate (e.g., StudentID in Student table). Foreign Key: a column in one table that references the Primary Key of another table, establishing a relationship between the two (e.g., CourseID in Student table references CourseID in Course table).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What are ACID properties in a database?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">ACID: Atomicity (a transaction is all-or-nothing — if any part fails, everything rolls back), Consistency (transaction brings DB from one valid state to another), Isolation (concurrent transactions don't interfere with each other), Durability (once committed, data persists even after system crash).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is normalization? Explain 1NF and 3NF.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Normalization organizes a database to minimize redundancy. 1NF: all column values must be atomic (no repeating groups, no arrays in cells). 3NF: must be in 2NF + no transitive dependency (non-key columns must depend only on PK, not on other non-key columns). Goal: eliminate anomalies in insert, update, and delete operations.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What is the difference between RDBMS and NoSQL?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">RDBMS: structured data in tables with fixed schema, SQL language, ACID transactions, vertical scaling. Best for banking, ERP. Examples: MySQL, Oracle. NoSQL: flexible/dynamic schema, stores JSON documents/key-value/graph data, horizontal scaling, eventually consistent. Best for social media, big data, real-time apps. Examples: MongoDB, Redis, Cassandra.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>Write a SQL query to find all students with marks greater than 75, sorted by name.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">SELECT s.Name, r.Marks FROM Student s JOIN Result r ON s.StudentID = r.StudentID WHERE r.Marks > 75 ORDER BY s.Name ASC;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click to check your answer</div></div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. Which key uniquely identifies each row in a database table?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Foreign Key</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Primary Key</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Composite Key</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Secondary Key</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. Which SQL command is used to retrieve data from a table?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> INSERT</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> UPDATE</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> SELECT</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> CREATE</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Which normal form eliminates transitive dependencies?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 1NF</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> 2NF</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> 3NF</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> BCNF</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. MongoDB is an example of ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> RDBMS</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> NoSQL Database</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Flat File Database</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Network Database</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. The 'D' in ACID stands for ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Distribution</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Data</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Durability</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Dependency</div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i> Take Full Module Quiz
+            </a>
+          </div>
+        </div>
+
+        <div class="topic-nav reveal">
+          <a href="topic-networks.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Computer Networks</div></div>
+          </a>
+          <a href="quiz.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Test Yourself</div><div class="nav-title">Take the Full Quiz</div></div>
+            <i class="bi bi-patch-question-fill" style="font-size:1.2rem;color:var(--accent-violet)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

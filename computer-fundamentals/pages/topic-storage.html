@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Storage Devices | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    .storage-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      height: 100%;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .storage-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background: var(--card-accent, var(--gradient-badge));
+    }
+    .storage-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+    .storage-icon { font-size:2.2rem; margin-bottom:12px; display:block; }
+    .storage-name { font-family:var(--font-display); font-size:1.05rem; font-weight:700; margin-bottom:6px; }
+    .storage-desc { font-size:0.83rem; color:var(--text-secondary); line-height:1.6; margin-bottom:14px; }
+    .storage-specs { display:flex; flex-direction:column; gap:6px; }
+    .spec-row { display:flex; justify-content:space-between; font-size:0.78rem; padding:5px 0; border-bottom:1px solid var(--border-color); }
+    .spec-row:last-child { border:none; }
+    .spec-label { color:var(--text-muted); font-weight:600; }
+    .spec-val   { color:var(--text-primary); font-weight:600; text-align:right; }
+
+    /* Speed bar */
+    .speed-bar-wrap { margin-top: 10px; }
+    .speed-label { display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted); margin-bottom:4px; }
+    .speed-bar { height:6px; border-radius:3px; background:var(--border-color); }
+    .speed-fill { height:100%; border-radius:3px; }
+  </style>
+</head>
+<body data-topic-id="storage-devices">
+
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Intermediate Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Storage Devices</span>
+    </div>
+    <div class="topic-hero-icon icon-rose" style="background:rgba(244,63,94,0.15)">
+      <i class="bi bi-hdd-fill"></i>
+    </div>
+    <h1 class="topic-hero-title">Storage Devices</h1>
+    <p class="topic-hero-desc">
+      Explore secondary storage — HDD, SSD, Pen Drive, CD, DVD, and Blu-ray — with speed comparisons,
+      types, capacities, and when to use which.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-amber"><i class="bi bi-2-circle me-1"></i>Intermediate Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>13 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#types"><i class="bi bi-grid"></i> Types Overview</a></li>
+              <li><a href="#hdd"><i class="bi bi-hdd"></i> HDD</a></li>
+              <li><a href="#ssd"><i class="bi bi-lightning"></i> SSD</a></li>
+              <li><a href="#optical"><i class="bi bi-disc"></i> Optical (CD/DVD)</a></li>
+              <li><a href="#removable"><i class="bi bi-usb-drive"></i> Removable Storage</a></li>
+              <li><a href="#comparison"><i class="bi bi-table"></i> Comparison Table</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>
+              <strong>Storage devices</strong> (also called secondary storage or auxiliary memory) are hardware
+              devices that store data <em>permanently</em> — even when the computer is switched off.
+              Unlike RAM (which is temporary), storage devices keep your files, programs, and OS safe
+              until you choose to delete them.
+            </p>
+            <p>
+              Storage devices are categorized by their <strong>technology</strong>:
+              <strong>Magnetic</strong> (HDD — uses magnetic platters),
+              <strong>Solid State</strong> (SSD/Flash — uses electronic chips, no moving parts),
+              <strong>Optical</strong> (CD/DVD/Blu-ray — uses laser light), and
+              <strong>Removable</strong> (Pen Drive, Memory Card — portable flash storage).
+            </p>
+            <p>
+              The key metrics for storage devices are: <strong>Capacity</strong> (how much data they can hold,
+              measured in GB/TB), <strong>Speed</strong> (how fast data can be read/written),
+              <strong>Durability</strong> (how long they last), and <strong>Cost</strong> (price per GB).
+              SSDs are faster but costlier; HDDs are slower but cheaper per GB.
+            </p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p>
+              <strong>स्टोरेज डिवाइस</strong> (द्वितीयक भंडारण या सहायक मेमोरी भी कहलाते हैं) वे हार्डवेयर उपकरण हैं
+              जो डेटा को <em>स्थायी रूप से</em> संग्रहीत करते हैं — कंप्यूटर बंद होने पर भी।
+              RAM (अस्थायी) के विपरीत, स्टोरेज डिवाइस आपकी फाइलें, प्रोग्राम और OS तब तक सुरक्षित रखते हैं
+              जब तक आप उन्हें हटाना नहीं चाहते।
+            </p>
+            <p>
+              स्टोरेज डिवाइस को उनकी <strong>तकनीक</strong> के आधार पर वर्गीकृत किया जाता है:
+              <strong>चुंबकीय (Magnetic)</strong> — HDD (चुंबकीय प्लेटर का उपयोग),
+              <strong>सॉलिड स्टेट (Solid State)</strong> — SSD/Flash (इलेक्ट्रॉनिक चिप, कोई चलने वाला हिस्सा नहीं),
+              <strong>ऑप्टिकल (Optical)</strong> — CD/DVD/Blu-ray (लेजर प्रकाश का उपयोग), और
+              <strong>हटाने योग्य (Removable)</strong> — पेन ड्राइव, मेमोरी कार्ड।
+            </p>
+            <p>
+              स्टोरेज डिवाइस के मुख्य मापदंड हैं: <strong>क्षमता</strong> (GB/TB में),
+              <strong>गति</strong> (डेटा पढ़ने/लिखने की गति), <strong>टिकाऊपन</strong>, और <strong>लागत</strong>।
+              SSD तेज लेकिन महंगा है; HDD धीमा लेकिन प्रति GB सस्ता है।
+            </p>
+          </div>
+        </div>
+
+        <!-- ② Types Overview -->
+        <div class="content-section reveal" id="types">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div><div class="cs-title">Types of Storage Devices</div><div class="cs-subtitle">Four main categories</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="key-note" style="border-color:var(--accent-blue);flex-direction:column;gap:6px">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <i class="bi bi-hdd-fill" style="color:var(--accent-blue);font-size:1.2rem"></i>
+                  <strong style="color:var(--accent-blue)">1. Magnetic Storage</strong>
+                </div>
+                <span>Uses magnetic fields on spinning platters. Example: HDD (Hard Disk Drive). Large capacity, affordable, slower.</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="key-note" style="border-color:var(--accent-violet);flex-direction:column;gap:6px">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <i class="bi bi-lightning-charge-fill" style="color:var(--accent-violet);font-size:1.2rem"></i>
+                  <strong style="color:var(--accent-violet)">2. Solid State Storage</strong>
+                </div>
+                <span>Uses flash memory chips (EEPROM). No moving parts. Examples: SSD, Pen Drive, Memory Card. Fast, durable, expensive.</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="key-note" style="border-color:var(--accent-teal);flex-direction:column;gap:6px">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <i class="bi bi-disc-fill" style="color:var(--accent-teal);font-size:1.2rem"></i>
+                  <strong style="color:var(--accent-teal)">3. Optical Storage</strong>
+                </div>
+                <span>Uses laser light to read/write. Examples: CD (700 MB), DVD (4.7 GB), Blu-ray (25 GB+). Used for media distribution.</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="key-note" style="border-color:var(--accent-amber);flex-direction:column;gap:6px">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <i class="bi bi-usb-drive-fill" style="color:var(--accent-amber);font-size:1.2rem"></i>
+                  <strong style="color:var(--accent-amber)">4. Removable Storage</strong>
+                </div>
+                <span>Portable flash-based devices. Examples: USB Pen Drive (up to 2 TB), SD Card (phone), Memory Stick. Easy to carry.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ HDD -->
+        <div class="content-section reveal" id="hdd">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-hdd-fill"></i></div>
+            <div><div class="cs-title">HDD — Hard Disk Drive</div><div class="cs-subtitle">Magnetic spinning disk storage</div></div>
+          </div>
+          <div class="row g-3 align-items-start">
+            <div class="col-md-7 prose">
+              <p>An <strong>HDD</strong> stores data on rapidly spinning magnetic platters (disks). A read/write head moves across the platters to read or write data. The platters spin at <strong>5400–7200 RPM</strong> (Rotations Per Minute).</p>
+              <p>Because of the moving parts, HDDs are <strong>slower</strong> than SSDs and more vulnerable to physical shock. However, they offer <strong>very large storage capacity</strong> (1 TB – 20 TB) at a <strong>low price per GB</strong>, making them ideal for bulk storage.</p>
+            </div>
+            <div class="col-md-5">
+              <div class="storage-card" style="--card-accent: linear-gradient(90deg,#3B5BDB,#4C6EF5)">
+                <span class="storage-icon">💿</span>
+                <div class="storage-name" style="color:var(--accent-blue)">HDD Specs</div>
+                <div class="storage-specs">
+                  <div class="spec-row"><span class="spec-label">Technology</span><span class="spec-val">Magnetic platters</span></div>
+                  <div class="spec-row"><span class="spec-label">Speed (read)</span><span class="spec-val">80–160 MB/s</span></div>
+                  <div class="spec-row"><span class="spec-label">Capacity</span><span class="spec-val">500 GB – 20 TB</span></div>
+                  <div class="spec-row"><span class="spec-label">Moving parts</span><span class="spec-val">Yes (platters + head)</span></div>
+                  <div class="spec-row"><span class="spec-label">Cost/GB</span><span class="spec-val">Very cheap (~₹3/GB)</span></div>
+                  <div class="spec-row"><span class="spec-label">Durability</span><span class="spec-val">Moderate (shock risk)</span></div>
+                </div>
+                <div class="speed-bar-wrap mt-3">
+                  <div class="speed-label"><span>Speed</span><span>40%</span></div>
+                  <div class="speed-bar"><div class="speed-fill" style="width:40%;background:var(--accent-blue)"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ SSD -->
+        <div class="content-section reveal" id="ssd">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-lightning-charge-fill"></i></div>
+            <div><div class="cs-title">SSD — Solid State Drive</div><div class="cs-subtitle">Flash memory — no moving parts</div></div>
+          </div>
+          <div class="row g-3 align-items-start">
+            <div class="col-md-7 prose">
+              <p>An <strong>SSD</strong> stores data in <strong>NAND flash memory chips</strong> (a type of EEPROM). There are no moving parts — data is accessed electronically. This makes SSDs <strong>much faster</strong>, more durable, silent, and energy-efficient compared to HDDs.</p>
+              <p>Modern SSDs use the <strong>NVMe (PCIe)</strong> interface reaching speeds of <strong>3500–7000 MB/s</strong>. Older SATA SSDs reach ~550 MB/s. The trade-off: SSDs are more expensive per GB but prices are falling every year.</p>
+              <p>SSD types: <strong>2.5" SATA SSD</strong> (older laptops), <strong>M.2 NVMe SSD</strong> (modern ultrabooks), <strong>PCIe SSD</strong> (high-end workstations).</p>
+            </div>
+            <div class="col-md-5">
+              <div class="storage-card" style="--card-accent: linear-gradient(90deg,#7048E8,#9775FA)">
+                <span class="storage-icon">⚡</span>
+                <div class="storage-name" style="color:var(--accent-violet)">SSD Specs</div>
+                <div class="storage-specs">
+                  <div class="spec-row"><span class="spec-label">Technology</span><span class="spec-val">NAND Flash (EEPROM)</span></div>
+                  <div class="spec-row"><span class="spec-label">Speed (read)</span><span class="spec-val">500–7000 MB/s</span></div>
+                  <div class="spec-row"><span class="spec-label">Capacity</span><span class="spec-val">128 GB – 8 TB</span></div>
+                  <div class="spec-row"><span class="spec-label">Moving parts</span><span class="spec-val">None</span></div>
+                  <div class="spec-row"><span class="spec-label">Cost/GB</span><span class="spec-val">Higher (~₹8–15/GB)</span></div>
+                  <div class="spec-row"><span class="spec-label">Durability</span><span class="spec-val">Very high (shock-proof)</span></div>
+                </div>
+                <div class="speed-bar-wrap mt-3">
+                  <div class="speed-label"><span>Speed</span><span>95%</span></div>
+                  <div class="speed-bar"><div class="speed-fill" style="width:95%;background:var(--accent-violet)"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ Optical Storage -->
+        <div class="content-section reveal" id="optical">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-disc-fill"></i></div>
+            <div><div class="cs-title">Optical Storage — CD, DVD, Blu-ray</div><div class="cs-subtitle">Laser-based disc storage</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="storage-card" style="--card-accent:linear-gradient(90deg,#0EA5E9,#38BDF8)">
+                <span class="storage-icon">💿</span>
+                <div class="storage-name" style="color:var(--accent-teal)">CD</div>
+                <div class="storage-desc">Compact Disc. Uses infrared laser (780 nm).</div>
+                <div class="storage-specs">
+                  <div class="spec-row"><span class="spec-label">Capacity</span><span class="spec-val">700 MB</span></div>
+                  <div class="spec-row"><span class="spec-label">Types</span><span class="spec-val">CD-ROM, CD-R, CD-RW</span></div>
+                  <div class="spec-row"><span class="spec-label">Use</span><span class="spec-val">Music, old software</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="storage-card" style="--card-accent:linear-gradient(90deg,#10B981,#34D399)">
+                <span class="storage-icon">📀</span>
+                <div class="storage-name" style="color:var(--accent-emerald)">DVD</div>
+                <div class="storage-desc">Digital Versatile Disc. Uses red laser (650 nm).</div>
+                <div class="storage-specs">
+                  <div class="spec-row"><span class="spec-label">Capacity</span><span class="spec-val">4.7 GB (single layer)</span></div>
+                  <div class="spec-row"><span class="spec-label">Types</span><span class="spec-val">DVD-ROM, DVD-R, DVD-RW</span></div>
+                  <div class="spec-row"><span class="spec-label">Use</span><span class="spec-val">Movies, OS install</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="storage-card" style="--card-accent:linear-gradient(90deg,#F43F5E,#FB7185)">
+                <span class="storage-icon">🔵</span>
+                <div class="storage-name" style="color:var(--accent-rose)">Blu-ray</div>
+                <div class="storage-desc">Uses blue-violet laser (405 nm) — shorter wavelength = more data.</div>
+                <div class="storage-specs">
+                  <div class="spec-row"><span class="spec-label">Capacity</span><span class="spec-val">25–100 GB</span></div>
+                  <div class="spec-row"><span class="spec-label">Types</span><span class="spec-val">BD-ROM, BD-R, BD-RE</span></div>
+                  <div class="spec-row"><span class="spec-label">Use</span><span class="spec-val">4K movies, PS5 games</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="key-note mt-3"><i class="bi bi-info-circle-fill"></i> Optical disc types: <strong>ROM</strong> = Read Only (factory pressed), <strong>R</strong> = Recordable (write once), <strong>RW</strong> = ReWritable (erase &amp; rewrite multiple times).</div>
+        </div>
+
+        <!-- ⑥ Removable Storage -->
+        <div class="content-section reveal" id="removable">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-usb-drive-fill"></i></div>
+            <div><div class="cs-title">Removable Storage Devices</div><div class="cs-subtitle">Portable flash-based storage</div></div>
+          </div>
+          <div class="io-grid">
+            <div class="io-item">
+              <span class="io-emoji">💾</span>
+              <div class="io-name">USB Pen Drive</div>
+              <div class="io-type">4 GB – 2 TB</div>
+            </div>
+            <div class="io-item">
+              <span class="io-emoji">📷</span>
+              <div class="io-name">SD Card</div>
+              <div class="io-type">2 GB – 1 TB</div>
+            </div>
+            <div class="io-item">
+              <span class="io-emoji">📼</span>
+              <div class="io-name">Magnetic Tape</div>
+              <div class="io-type">TB range (archival)</div>
+            </div>
+            <div class="io-item">
+              <span class="io-emoji">☁️</span>
+              <div class="io-name">Cloud Storage</div>
+              <div class="io-type">Unlimited (online)</div>
+            </div>
+            <div class="io-item">
+              <span class="io-emoji">🗜️</span>
+              <div class="io-name">Memory Stick</div>
+              <div class="io-type">Sony proprietary</div>
+            </div>
+            <div class="io-item">
+              <span class="io-emoji">📟</span>
+              <div class="io-name">Floppy Disk</div>
+              <div class="io-type">1.44 MB (obsolete)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑦ Comparison Table -->
+        <div class="content-section reveal" id="comparison">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-table"></i></div>
+            <div><div class="cs-title">HDD vs SSD vs Optical — Comparison</div></div>
+          </div>
+          <div class="table-responsive">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th style="color:var(--text-muted)">Feature</th>
+                  <th style="color:var(--accent-blue)">HDD</th>
+                  <th style="color:var(--accent-violet)">SSD</th>
+                  <th style="color:var(--accent-teal)">CD/DVD</th>
+                  <th style="color:var(--accent-amber)">Pen Drive</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Technology</strong></td><td>Magnetic platters</td><td>NAND Flash</td><td>Laser optical</td><td>Flash memory</td></tr>
+                <tr><td><strong>Speed</strong></td><td>80–160 MB/s</td><td>500–7000 MB/s</td><td>~10 MB/s</td><td>10–400 MB/s</td></tr>
+                <tr><td><strong>Capacity</strong></td><td>500 GB – 20 TB</td><td>128 GB – 8 TB</td><td>700 MB – 100 GB</td><td>4 GB – 2 TB</td></tr>
+                <tr><td><strong>Moving Parts</strong></td><td>Yes</td><td>No</td><td>Yes (disc spin)</td><td>No</td></tr>
+                <tr><td><strong>Durability</strong></td><td>Moderate</td><td>Very High</td><td>Scratches easily</td><td>High</td></tr>
+                <tr><td><strong>Cost/GB</strong></td><td>Lowest</td><td>Higher</td><td>Very low</td><td>Low–Medium</td></tr>
+                <tr><td><strong>Portable?</strong></td><td>Mostly internal</td><td>Internal/External</td><td>Yes</td><td>Yes (designed for)</td></tr>
+                <tr><td><strong>Best for</strong></td><td>Bulk storage, servers</td><td>OS, speed-critical</td><td>Media distribution</td><td>Data transfer</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ⑧ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div><div class="cs-title">Real-Life Examples</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">🎓</div>
+              <div>
+                <div class="example-title">Student's Perspective</div>
+                <p class="example-text">You <strong>install Windows</strong> on an SSD (fast boot). You store <strong>10,000 songs and movies</strong> on an HDD (cheap bulk storage). You copy notes to a <strong>Pen Drive</strong> and share with friends. Old textbook CDs you received in school were <strong>CD-ROMs</strong>.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🏢</div>
+              <div>
+                <div class="example-title">Company/Server Room</div>
+                <p class="example-text"><strong>NAS (Network Attached Storage)</strong> uses multiple HDDs for cheap terabyte-scale storage. Critical databases run on fast <strong>NVMe SSDs</strong>. Old records are archived to <strong>magnetic tape</strong> (cheapest per GB for archive data).</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🎮</div>
+              <div>
+                <div class="example-title">Gaming Console (PS5 / Xbox)</div>
+                <p class="example-text">PlayStation 5 and Xbox Series X use a custom <strong>NVMe SSD</strong> — games load in 1–2 seconds instead of 30–60 seconds on an HDD. Some games still come on <strong>Blu-ray discs</strong> (100 GB).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑨ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Secondary Storage</strong> = non-volatile, permanent, slower than RAM, not directly accessed by CPU — data first loaded into RAM.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>HDD RPM: <strong>5400 RPM</strong> (laptops, power saving) vs <strong>7200 RPM</strong> (desktops, faster).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>SSD interface types: <strong>SATA</strong> (~550 MB/s) vs <strong>NVMe/PCIe</strong> (3500–7000 MB/s).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>CD capacity: <strong>700 MB</strong> | DVD single layer: <strong>4.7 GB</strong> | DVD dual layer: <strong>8.5 GB</strong> | Blu-ray: <strong>25–100 GB</strong>.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Floppy Disk</strong> = obsolete 1.44 MB magnetic disk. <strong>Zip Drive</strong> = 100–750 MB removable disk (1990s).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Cloud storage examples: Google Drive (15 GB free), OneDrive (5 GB free), Dropbox — data stored on remote servers.</div>
+        </div>
+
+        <!-- ⑩ Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Storage Devices</div>
+          <p class="summary-text">
+            Storage devices are <strong>non-volatile secondary memory</strong>. Types: <strong>Magnetic</strong> (HDD — 80–160 MB/s, 500 GB–20 TB, cheap), <strong>Solid State</strong> (SSD — 500–7000 MB/s, no moving parts, durable, costlier), <strong>Optical</strong> (CD=700 MB, DVD=4.7 GB, Blu-ray=25–100 GB), <strong>Removable</strong> (Pen Drive, SD Card). SSD uses <strong>NAND Flash (EEPROM)</strong>. HDD uses <strong>magnetic platters at 5400–7200 RPM</strong>. Optical discs: ROM=read only, R=write once, RW=rewritable. Cloud storage uses remote servers over the internet.
+          </p>
+        </div>
+
+        <!-- Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is the difference between HDD and SSD?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">HDD (Hard Disk Drive) stores data on spinning magnetic platters at 5400–7200 RPM; it has moving parts, is slower (80–160 MB/s), more affordable, and vulnerable to physical shock. SSD (Solid State Drive) uses NAND flash chips, has no moving parts, is much faster (500–7000 MB/s), more durable, silent, but costs more per GB.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What is the storage capacity of a CD, DVD, and Blu-ray disc?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">CD: 700 MB. DVD (single layer): 4.7 GB, DVD (dual layer): 8.5 GB. Blu-ray (single layer): 25 GB, Blu-ray (dual layer): 50 GB, BDXL: up to 128 GB.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is the difference between CD-ROM, CD-R, and CD-RW?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">CD-ROM (Read Only Memory): factory-pressed, can only be read. CD-R (Recordable): blank disc, can be written once by user, then read many times. CD-RW (ReWritable): can be erased and rewritten multiple times (like a reusable storage medium).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>Why is secondary storage needed if we already have RAM?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">RAM is volatile (data lost on power off) and expensive per GB. Secondary storage is non-volatile (permanent), much cheaper per GB, and can hold terabytes of data. RAM temporarily holds what the CPU is currently working on; secondary storage permanently holds everything else (OS, programs, user files).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>What is NVMe? How is it different from SATA SSD?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">NVMe (Non-Volatile Memory Express) is a protocol for SSDs using the PCIe bus. NVMe SSDs reach 3500–7000 MB/s read speeds. SATA SSDs use the older SATA interface and are limited to ~550 MB/s. NVMe SSDs are significantly faster and used in modern laptops (M.2 form factor) and gaming PCs.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click an option to check your answer</div></div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. What is the storage capacity of a standard DVD (single layer)?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 700 MB</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> 4.7 GB</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> 25 GB</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 1.44 MB</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. Which storage device has NO moving parts?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> HDD</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> DVD Drive</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> SSD</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Floppy Disk</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. HDD platters typically spin at ______ RPM.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 1000–2000 RPM</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> 5400–7200 RPM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> 10000–15000 RPM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 100–500 RPM</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. Blu-ray disc uses which type of laser?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Red laser</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Infrared laser</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Blue-violet laser</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Green laser</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. SSD technology is based on which type of memory?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> DRAM</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> SRAM</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> NAND Flash (EEPROM)</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Magnetic ferrite</div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i> Take Full Quiz
+            </a>
+          </div>
+        </div>
+
+        <!-- Topic Nav -->
+        <div class="topic-nav reveal">
+          <a href="topic-memory.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Memory: RAM &amp; ROM</div></div>
+          </a>
+          <a href="topic-number-systems.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Next Topic</div><div class="nav-title">Number Systems</div></div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+/* =========================================================
+   Search Modal + UI Polish (Iteration 5)
+   ========================================================= */
+
+/* ── Search Trigger Button ── */
+.search-trigger {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.search-trigger:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: rgba(59,91,219,0.06);
+}
+.search-trigger kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 1px 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ── Search Overlay ── */
+#searchOverlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  z-index: 1080;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+#searchOverlay.open { opacity: 1; pointer-events: auto; }
+
+/* ── Search Modal ── */
+#searchModal {
+  position: fixed;
+  top: 80px; left: 50%; transform: translateX(-50%) translateY(-16px);
+  width: min(640px, calc(100vw - 32px));
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+  z-index: 1090;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  max-height: calc(100vh - 120px);
+  display: flex; flex-direction: column;
+}
+#searchModal.open {
+  opacity: 1; pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Search input row */
+.search-input-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.search-input-row i { color: var(--text-muted); font-size: 1rem; flex-shrink: 0; }
+#searchInput {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 1rem; color: var(--text-primary);
+  font-family: var(--font-body);
+  caret-color: var(--accent-blue);
+}
+#searchInput::placeholder { color: var(--text-muted); }
+#searchClose {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--bg-primary); border: 1px solid var(--border-color);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); font-size: 0.75rem;
+  transition: all var(--transition); flex-shrink: 0;
+}
+#searchClose:hover { background: var(--accent-rose); border-color: var(--accent-rose); color: #fff; }
+
+/* Results area */
+#searchResults {
+  padding: 14px 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+#searchResults::-webkit-scrollbar { width: 4px; }
+#searchResults::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 2px; }
+
+/* Search footer hint */
+.search-footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border-color);
+  display: flex; gap: 14px; flex-wrap: wrap;
+  font-size: 0.7rem; color: var(--text-muted);
+  flex-shrink: 0;
+}
+.search-footer kbd {
+  display: inline-flex; padding: 1px 6px;
+  background: var(--bg-primary); border: 1px solid var(--border-color);
+  border-radius: 4px; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted);
+}
+
+/* ── Navbar scrolled state ── */
+#mainNav.scrolled {
+  background: rgba(10,15,30,0.95) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+[data-theme="light"] #mainNav.scrolled {
+  background: rgba(240,244,255,0.97) !important;
+  box-shadow: 0 2px 20px rgba(59,91,219,0.1);
+}
+
+/* ── Back to Top Button ── */
+#backToTop {
+  position: fixed; bottom: 28px; right: 28px;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--gradient-badge);
+  color: #fff; border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  opacity: 0; transform: translateY(16px);
+  transition: all 0.3s ease;
+  z-index: 500;
+}
+#backToTop.visible { opacity: 1; transform: translateY(0); }
+#backToTop:hover   { transform: translateY(-3px); box-shadow: 0 0 28px rgba(59,91,219,0.5); }
+
+/* ── Smooth topic card hover glow ── */
+.topic-card:hover { border-color: rgba(59,91,219,0.35); }
+
+/* ── Reading time badge on topic hero ── */
+.reading-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 100px; padding: 3px 10px;
+}
+
+/* ── Print styles for PDF ── */
+@media print {
+  #mainNav, #progressBar, #backToTop, footer,
+  .toc-sidebar, .topic-nav, .lang-toggle,
+  .btn-primary-cta, .btn-secondary-cta { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .content-section { border: 1px solid #ddd !important; background: #fff !important; }
+}
+
+/* ── Improved mobile nav ── */
+@media (max-width: 991px) {
+  .navbar-collapse {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-top: 10px;
+    box-shadow: var(--shadow-lg);
+  }
+  .search-trigger kbd { display: none; }
+  #backToTop { bottom: 20px; right: 16px; width: 40px; height: 40px; }
+}
+
+/* ── Focus visible for accessibility ── */
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Animated underline for nav links ── */
+.navbar-nav .nav-link {
+  position: relative;
+}
+.navbar-nav .nav-link::after {
+  content: '';
+  position: absolute; bottom: 0; left: 14px; right: 14px; height: 2px;
+  background: var(--accent-blue); border-radius: 1px;
+  transform: scaleX(0); transition: transform var(--transition);
+  transform-origin: center;
+}
+.navbar-nav .nav-link:hover::after,
+.navbar-nav .nav-link.active::after { transform: scaleX(1); }
+
+/* ── Topic card visited state ── */
+.topic-card[data-visited="true"]::after {
+  content: '✓';
+  position: absolute; top: 14px; right: 14px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent-emerald); color: #fff;
+  font-size: 0.72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Smooth page load fade ── */
+body { animation: pageLoad 0.3s ease; }
+@keyframes pageLoad { from { opacity: 0; } to { opacity: 1; } }

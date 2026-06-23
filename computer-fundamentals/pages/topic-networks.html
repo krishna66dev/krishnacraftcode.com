@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Computer Networks | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    /* Network type cards */
+    .net-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      height: 100%;
+      transition: all var(--transition);
+      border-top: 3px solid var(--nc, var(--accent-blue));
+    }
+    .net-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .net-card-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .net-card-title { font-family: var(--font-display); font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .net-card-sub   { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .net-card-desc  { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* OSI Model layers */
+    .osi-layer {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 18px; border-radius: var(--radius-md);
+      margin-bottom: 5px; transition: all var(--transition);
+      cursor: default;
+    }
+    .osi-layer:hover { transform: translateX(5px); }
+    .osi-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-weight: 700; font-size: 0.85rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .osi-name   { font-weight: 700; font-size: 0.9rem; min-width: 120px; }
+    .osi-func   { font-size: 0.8rem; color: var(--text-secondary); flex: 1; }
+    .osi-proto  { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; }
+
+    /* Topology diagrams using CSS */
+    .topo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+    .topo-card {
+      background: var(--bg-primary); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 18px; text-align: center;
+      transition: all var(--transition);
+    }
+    .topo-card:hover { border-color: var(--accent-blue); box-shadow: var(--shadow-sm); }
+    .topo-visual { height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; position: relative; }
+    .topo-name { font-weight: 700; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px; }
+    .topo-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* Network node dot */
+    .n-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent-blue); border: 2px solid #fff;
+      box-shadow: 0 0 6px rgba(59,91,219,0.5); position: absolute;
+    }
+    .n-line { position: absolute; background: var(--accent-blue); opacity: 0.4; }
+
+    /* Device cards */
+    .device-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 13px 16px; background: var(--bg-primary);
+      border-radius: var(--radius-md); margin-bottom: 8px;
+      border-left: 3px solid var(--dv-color, var(--accent-blue));
+      transition: all var(--transition);
+    }
+    .device-row:hover { box-shadow: var(--shadow-sm); }
+    .device-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .device-name { font-weight: 700; font-size: 0.88rem; color: var(--text-primary); }
+    .device-desc { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+  </style>
+</head>
+<body data-topic-id="computer-networks">
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Advanced Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Computer Networks</span>
+    </div>
+    <div class="topic-hero-icon icon-blue" style="background:rgba(59,91,219,0.15)">
+      <i class="bi bi-diagram-3-fill"></i>
+    </div>
+    <h1 class="topic-hero-title">Computer Networks</h1>
+    <p class="topic-hero-desc">
+      Learn LAN, WAN, MAN, PAN — network types, topologies (Bus, Star, Ring, Mesh),
+      the 7-layer OSI model, TCP/IP model, and networking devices.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-rose"><i class="bi bi-3-circle me-1"></i>Advanced Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>16 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- SIDEBAR -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#types"><i class="bi bi-diagram-3"></i> Network Types</a></li>
+              <li><a href="#topologies"><i class="bi bi-bezier2"></i> Topologies</a></li>
+              <li><a href="#osi"><i class="bi bi-layers"></i> OSI Model</a></li>
+              <li><a href="#tcpip"><i class="bi bi-stack"></i> TCP/IP Model</a></li>
+              <li><a href="#devices"><i class="bi bi-router"></i> Network Devices</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>A <strong>Computer Network</strong> is a group of two or more computers (or devices) connected together to share resources — such as files, printers, internet connections, and data. Networking is the backbone of the modern internet, corporate IT infrastructure, and mobile communication.</p>
+            <p>Networks are classified by their <strong>geographic scope</strong> (LAN, MAN, WAN, PAN), their <strong>physical layout</strong> (topology — Bus, Star, Ring, Mesh), and the <strong>communication protocol</strong> they use (TCP/IP, HTTP, FTP). The <strong>OSI Model</strong> (7 layers) and <strong>TCP/IP Model</strong> (4 layers) are frameworks that define how data travels from one computer to another across a network.</p>
+            <p>Without networks, the internet would not exist. Every time you open a website, send a message, or stream a video — data is traveling through a complex web of networked devices using these protocols and models.</p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p>एक <strong>कंप्यूटर नेटवर्क</strong> दो या अधिक कंप्यूटरों (या उपकरणों) का एक समूह है जो संसाधनों को साझा करने के लिए एक-दूसरे से जुड़े होते हैं — जैसे फाइलें, प्रिंटर, इंटरनेट कनेक्शन और डेटा। नेटवर्किंग आधुनिक इंटरनेट, कॉर्पोरेट IT और मोबाइल संचार की रीढ़ है।</p>
+            <p>नेटवर्क को उनके <strong>भौगोलिक क्षेत्र</strong> (LAN, MAN, WAN, PAN), <strong>भौतिक लेआउट</strong> (टोपोलॉजी — Bus, Star, Ring, Mesh) और उनके द्वारा उपयोग किए जाने वाले <strong>संचार प्रोटोकॉल</strong> (TCP/IP, HTTP, FTP) के आधार पर वर्गीकृत किया जाता है। <strong>OSI मॉडल</strong> (7 परतें) और <strong>TCP/IP मॉडल</strong> (4 परतें) यह परिभाषित करते हैं कि डेटा एक कंप्यूटर से दूसरे कंप्यूटर तक कैसे पहुँचता है।</p>
+          </div>
+        </div>
+
+        <!-- ② Network Types -->
+        <div class="content-section reveal" id="types">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-diagram-3-fill"></i></div>
+            <div><div class="cs-title">Types of Computer Networks</div><div class="cs-subtitle">Classified by geographic coverage</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="net-card" style="--nc:var(--accent-blue)">
+                <span class="net-card-icon">🏠</span>
+                <div class="net-card-title" style="color:var(--accent-blue)">PAN</div>
+                <div class="net-card-sub">Personal Area Network</div>
+                <div class="net-card-desc">Smallest network — connects personal devices within 10 meters. Examples: Bluetooth headset to phone, smartwatch to laptop, wireless keyboard.</div>
+                <div class="key-note mt-2" style="border-color:var(--accent-blue);padding:6px 10px;font-size:0.75rem"><i class="bi bi-rulers"></i> Range: ~10 m | Tech: Bluetooth, USB, Infrared</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="net-card" style="--nc:var(--accent-emerald)">
+                <span class="net-card-icon">🏢</span>
+                <div class="net-card-title" style="color:var(--accent-emerald)">LAN</div>
+                <div class="net-card-sub">Local Area Network</div>
+                <div class="net-card-desc">Connects computers within a single building, office, school, or campus. High speed, privately owned. Examples: School computer lab, home Wi-Fi network, office network.</div>
+                <div class="key-note mt-2" style="border-color:var(--accent-emerald);padding:6px 10px;font-size:0.75rem"><i class="bi bi-rulers"></i> Range: Up to 1 km | Tech: Ethernet, Wi-Fi</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="net-card" style="--nc:var(--accent-amber)">
+                <span class="net-card-icon">🏙️</span>
+                <div class="net-card-title" style="color:var(--accent-amber)">MAN</div>
+                <div class="net-card-sub">Metropolitan Area Network</div>
+                <div class="net-card-desc">Covers a city or metropolitan area. Connects multiple LANs. Example: Cable TV network in a city, university campuses across a city, city-wide Wi-Fi.</div>
+                <div class="key-note mt-2" style="border-color:var(--accent-amber);padding:6px 10px;font-size:0.75rem"><i class="bi bi-rulers"></i> Range: 5–50 km | Tech: Fiber optic, WiMAX</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="net-card" style="--nc:var(--accent-rose)">
+                <span class="net-card-icon">🌍</span>
+                <div class="net-card-title" style="color:var(--accent-rose)">WAN</div>
+                <div class="net-card-sub">Wide Area Network</div>
+                <div class="net-card-desc">Spans countries, continents — the largest type. The Internet is the world's largest WAN. Connects multiple MANs and LANs. Uses leased lines, satellites, and fiber optic cables.</div>
+                <div class="key-note mt-2" style="border-color:var(--accent-rose);padding:6px 10px;font-size:0.75rem"><i class="bi bi-rulers"></i> Range: Unlimited | Tech: Satellite, Leased lines, Fiber</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ Topologies -->
+        <div class="content-section reveal" id="topologies">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-bezier2"></i></div>
+            <div><div class="cs-title">Network Topologies</div><div class="cs-subtitle">Physical arrangement of network devices</div></div>
+          </div>
+          <div class="topo-grid">
+
+            <!-- Bus -->
+            <div class="topo-card">
+              <div class="topo-visual">
+                <svg width="120" height="60" viewBox="0 0 120 60">
+                  <line x1="10" y1="30" x2="110" y2="30" stroke="var(--accent-blue)" stroke-width="2.5" opacity="0.5"/>
+                  <circle cx="10"  cy="30" r="7" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="35"  cy="30" r="7" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="60"  cy="30" r="7" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="85"  cy="30" r="7" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="110" cy="30" r="7" fill="var(--accent-rose)" opacity="0.8"/>
+                  <line x1="35" y1="30" x2="35" y2="10" stroke="var(--accent-violet)" stroke-width="1.5" stroke-dasharray="3"/>
+                  <line x1="85" y1="30" x2="85" y2="10" stroke="var(--accent-violet)" stroke-width="1.5" stroke-dasharray="3"/>
+                </svg>
+              </div>
+              <div class="topo-name">Bus</div>
+              <div class="topo-desc">All devices share one backbone cable. Simple but single point of failure.</div>
+            </div>
+
+            <!-- Star -->
+            <div class="topo-card">
+              <div class="topo-visual">
+                <svg width="120" height="80" viewBox="0 0 120 80">
+                  <circle cx="60" cy="40" r="9" fill="var(--accent-amber)" opacity="0.9"/>
+                  <line x1="60" y1="40" x2="20"  y2="15"  stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.5"/>
+                  <line x1="60" y1="40" x2="100" y2="15"  stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.5"/>
+                  <line x1="60" y1="40" x2="20"  y2="65"  stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.5"/>
+                  <line x1="60" y1="40" x2="100" y2="65"  stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.5"/>
+                  <line x1="60" y1="40" x2="60"  y2="8"   stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.5"/>
+                  <circle cx="20"  cy="15" r="6" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="100" cy="15" r="6" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="20"  cy="65" r="6" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="100" cy="65" r="6" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="60"  cy="8"  r="6" fill="var(--accent-blue)" opacity="0.8"/>
+                </svg>
+              </div>
+              <div class="topo-name">Star ⭐</div>
+              <div class="topo-desc">All devices connect to a central hub/switch. Most common in LAN. Easy to manage.</div>
+            </div>
+
+            <!-- Ring -->
+            <div class="topo-card">
+              <div class="topo-visual">
+                <svg width="100" height="80" viewBox="0 0 100 80">
+                  <circle cx="50" cy="40" r="28" fill="none" stroke="var(--accent-blue)" stroke-width="2" opacity="0.4"/>
+                  <circle cx="50" cy="12" r="7" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="78" cy="40" r="7" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="50" cy="68" r="7" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="22" cy="40" r="7" fill="var(--accent-violet)" opacity="0.8"/>
+                </svg>
+              </div>
+              <div class="topo-name">Ring</div>
+              <div class="topo-desc">Each device connects to exactly two others, forming a ring. Token passing. Failure = network down.</div>
+            </div>
+
+            <!-- Mesh -->
+            <div class="topo-card">
+              <div class="topo-visual">
+                <svg width="100" height="80" viewBox="0 0 100 80">
+                  <line x1="20" y1="20" x2="80" y2="20" stroke="var(--accent-emerald)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="20" y1="20" x2="20" y2="60" stroke="var(--accent-emerald)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="20" y1="20" x2="80" y2="60" stroke="var(--accent-emerald)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="80" y1="20" x2="20" y2="60" stroke="var(--accent-emerald)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="80" y1="20" x2="80" y2="60" stroke="var(--accent-emerald)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="20" y1="60" x2="80" y2="60" stroke="var(--accent-emerald)" stroke-width="1.5" opacity="0.4"/>
+                  <circle cx="20" cy="20" r="7" fill="var(--accent-emerald)" opacity="0.85"/>
+                  <circle cx="80" cy="20" r="7" fill="var(--accent-emerald)" opacity="0.85"/>
+                  <circle cx="20" cy="60" r="7" fill="var(--accent-emerald)" opacity="0.85"/>
+                  <circle cx="80" cy="60" r="7" fill="var(--accent-emerald)" opacity="0.85"/>
+                </svg>
+              </div>
+              <div class="topo-name">Mesh 🕸️</div>
+              <div class="topo-desc">Every device connects to every other. Most reliable — no single failure point. Used in WAN, internet backbone.</div>
+            </div>
+
+            <!-- Tree/Hybrid -->
+            <div class="topo-card">
+              <div class="topo-visual">
+                <svg width="120" height="80" viewBox="0 0 120 80">
+                  <circle cx="60" cy="12" r="7" fill="var(--accent-rose)" opacity="0.9"/>
+                  <line x1="60" y1="12" x2="30" y2="40" stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="60" y1="12" x2="90" y2="40" stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.4"/>
+                  <circle cx="30" cy="40" r="6" fill="var(--accent-amber)" opacity="0.85"/>
+                  <circle cx="90" cy="40" r="6" fill="var(--accent-amber)" opacity="0.85"/>
+                  <line x1="30" y1="40" x2="15" y2="68" stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="30" y1="40" x2="45" y2="68" stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="90" y1="40" x2="75" y2="68" stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.4"/>
+                  <line x1="90" y1="40" x2="105" y2="68" stroke="var(--accent-blue)" stroke-width="1.5" opacity="0.4"/>
+                  <circle cx="15"  cy="68" r="5" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="45"  cy="68" r="5" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="75"  cy="68" r="5" fill="var(--accent-blue)" opacity="0.8"/>
+                  <circle cx="105" cy="68" r="5" fill="var(--accent-blue)" opacity="0.8"/>
+                </svg>
+              </div>
+              <div class="topo-name">Tree / Hybrid</div>
+              <div class="topo-desc">Hierarchical combination of Bus and Star. Used in large campus/corporate networks.</div>
+            </div>
+
+          </div>
+          <div class="key-note mt-3" style="border-color:var(--accent-amber)"><i class="bi bi-star-fill" style="color:var(--accent-amber)"></i><strong>Star topology</strong> is the most widely used in modern LANs. <strong>Mesh topology</strong> is used in the internet backbone and military networks for maximum reliability.</div>
+        </div>
+
+        <!-- ④ OSI Model -->
+        <div class="content-section reveal" id="osi">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-layers-fill"></i></div>
+            <div><div class="cs-title">OSI Model — 7 Layers</div><div class="cs-subtitle">Open Systems Interconnection — how data travels across a network</div></div>
+          </div>
+          <div class="key-note mb-3" style="border-color:var(--accent-violet)"><i class="bi bi-info-circle-fill" style="color:var(--accent-violet)"></i><strong>Mnemonic to remember layers (top to bottom):</strong> "All People Seem To Need Data Processing" (Application, Presentation, Session, Transport, Network, Data Link, Physical)</div>
+
+          <div class="osi-layer" style="background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2)">
+            <div class="osi-num" style="background:var(--accent-rose)">7</div>
+            <div class="osi-name" style="color:var(--accent-rose)">Application</div>
+            <div class="osi-func">User interface — provides network services to apps</div>
+            <div class="osi-proto">HTTP, HTTPS, FTP, SMTP, DNS</div>
+          </div>
+          <div class="osi-layer" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2)">
+            <div class="osi-num" style="background:var(--accent-amber)">6</div>
+            <div class="osi-name" style="color:var(--accent-amber)">Presentation</div>
+            <div class="osi-func">Data format, encryption, compression</div>
+            <div class="osi-proto">SSL/TLS, JPEG, MPEG, ASCII</div>
+          </div>
+          <div class="osi-layer" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
+            <div class="osi-num" style="background:var(--accent-emerald)">5</div>
+            <div class="osi-name" style="color:var(--accent-emerald)">Session</div>
+            <div class="osi-func">Establishes, manages, and terminates sessions</div>
+            <div class="osi-proto">NetBIOS, RPC, SIP</div>
+          </div>
+          <div class="osi-layer" style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2)">
+            <div class="osi-num" style="background:var(--accent-teal)">4</div>
+            <div class="osi-name" style="color:var(--accent-teal)">Transport</div>
+            <div class="osi-func">End-to-end delivery, error control, flow control</div>
+            <div class="osi-proto">TCP, UDP</div>
+          </div>
+          <div class="osi-layer" style="background:rgba(59,91,219,0.08);border:1px solid rgba(59,91,219,0.2)">
+            <div class="osi-num" style="background:var(--accent-blue)">3</div>
+            <div class="osi-name" style="color:var(--accent-blue)">Network</div>
+            <div class="osi-func">Logical addressing, routing between networks</div>
+            <div class="osi-proto">IP, ICMP, OSPF, BGP</div>
+          </div>
+          <div class="osi-layer" style="background:rgba(112,72,232,0.08);border:1px solid rgba(112,72,232,0.2)">
+            <div class="osi-num" style="background:var(--accent-violet)">2</div>
+            <div class="osi-name" style="color:var(--accent-violet)">Data Link</div>
+            <div class="osi-func">MAC addressing, framing, error detection in link</div>
+            <div class="osi-proto">Ethernet, Wi-Fi (802.11), PPP, ARP</div>
+          </div>
+          <div class="osi-layer" style="background:rgba(100,116,139,0.08);border:1px solid rgba(100,116,139,0.2)">
+            <div class="osi-num" style="background:#64748B">1</div>
+            <div class="osi-name" style="color:var(--text-secondary)">Physical</div>
+            <div class="osi-func">Raw bit transmission over physical media</div>
+            <div class="osi-proto">Cables, Radio waves, Hubs, Repeaters</div>
+          </div>
+        </div>
+
+        <!-- ⑤ TCP/IP Model -->
+        <div class="content-section reveal" id="tcpip">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-stack"></i></div>
+            <div><div class="cs-title">TCP/IP Model — 4 Layers</div><div class="cs-subtitle">The practical model used by the internet today</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6 prose"><p>The <strong>TCP/IP Model</strong> is the practical networking model actually used by the internet. It has <strong>4 layers</strong> (simplified from OSI's 7). TCP/IP was developed by ARPANET (precursor to the internet) in the 1970s.</p>
+            <p><strong>TCP</strong> (Transmission Control Protocol) ensures reliable, ordered delivery. <strong>IP</strong> (Internet Protocol) handles addressing and routing. Every device on the internet has an <strong>IP address</strong>.</p></div>
+            <div class="col-md-6">
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <div class="osi-layer" style="background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);border-radius:var(--radius-md)">
+                  <div class="osi-num" style="background:var(--accent-rose);width:26px;height:26px;font-size:0.72rem">4</div>
+                  <div><div class="osi-name" style="color:var(--accent-rose);font-size:0.85rem">Application</div><div class="osi-proto">HTTP, FTP, SMTP, DNS, SSH</div></div>
+                </div>
+                <div class="osi-layer" style="background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.3);border-radius:var(--radius-md)">
+                  <div class="osi-num" style="background:var(--accent-teal);width:26px;height:26px;font-size:0.72rem">3</div>
+                  <div><div class="osi-name" style="color:var(--accent-teal);font-size:0.85rem">Transport</div><div class="osi-proto">TCP, UDP</div></div>
+                </div>
+                <div class="osi-layer" style="background:rgba(59,91,219,0.1);border:1px solid rgba(59,91,219,0.3);border-radius:var(--radius-md)">
+                  <div class="osi-num" style="background:var(--accent-blue);width:26px;height:26px;font-size:0.72rem">2</div>
+                  <div><div class="osi-name" style="color:var(--accent-blue);font-size:0.85rem">Internet</div><div class="osi-proto">IP, ICMP, ARP</div></div>
+                </div>
+                <div class="osi-layer" style="background:rgba(100,116,139,0.1);border:1px solid rgba(100,116,139,0.3);border-radius:var(--radius-md)">
+                  <div class="osi-num" style="background:#64748B;width:26px;height:26px;font-size:0.72rem">1</div>
+                  <div><div class="osi-name" style="color:var(--text-secondary);font-size:0.85rem">Network Access</div><div class="osi-proto">Ethernet, Wi-Fi, Cables</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="key-note mt-3"><i class="bi bi-info-circle-fill"></i>OSI Layer 5+6+7 = TCP/IP Application layer. OSI Layer 1+2 = TCP/IP Network Access layer. OSI is a <strong>theoretical reference model</strong>; TCP/IP is the <strong>actual implementation</strong> used by the internet.</div>
+        </div>
+
+        <!-- ⑥ Network Devices -->
+        <div class="content-section reveal" id="devices">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-router-fill"></i></div>
+            <div><div class="cs-title">Network Devices</div><div class="cs-subtitle">Hardware that builds and manages networks</div></div>
+          </div>
+          <div class="device-row" style="--dv-color:var(--accent-blue)">
+            <div class="device-icon">🔌</div>
+            <div><div class="device-name">Hub</div><div class="device-desc">Operates at OSI Layer 1 (Physical). Broadcasts data to ALL connected devices — no filtering. Simple but inefficient and insecure. Now mostly replaced by switches.</div></div>
+          </div>
+          <div class="device-row" style="--dv-color:var(--accent-violet)">
+            <div class="device-icon">🔀</div>
+            <div><div class="device-name">Switch</div><div class="device-desc">Operates at OSI Layer 2 (Data Link). Uses MAC addresses to send data only to the intended device — intelligent and efficient. Standard in modern LANs. Example: Cisco Catalyst, Netgear switch.</div></div>
+          </div>
+          <div class="device-row" style="--dv-color:var(--accent-rose)">
+            <div class="device-icon">📡</div>
+            <div><div class="device-name">Router</div><div class="device-desc">Operates at OSI Layer 3 (Network). Routes data packets between different networks using IP addresses. Your home Wi-Fi box is a router. Connects LAN to WAN (internet). Example: TP-Link, Cisco router.</div></div>
+          </div>
+          <div class="device-row" style="--dv-color:var(--accent-emerald)">
+            <div class="device-icon">🔁</div>
+            <div><div class="device-name">Repeater</div><div class="device-desc">Operates at OSI Layer 1. Amplifies/regenerates signals that have weakened over long distances — extends network range. Used in long-distance cable networks.</div></div>
+          </div>
+          <div class="device-row" style="--dv-color:var(--accent-amber)">
+            <div class="device-icon">🌉</div>
+            <div><div class="device-name">Bridge</div><div class="device-desc">Operates at OSI Layer 2. Connects two LAN segments and filters traffic between them using MAC addresses. Reduces network congestion.</div></div>
+          </div>
+          <div class="device-row" style="--dv-color:var(--accent-teal)">
+            <div class="device-icon">🚪</div>
+            <div><div class="device-name">Gateway</div><div class="device-desc">Operates at all OSI layers. Translates between different network protocols. Acts as the entry/exit point of a network. Your router often acts as a gateway to the internet.</div></div>
+          </div>
+          <div class="device-row" style="--dv-color:#64748B">
+            <div class="device-icon">📶</div>
+            <div><div class="device-name">Modem</div><div class="device-desc">Modulates digital data to analog signals for transmission over telephone lines and demodulates incoming analog to digital. MOdulator-DEModulator. Used for DSL/cable internet connections.</div></div>
+          </div>
+        </div>
+
+        <!-- ⑦ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div><div class="cs-title">Real-Life Examples</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">🏫</div>
+              <div>
+                <div class="example-title">School Computer Lab = LAN</div>
+                <p class="example-text">All computers in your school lab connected to one switch/hub sharing a printer and internet — that's a <strong>LAN (Local Area Network)</strong>. The switch uses <strong>Star topology</strong>. The teacher's computer acts as a server.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🌐</div>
+              <div>
+                <div class="example-title">Opening a Website = OSI Layers in Action</div>
+                <p class="example-text">You type "google.com" (Layer 7 – Application/HTTP) → SSL encrypts it (Layer 6) → Session established (Layer 5) → TCP ensures reliable delivery (Layer 4) → IP routes to Google's server (Layer 3) → Ethernet sends across your LAN (Layer 2) → Electrical signals travel through cable (Layer 1).</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">📱</div>
+              <div>
+                <div class="example-title">Your Home Network</div>
+                <p class="example-text">Your <strong>Router</strong> connects your home LAN to the internet (WAN). Your phone connects via <strong>Wi-Fi</strong> (Layer 2 wireless). The <strong>Modem</strong> converts ISP signals. <strong>Star topology</strong> — all devices connect to your router at the center.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑧ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>OSI = <strong>7 layers</strong> (theoretical model). TCP/IP = <strong>4 layers</strong> (practical internet model). OSI was developed by ISO.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Mnemonic for OSI layers (bottom-up): <strong>"Please Do Not Throw Sausage Pizza Away"</strong> (Physical, Data Link, Network, Transport, Session, Presentation, Application).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Hub</strong> = broadcasts to all (Layer 1). <strong>Switch</strong> = sends to specific MAC (Layer 2). <strong>Router</strong> = routes using IP (Layer 3).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>IP address</strong> = logical address assigned to each device (e.g., 192.168.1.1). <strong>MAC address</strong> = physical hardware address burned into NIC (e.g., AA:BB:CC:DD:EE:FF).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>TCP</strong> = reliable, connection-oriented (used for web, email). <strong>UDP</strong> = unreliable, connectionless, fast (used for video streaming, gaming, DNS).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Common ports: HTTP=80, HTTPS=443, FTP=21, SSH=22, SMTP=25, DNS=53, RDP=3389.</div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Computer Networks</div>
+          <p class="summary-text">Network types by range: <strong>PAN</strong> (~10m, Bluetooth) → <strong>LAN</strong> (building, Ethernet/Wi-Fi) → <strong>MAN</strong> (city, fiber) → <strong>WAN</strong> (global, internet). Topologies: <strong>Bus</strong> (shared cable), <strong>Star</strong> (central hub — most popular), <strong>Ring</strong> (token passing), <strong>Mesh</strong> (fully connected, most reliable). OSI Model: <strong>7 layers</strong> — Physical→Data Link→Network→Transport→Session→Presentation→Application. TCP/IP: <strong>4 layers</strong> — Network Access→Internet→Transport→Application. Devices: Hub (L1), Switch (L2, MAC), Router (L3, IP), Modem (analog↔digital). TCP = reliable; UDP = fast but unreliable.</p>
+        </div>
+
+        <!-- Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is the difference between LAN, MAN, and WAN?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">LAN (Local Area Network): covers a single building/campus, high speed, privately owned (e.g., school lab, home Wi-Fi). MAN (Metropolitan Area Network): covers a city, 5-50 km range (e.g., cable TV network). WAN (Wide Area Network): covers countries/globe, the internet is the largest WAN.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>Explain the OSI model and its 7 layers.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">OSI (Open Systems Interconnection) model has 7 layers: 1-Physical (raw bits), 2-Data Link (MAC, framing), 3-Network (IP, routing), 4-Transport (TCP/UDP, end-to-end), 5-Session (establish/terminate sessions), 6-Presentation (encryption, format), 7-Application (HTTP, FTP — user interface). Mnemonic: "Please Do Not Throw Sausage Pizza Away."</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is the difference between a Hub, Switch, and Router?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Hub (Layer 1): broadcasts data to ALL ports — unintelligent, creates collisions. Switch (Layer 2): uses MAC addresses to send data only to the intended device — intelligent, reduces collisions. Router (Layer 3): uses IP addresses to route data between different networks — connects LAN to WAN/internet.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What is the difference between TCP and UDP?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">TCP (Transmission Control Protocol): reliable, connection-oriented, guarantees delivery and order, slower — used for web browsing (HTTP), email (SMTP), file transfer (FTP). UDP (User Datagram Protocol): unreliable, connectionless, no delivery guarantee, faster — used for video streaming, online gaming, DNS, VoIP.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>What is the difference between IP address and MAC address?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">IP Address: logical address assigned by network administrator/DHCP, can change, used for routing between networks (Layer 3). Example: 192.168.1.105. MAC Address: physical hardware address burned into the Network Interface Card (NIC) at manufacturing, permanent, used within a LAN (Layer 2). Example: AA:BB:CC:11:22:33.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click an option to check your answer</div></div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. Which network type covers a city or metropolitan area?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> LAN</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> PAN</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> MAN</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> WAN</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. In which topology does every device connect to a central switch or hub?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Bus</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Ring</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Star</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Mesh</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Which OSI layer is responsible for routing using IP addresses?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Layer 2 — Data Link</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Layer 3 — Network</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Layer 4 — Transport</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Layer 1 — Physical</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. Which protocol provides RELIABLE data delivery?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> UDP</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> TCP</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> IP</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> HTTP</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. A device that connects two different networks and routes traffic using IP addresses is a ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Hub</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Switch</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Repeater</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">D</span> Router</div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i> Take Full Module Quiz
+            </a>
+          </div>
+        </div>
+
+        <!-- Topic Nav -->
+        <div class="topic-nav reveal">
+          <a href="topic-generations.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Computer Generations</div></div>
+          </a>
+          <a href="topic-database.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Next Topic</div><div class="nav-title">Database Fundamentals</div></div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

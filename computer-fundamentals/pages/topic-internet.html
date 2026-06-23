@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Internet & Web Technologies | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    .web-tech-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 20px; height: 100%;
+      border-left: 3px solid var(--wc, var(--accent-blue));
+      transition: all var(--transition);
+    }
+    .web-tech-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .wt-icon  { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+    .wt-title { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; margin-bottom: 5px; }
+    .wt-desc  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* HTTP flow */
+    .http-step {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; background: var(--bg-primary);
+      border-radius: var(--radius-md); margin-bottom: 6px;
+      border: 1px solid var(--border-color); font-size: 0.84rem;
+    }
+    .http-badge {
+      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+      padding: 3px 8px; border-radius: var(--radius-sm);
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* HTML code block */
+    .html-block { background: var(--bg-code); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.9; overflow-x: auto; }
+    .ht  { color: var(--accent-rose); }
+    .ha  { color: var(--accent-amber); }
+    .hv  { color: var(--accent-emerald); }
+    .hc  { color: #64748B; font-style: italic; }
+    .htx { color: var(--text-secondary); }
+
+    /* Cloud service cards */
+    .cloud-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; text-align: center; transition: all var(--transition); }
+    .cloud-card:hover { border-color: var(--cc, var(--accent-blue)); box-shadow: var(--shadow-sm); }
+    .cc-icon  { font-size: 2.2rem; margin-bottom: 10px; display: block; }
+    .cc-name  { font-family: var(--font-display); font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
+    .cc-abbr  { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+    .cc-desc  { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+    .cc-ex    { font-size: 0.68rem; color: var(--text-muted); margin-top: 8px; }
+  </style>
+</head>
+<body data-topic-id="internet-web">
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Advanced Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Internet &amp; Web Technologies</span>
+    </div>
+    <div class="topic-hero-icon icon-teal" style="background:rgba(14,165,233,0.15)">
+      <i class="bi bi-globe2"></i>
+    </div>
+    <h1 class="topic-hero-title">Internet &amp; Web Technologies</h1>
+    <p class="topic-hero-desc">
+      Explore how the internet works — HTTP/HTTPS, DNS, IP addressing, web browsers,
+      HTML/CSS/JS basics, cloud computing (IaaS/PaaS/SaaS), and key internet protocols.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-rose"><i class="bi bi-3-circle me-1"></i>Advanced Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>16 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-teal"><i class="bi bi-cloud me-1"></i>Cloud Computing</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#internet-basics"><i class="bi bi-globe"></i> Internet Basics</a></li>
+              <li><a href="#http"><i class="bi bi-arrow-left-right"></i> HTTP &amp; HTTPS</a></li>
+              <li><a href="#dns"><i class="bi bi-search"></i> DNS</a></li>
+              <li><a href="#web-techs"><i class="bi bi-code-slash"></i> Web Technologies</a></li>
+              <li><a href="#cloud"><i class="bi bi-cloud-fill"></i> Cloud Computing</a></li>
+              <li><a href="#protocols"><i class="bi bi-list-check"></i> Key Protocols</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+          <div class="lang-content visible prose" data-lang="en">
+            <p>The <strong>Internet</strong> is a global network of billions of interconnected computers and devices that communicate using standardized protocols (mainly TCP/IP). It is the infrastructure. The <strong>World Wide Web (WWW)</strong> is a service that runs ON the internet — it's the collection of websites and web pages accessible through browsers.</p>
+            <p>Every website has an <strong>IP address</strong> (e.g., 142.250.182.46 for Google), but humans use <strong>domain names</strong> (google.com). The <strong>DNS (Domain Name System)</strong> translates domain names to IP addresses. Data travels via <strong>HTTP/HTTPS</strong> protocol between your browser and web servers.</p>
+            <p><strong>Cloud Computing</strong> delivers computing resources (servers, storage, databases, networking, software) over the internet ("the cloud") on demand with pay-as-you-go pricing. Examples: AWS, Google Cloud, Microsoft Azure.</p>
+          </div>
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p><strong>इंटरनेट</strong> अरबों परस्पर जुड़े कंप्यूटरों और उपकरणों का एक वैश्विक नेटवर्क है जो मानकीकृत प्रोटोकॉल (मुख्यतः TCP/IP) का उपयोग करके संचार करते हैं। <strong>World Wide Web (WWW)</strong> इंटरनेट पर चलने वाली एक सेवा है — यह ब्राउज़र के माध्यम से सुलभ वेबसाइटों और वेब पेजों का संग्रह है।</p>
+            <p>प्रत्येक वेबसाइट का एक <strong>IP पता</strong> होता है, लेकिन मनुष्य <strong>डोमेन नाम</strong> (google.com) का उपयोग करते हैं। <strong>DNS</strong> डोमेन नामों को IP पतों में अनुवादित करता है। डेटा <strong>HTTP/HTTPS</strong> प्रोटोकॉल के माध्यम से यात्रा करता है।</p>
+            <p><strong>क्लाउड कंप्यूटिंग</strong> मांग पर इंटरनेट ("क्लाउड") के माध्यम से कंप्यूटिंग संसाधन प्रदान करता है। उदाहरण: AWS, Google Cloud, Microsoft Azure।</p>
+          </div>
+        </div>
+
+        <!-- ② Internet Basics -->
+        <div class="content-section reveal" id="internet-basics">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-globe2"></i></div>
+            <div><div class="cs-title">Internet Basics</div><div class="cs-subtitle">Key concepts and terminology</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="web-tech-card" style="--wc:var(--accent-blue)">
+                <span class="wt-icon">🌐</span>
+                <div class="wt-title" style="color:var(--accent-blue)">Internet vs WWW</div>
+                <div class="wt-desc"><strong>Internet</strong> = the physical global network infrastructure (cables, routers, servers). <strong>WWW</strong> = web pages and websites accessed via HTTP. WWW runs ON the internet. Email, FTP, and VoIP also use the internet but are NOT the web.</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="web-tech-card" style="--wc:var(--accent-violet)">
+                <span class="wt-icon">📍</span>
+                <div class="wt-title" style="color:var(--accent-violet)">IP Address</div>
+                <div class="wt-desc">A unique numerical address for every device on the internet. <strong>IPv4</strong>: 32-bit, dotted decimal (192.168.1.1) — ~4.3 billion addresses. <strong>IPv6</strong>: 128-bit, hexadecimal (2001:db8::1) — 340 undecillion addresses. IPv4 exhausted; world moving to IPv6.</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="web-tech-card" style="--wc:var(--accent-emerald)">
+                <span class="wt-icon">🏠</span>
+                <div class="wt-title" style="color:var(--accent-emerald)">URL Structure</div>
+                <div class="wt-desc"><code style="font-size:0.75rem;color:var(--accent-teal)">https://www.example.com:443/page?q=search#section</code><br/>Protocol (https) + Subdomain (www) + Domain (example.com) + Port (443) + Path (/page) + Query (?q=search) + Fragment (#section)</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="web-tech-card" style="--wc:var(--accent-amber)">
+                <span class="wt-icon">🖥️</span>
+                <div class="wt-title" style="color:var(--accent-amber)">Web Server vs Browser</div>
+                <div class="wt-desc"><strong>Web Server</strong>: computer that hosts websites and serves HTML files in response to HTTP requests (e.g., Apache, Nginx). <strong>Browser</strong>: client software that requests and renders web pages (Chrome, Firefox, Safari, Edge).</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ HTTP & HTTPS -->
+        <div class="content-section reveal" id="http">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-arrow-left-right"></i></div>
+            <div><div class="cs-title">HTTP &amp; HTTPS</div><div class="cs-subtitle">How your browser talks to web servers</div></div>
+          </div>
+          <div class="prose mb-4">
+            <p><strong>HTTP</strong> (HyperText Transfer Protocol) is the foundation of data communication on the web. It is a <em>request-response protocol</em>: your browser sends a REQUEST, the server sends a RESPONSE with the web page content. <strong>HTTPS</strong> = HTTP + SSL/TLS encryption — all data is encrypted, preventing eavesdropping.</p>
+          </div>
+          <div class="diagram-box mb-4">
+            <p class="mb-3" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700">HTTP Request-Response Flow</p>
+            <div class="http-step"><span class="http-badge" style="background:rgba(59,91,219,0.15);color:var(--accent-blue)">Step 1</span><span>You type <code style="color:var(--accent-teal)">https://google.com</code> → Browser checks DNS for Google's IP address</span></div>
+            <div class="http-step"><span class="http-badge" style="background:rgba(112,72,232,0.15);color:var(--accent-violet)">Step 2</span><span>Browser sends HTTP GET request to Google's server (IP: 142.250.x.x) on port 443</span></div>
+            <div class="http-step"><span class="http-badge" style="background:rgba(14,165,233,0.15);color:var(--accent-teal)">Step 3</span><span>TLS handshake — browser and server agree on encryption keys (HTTPS security)</span></div>
+            <div class="http-step"><span class="http-badge" style="background:rgba(16,185,129,0.15);color:var(--accent-emerald)">Step 4</span><span>Google's server sends HTTP 200 OK response with HTML, CSS, JavaScript files</span></div>
+            <div class="http-step"><span class="http-badge" style="background:rgba(245,158,11,0.15);color:var(--accent-amber)">Step 5</span><span>Browser parses HTML, loads CSS/JS/images, renders the Google homepage on screen</span></div>
+          </div>
+          <div class="key-note" style="border-color:var(--accent-violet)"><i class="bi bi-info-circle-fill" style="color:var(--accent-violet)"></i><strong>HTTP Status Codes:</strong> 200 OK (success), 301 Moved Permanently, 404 Not Found, 403 Forbidden, 500 Internal Server Error, 503 Service Unavailable.</div>
+        </div>
+
+        <!-- ④ DNS -->
+        <div class="content-section reveal" id="dns">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-search"></i></div>
+            <div><div class="cs-title">DNS — Domain Name System</div><div class="cs-subtitle">The "phonebook" of the internet</div></div>
+          </div>
+          <div class="prose mb-3"><p><strong>DNS</strong> converts human-readable domain names (google.com) into machine-readable IP addresses (142.250.182.46). Without DNS, you'd need to memorize IP addresses to visit websites. DNS uses a hierarchical, distributed database of servers worldwide.</p></div>
+          <div class="row g-3">
+            <div class="col-md-6"><div class="key-note" style="border-color:var(--accent-blue);flex-direction:column;gap:5px"><div style="display:flex;gap:8px"><i class="bi bi-1-circle-fill" style="color:var(--accent-blue)"></i><strong style="color:var(--accent-blue)">Root DNS Servers</strong></div><span>13 root server clusters worldwide (A to M). They know the authoritative name servers for each TLD (.com, .in, .org).</span></div></div>
+            <div class="col-md-6"><div class="key-note" style="border-color:var(--accent-violet);flex-direction:column;gap:5px"><div style="display:flex;gap:8px"><i class="bi bi-2-circle-fill" style="color:var(--accent-violet)"></i><strong style="color:var(--accent-violet)">TLD Name Servers</strong></div><span>Top-Level Domain servers (.com, .in, .org). Managed by registries. Know which authoritative server has google.com's record.</span></div></div>
+            <div class="col-md-6"><div class="key-note" style="border-color:var(--accent-emerald);flex-direction:column;gap:5px"><div style="display:flex;gap:8px"><i class="bi bi-3-circle-fill" style="color:var(--accent-emerald)"></i><strong style="color:var(--accent-emerald)">Authoritative Name Server</strong></div><span>Has the final, definitive IP record for a specific domain. Google's authoritative server returns 142.250.182.46 for google.com.</span></div></div>
+            <div class="col-md-6"><div class="key-note" style="border-color:var(--accent-amber);flex-direction:column;gap:5px"><div style="display:flex;gap:8px"><i class="bi bi-4-circle-fill" style="color:var(--accent-amber)"></i><strong style="color:var(--accent-amber)">DNS Cache</strong></div><span>Your browser, OS, and ISP cache DNS results (TTL: Time To Live) to avoid repeating lookups. Speeds up web browsing significantly.</span></div></div>
+          </div>
+        </div>
+
+        <!-- ⑤ Web Technologies -->
+        <div class="content-section reveal" id="web-techs">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-code-slash"></i></div>
+            <div><div class="cs-title">Web Technologies — HTML, CSS, JavaScript</div><div class="cs-subtitle">The three pillars of every website</div></div>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <div style="text-align:center;padding:20px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.25);border-radius:var(--radius-lg)">
+                <div style="font-size:2.5rem;margin-bottom:8px">🏗️</div>
+                <div style="font-family:var(--font-display);font-weight:700;color:var(--accent-rose);margin-bottom:6px">HTML</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Structure &amp; Content</div>
+                <div style="font-size:0.8rem;color:var(--text-secondary)">Defines headings, paragraphs, links, images, tables, forms. The skeleton of every webpage. HyperText Markup Language.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div style="text-align:center;padding:20px;background:rgba(59,91,219,0.08);border:1px solid rgba(59,91,219,0.25);border-radius:var(--radius-lg)">
+                <div style="font-size:2.5rem;margin-bottom:8px">🎨</div>
+                <div style="font-family:var(--font-display);font-weight:700;color:var(--accent-blue);margin-bottom:6px">CSS</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Styling &amp; Layout</div>
+                <div style="font-size:0.8rem;color:var(--text-secondary)">Controls colors, fonts, spacing, animations, responsive layouts. The skin and clothing of a webpage. Cascading Style Sheets.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div style="text-align:center;padding:20px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:var(--radius-lg)">
+                <div style="font-size:2.5rem;margin-bottom:8px">⚡</div>
+                <div style="font-family:var(--font-display);font-weight:700;color:var(--accent-amber);margin-bottom:6px">JavaScript</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Interactivity &amp; Logic</div>
+                <div style="font-size:0.8rem;color:var(--text-secondary)">Makes pages interactive — form validation, animations, API calls, dynamic content updates without page reload (AJAX).</div>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Basic HTML Structure Example:</p>
+          <div class="html-block">
+<span class="hc">&lt;!-- HTML5 Document Structure --&gt;</span>
+<span class="ht">&lt;!DOCTYPE</span> <span class="ha">html</span><span class="ht">&gt;</span>
+<span class="ht">&lt;html</span> <span class="ha">lang</span>=<span class="hv">"en"</span><span class="ht">&gt;</span>
+<span class="ht">&lt;head&gt;</span>
+  <span class="ht">&lt;meta</span> <span class="ha">charset</span>=<span class="hv">"UTF-8"</span><span class="ht">/&gt;</span>
+  <span class="ht">&lt;title&gt;</span><span class="htx">My Web Page</span><span class="ht">&lt;/title&gt;</span>
+  <span class="ht">&lt;link</span> <span class="ha">rel</span>=<span class="hv">"stylesheet"</span> <span class="ha">href</span>=<span class="hv">"style.css"</span><span class="ht">/&gt;</span>
+<span class="ht">&lt;/head&gt;</span>
+<span class="ht">&lt;body&gt;</span>
+  <span class="ht">&lt;h1&gt;</span><span class="htx">Hello World!</span><span class="ht">&lt;/h1&gt;</span>  <span class="hc">&lt;!-- Heading --&gt;</span>
+  <span class="ht">&lt;p&gt;</span><span class="htx">This is a paragraph.</span><span class="ht">&lt;/p&gt;</span>
+  <span class="ht">&lt;a</span> <span class="ha">href</span>=<span class="hv">"https://google.com"</span><span class="ht">&gt;</span><span class="htx">Visit Google</span><span class="ht">&lt;/a&gt;</span>
+  <span class="ht">&lt;img</span> <span class="ha">src</span>=<span class="hv">"photo.jpg"</span> <span class="ha">alt</span>=<span class="hv">"My Photo"</span><span class="ht">/&gt;</span>
+  <span class="ht">&lt;script</span> <span class="ha">src</span>=<span class="hv">"script.js"</span><span class="ht">&gt;&lt;/script&gt;</span>
+<span class="ht">&lt;/body&gt;</span>
+<span class="ht">&lt;/html&gt;</span>
+          </div>
+        </div>
+
+        <!-- ⑥ Cloud Computing -->
+        <div class="content-section reveal" id="cloud">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-cloud-fill"></i></div>
+            <div><div class="cs-title">Cloud Computing</div><div class="cs-subtitle">On-demand computing resources over the internet</div></div>
+          </div>
+          <div class="prose mb-4"><p>Cloud computing delivers computing services (servers, storage, databases, networking, software, analytics, AI) over the internet on demand with pay-per-use pricing. Key characteristics: <strong>on-demand</strong>, <strong>broad network access</strong>, <strong>resource pooling</strong>, <strong>rapid elasticity</strong>, <strong>measured service</strong>.</p></div>
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <div class="cloud-card" style="--cc:var(--accent-blue)">
+                <span class="cc-icon">🏗️</span>
+                <div class="cc-name" style="color:var(--accent-blue)">IaaS</div>
+                <span class="cc-abbr">Infrastructure as a Service</span>
+                <div class="cc-desc">Provides virtualized computing infrastructure — servers, VMs, storage, networking. You manage OS and above. Most control, most responsibility.</div>
+                <div class="cc-ex">Examples: AWS EC2, Google Compute Engine, Azure VMs, DigitalOcean</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="cloud-card" style="--cc:var(--accent-violet)">
+                <span class="cc-icon">⚙️</span>
+                <div class="cc-name" style="color:var(--accent-violet)">PaaS</div>
+                <span class="cc-abbr">Platform as a Service</span>
+                <div class="cc-desc">Provides a platform for developers to build, test, and deploy apps without managing underlying infrastructure. You manage only your application and data.</div>
+                <div class="cc-ex">Examples: Heroku, Google App Engine, AWS Elastic Beanstalk, Firebase</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="cloud-card" style="--cc:var(--accent-emerald)">
+                <span class="cc-icon">📱</span>
+                <div class="cc-name" style="color:var(--accent-emerald)">SaaS</div>
+                <span class="cc-abbr">Software as a Service</span>
+                <div class="cc-desc">Ready-to-use software delivered over internet via browser. No installation, no maintenance. Provider manages everything. Least control, most convenience.</div>
+                <div class="cc-ex">Examples: Gmail, Google Docs, Office 365, Zoom, Salesforce, Dropbox</div>
+              </div>
+            </div>
+          </div>
+          <div class="key-note" style="border-color:var(--accent-amber)"><i class="bi bi-star-fill" style="color:var(--accent-amber)"></i><strong>Cloud Deployment Models:</strong> Public Cloud (AWS/Azure/GCP — shared infrastructure), Private Cloud (organization's own cloud), Hybrid Cloud (mix of public + private), Community Cloud (shared by organizations with common needs).</div>
+        </div>
+
+        <!-- ⑦ Key Protocols -->
+        <div class="content-section reveal" id="protocols">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-list-check"></i></div>
+            <div><div class="cs-title">Key Internet Protocols</div><div class="cs-subtitle">Quick reference for exams</div></div>
+          </div>
+          <div class="table-responsive">
+            <table class="compare-table">
+              <thead><tr><th style="color:var(--accent-blue)">Protocol</th><th style="color:var(--accent-blue)">Full Form</th><th style="color:var(--accent-blue)">Port</th><th style="color:var(--accent-blue)">Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><strong>HTTP</strong></td><td>HyperText Transfer Protocol</td><td>80</td><td>Web page transfer (unencrypted)</td></tr>
+                <tr><td><strong>HTTPS</strong></td><td>HTTP Secure</td><td>443</td><td>Encrypted web page transfer (TLS/SSL)</td></tr>
+                <tr><td><strong>FTP</strong></td><td>File Transfer Protocol</td><td>21</td><td>Transfer files between client and server</td></tr>
+                <tr><td><strong>SMTP</strong></td><td>Simple Mail Transfer Protocol</td><td>25/587</td><td>Sending emails</td></tr>
+                <tr><td><strong>POP3</strong></td><td>Post Office Protocol v3</td><td>110</td><td>Receiving emails (downloads to device)</td></tr>
+                <tr><td><strong>IMAP</strong></td><td>Internet Message Access Protocol</td><td>143</td><td>Receiving emails (stays on server)</td></tr>
+                <tr><td><strong>DNS</strong></td><td>Domain Name System</td><td>53</td><td>Domain name to IP translation</td></tr>
+                <tr><td><strong>DHCP</strong></td><td>Dynamic Host Configuration Protocol</td><td>67/68</td><td>Automatically assigns IP addresses</td></tr>
+                <tr><td><strong>SSH</strong></td><td>Secure Shell</td><td>22</td><td>Secure remote server access</td></tr>
+                <tr><td><strong>Telnet</strong></td><td>Teletype Network</td><td>23</td><td>Remote access (unencrypted — obsolete)</td></tr>
+                <tr><td><strong>SNMP</strong></td><td>Simple Network Management Protocol</td><td>161</td><td>Network device management and monitoring</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Internet ≠ WWW: Internet is the network infrastructure; WWW is one service running on it (along with email, FTP, VoIP, etc.).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>IPv4</strong> = 32-bit (e.g., 192.168.1.1, max ~4.3 billion addresses). <strong>IPv6</strong> = 128-bit hexadecimal (2001:db8::1, virtually unlimited). IPv4 is exhausted; IPv6 adoption growing.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>ARPANET was the predecessor to the internet, developed by the US Department of Defense in 1969. Tim Berners-Lee invented the <strong>World Wide Web</strong> in 1989 at CERN.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Difference: <strong>Internet</strong> (global network), <strong>Intranet</strong> (private internal network within an organization), <strong>Extranet</strong> (intranet with limited access for select external partners).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Cloud advantages: Cost savings (no hardware purchase), Scalability (scale up/down instantly), Accessibility (anywhere/anytime), Disaster Recovery, Automatic Updates.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>Bandwidth</strong> = maximum data transfer rate (Mbps/Gbps). <strong>Latency</strong> = delay in data transfer (ms). High bandwidth + low latency = fast internet experience.</div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Internet &amp; Web Technologies</div>
+          <p class="summary-text">Internet = global TCP/IP network. WWW = websites on the internet (invented by Tim Berners-Lee, 1989). <strong>URL</strong> = Protocol + Domain + Path. <strong>DNS</strong> = converts domain names to IP addresses (port 53). <strong>HTTP</strong> (port 80) = web protocol; <strong>HTTPS</strong> (port 443) = encrypted HTTP. Status codes: 200 OK, 404 Not Found, 500 Server Error. Web = <strong>HTML</strong> (structure) + <strong>CSS</strong> (style) + <strong>JavaScript</strong> (interactivity). <strong>IPv4</strong> = 32-bit; <strong>IPv6</strong> = 128-bit. Cloud: <strong>IaaS</strong> (VMs — AWS EC2), <strong>PaaS</strong> (platform — Heroku), <strong>SaaS</strong> (software — Gmail). Internet protocols: HTTP, FTP, SMTP, DNS, DHCP, SSH. ARPANET = 1969 internet precursor.</p>
+        </div>
+
+        <!-- Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is the difference between the Internet and the World Wide Web?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Internet: global network of billions of interconnected computers communicating via TCP/IP — the infrastructure (cables, routers, servers). WWW: a service that runs on the internet — collection of web pages and websites accessed via HTTP using browsers. The internet also supports email, FTP, VoIP, etc. — the WWW is just one of these services.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What is DNS and how does it work?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">DNS (Domain Name System) is the "phonebook" of the internet that translates domain names (google.com) to IP addresses (142.250.x.x). When you type a URL: (1) Browser checks local DNS cache, (2) Queries ISP's DNS resolver, (3) Resolver queries Root servers → TLD servers → Authoritative name servers, (4) Gets the IP and caches it. Uses UDP port 53.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is the difference between HTTP and HTTPS?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">HTTP (HyperText Transfer Protocol, port 80): transmits web data in plain text — anyone can intercept and read it. HTTPS (HTTP Secure, port 443): HTTP + SSL/TLS encryption — all data is encrypted, authenticated, and integrity-protected. HTTPS is essential for login pages, banking, and all modern websites.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What are IaaS, PaaS, and SaaS?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">IaaS (Infrastructure as a Service): provides virtual servers, storage, networking — you manage OS and apps (e.g., AWS EC2, Azure VMs). PaaS (Platform as a Service): provides a platform to build and deploy apps — provider manages infrastructure (e.g., Heroku, Google App Engine). SaaS (Software as a Service): ready-to-use software via browser — provider manages everything (e.g., Gmail, Office 365, Zoom).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>What is the difference between IPv4 and IPv6?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">IPv4: 32-bit addresses in dotted decimal (192.168.1.1), supports ~4.3 billion unique addresses — exhausted. IPv6: 128-bit addresses in hexadecimal (2001:0db8:85a3::8a2e:0370:7334), supports ~340 undecillion addresses — virtually unlimited. IPv6 also has built-in security (IPSec), better routing, and no need for NAT.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click to check your answer</div></div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. HTTPS uses which port number?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 80</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> 21</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> 443</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 22</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. DNS converts domain names to ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> MAC addresses</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> IP addresses</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> URL paths</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Email addresses</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Gmail is an example of which cloud service model?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> IaaS</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> PaaS</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> SaaS</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> DaaS</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. Who invented the World Wide Web?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Bill Gates</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Vint Cerf</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Tim Berners-Lee</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Steve Jobs</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. IPv4 addresses are ______ bits long.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> 16</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> 32</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> 64</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> 128</div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex"><i class="bi bi-collection-play-fill"></i> Take Full Module Quiz</a>
+          </div>
+        </div>
+
+        <div class="topic-nav reveal">
+          <a href="topic-software-eng.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Software Engineering</div></div>
+          </a>
+          <a href="topic-cybersecurity.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Next Topic</div><div class="nav-title">Cyber Security</div></div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

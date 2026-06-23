@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Software Engineering | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <style>
+    /* SDLC Phase cards */
+    .sdlc-phase {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 18px 20px; border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      margin-bottom: 8px; transition: all var(--transition);
+      background: var(--bg-primary);
+    }
+    .sdlc-phase:hover { box-shadow: var(--shadow-sm); transform: translateX(4px); }
+    .sdlc-num {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-weight: 800; font-size: 1rem; color: #fff;
+    }
+    .sdlc-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+    .sdlc-desc  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; }
+    .sdlc-output{ font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
+
+    /* Model comparison */
+    .model-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 22px; height: 100%;
+      border-top: 3px solid var(--mc, var(--accent-blue));
+      transition: all var(--transition);
+    }
+    .model-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .model-icon  { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .model-name  { font-family: var(--font-display); font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .model-desc  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+    .model-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; padding: 3px 9px; border-radius: 100px; margin: 2px; border: 1px solid var(--border-color); color: var(--text-muted); background: var(--bg-primary); }
+
+    /* Agile vs Waterfall visual */
+    .av-row { display: flex; gap: 0; margin-bottom: 6px; border-radius: var(--radius-sm); overflow: hidden; }
+    .av-label { width: 130px; flex-shrink: 0; font-size: 0.78rem; font-weight: 700; padding: 9px 12px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: center; }
+    .av-water { flex: 1; padding: 9px 12px; font-size: 0.78rem; border: 1px solid var(--border-color); border-left: none; color: var(--text-secondary); background: rgba(59,91,219,0.04); }
+    .av-agile  { flex: 1; padding: 9px 12px; font-size: 0.78rem; border: 1px solid var(--border-color); border-left: none; color: var(--text-secondary); background: rgba(16,185,129,0.04); }
+    .av-head   { font-weight: 700 !important; font-size: 0.8rem !important; }
+  </style>
+</head>
+<body data-topic-id="software-engineering">
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Advanced Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Software Engineering</span>
+    </div>
+    <div class="topic-hero-icon icon-violet" style="background:rgba(112,72,232,0.15)">
+      <i class="bi bi-code-square"></i>
+    </div>
+    <h1 class="topic-hero-title">Software Engineering</h1>
+    <p class="topic-hero-desc">
+      Understand SDLC phases, software development models (Waterfall, Agile, Spiral, RAD),
+      software testing types, and quality assurance — essential for every CS student.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-rose"><i class="bi bi-3-circle me-1"></i>Advanced Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>15 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#sdlc"><i class="bi bi-arrow-repeat"></i> SDLC Phases</a></li>
+              <li><a href="#models"><i class="bi bi-diagram-2"></i> Dev Models</a></li>
+              <li><a href="#agile-vs-waterfall"><i class="bi bi-table"></i> Agile vs Waterfall</a></li>
+              <li><a href="#testing"><i class="bi bi-bug"></i> Software Testing</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+          <div class="lang-content visible prose" data-lang="en">
+            <p><strong>Software Engineering</strong> is the systematic application of engineering principles to the design, development, testing, maintenance, and management of software. It is NOT just coding — it's about building software that is reliable, efficient, maintainable, and delivered on time within budget.</p>
+            <p>The core framework is the <strong>SDLC (Software Development Life Cycle)</strong> — a structured process that guides teams through phases: planning, requirements, design, implementation, testing, deployment, and maintenance. Different <strong>models</strong> (Waterfall, Agile, Spiral) define how these phases are sequenced and repeated.</p>
+            <p>As systems grow complex (banking apps, hospital management, airline booking), software engineering principles prevent chaotic development, reduce bugs, and ensure the final product meets user requirements. It is the backbone of the software industry.</p>
+          </div>
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p><strong>सॉफ्टवेयर इंजीनियरिंग</strong> सॉफ्टवेयर के डिजाइन, विकास, परीक्षण, रखरखाव और प्रबंधन में इंजीनियरिंग सिद्धांतों का व्यवस्थित अनुप्रयोग है। यह केवल कोडिंग नहीं है — यह ऐसा सॉफ्टवेयर बनाने के बारे में है जो विश्वसनीय, कुशल, रखरखाव योग्य हो और समय पर बजट के भीतर वितरित किया जाए।</p>
+            <p>मुख्य ढांचा <strong>SDLC (Software Development Life Cycle)</strong> है — एक संरचित प्रक्रिया जो टीमों को चरणों के माध्यम से मार्गदर्शन करती है: योजना, आवश्यकताएं, डिजाइन, कार्यान्वयन, परीक्षण, तैनाती और रखरखाव। विभिन्न <strong>मॉडल</strong> (Waterfall, Agile, Spiral) परिभाषित करते हैं कि ये चरण कैसे अनुक्रमित और दोहराए जाते हैं।</p>
+          </div>
+        </div>
+
+        <!-- ② SDLC Phases -->
+        <div class="content-section reveal" id="sdlc">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-arrow-repeat"></i></div>
+            <div><div class="cs-title">SDLC — Software Development Life Cycle</div><div class="cs-subtitle">The 7 phases every software project goes through</div></div>
+          </div>
+
+          <div class="sdlc-phase">
+            <div class="sdlc-num" style="background:var(--accent-blue)">1</div>
+            <div>
+              <div class="sdlc-title" style="color:var(--accent-blue)">Planning</div>
+              <div class="sdlc-desc">Define project scope, feasibility study (technical, financial, operational), estimate resources, cost, and timeline. Identify risks early.</div>
+              <div class="sdlc-output">📄 Output: Project Plan, Feasibility Report</div>
+            </div>
+          </div>
+          <div class="sdlc-phase">
+            <div class="sdlc-num" style="background:var(--accent-violet)">2</div>
+            <div>
+              <div class="sdlc-title" style="color:var(--accent-violet)">Requirements Analysis</div>
+              <div class="sdlc-desc">Gather and document what the system must do (functional requirements: features) and how it must perform (non-functional: speed, security, scalability).</div>
+              <div class="sdlc-output">📄 Output: SRS — Software Requirements Specification</div>
+            </div>
+          </div>
+          <div class="sdlc-phase">
+            <div class="sdlc-num" style="background:var(--accent-teal)">3</div>
+            <div>
+              <div class="sdlc-title" style="color:var(--accent-teal)">System Design</div>
+              <div class="sdlc-desc">Translate requirements into architecture. High-Level Design (HLD): overall system architecture, database design, modules. Low-Level Design (LLD): detailed algorithm and data structure design for each module.</div>
+              <div class="sdlc-output">📄 Output: HLD Document, LLD Document, ER Diagrams</div>
+            </div>
+          </div>
+          <div class="sdlc-phase">
+            <div class="sdlc-num" style="background:var(--accent-emerald)">4</div>
+            <div>
+              <div class="sdlc-title" style="color:var(--accent-emerald)">Implementation (Coding)</div>
+              <div class="sdlc-desc">Developers write code based on the design documents. Follows coding standards and guidelines. Code reviews and version control (Git) used. Longest phase.</div>
+              <div class="sdlc-output">📄 Output: Source Code, Unit Test Cases</div>
+            </div>
+          </div>
+          <div class="sdlc-phase">
+            <div class="sdlc-num" style="background:var(--accent-amber)">5</div>
+            <div>
+              <div class="sdlc-title" style="color:var(--accent-amber)">Testing &amp; QA</div>
+              <div class="sdlc-desc">Verify the software works correctly. Types: Unit Testing, Integration Testing, System Testing, UAT (User Acceptance Testing). Find and fix bugs (defects) before release.</div>
+              <div class="sdlc-output">📄 Output: Test Reports, Bug Reports</div>
+            </div>
+          </div>
+          <div class="sdlc-phase">
+            <div class="sdlc-num" style="background:var(--accent-rose)">6</div>
+            <div>
+              <div class="sdlc-title" style="color:var(--accent-rose)">Deployment</div>
+              <div class="sdlc-desc">Release the software to the production environment (live servers). Can be phased (gradual rollout) or full release. Includes installation, configuration, and user training.</div>
+              <div class="sdlc-output">📄 Output: Deployed Product, User Manual</div>
+            </div>
+          </div>
+          <div class="sdlc-phase">
+            <div class="sdlc-num" style="background:#64748B">7</div>
+            <div>
+              <div class="sdlc-title" style="color:var(--text-secondary)">Maintenance</div>
+              <div class="sdlc-desc">Fix bugs reported by users (corrective), adapt to new OS/hardware (adaptive), add new features (perfective), prevent future issues (preventive). Longest overall phase in software lifecycle.</div>
+              <div class="sdlc-output">📄 Output: Updated Software, Patch Releases</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ Development Models -->
+        <div class="content-section reveal" id="models">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-diagram-2-fill"></i></div>
+            <div><div class="cs-title">Software Development Models</div><div class="cs-subtitle">Different approaches to organizing the SDLC</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="model-card" style="--mc:var(--accent-blue)">
+                <span class="model-icon">🌊</span>
+                <div class="model-name" style="color:var(--accent-blue)">Waterfall Model</div>
+                <div class="model-desc">Sequential, linear model. Each phase must be 100% complete before the next begins. Simple to understand and manage. Best for projects with well-defined, fixed requirements.</div>
+                <div><span class="model-badge" style="color:var(--accent-emerald);border-color:rgba(16,185,129,0.3)">✓ Simple &amp; structured</span><span class="model-badge" style="color:var(--accent-rose);border-color:rgba(244,63,94,0.3)">✗ Rigid, late testing</span></div>
+                <div style="margin-top:10px;font-size:0.75rem;color:var(--text-muted)">Best for: Government projects, construction software, embedded systems</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="model-card" style="--mc:var(--accent-emerald)">
+                <span class="model-icon">🔄</span>
+                <div class="model-name" style="color:var(--accent-emerald)">Agile Model</div>
+                <div class="model-desc">Iterative, incremental development in short cycles called <strong>Sprints</strong> (2–4 weeks). Delivers working software frequently. Embraces changing requirements. Involves constant customer collaboration.</div>
+                <div><span class="model-badge" style="color:var(--accent-emerald);border-color:rgba(16,185,129,0.3)">✓ Flexible, fast delivery</span><span class="model-badge" style="color:var(--accent-rose);border-color:rgba(244,63,94,0.3)">✗ Needs active client</span></div>
+                <div style="margin-top:10px;font-size:0.75rem;color:var(--text-muted)">Best for: Startups, web/mobile apps, evolving requirements</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="model-card" style="--mc:var(--accent-violet)">
+                <span class="model-icon">🌀</span>
+                <div class="model-name" style="color:var(--accent-violet)">Spiral Model</div>
+                <div class="model-desc">Combines Waterfall's structure with iterative prototyping. Each spiral loop = one phase: Planning → Risk Analysis → Engineering → Evaluation. Best for high-risk, large-scale projects.</div>
+                <div><span class="model-badge" style="color:var(--accent-emerald);border-color:rgba(16,185,129,0.3)">✓ Risk management</span><span class="model-badge" style="color:var(--accent-rose);border-color:rgba(244,63,94,0.3)">✗ Complex, expensive</span></div>
+                <div style="margin-top:10px;font-size:0.75rem;color:var(--text-muted)">Best for: Large defense/aerospace software, complex systems</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="model-card" style="--mc:var(--accent-amber)">
+                <span class="model-icon">⚡</span>
+                <div class="model-name" style="color:var(--accent-amber)">RAD Model</div>
+                <div class="model-desc"><strong>Rapid Application Development</strong> — uses prototyping and iterative development with intense end-user involvement. Very fast delivery (60–90 days). Uses CASE tools and component reuse.</div>
+                <div><span class="model-badge" style="color:var(--accent-emerald);border-color:rgba(16,185,129,0.3)">✓ Very fast</span><span class="model-badge" style="color:var(--accent-rose);border-color:rgba(244,63,94,0.3)">✗ Needs skilled team</span></div>
+                <div style="margin-top:10px;font-size:0.75rem;color:var(--text-muted)">Best for: Small-medium projects with clear requirements</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="model-card" style="--mc:var(--accent-rose)">
+                <span class="model-icon">🔁</span>
+                <div class="model-name" style="color:var(--accent-rose)">Iterative Model</div>
+                <div class="model-desc">Development done in repeated cycles (iterations). Each iteration produces a working version with more features than the last. Allows partial implementation and gradual improvement.</div>
+                <div><span class="model-badge" style="color:var(--accent-emerald);border-color:rgba(16,185,129,0.3)">✓ Early partial product</span><span class="model-badge" style="color:var(--accent-rose);border-color:rgba(244,63,94,0.3)">✗ Needs good architecture</span></div>
+                <div style="margin-top:10px;font-size:0.75rem;color:var(--text-muted)">Best for: Large projects where requirements evolve gradually</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="model-card" style="--mc:var(--accent-teal)">
+                <span class="model-icon">🏗️</span>
+                <div class="model-name" style="color:var(--accent-teal)">V-Model (Verification &amp; Validation)</div>
+                <div class="model-desc">Extension of Waterfall where each development phase has a corresponding testing phase. Development and testing happen in parallel (V shape). Very structured with early test planning.</div>
+                <div><span class="model-badge" style="color:var(--accent-emerald);border-color:rgba(16,185,129,0.3)">✓ High quality</span><span class="model-badge" style="color:var(--accent-rose);border-color:rgba(244,63,94,0.3)">✗ Rigid, expensive</span></div>
+                <div style="margin-top:10px;font-size:0.75rem;color:var(--text-muted)">Best for: Medical devices, safety-critical systems</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ Agile vs Waterfall -->
+        <div class="content-section reveal" id="agile-vs-waterfall">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-table"></i></div>
+            <div><div class="cs-title">Agile vs Waterfall — Comparison</div><div class="cs-subtitle">Most asked comparison in exams and interviews</div></div>
+          </div>
+          <div style="border-radius:var(--radius-lg);overflow:hidden">
+            <div class="av-row">
+              <div class="av-label" style="background:var(--bg-card);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em">Feature</div>
+              <div class="av-water av-head" style="color:var(--accent-blue);background:rgba(59,91,219,0.08)">🌊 Waterfall</div>
+              <div class="av-agile av-head"  style="color:var(--accent-emerald);background:rgba(16,185,129,0.08)">🔄 Agile</div>
+            </div>
+            <div class="av-row"><div class="av-label">Approach</div><div class="av-water">Sequential, linear</div><div class="av-agile">Iterative, incremental</div></div>
+            <div class="av-row"><div class="av-label">Flexibility</div><div class="av-water">Rigid — changes are costly</div><div class="av-agile">Highly flexible — embraces change</div></div>
+            <div class="av-row"><div class="av-label">Delivery</div><div class="av-water">One final delivery at end</div><div class="av-agile">Working software every sprint (2–4 wks)</div></div>
+            <div class="av-row"><div class="av-label">Customer role</div><div class="av-water">Only at beginning and end</div><div class="av-agile">Involved throughout the process</div></div>
+            <div class="av-row"><div class="av-label">Testing</div><div class="av-water">After coding is complete</div><div class="av-agile">Continuous, during each sprint</div></div>
+            <div class="av-row"><div class="av-label">Documentation</div><div class="av-water">Extensive, heavy documentation</div><div class="av-agile">Minimal — working software over docs</div></div>
+            <div class="av-row"><div class="av-label">Team size</div><div class="av-water">Large, hierarchical teams</div><div class="av-agile">Small, cross-functional teams (5–9)</div></div>
+            <div class="av-row"><div class="av-label">Best for</div><div class="av-water">Fixed, well-known requirements</div><div class="av-agile">Dynamic, evolving requirements</div></div>
+            <div class="av-row"><div class="av-label">Examples</div><div class="av-water">Defense, construction management</div><div class="av-agile">Startups, web apps, mobile apps</div></div>
+          </div>
+        </div>
+
+        <!-- ⑤ Software Testing -->
+        <div class="content-section reveal" id="testing">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-bug-fill"></i></div>
+            <div><div class="cs-title">Software Testing</div><div class="cs-subtitle">Ensuring software works correctly and reliably</div></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(59,91,219,0.06);border-color:rgba(59,91,219,0.2)">
+                <div class="example-icon">🔬</div>
+                <div><div class="example-title" style="color:var(--accent-blue)">Unit Testing</div>
+                <p class="example-text">Tests individual functions/modules in isolation. Done by developers. Example: Test if calculateTax(income) returns the correct tax amount. Tools: JUnit, pytest, Jest.</p></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(112,72,232,0.06);border-color:rgba(112,72,232,0.2)">
+                <div class="example-icon">🔗</div>
+                <div><div class="example-title" style="color:var(--accent-violet)">Integration Testing</div>
+                <p class="example-text">Tests combined modules working together. Checks data flow between modules. Example: Login module + Database module + Session module working together correctly.</p></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.2)">
+                <div class="example-icon">🖥️</div>
+                <div><div class="example-title" style="color:var(--accent-emerald)">System Testing</div>
+                <p class="example-text">Tests the complete integrated system against requirements. Validates that the full system meets all functional and non-functional requirements. Done by QA team.</p></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.2)">
+                <div class="example-icon">👥</div>
+                <div><div class="example-title" style="color:var(--accent-amber)">UAT — User Acceptance Testing</div>
+                <p class="example-text">Final testing by actual end-users to confirm the system meets business requirements. Done before go-live. Alpha testing (internal users), Beta testing (external users).</p></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(244,63,94,0.06);border-color:rgba(244,63,94,0.2)">
+                <div class="example-icon">⬜</div>
+                <div><div class="example-title" style="color:var(--accent-rose)">Black Box Testing</div>
+                <p class="example-text">Tests based on inputs and outputs WITHOUT knowing internal code logic. Tester treats software as a "black box." Focuses on functionality. Example: Testing a login form without knowing the backend code.</p></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example-box" style="background:rgba(14,165,233,0.06);border-color:rgba(14,165,233,0.2)">
+                <div class="example-icon">⬜</div>
+                <div><div class="example-title" style="color:var(--accent-teal)">White Box Testing</div>
+                <p class="example-text">Tests WITH full knowledge of internal code structure and logic. Checks code paths, loops, and conditions. Also called Glass Box or Structural testing. Done by developers.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="key-note mt-3" style="border-color:var(--accent-amber)"><i class="bi bi-star-fill" style="color:var(--accent-amber)"></i><strong>Regression Testing</strong> — re-running tests after bug fixes or new features to ensure existing functionality is not broken. Critical in Agile/CI-CD pipelines.</div>
+        </div>
+
+        <!-- ⑥ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div><div class="cs-title">Real-Life Examples</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">🏦</div>
+              <div><div class="example-title">Core Banking System — Waterfall</div>
+              <p class="example-text">A bank's core system (loan processing, account management) uses <strong>Waterfall</strong> — requirements are well-defined by RBI regulations, changes are expensive, and extensive documentation is legally required. Strict V-Model testing ensures zero defects in financial transactions.</p></div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">📱</div>
+              <div><div class="example-title">WhatsApp Features — Agile/Scrum</div>
+              <p class="example-text">WhatsApp releases new features (voice notes, polls, reactions) every few weeks. This is <strong>Agile Scrum</strong> — small teams work in 2-week sprints, continuously releasing improvements. Requirements evolve based on user feedback.</p></div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🚀</div>
+              <div><div class="example-title">Space Mission Software — Spiral</div>
+              <p class="example-text">NASA's software for satellite control uses the <strong>Spiral Model</strong> — each loop carefully analyzes risks (what if the satellite fails to respond?) and builds prototypes, because a single bug could mean mission failure worth billions of rupees.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes — Exam Tips</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>SRS</strong> = Software Requirements Specification — the most important output of the requirements phase. Acts as a contract between client and developer.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Agile frameworks: <strong>Scrum</strong> (sprints, daily standups, Product Backlog), <strong>Kanban</strong> (visual boards), <strong>XP</strong> (Extreme Programming — pair programming, TDD).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>COCOMO</strong> (Constructive Cost Model) — a popular software cost estimation model. Calculates effort in person-months based on project size (KLOC).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Software quality attributes (ISO 9126): <strong>Functionality, Reliability, Usability, Efficiency, Maintainability, Portability</strong>.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i><strong>CI/CD</strong> (Continuous Integration / Continuous Deployment) — modern DevOps practice that automates testing and deployment after every code commit. Tools: Jenkins, GitHub Actions, GitLab CI.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i>Types of maintenance: <strong>Corrective</strong> (fix bugs), <strong>Adaptive</strong> (adapt to new environment), <strong>Perfective</strong> (add features), <strong>Preventive</strong> (prevent future problems).</div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Software Engineering</div>
+          <p class="summary-text"><strong>SDLC phases:</strong> Planning → Requirements (SRS) → Design (HLD+LLD) → Implementation (Coding) → Testing → Deployment → Maintenance. Models: <strong>Waterfall</strong> (sequential, fixed requirements), <strong>Agile</strong> (iterative sprints, flexible), <strong>Spiral</strong> (risk-focused), <strong>RAD</strong> (rapid prototyping), <strong>V-Model</strong> (testing parallel to development). Testing types: Unit → Integration → System → UAT. Black Box (no code knowledge) vs White Box (with code knowledge). Agile uses Scrum (sprints, backlogs). Maintenance types: Corrective, Adaptive, Perfective, Preventive.</p>
+        </div>
+
+        <!-- Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is the SDLC and what are its phases?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">SDLC (Software Development Life Cycle) is a structured process for developing software. Phases: 1-Planning, 2-Requirements Analysis (SRS), 3-System Design (HLD+LLD), 4-Implementation/Coding, 5-Testing, 6-Deployment, 7-Maintenance.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What is the difference between Waterfall and Agile models?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Waterfall: sequential, linear, one delivery at the end, rigid. Best for fixed requirements. Agile: iterative sprints (2-4 weeks), working software delivered frequently, flexible to change, continuous customer involvement. Best for evolving requirements like web/mobile apps.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>What is the difference between Black Box and White Box testing?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Black Box: test based on input/output without knowledge of internal code (functionality testing). White Box: test with full knowledge of internal code structure — checks code paths, conditions, loops (structural testing). Black Box done by QA/testers; White Box done by developers.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>What is SRS?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">SRS (Software Requirements Specification) is a formal document produced during the requirements phase. It describes what the system should do (functional requirements) and how it should perform (non-functional: speed, security, scalability). It acts as a contract between the client and development team.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>What are the four types of software maintenance?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">1-Corrective: fix bugs/defects found after deployment. 2-Adaptive: modify software to work in new environments (new OS, hardware). 3-Perfective: add new features or improve existing ones based on user requests. 4-Preventive: restructure code to prevent future problems (refactoring, documentation).</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click to check your answer</div></div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. The output of the Requirements Analysis phase is ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> HLD Document</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> SRS — Software Requirements Specification</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Source Code</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Test Report</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. In Agile development, work is done in short cycles called ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Phases</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Loops</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Sprints</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Iterations</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Which testing is done WITHOUT knowledge of internal code?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> White Box Testing</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Black Box Testing</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Unit Testing</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Integration Testing</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. Which SDLC model combines Waterfall with iterative prototyping and risk analysis?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Agile Model</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> RAD Model</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Spiral Model</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> V-Model</div>
+            </div>
+          </div>
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. Re-testing after fixing bugs to ensure existing features still work is called ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> System Testing</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Smoke Testing</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Regression Testing</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Unit Testing</div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex"><i class="bi bi-collection-play-fill"></i> Take Full Module Quiz</a>
+          </div>
+        </div>
+
+        <div class="topic-nav reveal">
+          <a href="topic-database.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Database Fundamentals</div></div>
+          </a>
+          <a href="topic-internet.html" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Next Topic</div><div class="nav-title">Internet &amp; Web Technologies</div></div>
+            <i class="bi bi-arrow-right" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text"><p><a href="../index.html">← Back to Home</a></p></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Input &amp; Output Devices | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+</head>
+<body data-topic-id="io-devices">
+
+<div id="progressBar"></div>
+
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="topic-hero">
+  <div class="container topic-hero-inner">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="../index.html#topics">Topics</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Basic Level</span>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Input &amp; Output Devices</span>
+    </div>
+    <div class="topic-hero-icon icon-teal" style="background:rgba(14,165,233,0.15)">
+      <i class="bi bi-keyboard"></i>
+    </div>
+    <h1 class="topic-hero-title">Input &amp; Output Devices</h1>
+    <p class="topic-hero-desc">
+      Learn which devices send data INTO the computer (Input) and which devices
+      bring data OUT from the computer (Output), with types, examples, and diagrams.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-emerald"><i class="bi bi-1-circle me-1"></i>Basic Level</span>
+      <span class="tag tag-blue"><i class="bi bi-clock me-1"></i>12 min read</span>
+      <span class="tag tag-violet"><i class="bi bi-translate me-1"></i>English + हिंदी</span>
+      <span class="tag tag-amber"><i class="bi bi-patch-question me-1"></i>5 MCQs included</span>
+    </div>
+  </div>
+</div>
+
+<div class="topic-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-lg-3 d-none d-lg-block">
+        <div class="toc-sidebar">
+          <div class="toc-card">
+            <div class="toc-title"><i class="bi bi-list-ul me-1"></i>On This Page</div>
+            <ul class="toc-list">
+              <li><a href="#explanation"><i class="bi bi-book"></i> Explanation</a></li>
+              <li><a href="#input-devices"><i class="bi bi-keyboard"></i> Input Devices</a></li>
+              <li><a href="#output-devices"><i class="bi bi-display"></i> Output Devices</a></li>
+              <li><a href="#io-devices"><i class="bi bi-arrow-left-right"></i> Both (I/O)</a></li>
+              <li><a href="#examples"><i class="bi bi-lightbulb"></i> Real-Life Examples</a></li>
+              <li><a href="#key-notes"><i class="bi bi-pencil-square"></i> Key Notes</a></li>
+              <li><a href="#summary"><i class="bi bi-journal-check"></i> Summary</a></li>
+              <li><a href="#interview"><i class="bi bi-person-workspace"></i> Interview Q&amp;A</a></li>
+              <li><a href="#mcq"><i class="bi bi-ui-checks"></i> MCQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+
+        <!-- ① Explanation -->
+        <div class="content-section reveal" id="explanation">
+          <div class="cs-header">
+            <div class="cs-icon icon-teal"><i class="bi bi-book-fill"></i></div>
+            <div><div class="cs-title">Topic Explanation</div><div class="cs-subtitle">Read in your preferred language</div></div>
+          </div>
+
+          <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="hi">🇮🇳 हिंदी</button>
+          </div>
+
+          <div class="lang-content visible prose" data-lang="en">
+            <p>
+              In the <strong>IPO Cycle</strong>, we need devices to send data <em>into</em> the computer and to
+              receive the results <em>from</em> the computer. These are called <strong>Input Devices</strong>
+              and <strong>Output Devices</strong>.
+            </p>
+            <p>
+              <strong>Input Devices</strong> are hardware components that allow users to send data and instructions
+              to the computer. The computer reads this data, processes it, and gives back a result.
+              Common examples: <strong>Keyboard</strong> (for typing), <strong>Mouse</strong> (for clicking and pointing),
+              <strong>Scanner</strong> (for digitizing documents), <strong>Microphone</strong> (for capturing sound).
+            </p>
+            <p>
+              <strong>Output Devices</strong> are hardware components that receive processed data from the computer
+              and present it to the user in a human-readable form (visual, audio, or printed).
+              Common examples: <strong>Monitor</strong> (displays text and graphics), <strong>Printer</strong>
+              (prints on paper), <strong>Speaker</strong> (plays audio), <strong>Projector</strong> (displays on screen).
+            </p>
+            <p>
+              Some devices work as <strong>both</strong> input and output — these are called
+              <strong>Input/Output (I/O) Devices</strong>. Example: Touchscreen, Modem, Headset with mic.
+            </p>
+          </div>
+
+          <div class="lang-content hindi-prose prose" data-lang="hi">
+            <p>
+              <strong>IPO चक्र</strong> में, हमें कंप्यूटर में डेटा भेजने और परिणाम प्राप्त करने के लिए उपकरणों की
+              आवश्यकता होती है। इन्हें <strong>इनपुट डिवाइस</strong> और <strong>आउटपुट डिवाइस</strong> कहते हैं।
+            </p>
+            <p>
+              <strong>इनपुट डिवाइस</strong> वे हार्डवेयर घटक हैं जो उपयोगकर्ताओं को डेटा और निर्देश कंप्यूटर में
+              भेजने की अनुमति देते हैं। सामान्य उदाहरण: <strong>कीबोर्ड</strong> (टाइपिंग के लिए),
+              <strong>माउस</strong> (क्लिक करने के लिए), <strong>स्कैनर</strong> (दस्तावेज़ डिजिटाइज़ करने के लिए),
+              <strong>माइक्रोफोन</strong> (ध्वनि रिकॉर्ड करने के लिए)।
+            </p>
+            <p>
+              <strong>आउटपुट डिवाइस</strong> वे हार्डवेयर घटक हैं जो कंप्यूटर से प्रोसेस किया गया डेटा प्राप्त करते हैं
+              और उसे उपयोगकर्ता को मानव-पठनीय रूप में प्रस्तुत करते हैं।
+              सामान्य उदाहरण: <strong>मॉनिटर</strong> (पाठ और ग्राफिक्स दिखाता है),
+              <strong>प्रिंटर</strong> (कागज पर प्रिंट करता है),
+              <strong>स्पीकर</strong> (ऑडियो बजाता है), <strong>प्रोजेक्टर</strong> (स्क्रीन पर प्रदर्शित करता है)।
+            </p>
+            <p>
+              कुछ डिवाइस <strong>इनपुट और आउटपुट दोनों</strong> के रूप में काम करते हैं —
+              इन्हें <strong>इनपुट/आउटपुट (I/O) डिवाइस</strong> कहते हैं। उदाहरण: टचस्क्रीन, मॉडेम, माइक वाला हेडसेट।
+            </p>
+          </div>
+        </div>
+
+        <!-- ② Input Devices Grid -->
+        <div class="content-section reveal" id="input-devices">
+          <div class="cs-header">
+            <div class="cs-icon icon-blue"><i class="bi bi-keyboard-fill"></i></div>
+            <div><div class="cs-title">Input Devices</div><div class="cs-subtitle">Devices that send data INTO the computer</div></div>
+          </div>
+
+          <div style="padding:3px 12px 8px;background:rgba(59,91,219,0.08);border-radius:var(--radius-md);font-size:0.8rem;color:var(--accent-blue);font-weight:600;margin-bottom:16px;display:inline-block">
+            ← Data goes IN to the CPU
+          </div>
+
+          <div class="io-grid">
+            <div class="io-item"><span class="io-emoji">⌨️</span><div class="io-name">Keyboard</div><div class="io-type">Typing text</div></div>
+            <div class="io-item"><span class="io-emoji">🖱️</span><div class="io-name">Mouse</div><div class="io-type">Pointing &amp; clicking</div></div>
+            <div class="io-item"><span class="io-emoji">📷</span><div class="io-name">Scanner</div><div class="io-type">Digitizes documents</div></div>
+            <div class="io-item"><span class="io-emoji">🎤</span><div class="io-name">Microphone</div><div class="io-type">Records sound</div></div>
+            <div class="io-item"><span class="io-emoji">📸</span><div class="io-name">Webcam</div><div class="io-type">Captures video</div></div>
+            <div class="io-item"><span class="io-emoji">🕹️</span><div class="io-name">Joystick</div><div class="io-type">Games &amp; control</div></div>
+            <div class="io-item"><span class="io-emoji">💳</span><div class="io-name">Card Reader</div><div class="io-type">Reads card data</div></div>
+            <div class="io-item"><span class="io-emoji">🖊️</span><div class="io-name">Light Pen</div><div class="io-type">Drawing on screen</div></div>
+          </div>
+        </div>
+
+        <!-- ③ Output Devices Grid -->
+        <div class="content-section reveal" id="output-devices">
+          <div class="cs-header">
+            <div class="cs-icon icon-emerald"><i class="bi bi-display-fill"></i></div>
+            <div><div class="cs-title">Output Devices</div><div class="cs-subtitle">Devices that bring processed data OUT from the computer</div></div>
+          </div>
+
+          <div style="padding:3px 12px 8px;background:rgba(16,185,129,0.08);border-radius:var(--radius-md);font-size:0.8rem;color:var(--accent-emerald);font-weight:600;margin-bottom:16px;display:inline-block">
+            Data comes OUT from CPU →
+          </div>
+
+          <div class="io-grid">
+            <div class="io-item"><span class="io-emoji">🖥️</span><div class="io-name">Monitor</div><div class="io-type">Displays visuals</div></div>
+            <div class="io-item"><span class="io-emoji">🖨️</span><div class="io-name">Printer</div><div class="io-type">Hard copy output</div></div>
+            <div class="io-item"><span class="io-emoji">🔊</span><div class="io-name">Speaker</div><div class="io-type">Audio output</div></div>
+            <div class="io-item"><span class="io-emoji">📽️</span><div class="io-name">Projector</div><div class="io-type">Big screen display</div></div>
+            <div class="io-item"><span class="io-emoji">🖥️</span><div class="io-name">Plotter</div><div class="io-type">Large drawings</div></div>
+            <div class="io-item"><span class="io-emoji">💾</span><div class="io-name">Disk (Write)</div><div class="io-type">Stores output data</div></div>
+          </div>
+        </div>
+
+        <!-- ④ I/O Devices -->
+        <div class="content-section reveal" id="io-devices">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-arrow-left-right"></i></div>
+            <div><div class="cs-title">Input + Output Devices (Both)</div><div class="cs-subtitle">Devices that work as both input and output</div></div>
+          </div>
+          <div class="io-grid">
+            <div class="io-item"><span class="io-emoji">📱</span><div class="io-name">Touchscreen</div><div class="io-type">Input + Display</div></div>
+            <div class="io-item"><span class="io-emoji">📡</span><div class="io-name">Modem</div><div class="io-type">Send &amp; receive data</div></div>
+            <div class="io-item"><span class="io-emoji">🎧</span><div class="io-name">Headset</div><div class="io-type">Mic + Speakers</div></div>
+            <div class="io-item"><span class="io-emoji">💾</span><div class="io-name">Hard Disk</div><div class="io-type">Read &amp; Write</div></div>
+            <div class="io-item"><span class="io-emoji">📠</span><div class="io-name">Fax Machine</div><div class="io-type">Send &amp; receive</div></div>
+            <div class="io-item"><span class="io-emoji">🖊️</span><div class="io-name">Network Card</div><div class="io-type">Send &amp; receive</div></div>
+          </div>
+        </div>
+
+        <!-- ⑤ Real-Life Examples -->
+        <div class="content-section reveal" id="examples">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-lightbulb-fill"></i></div>
+            <div><div class="cs-title">Real-Life Examples</div></div>
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div class="example-box">
+              <div class="example-icon">🎮</div>
+              <div>
+                <div class="example-title">Gaming Setup</div>
+                <p class="example-text"><strong>Input:</strong> Joystick / Keyboard + Mouse (your commands go into the computer). <strong>Processing:</strong> CPU runs the game engine. <strong>Output:</strong> Monitor shows the game, Speakers give game sounds, Headset provides both audio (output) and mic (input).</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🏫</div>
+              <div>
+                <div class="example-title">Online Class Setup</div>
+                <p class="example-text"><strong>Input:</strong> Webcam captures your face, Microphone captures your voice. <strong>Output:</strong> Speaker plays teacher's voice, Monitor shows the video call. Touchscreen devices serve as both.</p>
+              </div>
+            </div>
+            <div class="example-box">
+              <div class="example-icon">🏦</div>
+              <div>
+                <div class="example-title">ATM Machine</div>
+                <p class="example-text"><strong>Input:</strong> Card Reader (reads your card), Keypad (you enter PIN). <strong>Output:</strong> Screen (shows balance/options), Printer (prints receipt), Cash Dispenser (gives money).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ Key Notes -->
+        <div class="content-section reveal" id="key-notes">
+          <div class="cs-header">
+            <div class="cs-icon icon-amber"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="cs-title">Key Notes</div></div>
+          </div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> A <strong>Monitor</strong> is also called a <strong>Visual Display Unit (VDU)</strong> — commonly asked in exams.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> There are two types of printers: <strong>Impact</strong> (Dot Matrix — uses ribbons) and <strong>Non-Impact</strong> (Inkjet, Laser — no physical contact with paper).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> A <strong>Touchscreen</strong> is the best example of an <strong>I/O device</strong> — it takes input (touch) and displays output (screen).</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> <strong>OCR</strong> (Optical Character Recognition) — scanner input device that reads printed text and converts to digital text.</div>
+          <div class="key-note"><i class="bi bi-star-fill"></i> The <strong>resolution</strong> of a monitor is measured in <strong>pixels</strong> (e.g., 1920×1080 = Full HD).</div>
+        </div>
+
+        <!-- ⑦ Summary -->
+        <div class="summary-box reveal" id="summary">
+          <div class="summary-title"><i class="bi bi-journal-check" style="color:var(--accent-blue)"></i> Summary — Input &amp; Output Devices</div>
+          <p class="summary-text">
+            <strong>Input Devices</strong> send data INTO the computer (Keyboard, Mouse, Scanner, Mic, Webcam, Joystick).
+            <strong>Output Devices</strong> bring results OUT from the computer (Monitor/VDU, Printer, Speaker, Projector).
+            Some devices are <strong>both input and output</strong> (Touchscreen, Modem, Hard Disk, Headset).
+            Monitor is also called <strong>VDU</strong>. Printers are of two types: <strong>Impact</strong> (Dot Matrix) and <strong>Non-Impact</strong> (Inkjet, Laser).
+            Touchscreen is the most common example of an <strong>I/O device</strong>.
+          </p>
+        </div>
+
+        <!-- ⑧ Interview Questions -->
+        <div class="content-section reveal" id="interview">
+          <div class="cs-header">
+            <div class="cs-icon icon-violet"><i class="bi bi-person-workspace"></i></div>
+            <div><div class="cs-title">Interview / Viva Questions</div><div class="cs-subtitle">Click to reveal answers</div></div>
+          </div>
+          <div class="interview-list d-flex flex-column gap-2">
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">1</span>What is an Input Device? Give 3 examples.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">An input device is a hardware component that allows users to enter data and instructions into a computer. Examples: (1) Keyboard – for typing, (2) Mouse – for pointing and clicking, (3) Scanner – for digitizing paper documents.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">2</span>What is VDU and what type of device is it?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">VDU stands for Visual Display Unit, another name for a Monitor. It is an Output Device that displays text, images, and video output from the computer to the user.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">3</span>Differentiate between Impact and Non-Impact printers.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">Impact Printers physically strike an ink ribbon against paper (like a typewriter). Example: Dot Matrix Printer. Non-Impact Printers do not touch the paper physically — they use inkjets or laser beams. Examples: Inkjet Printer, Laser Printer. Non-Impact printers are faster and quieter.</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">4</span>Give two examples of I/O (both input and output) devices.<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">(1) Touchscreen – acts as input (you touch it to give commands) and output (it displays information). (2) Modem – receives data from the internet (input) and sends data to the internet (output).</div>
+            </div>
+            <div class="interview-q">
+              <div class="q-header"><span class="q-num">5</span>What is a Scanner and how does it work?<i class="bi bi-chevron-right q-arrow"></i></div>
+              <div class="q-answer">A Scanner is an input device that captures physical documents, photographs, or images and converts them into digital format that a computer can store and process. It works by shining a light on the document and using sensors to detect reflected light, converting it into a digital image.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑨ MCQs -->
+        <div class="content-section reveal" id="mcq">
+          <div class="cs-header">
+            <div class="cs-icon icon-rose"><i class="bi bi-ui-checks-grid"></i></div>
+            <div><div class="cs-title">Multiple Choice Questions</div><div class="cs-subtitle">Click an option to check your answer</div></div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q1. Which of the following is an Input Device?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Monitor</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Scanner</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Printer</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Speaker</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q2. VDU stands for ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Visual Data Utility</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">B</span> Visual Display Unit</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Virtual Display Unit</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Video Data Unit</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q3. Which device is an example of BOTH Input and Output?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Keyboard</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Printer</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Touchscreen</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Scanner</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q4. Dot Matrix Printer is which type of printer?</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">A</span> Impact Printer</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Non-Impact Printer</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">C</span> Laser Printer</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Inkjet Printer</div>
+            </div>
+          </div>
+
+          <div class="mcq-card">
+            <div class="mcq-q">Q5. Monitor resolution is measured in ______.</div>
+            <div class="mcq-options">
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">A</span> Bytes</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">B</span> Hertz (Hz)</div>
+              <div class="mcq-option" data-correct="true"><span class="mcq-label">C</span> Pixels</div>
+              <div class="mcq-option" data-correct="false"><span class="mcq-label">D</span> Watts</div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="quiz.html" class="btn-primary-cta" style="display:inline-flex">
+              <i class="bi bi-collection-play-fill"></i>
+              Take Full Quiz (25 Questions)
+            </a>
+          </div>
+        </div>
+
+        <!-- Topic Nav -->
+        <div class="topic-nav reveal">
+          <a href="topic-hardware-software.html" class="topic-nav-btn">
+            <i class="bi bi-arrow-left" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+            <div><div class="nav-label">Previous Topic</div><div class="nav-title">Hardware vs Software</div></div>
+          </a>
+          <a href="../index.html#topics" class="topic-nav-btn" style="justify-content:flex-end;text-align:right">
+            <div><div class="nav-label">Back to</div><div class="nav-title">All Topics</div></div>
+            <i class="bi bi-grid" style="font-size:1.2rem;color:var(--accent-blue)"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-text">
+      <p class="mb-1"><strong style="color:var(--text-primary)">CompFund</strong> — Computer Fundamentals Learning Platform</p>
+      <p><a href="../index.html">← Back to Home</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/topic.js"></script>
+<script src="../js/search.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>

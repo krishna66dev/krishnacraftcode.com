@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Center | Computer Fundamentals</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/topic.css"/>
+  <link rel="stylesheet" href="../css/polish.css"/>
+  <link rel="stylesheet" href="../css/quiz.css"/>
+</head>
+<body>
+<div id="progressBar"></div>
+
+<!-- NAVBAR -->
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">
+      <div class="brand-icon"><i class="bi bi-cpu-fill text-white"></i></div>
+      <span>CompFund<span style="color:var(--accent-violet)">.</span></span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem;color:var(--text-primary)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="../index.html#topics"><i class="bi bi-journals me-1"></i>Topics</a></li>
+        <li class="nav-item"><a class="nav-link active" href="quiz.html"><i class="bi bi-patch-question me-1"></i>Quiz</a></li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><button id="themeToggle"><i class="bi bi-sun-fill"></i></button>
+        </li>
+        <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+          <button class="search-trigger" id="searchTrigger"><i class="bi bi-search"></i><span class="d-none d-lg-inline"> Search…</span></button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="quiz-hero">
+  <div class="container" style="position:relative;z-index:1">
+    <div class="breadcrumb-nav">
+      <a href="../index.html"><i class="bi bi-house"></i> Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <span style="color:var(--text-primary)">Quiz Center</span>
+    </div>
+    <div class="topic-hero-icon icon-violet" style="background:rgba(112,72,232,0.15)">
+      <i class="bi bi-patch-question-fill"></i>
+    </div>
+    <h1 class="topic-hero-title">Quiz Center</h1>
+    <p class="topic-hero-desc">
+      Test your knowledge with module-wise quizzes. Get instant scores, grade cards,
+      answer explanations, and a downloadable PDF result report.
+    </p>
+    <div class="topic-tags">
+      <span class="tag tag-emerald"><i class="bi bi-check2-circle me-1"></i>Auto Graded</span>
+      <span class="tag tag-blue"><i class="bi bi-translate me-1"></i>With Explanations</span>
+      <span class="tag tag-violet"><i class="bi bi-file-earmark-pdf me-1"></i>PDF Export</span>
+      <span class="tag tag-amber"><i class="bi bi-clock me-1"></i>Timed</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="topic-body">
+  <div class="container">
+
+    <!-- ── SETUP SECTION ── -->
+    <div id="setupSection">
+      <div class="quiz-setup reveal">
+        <div class="setup-title">🎓 Start Your Quiz</div>
+        <p style="color:var(--text-secondary);margin-bottom:28px;font-size:0.95rem">
+          Enter your name, choose a module, and hit Start. Each question shows the correct
+          answer and explanation immediately after you answer.
+        </p>
+
+        <!-- Name input -->
+        <div class="mb-4">
+          <label style="font-size:0.82rem;font-weight:700;color:var(--text-muted);margin-bottom:8px;display:block;text-transform:uppercase;letter-spacing:0.06em">
+            <i class="bi bi-person-fill me-1"></i>Your Name
+          </label>
+          <input type="text" id="studentName" class="name-input" placeholder="Enter your full name…" maxlength="60" autocomplete="off"/>
+        </div>
+
+        <!-- Module grid -->
+        <div class="mb-4">
+          <label style="font-size:0.82rem;font-weight:700;color:var(--text-muted);margin-bottom:14px;display:block;text-transform:uppercase;letter-spacing:0.06em">
+            <i class="bi bi-journals me-1"></i>Choose a Module
+          </label>
+          <div class="row g-3" id="moduleGrid"></div>
+        </div>
+
+        <!-- Selected info -->
+        <div id="selectedModuleInfo" style="display:none;font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;padding:10px 16px;background:var(--bg-primary);border-radius:var(--radius-md);border:1px solid var(--border-color)">
+        </div>
+
+        <!-- Start button -->
+        <button id="startBtn" class="btn-primary-cta" onclick="startQuiz()" disabled style="width:100%;justify-content:center;padding:16px;font-size:1rem">
+          <i class="bi bi-play-fill"></i> Start Quiz
+        </button>
+
+        <!-- Quiz rules -->
+        <div class="row g-3 mt-4">
+          <div class="col-sm-6 col-md-3">
+            <div style="text-align:center;padding:16px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md)">
+              <div style="font-size:1.5rem;margin-bottom:6px">⚡</div>
+              <div style="font-size:0.78rem;font-weight:700;color:var(--text-secondary)">Instant feedback after each answer</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div style="text-align:center;padding:16px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md)">
+              <div style="font-size:1.5rem;margin-bottom:6px">📖</div>
+              <div style="font-size:0.78rem;font-weight:700;color:var(--text-secondary)">Explanation shown for every question</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div style="text-align:center;padding:16px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md)">
+              <div style="font-size:1.5rem;margin-bottom:6px">🏆</div>
+              <div style="font-size:0.78rem;font-weight:700;color:var(--text-secondary)">Grade A+, A, B, C, D or F awarded</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div style="text-align:center;padding:16px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md)">
+              <div style="font-size:1.5rem;margin-bottom:6px">📄</div>
+              <div style="font-size:0.78rem;font-weight:700;color:var(--text-secondary)">Download PDF result with full review</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── QUIZ ARENA ── -->
+    <div id="quizArena">
+      <!-- Sticky header bar -->
+      <div class="quiz-header-bar">
+        <div class="quiz-progress-wrap">
+          <div class="quiz-progress-label">
+            <span id="quizProgressLabel">Question 1 of 25</span>
+            <span id="quizProgressPct">0 answered</span>
+          </div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="quizProgressFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <i class="bi bi-stopwatch-fill" style="color:var(--accent-amber)"></i>
+          <span class="quiz-timer" id="quizTimer">00:00</span>
+        </div>
+        <button class="btn-quiz-nav btn-prev" style="padding:8px 16px;font-size:0.82rem" onclick="confirmSubmit()">
+          <i class="bi bi-send-check-fill"></i> Submit
+        </button>
+      </div>
+
+      <!-- Question display area -->
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div id="questionContainer"></div>
+        </div>
+        <div class="col-lg-4">
+          <div class="q-map" id="questionMap" style="position:sticky;top:calc(var(--nav-height) + 90px)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESULT SECTION ── -->
+    <div id="resultSection"></div>
+
+  </div>
+</div>
+
+<footer><div class="container"><div class="footer-text">
+  <p class="mb-1"><strong style="color:var(--text-primary)">CompFund</strong> — Computer Fundamentals Learning Platform</p>
+  <p><a href="../index.html">← Back to Home</a></p>
+</div></div></footer>
+
+<!-- jsPDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Bootstrap + Main JS + Quiz JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/quiz.js"></script>
+<div id="searchOverlay"></div>
+<div id="searchModal" role="dialog">
+  <div class="search-input-row"><i class="bi bi-search"></i><input type="text" id="searchInput" placeholder="Search topics…" autocomplete="off"/><button id="searchClose"><i class="bi bi-x"></i></button></div>
+  <div id="searchResults"></div>
+  <div class="search-footer"><span><kbd>Esc</kbd> close</span><span><kbd>Ctrl K</kbd> open</span></div>
+</div>
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('backToTop')?.classList.toggle('visible',window.scrollY>400)},{passive:true});
+</script>
+</body>
+</html>
