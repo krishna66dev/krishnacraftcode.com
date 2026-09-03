@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aptitude Assessment | Recruitment Screening Test</title>
+
+    <!-- Bootstrap 5 + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js">
+    </script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- ============================================================
+    MAIN APP CONTAINER
+    ============================================================ -->
+    <div id="app">
+
+        <!-- ============================================================
+        HEADER
+        ============================================================ -->
+        <header id="mainHeader" class="sticky-top">
+            <div class="container-fluid">
+                <div class="row align-items-center g-2">
+
+                    <!-- Logo / Brand -->
+                    <div class="col-auto d-flex align-items-center gap-2">
+                        <span class="brand-icon"><i class="bi bi-clipboard2-check"></i></span>
+                        <span class="brand-text d-none d-sm-inline">Aptitude</span>
+                        <span class="brand-text fw-bold">Assessment</span>
+                        <span
+                            class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2 d-none d-md-inline-block">
+                            <i class="bi bi-question-circle"></i> 200 Q
+                        </span>
+                    </div>
+
+                    <!-- Timer + Progress (visible during test) -->
+                    <div class="col d-none" id="headerTestControls">
+                        <div class="d-flex align-items-center justify-content-end gap-3 flex-wrap">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-clock-history text-primary"></i>
+                                <span id="timerDisplay" class="fw-bold font-monospace">90:00</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-bar-chart-fill text-success"></i>
+                                <span id="progressText">0 / 200</span>
+                            </div>
+                            <div style="width:120px;">
+                                <div class="progress" style="height:8px;">
+                                    <div id="progressBar" class="progress-bar bg-primary" style="width:0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Controls -->
+                    <div class="col-auto ms-auto d-flex align-items-center gap-2">
+                        <button id="themeToggle" class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                            title="Toggle theme">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
+                        <button id="clearDataBtn"
+                            class="btn btn-outline-danger btn-sm rounded-pill px-3 d-none d-md-inline-block"
+                            title="Clear saved data">
+                            <i class="bi bi-trash3"></i> Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================================================
+        PAGE CONTENT
+        ============================================================ -->
+        <main id="mainContent" class="container-fluid py-3">
+
+            <!-- ============================================================
+            START SCREEN
+            ============================================================ -->
+            <section id="startScreen">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 col-xl-7">
+
+                        <div class="card border-0 shadow-lg overflow-hidden">
+                            <div class="card-header bg-gradient-primary text-white text-center py-4">
+                                <h1 class="display-5 fw-bold mb-0">
+                                    <i class="bi bi-clipboard2-check me-2"></i>Aptitude Assessment
+                                </h1>
+                                <p class="lead mb-0">Recruitment Screening Test</p>
+                            </div>
+                            <div class="card-body p-4 p-md-5">
+
+                                <!-- Info cards -->
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6 col-md-3">
+                                        <div class="info-card text-center p-3 rounded-3">
+                                            <i class="bi bi-list-ol fs-2 text-primary"></i>
+                                            <div class="fw-bold mt-1">200</div>
+                                            <small>Questions</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="info-card text-center p-3 rounded-3">
+                                            <i class="bi bi-clock fs-2 text-primary"></i>
+                                            <div class="fw-bold mt-1">90</div>
+                                            <small>Minutes</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="info-card text-center p-3 rounded-3">
+                                            <i class="bi bi-check-circle fs-2 text-success"></i>
+                                            <div class="fw-bold mt-1">1 Mark</div>
+                                            <small>Per Question</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="info-card text-center p-3 rounded-3">
+                                            <i class="bi bi-chat-dots fs-2 text-info"></i>
+                                            <div class="fw-bold mt-1">MCQ</div>
+                                            <small>Format</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Features list -->
+                                <div class="row g-2 mb-4">
+                                    <div class="col-6"><i class="bi bi-check-circle-fill text-success"></i> Instant
+                                        Answer Feedback</div>
+                                    <div class="col-6"><i class="bi bi-check-circle-fill text-success"></i> Detailed
+                                        Solutions</div>
+                                    <div class="col-6"><i class="bi bi-check-circle-fill text-success"></i> Result Saved
+                                        Locally</div>
+                                    <div class="col-6"><i class="bi bi-check-circle-fill text-success"></i> Resume After
+                                        Refresh</div>
+                                </div>
+
+                                <!-- Warning -->
+                                <div class="alert alert-warning d-flex align-items-start gap-2">
+                                    <i class="bi bi-exclamation-triangle-fill fs-5 mt-1"></i>
+                                    <div>
+                                        <strong>Important:</strong> Once an answer is selected, it will be evaluated
+                                        immediately and cannot be changed. Please answer carefully.
+                                    </div>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+                                    <button id="startTestBtn" class="btn btn-primary btn-lg px-5 rounded-pill">
+                                        <i class="bi bi-play-fill"></i> Start Test
+                                    </button>
+                                    <button id="viewPrevResultBtn"
+                                        class="btn btn-outline-secondary btn-lg px-4 rounded-pill d-none">
+                                        <i class="bi bi-clock-history"></i> Previous Result
+                                    </button>
+                                    <button id="clearDataStartBtn"
+                                        class="btn btn-outline-danger btn-lg px-4 rounded-pill">
+                                        <i class="bi bi-trash3"></i> Clear Data
+                                    </button>
+                                </div>
+
+                                <!-- Previous result preview -->
+                                <div id="prevResultPreview" class="mt-4 d-none">
+                                    <hr />
+                                    <h5 class="text-center"><i class="bi bi-clock-history"></i> Previous Result</h5>
+                                    <div id="prevResultCard" class="card border-primary-subtle"></div>
+                                </div>
+
+                                <!-- Resume banner -->
+                                <div id="resumeBanner" class="mt-4 d-none">
+                                    <div
+                                        class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                        <span><i class="bi bi-info-circle-fill"></i> Previous test progress
+                                            found.</span>
+                                        <div>
+                                            <button id="resumeTestBtn" class="btn btn-primary btn-sm rounded-pill">
+                                                <i class="bi bi-arrow-clockwise"></i> Resume Test
+                                            </button>
+                                            <button id="newTestFromResumeBtn"
+                                                class="btn btn-outline-secondary btn-sm rounded-pill">
+                                                Start New
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+            TEST SCREEN (hidden initially)
+            ============================================================ -->
+            <section id="testScreen" class="d-none">
+                <div class="row g-3">
+
+                    <!-- LEFT SIDEBAR / NAVIGATOR (Desktop) -->
+                    <!-- LEFT SIDEBAR / NAVIGATOR (Desktop) -->
+                    <div class="col-lg-3 col-xl-2 d-none d-lg-block">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-3 d-flex flex-column">
+                                <h6 class="fw-bold mb-2 flex-shrink-0">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i> Navigator
+                                </h6>
+                                <div class="d-flex justify-content-between small mb-2 flex-shrink-0">
+                                    <span><span class="text-success">●</span> Correct</span>
+                                    <span><span class="text-danger">●</span> Wrong</span>
+                                    <span><span class="text-secondary">●</span> Unanswered</span>
+                                </div>
+                                <div id="questionNavigator" class="d-flex flex-wrap gap-1"></div>
+                                <div class="nav-stats">
+                                    <div class="stat-row">
+                                        <span>Answered:</span>
+                                        <span class="stat-value" id="navAnswered">0</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Remaining:</span>
+                                        <span class="stat-value" id="navRemaining">200</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Correct:</span>
+                                        <span class="stat-value text-success" id="navCorrect">0</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Wrong:</span>
+                                        <span class="stat-value text-danger" id="navWrong">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: QUESTION AREA -->
+                    <div class="col-lg-9 col-xl-10">
+
+                        <!-- Mobile nav toggle -->
+                        <div class="d-lg-none mb-2">
+                            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="offcanvas"
+                                data-bs-target="#mobileNavCanvas">
+                                <i class="bi bi-list"></i> Question Navigator
+                            </button>
+                            <span class="ms-2 small text-muted">Question <span id="mobileQNum">1</span>/200</span>
+                        </div>
+
+                        <!-- Question Card -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-3 p-md-4">
+
+                                <!-- Question header -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="fw-bold mb-0">
+                                        Question <span id="qNumberDisplay">1</span> of 200
+                                    </h5>
+                                    <span id="qCategoryBadge"
+                                        class="badge bg-secondary-subtle text-secondary rounded-pill">Category</span>
+                                </div>
+
+                                <!-- Question text -->
+                                <p id="qText" class="fs-5 fw-medium mb-4">Loading...</p>
+
+                                <!-- Options -->
+                                <div id="optionsContainer" class="d-grid gap-3 mb-3"></div>
+
+                                <!-- Feedback / Solution -->
+                                <div id="feedbackArea" class="mt-4 d-none">
+                                    <div id="feedbackAlert" class="alert"></div>
+                                    <div id="solutionArea"
+                                        class="bg-light-subtle p-3 rounded-3 border-start border-4 border-primary d-none">
+                                        <strong><i class="bi bi-lightbulb"></i> Solution:</strong>
+                                        <p id="solutionText" class="mb-0 mt-1"></p>
+                                    </div>
+                                </div>
+
+                                <!-- Navigation buttons -->
+                                <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+                                    <button id="prevBtn" class="btn btn-outline-secondary rounded-pill px-4">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </button>
+                                    <button id="nextBtn" class="btn btn-outline-secondary rounded-pill px-4">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                    <button id="submitTestBtn" class="btn btn-danger rounded-pill px-4 ms-auto">
+                                        <i class="bi bi-send-check"></i> Submit Test
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+            RESULT SCREEN (hidden initially)
+            ============================================================ -->
+            <section id="resultScreen" class="d-none">
+                <div class="row justify-content-center">
+                    <div class="col-xl-10">
+
+                        <!-- Result header -->
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold"><i class="bi bi-trophy text-warning"></i> Assessment Completed</h2>
+                            <p class="text-muted">Thank you for completing the aptitude assessment.</p>
+                        </div>
+
+                        <!-- Score Card -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center h-100">
+                                    <div class="card-body">
+                                        <div class="score-ring mx-auto mb-2" id="scoreRing">
+                                            <svg viewBox="0 0 120 120" style="width:140px;height:140px;">
+                                                <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef"
+                                                    stroke-width="10" />
+                                                <circle cx="60" cy="60" r="50" fill="none" stroke="#6366f1"
+                                                    stroke-width="10" stroke-dasharray="314.16"
+                                                    stroke-dashoffset="314.16" id="scoreRingCircle" />
+                                                <text x="60" y="65" text-anchor="middle" font-size="28"
+                                                    font-weight="bold" fill="currentColor" id="scoreRingText">0%</text>
+                                            </svg>
+                                        </div>
+                                        <h3 class="fw-bold" id="resultScore">0 / 200</h3>
+                                        <p class="text-muted">Score</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center h-100">
+                                    <div class="card-body d-flex flex-column justify-content-center">
+                                        <div id="resultGradeDisplay" class="display-4 fw-bold">F</div>
+                                        <div id="resultPassDisplay" class="badge fs-5 px-4 py-2 mx-auto">PASS</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="row g-1 small">
+                                            <div class="col-6">Total Questions:</div>
+                                            <div class="col-6 fw-bold" id="rTotal">200</div>
+                                            <div class="col-6">Attempted:</div>
+                                            <div class="col-6 fw-bold" id="rAttempted">0</div>
+                                            <div class="col-6 text-success">Correct:</div>
+                                            <div class="col-6 fw-bold text-success" id="rCorrect">0</div>
+                                            <div class="col-6 text-danger">Wrong:</div>
+                                            <div class="col-6 fw-bold text-danger" id="rWrong">0</div>
+                                            <div class="col-6">Unanswered:</div>
+                                            <div class="col-6 fw-bold" id="rUnanswered">0</div>
+                                            <div class="col-6">Percentage:</div>
+                                            <div class="col-6 fw-bold" id="rPercentage">0%</div>
+                                            <div class="col-6">Time Taken:</div>
+                                            <div class="col-6 fw-bold" id="rTimeTaken">--</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Performance -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-transparent fw-bold">
+                                <i class="bi bi-bar-chart-fill"></i> Category Performance
+                            </div>
+                            <div class="card-body" id="categoryPerformance"></div>
+                        </div>
+
+                        <!-- Question Review with Search/Filter -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-transparent fw-bold d-flex flex-wrap align-items-center gap-2">
+                                <i class="bi bi-question-square"></i> Question Review
+                                <div class="ms-auto d-flex flex-wrap gap-2">
+                                    <input type="text" id="reviewSearch" class="form-control form-control-sm"
+                                        style="width:160px;" placeholder="Search..." />
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-secondary active filter-btn"
+                                            data-filter="all">All</button>
+                                        <button class="btn btn-outline-success filter-btn"
+                                            data-filter="correct">Correct</button>
+                                        <button class="btn btn-outline-danger filter-btn"
+                                            data-filter="wrong">Wrong</button>
+                                        <button class="btn btn-outline-secondary filter-btn"
+                                            data-filter="unanswered">Unanswered</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" id="reviewContainer">
+                                <!-- Accordion will be rendered here -->
+                            </div>
+                        </div>
+
+                        <!-- Result actions -->
+                        <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+                            <button id="downloadPdfBtn" class="btn btn-primary btn-lg rounded-pill px-5">
+                                <i class="bi bi-file-pdf"></i> Download Result as PDF
+                            </button>
+                            <button id="newTestFromResultBtn"
+                                class="btn btn-outline-secondary btn-lg rounded-pill px-4">
+                                <i class="bi bi-arrow-repeat"></i> Start New Test
+                            </button>
+                            <button id="clearDataResultBtn" class="btn btn-outline-danger btn-lg rounded-pill px-4">
+                                <i class="bi bi-trash3"></i> Clear Data
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ============================================================
+        MOBILE OFF CANVAS NAVIGATOR
+        ============================================================ -->
+
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileNavCanvas">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title"><i class="bi bi-grid-3x3-gap-fill"></i> Navigator</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="d-flex justify-content-between small mb-2">
+                    <span><span class="text-success">●</span> Correct</span>
+                    <span><span class="text-danger">●</span> Wrong</span>
+                    <span><span class="text-secondary">●</span> Unanswered</span>
+                </div>
+                <div id="mobileNavigator" class="d-flex flex-wrap gap-1"></div>
+                <hr />
+                <div class="small">
+                    <div>Answered: <span id="mNavAnswered">0</span></div>
+                    <div>Remaining: <span id="mNavRemaining">200</span></div>
+                    <div>Correct: <span id="mNavCorrect">0</span></div>
+                    <div>Wrong: <span id="mNavWrong">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        CONFIRMATION MODALS
+        ============================================================ -->
+
+        <!-- Submit Confirmation Modal -->
+        <div class="modal fade" id="submitModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill text-warning"></i> Submit
+                            Assessment?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to submit the assessment?</p>
+                        <div id="submitSummary" class="small"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button id="confirmSubmitBtn" class="btn btn-danger">Submit Test</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clear Data Confirmation Modal -->
+        <div class="modal fade" id="clearModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-trash3-fill text-danger"></i> Clear Saved Data?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will permanently delete your saved test progress and previous result from this browser.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button id="confirmClearBtn" class="btn btn-danger">Clear Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Test Confirmation Modal -->
+        <div class="modal fade" id="newTestModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill text-warning"></i> Start New
+                            Test?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="newtestmodelbody">
+                        <p>Starting a new test will delete your current progress.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button id="confirmNewTestBtn" class="btn btn-primary">Start New Test</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- /#app -->
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1050 @@
+/* ============================================================
+   CSS VARIABLES & THEMING
+   ============================================================ */
+:root {
+    /* Primary Colors */
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+    
+    /* Semantic Colors */
+    --success: #22c55e;
+    --success-dark: #16a34a;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    
+    /* Neutral Colors - Light Mode */
+    --bg-body: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-input: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --shadow-hover: rgba(0, 0, 0, 0.15);
+    
+    /* Component Colors */
+    --header-bg: #ffffff;
+    --nav-bg: #ffffff;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --card-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Transitions */
+    --transition-speed: 0.3s;
+}
+
+/* Dark Theme */
+[data-bs-theme="dark"] {
+    --bg-body: #0f172a;
+    --bg-card: #1e293b;
+    --bg-input: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    --border-color: #334155;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-hover: rgba(0, 0, 0, 0.5);
+    --header-bg: #1e293b;
+    --nav-bg: #1e293b;
+    
+    /* Override Bootstrap dark mode styles */
+    --bs-body-bg: #0f172a;
+    --bs-body-color: #f1f5f9;
+    --bs-secondary-color: #cbd5e1;
+    --bs-tertiary-color: #94a3b8;
+    --bs-border-color: #334155;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+* {
+    transition: background-color var(--transition-speed) ease,
+                color var(--transition-speed) ease,
+                border-color var(--transition-speed) ease,
+                box-shadow var(--transition-speed) ease;
+}
+
+body {
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+#mainHeader {
+    background: var(--header-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.6rem 0;
+    box-shadow: 0 1px 3px var(--shadow-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1030;
+}
+
+#mainHeader .brand-icon {
+    font-size: 1.8rem;
+    color: var(--primary);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#mainHeader .brand-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+#mainHeader .badge {
+    font-weight: 500;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.7rem;
+}
+
+#timerDisplay {
+    font-size: 1.1rem;
+    min-width: 70px;
+    display: inline-block;
+    color: var(--text-primary);
+}
+
+#timerDisplay.timer-warning {
+    color: var(--warning);
+}
+
+#timerDisplay.timer-danger {
+    color: var(--danger);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+#progressText {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+#mainHeader .progress {
+    background-color: var(--bg-input);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#mainHeader .progress-bar {
+    background: var(--primary-gradient);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+/* Header buttons */
+#mainHeader .btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+#mainHeader .btn-outline-secondary:hover {
+    background: var(--bg-input);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+#mainHeader .btn-outline-danger {
+    border-color: transparent;
+    color: var(--text-muted);
+}
+
+#mainHeader .btn-outline-danger:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+/* ============================================================
+   START SCREEN
+   ============================================================ */
+#startScreen .card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow-lg);
+}
+
+#startScreen .card-header {
+    background: var(--primary-gradient) !important;
+    border-bottom: none;
+    border-radius: 20px 20px 0 0 !important;
+}
+
+#startScreen .card-header h1 {
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#startScreen .card-header .lead {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.info-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow);
+}
+
+.info-card i {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.info-card .fw-bold {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.info-card small {
+    color: var(--text-secondary);
+}
+
+#startScreen .btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+#startScreen .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+}
+
+#startScreen .btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+#startScreen .btn-outline-secondary:hover {
+    background: var(--bg-input);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+#startScreen .btn-outline-danger {
+    border-color: var(--border-color);
+    color: var(--text-muted);
+}
+
+#startScreen .btn-outline-danger:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+#prevResultCard {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+/* ============================================================
+   TEST SCREEN
+   ============================================================ */
+#testScreen .card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+}
+
+/* Question Navigator */
+#questionNavigator .nav-btn,
+#mobileNavigator .nav-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#questionNavigator .nav-btn:hover,
+#mobileNavigator .nav-btn:hover {
+    transform: scale(1.05);
+    box-shadow: var(--card-shadow);
+}
+
+#questionNavigator .nav-btn.current,
+#mobileNavigator .nav-btn.current {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+#questionNavigator .nav-btn.correct,
+#mobileNavigator .nav-btn.correct {
+    border-color: var(--success);
+    background: var(--success);
+    color: white;
+}
+
+#questionNavigator .nav-btn.wrong,
+#mobileNavigator .nav-btn.wrong {
+    border-color: var(--danger);
+    background: var(--danger);
+    color: white;
+}
+
+#questionNavigator .nav-btn.answered,
+#mobileNavigator .nav-btn.answered {
+    border-color: var(--primary-light);
+    background: var(--bg-input);
+}
+
+/* Question Options */
+.option-card {
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0.9rem 1.2rem;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+}
+
+.option-card:hover:not(.disabled) {
+    transform: translateX(4px);
+    border-color: var(--primary-light);
+    box-shadow: var(--card-shadow);
+}
+
+.option-card .option-letter {
+    font-weight: 700;
+    color: var(--primary);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-input);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    transition: all var(--transition-speed) ease;
+}
+
+.option-card:hover:not(.disabled) .option-letter {
+    background: var(--primary);
+    color: white;
+}
+
+.option-card .option-text {
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.option-card .option-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.option-card.selected-correct {
+    border-color: var(--success);
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.option-card.selected-correct .option-letter {
+    background: var(--success);
+    color: white;
+}
+
+.option-card.selected-wrong {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.option-card.selected-wrong .option-letter {
+    background: var(--danger);
+    color: white;
+}
+
+.option-card.show-correct {
+    border-color: var(--success);
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.option-card.disabled {
+    cursor: default;
+    opacity: 0.85;
+}
+
+.option-card.disabled:hover {
+    transform: none;
+}
+
+/* Feedback Area */
+#feedbackAlert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+#feedbackAlert .alert-icon {
+    font-size: 1.5rem;
+}
+
+#feedbackAlert.correct {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success-dark);
+    border-left: 4px solid var(--success);
+}
+
+#feedbackAlert.incorrect {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-dark);
+    border-left: 4px solid var(--danger);
+}
+
+#solutionArea {
+    background: var(--bg-input) !important;
+    border-left-color: var(--primary) !important;
+    border-radius: 12px;
+}
+
+#solutionArea strong {
+    color: var(--text-secondary);
+}
+
+#solutionText {
+    color: var(--text-primary);
+}
+
+/* Navigation Buttons */
+#testScreen .btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+#testScreen .btn-outline-secondary:hover {
+    background: var(--bg-input);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+#testScreen .btn-danger {
+    background: var(--danger);
+    border: none;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+#testScreen .btn-danger:hover {
+    background: var(--danger-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* ============================================================
+   RESULT SCREEN
+   ============================================================ */
+#resultScreen .card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+}
+
+#resultScore {
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+
+/* Score Ring */
+.score-ring svg {
+    display: block;
+    margin: 0 auto;
+}
+
+.score-ring circle:last-child {
+    transition: stroke-dashoffset 1.5s ease;
+    stroke: var(--primary);
+}
+
+#scoreRingText {
+    font-size: 22px;
+    font-weight: 700;
+    fill: var(--text-primary);
+}
+
+#resultGradeDisplay {
+    font-size: 4rem;
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+
+#resultPassDisplay {
+    font-size: 1.1rem;
+    padding: 0.5rem 2rem;
+    border-radius: 50px;
+    margin-top: 0.5rem;
+}
+
+#resultPassDisplay.pass {
+    background: var(--success);
+    color: white;
+}
+
+#resultPassDisplay.fail {
+    background: var(--danger);
+    color: white;
+}
+
+/* Category Performance */
+.category-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.category-row:last-child {
+    border-bottom: none;
+}
+
+.category-name {
+    min-width: 140px;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.category-bar {
+    flex: 1;
+    background: var(--bg-input);
+    border-radius: 20px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.category-bar .fill {
+    height: 100%;
+    border-radius: 20px;
+    background: var(--primary-gradient);
+    transition: width 1s ease;
+}
+
+.category-stats {
+    min-width: 70px;
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Review Accordion */
+.review-item .accordion-button {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px !important;
+    padding: 0.8rem 1.2rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.review-item .accordion-button:not(.collapsed) {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    box-shadow: none;
+}
+
+.review-item .accordion-button:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    border-color: var(--primary);
+}
+
+.review-item .accordion-body {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+}
+
+.review-status-correct {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.review-status-wrong {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.review-status-unanswered {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+.modal .btn-close {
+    filter: var(--bs-btn-close-filter);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 991.98px) {
+    #mainHeader .brand-text {
+        font-size: 0.9rem;
+    }
+    
+    #mainHeader .badge {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    #timerDisplay {
+        font-size: 0.95rem;
+        min-width: 60px;
+    }
+    
+    #progressText {
+        font-size: 0.75rem;
+    }
+    
+    #mainHeader .progress {
+        width: 80px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #mainHeader {
+        padding: 0.4rem 0;
+    }
+    
+    #mainHeader .brand-icon {
+        font-size: 1.4rem;
+    }
+    
+    #mainHeader .brand-text {
+        font-size: 0.8rem;
+    }
+    
+    #timerDisplay {
+        font-size: 0.85rem;
+        min-width: 50px;
+    }
+    
+    #progressText {
+        font-size: 0.7rem;
+    }
+    
+    #mainHeader .progress {
+        width: 60px;
+    }
+    
+    #mainHeader .btn {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    #startScreen .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    #startScreen .display-5 {
+        font-size: 1.8rem;
+    }
+    
+    .info-card {
+        padding: 0.75rem !important;
+    }
+    
+    .info-card .fw-bold {
+        font-size: 1rem;
+    }
+    
+    #testScreen .card-body {
+        padding: 1rem !important;
+    }
+    
+    .option-card {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .option-card .option-letter {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+    
+    #resultScore {
+        font-size: 2rem;
+    }
+    
+    #resultGradeDisplay {
+        font-size: 3rem;
+    }
+    
+    .category-name {
+        min-width: 100px;
+        font-size: 0.8rem;
+    }
+    
+    .category-stats {
+        font-size: 0.75rem;
+        min-width: 60px;
+    }
+    
+    #resultScreen .card-body {
+        padding: 1rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .score-ring svg {
+        width: 100px !important;
+        height: 100px !important;
+    }
+    
+    #scoreRingText {
+        font-size: 18px;
+    }
+    
+    #resultScore {
+        font-size: 1.6rem;
+    }
+    
+    .btn-lg {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* ============================================================
+   UTILITY HELPERS
+   ============================================================ */
+.bg-gradient-primary {
+    background: var(--primary-gradient) !important;
+}
+
+.text-gradient {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.rounded-4 {
+    border-radius: 1rem !important;
+}
+
+.rounded-5 {
+    border-radius: 1.5rem !important;
+}
+
+.shadow-soft {
+    box-shadow: var(--card-shadow);
+}
+
+.shadow-medium {
+    box-shadow: var(--card-shadow-lg);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-input);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* ============================================================
+   NAVIGATOR SIDEBAR FIXES
+   ============================================================ */
+#testScreen .col-lg-3 {
+    display: flex;
+    flex-direction: column;
+}
+
+#testScreen .col-lg-3 .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 160px);
+    min-height: 600px;
+    overflow: hidden;
+    position: sticky;
+    top: 80px;
+}
+
+#testScreen .col-lg-3 .card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+#questionNavigator {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 2px;
+    margin-bottom: 8px;
+    max-height: calc(100vh - 320px);
+    min-height: 300px;
+    align-content: flex-start;
+    gap: 4px;
+}
+
+#questionNavigator::-webkit-scrollbar {
+    width: 4px;
+}
+
+#questionNavigator::-webkit-scrollbar-track {
+    background: var(--bg-input);
+    border-radius: 10px;
+}
+
+#questionNavigator::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 10px;
+}
+
+#questionNavigator::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+#questionNavigator .nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#questionNavigator .nav-btn:hover {
+    transform: scale(1.05);
+    box-shadow: var(--card-shadow);
+    z-index: 1;
+}
+
+#questionNavigator .nav-btn.current {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+#questionNavigator .nav-btn.correct {
+    border-color: var(--success);
+    background: var(--success);
+    color: white;
+}
+
+#questionNavigator .nav-btn.wrong {
+    border-color: var(--danger);
+    background: var(--danger);
+    color: white;
+}
+
+#questionNavigator .nav-btn.answered {
+    border-color: var(--primary-light);
+    background: var(--bg-input);
+}
+
+/* Mobile Navigator */
+#mobileNavigator {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 4px 2px;
+    align-content: flex-start;
+}
+
+#mobileNavigator .nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#mobileNavigator .nav-btn.current {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+#mobileNavigator .nav-btn.correct {
+    border-color: var(--success);
+    background: var(--success);
+    color: white;
+}
+
+#mobileNavigator .nav-btn.wrong {
+    border-color: var(--danger);
+    background: var(--danger);
+    color: white;
+}
+
+#mobileNavigator .nav-btn.answered {
+    border-color: var(--primary-light);
+    background: var(--bg-input);
+}
+
+/* Navigator Stats */
+.nav-stats {
+    border-top: 1px solid var(--border-color);
+    padding-top: 8px;
+    margin-top: 8px;
+    flex-shrink: 0;
+}
+
+.nav-stats .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    padding: 2px 0;
+    color: var(--text-secondary);
+}
+
+.nav-stats .stat-row .stat-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.nav-stats .stat-row .stat-value.text-success {
+    color: var(--success);
+}
+
+.nav-stats .stat-row .stat-value.text-danger {
+    color: var(--danger);
+}
+
+/* ============================================================
+   RESPONSIVE FIXES FOR NAVIGATOR
+   ============================================================ */
+@media (max-width: 991.98px) {
+    #testScreen .col-lg-3 .card {
+        max-height: none;
+        min-height: auto;
+        position: relative;
+        top: 0;
+    }
+    
+    #questionNavigator {
+        max-height: 300px;
+        min-height: 200px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    #questionNavigator .nav-btn,
+    #mobileNavigator .nav-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Print styles for PDF */
+@media print {
+    #mainHeader,
+    .btn,
+    .no-print {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        break-inside: avoid;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}
