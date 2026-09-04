@@ -238,6 +238,21 @@ body {
   border-color: var(--accent);
 }
 
+.sidebar-item.is-done {
+  background: var(--basic-soft);
+  border-color: transparent;
+}
+
+.sidebar-item.is-done:hover {
+  background: var(--basic-soft);
+}
+
+/* Active takes priority over the done-green tint when both apply */
+.sidebar-item.is-done.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
 .sidebar-item-check {
   color: var(--text-faint);
   font-size: 15px;
@@ -556,26 +571,35 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 16px 28px;
+  gap: 14px;
+  padding: 14px 28px;
   border-top: 1px solid var(--border);
   background: var(--bg-elevated);
   flex-shrink: 0;
 }
 
+.nav-footer-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
 .nav-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
+  gap: 6px;
   border: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text);
-  padding: 10px 16px;
+  padding: 11px 16px;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 13px;
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.1s ease;
+  transition: border-color 0.15s ease, transform 0.1s ease, background 0.15s ease;
+  white-space: nowrap;
 }
 
 .nav-btn:hover:not(:disabled) {
@@ -592,7 +616,7 @@ body {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
-  padding: 10px 20px;
+  flex: 1.3;
 }
 
 .study-btn:hover {
@@ -635,7 +659,7 @@ body {
   .mobile-header { display: flex; }
   .top-header { display: none; }
   .content-scroll { padding: 18px 16px; }
-  .nav-footer { padding: 14px 16px; }
+  .nav-footer { padding: 12px 14px; }
   .counter-bar { padding: 10px 16px; }
   .q-title { font-size: 21px; }
 }
@@ -645,8 +669,16 @@ body {
 }
 
 @media (max-width: 575.98px) {
-  .nav-footer { flex-wrap: wrap; }
-  .nav-btn span.btn-label { display: none; }
-  .study-btn span.btn-label { display: inline; }
-  .header-progress-block { align-items: flex-start; }
+  .nav-footer-buttons { gap: 7px; }
+  .nav-btn {
+    padding: 11px 8px;
+    font-size: 12px;
+    flex: 1;
+  }
+  .study-btn { flex: 1.4; }
+  .nav-btn .btn-label { display: inline; }
+}
+
+@media (max-width: 359.98px) {
+  .nav-btn { font-size: 11px; padding: 10px 4px; }
 }
