@@ -67,24 +67,26 @@
 
     <!-- Nav footer -->
     <footer class="nav-footer">
-      <button class="nav-btn" id="prevBtn" type="button">
-        <i class="bi bi-arrow-left"></i><span class="btn-label">Previous</span>
-      </button>
-
-      <div class="d-flex align-items-center gap-2">
-        <div class="progress d-none d-md-block" style="width:160px; height:6px; background:var(--border-soft);" role="progressbar" aria-label="Overall progress">
+      <div class="nav-footer-progress d-none d-md-flex align-items-center gap-2">
+        <div class="progress" style="width:160px; height:6px; background:var(--border-soft);" role="progressbar" aria-label="Overall progress">
           <div class="progress-bar" id="progressBar" style="width:0%; background: var(--accent);"></div>
         </div>
-        <span class="d-none d-md-inline" style="font-size:12px; font-family:'JetBrains Mono', monospace; color:var(--text-muted);" id="progressCount">0 / 100 Completed</span>
+        <span style="font-size:12px; font-family:'JetBrains Mono', monospace; color:var(--text-muted);" id="progressCount">0 / 100 Completed</span>
       </div>
 
-      <button class="nav-btn study-btn" id="studyBtn" type="button">
-        <i class="bi bi-bookmark-check"></i> <span class="btn-label">Mark as Studied</span>
-      </button>
+      <div class="nav-footer-buttons">
+        <button class="nav-btn" id="prevBtn" type="button">
+          <i class="bi bi-arrow-left"></i><span class="btn-label">Previous</span>
+        </button>
 
-      <button class="nav-btn" id="nextBtn" type="button">
-        <span class="btn-label">Next</span><i class="bi bi-arrow-right"></i>
-      </button>
+        <button class="nav-btn study-btn" id="studyBtn" type="button">
+          <i class="bi bi-bookmark-check"></i><span class="btn-label">Mark as Read</span>
+        </button>
+
+        <button class="nav-btn" id="nextBtn" type="button">
+          <span class="btn-label">Next</span><i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
     </footer>
   </div>
 </div>
