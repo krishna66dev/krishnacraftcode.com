@@ -283,10 +283,10 @@
   function updateStudyButton(isDone) {
     if (isDone) {
       el.studyBtn.classList.add('is-done');
-      el.studyBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Studied';
+      el.studyBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i><span class="btn-label">Read</span>';
     } else {
       el.studyBtn.classList.remove('is-done');
-      el.studyBtn.innerHTML = '<i class="bi bi-bookmark-check"></i> Mark as Studied';
+      el.studyBtn.innerHTML = '<i class="bi bi-bookmark-check"></i><span class="btn-label">Mark as Read</span>';
     }
   }
 
@@ -382,12 +382,27 @@
     let touchStartY = 0;
     let touchEndX = 0;
     let touchEndY = 0;
+    let ignoreThisGesture = false;
+
+    // A touch that starts inside a horizontally-scrollable element (like a
+    // code block) should scroll that element, not change the question.
+    function startsInsideHorizontalScrollable(target) {
+      let node = target;
+      while (node && node !== contentArea) {
+        if (node.classList && node.classList.contains('code-block')) {
+          return true;
+        }
+        node = node.parentElement;
+      }
+      return false;
+    }
 
     contentArea.addEventListener(
       'touchstart',
       (e) => {
         touchStartX = e.changedTouches[0].screenX;
         touchStartY = e.changedTouches[0].screenY;
+        ignoreThisGesture = startsInsideHorizontalScrollable(e.target);
       },
       { passive: true }
     );
@@ -395,6 +410,10 @@
     contentArea.addEventListener(
       'touchend',
       (e) => {
+        if (ignoreThisGesture) {
+          ignoreThisGesture = false;
+          return;
+        }
         touchEndX = e.changedTouches[0].screenX;
         touchEndY = e.changedTouches[0].screenY;
         const dx = touchEndX - touchStartX;
