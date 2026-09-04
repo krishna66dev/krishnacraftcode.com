@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aptitude Assessment — Recruitment Screening Test</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- App styles -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="app-header" id="appHeader">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-mark"><i class="bi bi-diagram-3-fill"></i></span>
+      <div class="brand-text">
+        <span class="brand-title">Aptitude Assessment</span>
+        <span class="brand-sub" id="brandSub">200 Questions</span>
+      </div>
+    </div>
+
+    <div class="header-mid d-none d-md-flex" id="headerProgressWrap" hidden>
+      <div class="header-progress">
+        <div class="header-progress-label">
+          <span id="headerProgressText">Progress: 0 / 200</span>
+        </div>
+        <div class="progress header-progress-bar" role="progressbar" aria-label="Test progress" aria-valuemin="0" aria-valuemax="200" aria-valuenow="0">
+          <div class="progress-bar" id="headerProgressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="timer-pill" id="timerPill" hidden>
+        <i class="bi bi-clock-fill"></i>
+        <span id="timerText">90:00</span>
+      </div>
+      <button class="icon-btn d-lg-none" id="openNavigatorBtn" hidden aria-label="Open question navigator" title="Question navigator">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+      </button>
+      <button class="icon-btn" id="themeToggleBtn" aria-label="Toggle dark mode" title="Toggle dark / light mode">
+        <i class="bi bi-moon-stars-fill"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="appMain">
+
+  <!-- ============ START / LANDING SCREEN ============ -->
+  <section id="startScreen" class="screen">
+    <div class="hero container">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow-tag"><i class="bi bi-briefcase-fill"></i> Recruitment Screening Test</span>
+          <h1 class="hero-title">Aptitude Assessment</h1>
+          <p class="hero-desc">A 200-question, 90-minute simulation of a real campus-placement aptitude round —
+            quantitative, logical and data-interpretation questions with instant feedback and a detailed
+            solution for every answer.</p>
+
+          <div class="hero-warning">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Once you select an answer, it is evaluated immediately and locked — you won't be able to change it.</span>
+          </div>
+
+          <div class="hero-actions" id="startActions">
+            <button class="btn btn-primary btn-lg btn-hero" id="startTestBtn">
+              <i class="bi bi-play-fill"></i> Start Test
+            </button>
+            <button class="btn btn-outline-secondary btn-lg btn-hero" id="viewPrevResultBtn" hidden>
+              <i class="bi bi-bar-chart-line-fill"></i> View Previous Result
+            </button>
+            <button class="btn btn-link btn-hero-link" id="clearDataLandingBtn" hidden>
+              <i class="bi bi-trash3"></i> Clear Saved Data
+            </button>
+          </div>
+
+          <div class="resume-banner" id="resumeBanner" hidden>
+            <i class="bi bi-arrow-repeat"></i>
+            <div class="resume-banner-text">
+              <strong>Previous test progress found.</strong>
+              <span id="resumeSummary">You have an in-progress attempt saved on this browser.</span>
+            </div>
+            <div class="resume-banner-actions">
+              <button class="btn btn-sm btn-primary" id="resumeTestBtn">Resume Test</button>
+              <button class="btn btn-sm btn-outline-secondary" id="startNewFromResumeBtn">Start New Test</button>
+              <button class="btn btn-sm btn-outline-danger" id="clearFromResumeBtn">Clear Saved Data</button>
+            </div>
+          </div>
+
+          <div class="prev-result-card" id="prevResultCard" hidden>
+            <div class="prev-result-head"><i class="bi bi-clock-history"></i> Previous Result</div>
+            <div class="prev-result-body">
+              <span id="prevResultScore">Score: 0/200</span>
+              <span id="prevResultPct">Percentage: 0%</span>
+              <span id="prevResultGrade">Grade: -</span>
+              <span id="prevResultStatus">Result: -</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-info-cards">
+          <div class="info-card"><i class="bi bi-list-ol"></i><div><strong>200</strong><span>Questions</span></div></div>
+          <div class="info-card"><i class="bi bi-hourglass-split"></i><div><strong>90</strong><span>Minutes</span></div></div>
+          <div class="info-card"><i class="bi bi-1-circle-fill"></i><div><strong>1</strong><span>Mark / Question</span></div></div>
+          <div class="info-card"><i class="bi bi-ui-checks"></i><div><strong>MCQ</strong><span>Format</span></div></div>
+          <div class="info-card"><i class="bi bi-lightning-charge-fill"></i><div><strong>Instant</strong><span>Answer Feedback</span></div></div>
+          <div class="info-card"><i class="bi bi-journal-text"></i><div><strong>Detailed</strong><span>Solutions</span></div></div>
+          <div class="info-card"><i class="bi bi-hdd-fill"></i><div><strong>Local</strong><span>Result Saved</span></div></div>
+          <div class="info-card"><i class="bi bi-diagram-2-fill"></i><div><strong>32</strong><span>Categories</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEST SCREEN ============ -->
+  <section id="testScreen" class="screen" hidden>
+    <div class="test-layout container-fluid">
+
+      <!-- Sidebar (desktop) -->
+      <aside class="test-sidebar d-none d-lg-flex" id="testSidebar">
+        <div class="sidebar-stats">
+          <div class="stat-chip stat-answered"><i class="bi bi-check2-square"></i><span id="statAnswered">0</span><small>Answered</small></div>
+          <div class="stat-chip stat-remaining"><i class="bi bi-hourglass"></i><span id="statRemaining">200</span><small>Remaining</small></div>
+          <div class="stat-chip stat-correct"><i class="bi bi-check-circle"></i><span id="statCorrect">0</span><small>Correct</small></div>
+          <div class="stat-chip stat-wrong"><i class="bi bi-x-circle"></i><span id="statWrong">0</span><small>Wrong</small></div>
+        </div>
+        <div class="sidebar-legend">
+          <span><i class="legend-dot legend-gray"></i>Unanswered</span>
+          <span><i class="legend-dot legend-blue"></i>Current</span>
+          <span><i class="legend-dot legend-green"></i>Correct</span>
+          <span><i class="legend-dot legend-red"></i>Wrong</span>
+        </div>
+        <div class="sidebar-nav-grid" id="questionNavigator"></div>
+      </aside>
+
+      <!-- Question area -->
+      <div class="test-content">
+        <div class="qcount-row">
+          <span id="qCountLabel">Question 1 of 200</span>
+          <span class="badge cat-badge" id="qCategoryBadge">Category</span>
+          <span class="badge diff-badge" id="qDifficultyBadge">Easy</span>
+        </div>
+
+        <div class="progress qtop-progress" role="progressbar" aria-label="Overall progress">
+          <div class="progress-bar" id="mainProgressFill" style="width:0.5%"></div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <h2 class="question-text" id="questionText">Loading question…</h2>
+
+          <div class="options-grid" id="optionsGrid"></div>
+
+          <div class="answer-feedback" id="answerFeedback" hidden>
+            <div class="feedback-banner" id="feedbackBanner"></div>
+            <div class="solution-box">
+              <div class="solution-label"><i class="bi bi-journal-text"></i> Solution</div>
+              <p id="solutionText"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-row">
+          <button class="btn btn-outline-secondary" id="prevBtn"><i class="bi bi-arrow-left"></i> Previous</button>
+          <button class="btn btn-secondary d-lg-none" id="openNavigatorBtnMobile"><i class="bi bi-grid-3x3-gap-fill"></i> Navigator</button>
+          <button class="btn btn-outline-secondary" id="nextBtn">Next <i class="bi bi-arrow-right"></i></button>
+        </div>
+
+        <div class="submit-row">
+          <button class="btn btn-success btn-lg" id="submitTestBtn"><i class="bi bi-send-check-fill"></i> Submit Test</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULT SCREEN ============ -->
+  <section id="resultScreen" class="screen" hidden>
+    <div class="container result-container">
+      <div class="result-head">
+        <span class="eyebrow-tag"><i class="bi bi-patch-check-fill"></i> Assessment Completed</span>
+        <h1>Your Result</h1>
+      </div>
+
+      <div class="result-top-grid">
+        <div class="score-ring-card">
+          <div class="score-ring" id="scoreRing">
+            <div class="score-ring-inner">
+              <span id="ringScore">0/200</span>
+              <span id="ringPct">0%</span>
+            </div>
+          </div>
+          <div class="grade-pass-row">
+            <span class="grade-pill" id="gradePill">Grade -</span>
+            <span class="pass-pill" id="passPill">-</span>
+          </div>
+        </div>
+
+        <div class="result-stats-grid">
+          <div class="rstat"><span id="rTotal">200</span><label>Total Questions</label></div>
+          <div class="rstat"><span id="rAttempted">0</span><label>Attempted</label></div>
+          <div class="rstat rstat-correct"><span id="rCorrect">0</span><label>Correct</label></div>
+          <div class="rstat rstat-wrong"><span id="rWrong">0</span><label>Wrong</label></div>
+          <div class="rstat"><span id="rUnanswered">0</span><label>Unanswered</label></div>
+          <div class="rstat"><span id="rMarks">0</span><label>Marks Obtained</label></div>
+          <div class="rstat"><span id="rTimeTaken">00:00:00</span><label>Time Taken</label></div>
+          <div class="rstat"><span id="rTimeRemaining">00:00:00</span><label>Time Remaining</label></div>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-primary" id="downloadPdfBtn"><i class="bi bi-file-earmark-pdf-fill"></i> Download Result as PDF</button>
+        <button class="btn btn-outline-secondary" id="startNewFromResultBtn"><i class="bi bi-arrow-repeat"></i> Start New Test</button>
+        <button class="btn btn-outline-danger" id="clearDataFromResultBtn"><i class="bi bi-trash3"></i> Clear Saved Data</button>
+      </div>
+
+      <!-- Category performance -->
+      <div class="panel-card">
+        <h3 class="panel-title"><i class="bi bi-bar-chart-fill"></i> Category Performance</h3>
+        <div id="categoryPerformance"></div>
+      </div>
+
+      <!-- Review -->
+      <div class="panel-card">
+        <h3 class="panel-title"><i class="bi bi-search"></i> Question Review</h3>
+
+        <div class="review-controls">
+          <input type="text" class="form-control" id="reviewSearch" placeholder="Search questions…">
+          <div class="review-filter-btns" id="reviewFilterBtns">
+            <button class="btn btn-sm btn-filter active" data-filter="all">All</button>
+            <button class="btn btn-sm btn-filter" data-filter="correct">Correct</button>
+            <button class="btn btn-sm btn-filter" data-filter="wrong">Wrong</button>
+            <button class="btn btn-sm btn-filter" data-filter="unanswered">Unanswered</button>
+          </div>
+          <select class="form-select form-select-sm" id="reviewCategoryFilter" style="max-width:220px">
+            <option value="all">All Categories</option>
+          </select>
+        </div>
+
+        <div class="accordion" id="reviewAccordion"></div>
+        <p class="text-muted small mt-2" id="reviewEmptyMsg" hidden>No questions match your search/filter.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ OFFCANVAS: MOBILE NAVIGATOR ============ -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="navigatorOffcanvas" aria-labelledby="navigatorOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="navigatorOffcanvasLabel"><i class="bi bi-grid-3x3-gap-fill"></i> Question Navigator</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="sidebar-stats mb-3">
+      <div class="stat-chip stat-answered"><i class="bi bi-check2-square"></i><span id="statAnsweredM">0</span><small>Answered</small></div>
+      <div class="stat-chip stat-remaining"><i class="bi bi-hourglass"></i><span id="statRemainingM">200</span><small>Remaining</small></div>
+      <div class="stat-chip stat-correct"><i class="bi bi-check-circle"></i><span id="statCorrectM">0</span><small>Correct</small></div>
+      <div class="stat-chip stat-wrong"><i class="bi bi-x-circle"></i><span id="statWrongM">0</span><small>Wrong</small></div>
+    </div>
+    <div class="sidebar-legend mb-2">
+      <span><i class="legend-dot legend-gray"></i>Unanswered</span>
+      <span><i class="legend-dot legend-blue"></i>Current</span>
+      <span><i class="legend-dot legend-green"></i>Correct</span>
+      <span><i class="legend-dot legend-red"></i>Wrong</span>
+    </div>
+    <div class="sidebar-nav-grid" id="questionNavigatorMobile"></div>
+  </div>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Submit confirmation -->
+<div class="modal fade" id="submitModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-send-check-fill"></i> Submit Assessment?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to submit the assessment? This cannot be undone.</p>
+        <div class="submit-summary" id="submitSummary"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" id="confirmSubmitBtn">Submit Test</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Clear data confirmation -->
+<div class="modal fade" id="clearDataModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Clear Saved Data</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>This will permanently delete your saved test progress and previous result from this browser.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmClearDataBtn">Clear Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Start new test confirmation (overwrite in-progress) -->
+<div class="modal fade" id="startNewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Start New Test</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Starting a new test will delete your current progress. Continue?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmStartNewBtn">Start New Test</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Auto-submit (time up) -->
+<div class="modal fade" id="timeUpModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger"><i class="bi bi-alarm-fill"></i> Time's Up!</h5>
+      </div>
+      <div class="modal-body">
+        <p>Your 90 minutes are over. The assessment has been submitted automatically.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="timeUpOkBtn">View Result</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- App logic (includes the 200-question bank) -->
+<script src="script.js"></script>
+</body>
+</html>
