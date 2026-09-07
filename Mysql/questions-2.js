@@ -1,0 +1,623 @@
+/* =========================================================================
+   questions-101-150.js
+   A separate, standalone batch of 50 NEW MySQL interview questions
+   (ids 101-150) — none of these overlap with questions 1-100 from the
+   main app. Difficulty is intentionally mixed (Basic → Expert); use the
+   `category` field to sort/filter/group if you want them ordered by
+   difficulty instead of by id.
+
+   Same object shape as the main app's QUESTIONS array:
+   { id, category, question, shortAnswer, explanation, example, sql,
+     output, mistakes, interviewDefinition }
+
+   To merge into the main app's script.js, just concat the arrays:
+     const QUESTIONS_101_150 = require('./questions-101-150.js');
+     const fullList = QUESTIONS.concat(QUESTIONS_101_150);
+   ========================================================================= */
+
+const QUESTIONS_101_150 = [
+  {
+    id: 101,
+    category: "Basic",
+    question: "What is a Schema in MySQL?",
+    shortAnswer: "MySQL me 'Schema' aur 'Database' practically same cheez hain — Schema database ke structure (tables, views, relationships) ko refer karta hai.",
+    explanation: "Kai databases (jaise Oracle) me 'schema' ka matlab hota hai ek user ke andar ka namespace, jo database se alag concept hota hai. Lekin MySQL me ye distinction exist nahi karta — MySQL me 'CREATE SCHEMA' aur 'CREATE DATABASE' exactly same kaam karte hain, ye sirf ek alternate syntax hai. Isliye MySQL documentation aur tools (jaise MySQL Workbench) me 'schema' aur 'database' terms ko interchangeably use kiya jata hai.",
+    example: "'CREATE SCHEMA school_db;' aur 'CREATE DATABASE school_db;' — dono statements exactly wahi result denge.",
+    sql: "CREATE SCHEMA school_db;\n-- Ye bilkul isi ke barabar hai:\nCREATE DATABASE school_db;",
+    output: "Query OK, 1 row affected\n(Both statements create an identical database named 'school_db')",
+    mistakes: "Beginners sochte hain MySQL me schema aur database do alag concepts hain (jaise Oracle/PostgreSQL me hota hai), aur interview me confuse ho jate hain jab dono terms ek doosre ki jagah use hote hain. Ye samajhna zaroori hai ki ye MySQL-specific behavior hai — dusre RDBMS me ye distinction genuinely exist karta hai.",
+    interviewDefinition: "In MySQL, 'schema' is simply a synonym for 'database' — CREATE SCHEMA and CREATE DATABASE are functionally identical, unlike in some other RDBMS where a schema represents a separate namespace within a database."
+  },
+  {
+    id: 102,
+    category: "Basic",
+    question: "What is the difference between VARCHAR and TEXT/BLOB data types?",
+    shortAnswer: "VARCHAR ek fixed maximum length (up to 65,535 bytes ke row limit ke andar) ke saath variable-length string store karta hai, jabki TEXT/BLOB bahut bade content (jaise articles, files) ke liye designed hain aur table ke row size limit se bahar (off-page) store ho sakte hain.",
+    explanation: "VARCHAR chhote-medium text (jaise names, emails, short descriptions) ke liye best hai — ye row ke andar hi store hota hai aur index kiya ja sakta hai poori tarah se. TEXT (aur binary data ke liye BLOB) bade content ke liye hote hain — jaise ek blog post ka poora content, ya ek document. In columns par index banaya to ja sakta hai, lekin sirf ek prefix length tak (jaise 'INDEX(content(100))'), poore column par nahi. TEXT/BLOB columns memory aur performance ke hisaab se VARCHAR se zyada 'costly' hote hain jab bade volumes me query kiye jaayein.",
+    example: "'products' table me 'name' VARCHAR(150) hoga (short), lekin 'description' ya 'full_specifications' ke liye TEXT use karenge (potentially bahut lamba content).",
+    sql: "CREATE TABLE articles (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  title VARCHAR(200),\n  content TEXT\n);",
+    output: "Query OK, 0 rows affected\n(title stays inline in the row; content can grow far larger and may be stored off-page)",
+    mistakes: "Beginners har text field ke liye 'TEXT' use kar dete hain 'safe side' ke liye, chahe wo field chhota ho (jaise 'name') — isse unnecessary overhead aata hai aur poora column index karna mushkil ho jata hai. Ek aur mistake: TEXT column par 'DEFAULT' value dene ki koshish karna — MySQL ke purane versions me TEXT/BLOB columns par DEFAULT allow nahi tha (8.0+ me kuch improvements aaye hain, lekin ye still edge-case behavior hai jo check karni chahiye).",
+    interviewDefinition: "VARCHAR is suited for short-to-medium variable-length strings stored inline within the row, while TEXT and BLOB are designed for much larger content (such as articles or binary files), often stored off-page, and can only be indexed using a prefix rather than their full length."
+  },
+  {
+    id: 103,
+    category: "Basic",
+    question: "What is a NATURAL JOIN in MySQL?",
+    shortAnswer: "NATURAL JOIN automatically un columns par match karta hai jinka naam dono tables me same ho — bina explicitly ON clause likhe.",
+    explanation: "Normal JOIN me hume ON clause likh kar batana padta hai ki kaunse columns match karne hain. NATURAL JOIN ye kaam khud-ba-khud kar leta hai — ye dono tables ke sabhi same-named columns ko automatically compare karke match karta hai. Ye chhoti, simple queries ke liye convenient lag sakta hai, lekin real-world me generally avoid kiya jata hai kyunki ye 'implicit' hai — agar future me table me koi naya column same naam se add ho jaye (jo accidentally match ho jaye), query ka behavior silently badal sakta hai bina kisi warning ke.",
+    example: "'employees' aur 'departments' — dono me 'department_id' column ho, to NATURAL JOIN automatically usi par match kar dega.",
+    sql: "SELECT e.name, d.department_name\nFROM employees e\nNATURAL JOIN departments d;",
+    output: "+-------+------------------+\n| name  | department_name  |\n+-------+------------------+\n| Priya | IT               |\n+-------+------------------+",
+    mistakes: "Beginners NATURAL JOIN ko production code me use kar dete hain 'kam likhna padega' soch kar — ye risky hai kyunki agar tables me schema change ho (naya same-named column add ho), query ka result silently badal sakta hai bina kisi obvious error ke. Explicit ON clause hamesha zyada safe aur readable practice hai.",
+    interviewDefinition: "A NATURAL JOIN automatically matches columns with identical names across two tables without requiring an explicit ON clause, but it is generally avoided in production code because schema changes can silently alter the join's behavior."
+  },
+  {
+    id: 104,
+    category: "Basic",
+    question: "What is the USING clause in a JOIN, and how is it different from ON?",
+    shortAnswer: "USING clause tab use hota hai jab dono tables me join column ka naam exactly same ho — ye ON clause ka ek shorter, cleaner alternative hai us specific case ke liye.",
+    explanation: "'ON a.column_name = b.column_name' likhna thoda repetitive lagta hai jab column ka naam dono taraf same ho. USING(column_name) isko compact bana deta hai. Farq NATURAL JOIN se ye hai ki USING me hum explicitly batate hain ki KAUNSA column match karna hai (sirf ek ya specific columns), jabki NATURAL JOIN sabhi same-named columns ko automatically match karta hai — isliye USING, NATURAL JOIN se zyada safe/predictable maana jata hai.",
+    example: "'orders' aur 'customers' dono me 'customer_id' naam ka column hai — USING clause se join karna.",
+    sql: "SELECT o.id, c.name\nFROM orders o\nJOIN customers c USING (customer_id);",
+    output: "+-----+--------+\n| id  | name   |\n+-----+--------+\n| 1   | Rahul  |\n+-----+--------+",
+    mistakes: "Beginners USING clause me table alias prefix (jaise 'o.customer_id') use karne ki koshish karte hain, jo syntax error deta hai — USING ke andar sirf column ka naam bina alias ke likhna hota hai. Ek aur mistake: USING use karte waqt SELECT me us shared column ko 'o.customer_id' se refer karna jab actually USING ke saath us column ko sirf ek baar (bina prefix ke) refer karna chahiye.",
+    interviewDefinition: "The USING clause is a shorthand for joining tables on a column with an identical name in both tables, offering a more concise alternative to writing an explicit ON condition, while still requiring the developer to name the specific join column (unlike a NATURAL JOIN)."
+  },
+  {
+    id: 105,
+    category: "Basic",
+    question: "What are the LEAST() and GREATEST() functions in MySQL?",
+    shortAnswer: "LEAST() diye gaye multiple values me se sabse chhoti value return karta hai, aur GREATEST() sabse badi value return karta hai — ye row-level (horizontal) comparison hai, columns ke beech.",
+    explanation: "In functions ko MIN()/MAX() aggregate functions se confuse nahi karna chahiye — MIN()/MAX() multiple rows ke ek column ka summary nikalte hain (vertical), jabki LEAST()/GREATEST() ek hi row ke multiple values (jaise multiple columns) ke beech compare karte hain (horizontal). Ye tab useful hote hain jab humein ek row ke andar kai columns me se best/worst value chahiye ho.",
+    example: "Ek employee ke teen alag scores (Q1, Q2, Q3 performance) me se sabse acha aur sabse bura score nikalna.",
+    sql: "SELECT name,\n  GREATEST(q1_score, q2_score, q3_score) AS best_quarter,\n  LEAST(q1_score, q2_score, q3_score) AS worst_quarter\nFROM performance_reviews;",
+    output: "+-------+---------------+----------------+\n| name  | best_quarter  | worst_quarter  |\n+-------+---------------+----------------+\n| Priya | 92            | 78             |\n+-------+---------------+----------------+",
+    mistakes: "Beginners LEAST()/GREATEST() ko MIN()/MAX() jaisa GROUP BY ke saath use karne ki koshish karte hain (jaise 'GREATEST(salary) GROUP BY dept') expecting ye rows ke beech compare karega — ye galat hai, in functions ko GROUP BY se koi lena-dena nahi. Ek aur mistake: agar in functions ke kisi bhi argument me NULL ho, to poora result NULL ho jata hai (jab tak koi special handling na ho) — ye subtle bug ka source ban sakta hai.",
+    interviewDefinition: "LEAST() and GREATEST() compare multiple values within a single row (such as several columns) and return the smallest or largest respectively, distinct from the MIN()/MAX() aggregate functions which summarize a column's values across multiple rows."
+  },
+  {
+    id: 106,
+    category: "Intermediate",
+    question: "Does TRUNCATE reset the AUTO_INCREMENT counter, and does DELETE?",
+    shortAnswer: "TRUNCATE table ka AUTO_INCREMENT counter reset kar deta hai wapas 1 (ya starting value) par, jabki DELETE (bina WHERE ya poori table ke rows delete karke bhi) AUTO_INCREMENT counter ko reset nahi karta — agli naya row phir bhi aage wali sequence se hi id lega.",
+    explanation: "Ye ek subtle lekin common interview trick question hai. TRUNCATE actually table ko internally drop karke recreate karta hai (isliye ye DDL command hai), jisse AUTO_INCREMENT bhi apni original starting value par wapas chala jata hai. DELETE, chahe poori table ki saari rows hi kyun na delete kar de, table ke internal structure ko touch nahi karta — isliye AUTO_INCREMENT counter apni last-used value ko yaad rakhta hai, aur agli insert usi se aage badhegi.",
+    example: "Ek table me 5 rows hain (ids 1-5). Agar hum saari rows DELETE kar dein aur ek naya row insert karein, uski id 6 hogi. Lekin agar TRUNCATE use karte, naya row ki id 1 se start hoti.",
+    sql: "-- Scenario with DELETE:\nDELETE FROM logs;\nINSERT INTO logs (message) VALUES ('new entry');\nSELECT id FROM logs; -- id continues from where it left off (e.g., 6), not 1\n\n-- Scenario with TRUNCATE:\nTRUNCATE TABLE logs;\nINSERT INTO logs (message) VALUES ('new entry');\nSELECT id FROM logs; -- id resets to 1",
+    output: "-- After DELETE + INSERT: id = 6 (counter was preserved)\n-- After TRUNCATE + INSERT: id = 1 (counter was reset)",
+    mistakes: "Beginners assume DELETE bhi TRUNCATE jaisa hi AUTO_INCREMENT reset kar dega, aur production me id sequences ke gaps dekh kar confuse ho jate hain — ye actually normal behavior hai, bug nahi. Ek aur mistake: AUTO_INCREMENT manually reset karne ke liye 'ALTER TABLE ... AUTO_INCREMENT = 1' use karna bhool jana jab genuinely reset chahiye ho bina TRUNCATE (jo poora data bhi hata deta hai) kiye.",
+    interviewDefinition: "TRUNCATE resets a table's AUTO_INCREMENT counter back to its starting value because it recreates the table internally, whereas DELETE — even when it removes every row — leaves the AUTO_INCREMENT counter untouched, so the next inserted row continues the previous numbering sequence."
+  },
+  {
+    id: 107,
+    category: "Intermediate",
+    question: "What is the JSON data type in MySQL?",
+    shortAnswer: "JSON ek native data type hai (MySQL 5.7+ se available) jo JSON-formatted data ko validate karke store karta hai, aur usme specific keys/values ko efficiently query karne ki capability deta hai.",
+    explanation: "Kabhi-kabhi data ka structure bahut flexible/dynamic hota hai (jaise ek product ke alag-alag types ke liye alag attributes), aur poora ek fixed relational schema banana impractical ho jata hai. JSON column aise semi-structured data ko store karne deta hai, aur MySQL automatically validate karta hai ki stored value valid JSON ho (invalid JSON insert nahi hone deta). Isse hum flexible schema aur relational database ke fayde dono ek saath thodi had tak use kar sakte hain — lekin over-use se normalization ke fayde (jaise proper indexing, constraints) khatam ho jate hain.",
+    example: "Ek 'products' table me 'attributes' JSON column rakhna, jisme har product ke different specifications (jaise ek phone ke liye 'ram', 'storage'; ek shirt ke liye 'size', 'color') dynamically store ho sakein.",
+    sql: "CREATE TABLE products (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  name VARCHAR(150),\n  attributes JSON\n);\n\nINSERT INTO products (name, attributes)\nVALUES ('Smartphone X', '{\"ram\": \"8GB\", \"storage\": \"128GB\"}');",
+    output: "Query OK, 1 row affected\n(The JSON value is validated and stored; malformed JSON would be rejected)",
+    mistakes: "Beginners JSON columns ko overuse kar dete hain — poori relational structure ko ek single JSON blob me daal dena, jisse foreign keys, proper indexing, aur data integrity checks jaisi relational database ki core strengths kho jaati hain. JSON best hota hai sirf genuinely dynamic/variable attributes ke liye, structured relational data ke liye nahi.",
+    interviewDefinition: "The JSON data type, available since MySQL 5.7, natively stores and validates JSON-formatted data within a column, enabling efficient querying of specific keys or values while accommodating flexible, semi-structured data alongside a traditional relational schema."
+  },
+  {
+    id: 108,
+    category: "Intermediate",
+    question: "How do you query specific values from a JSON column (JSON_EXTRACT, ->, ->>)?",
+    shortAnswer: "JSON_EXTRACT() (ya uska shorthand '->' operator) ek JSON column se ek specific key ki value nikalta hai; '->>' operator wahi kaam karta hai lekin result ko quotes ke bina plain text (unquoted string) ki tarah return karta hai.",
+    explanation: "JSON_EXTRACT(column, '$.key') MySQL me JSON path syntax use karta hai ('$' root object ko represent karta hai) specific field access karne ke liye. '->' operator isi function ka shorthand hai. Farq '->' aur '->>' ka ye hai: '->' result ko JSON format me hi return karta hai (string values ke around double quotes ke saath), jabki '->>' un quotes ko hata kar plain, unquoted text deta hai — jo generally WHERE conditions aur display ke liye zyada practical hota hai.",
+    example: "'attributes' JSON column se sirf 'ram' value nikalna, aur un products ko filter karna jinki RAM '8GB' hai.",
+    sql: "SELECT name,\n  attributes->>'$.ram' AS ram\nFROM products\nWHERE attributes->>'$.ram' = '8GB';",
+    output: "+---------------+------+\n| name          | ram  |\n+---------------+------+\n| Smartphone X  | 8GB  |\n+---------------+------+",
+    mistakes: "Beginners '->' aur '->>' ke output format ka farq samajhne me galti karte hain — '->' se aane wale result me extra double-quotes dikhte hain (jaise '\"8GB\"'), jo WHERE comparison me unexpected results de sakta hai agar '->>' ki jagah '->' use kar liya jaye. Ek aur mistake: JSON path syntax me '$.' likhna bhool jana, jo syntax error deta hai.",
+    interviewDefinition: "JSON_EXTRACT() (or its shorthand operator ->) retrieves a value at a given path within a JSON column, while the ->> operator performs the same extraction but returns the result as an unquoted plain string, which is generally more convenient for comparisons and display."
+  },
+  {
+    id: 109,
+    category: "Intermediate",
+    question: "What is a FULLTEXT index, and when should you use it?",
+    shortAnswer: "FULLTEXT index natural-language text search ke liye optimized hai — ye poore words/phrases ko efficiently search karne deta hai (jaise 'blog posts me kisi topic ke articles dhoondo'), jo normal LIKE '%word%' se kaafi fast aur relevant hota hai.",
+    explanation: "Normal index (B-Tree) text ke beech me kahin bhi match dhoondne ke liye useful nahi hota — jaise 'LIKE '%database%'' index use hi nahi karta (leading wildcard ki wajah se), aur poori table scan karta hai. FULLTEXT index specifically is problem ko solve karta hai — ye text ko words me tod kar ek special structure banata hai, jisse 'kisi bhi jagah word match ho' type searches bhi fast ho jaati hain, aur relevance-based ranking (MATCH...AGAINST) bhi possible hoti hai. Ye InnoDB aur MyISAM dono me supported hai (MySQL 5.6+ me InnoDB support add hua).",
+    example: "Ek blog application jaha users articles ke content me keywords search karte hain — FULLTEXT index is search ko fast banata hai.",
+    sql: "ALTER TABLE articles\nADD FULLTEXT(title, content);\n\nSELECT title\nFROM articles\nWHERE MATCH(title, content) AGAINST('database optimization');",
+    output: "+---------------------------------+\n| title                           |\n+---------------------------------+\n| MySQL Database Optimization Tips |\n+---------------------------------+",
+    mistakes: "Beginners chhote text search needs ke liye bhi FULLTEXT index bana dete hain jab simple LIKE (bina leading wildcard ke) hi kaafi hota — FULLTEXT ka real fayda large text content aur relevance-based search me hai. Ek aur mistake: MATCH...AGAINST ko sirf FULLTEXT index wale exact columns ke saath hi use karna hota hai, dusre columns ke saath nahi — is restriction ko bhool jana error deta hai.",
+    interviewDefinition: "A FULLTEXT index is specialized for natural-language text searching, enabling efficient and relevance-ranked matching of words or phrases within large text columns — a significant improvement over a leading-wildcard LIKE search, which cannot use a regular index."
+  },
+  {
+    id: 110,
+    category: "Intermediate",
+    question: "What is the LOCK TABLES statement, and how does it differ from InnoDB's row-level locking?",
+    shortAnswer: "LOCK TABLES ek explicit, session-level table lock hai jo poori table ko (read ya write ke liye) lock kar deta hai, jabki InnoDB ka default row-level locking sirf specific rows ko lock karta hai — LOCK TABLES generally avoid kiya jata hai jab tak koi specific legacy/maintenance use case na ho.",
+    explanation: "LOCK TABLES purane MySQL era se aaya hua ek coarse-grained locking mechanism hai, jo mainly MyISAM (jo row-level locking support hi nahi karta) ke liye zyada relevant tha. InnoDB me, transactions aur row-level locks (jaise 'SELECT ... FOR UPDATE') already fine-grained concurrency control provide karte hain — isliye modern InnoDB-based applications me LOCK TABLES ka use rare hai. Ye kabhi-kabhi specific maintenance operations (jaise consistent backup lena) ke liye use hota hai jaha poori table ko temporarily freeze karna zaroori ho.",
+    example: "Ek legacy maintenance script jo table ko backup lene se pehle temporarily read-locked karta hai taaki data consistent snapshot mile.",
+    sql: "LOCK TABLES employees READ;\n-- ... perform backup/read-only operations ...\nUNLOCK TABLES;",
+    output: "Query OK, 0 rows affected\n(All other sessions can still read 'employees', but cannot write to it until UNLOCK TABLES)",
+    mistakes: "Beginners LOCK TABLES ko InnoDB transactions ke saath directly mix kar dete hain, jisse unexpected locking behavior aur reduced concurrency hoti hai — InnoDB applications me generally transactions + row-level locks (FOR UPDATE) hi use karne chahiye. Ek aur mistake: UNLOCK TABLES call karna bhool jana, jisse poori table baaki sessions ke liye lambe time tak locked reh jati hai.",
+    interviewDefinition: "LOCK TABLES applies a coarse, session-level lock across an entire table, in contrast to InnoDB's default row-level locking which locks only the specific rows involved in a transaction — modern InnoDB applications rarely need LOCK TABLES, reserving it mostly for specific maintenance scenarios."
+  },
+  {
+    id: 111,
+    category: "Intermediate",
+    question: "What is the difference between COMMIT and MySQL's autocommit mode?",
+    shortAnswer: "Autocommit mode (jo by default ON hota hai) ke saath, har individual SQL statement apne aap ek complete transaction ki tarah turant COMMIT ho jata hai; agar autocommit OFF kiya jaye (ya explicitly START TRANSACTION use kiya jaye), tab changes tab tak permanent nahi hote jab tak explicitly COMMIT na call kiya jaye.",
+    explanation: "By default, jab hum ek single UPDATE ya INSERT statement chalate hain (bina explicitly START TRANSACTION ke), MySQL usse turant commit kar deta hai — isliye ek galti se bhi turant apply ho jaati hai. Jab humein multiple statements ko ek atomic unit ki tarah treat karna ho (jaise bank transfer ke do UPDATE statements), hum explicitly 'START TRANSACTION' se autocommit ko us transaction ke liye 'pause' kar dete hain, aur end me explicitly COMMIT (ya ROLLBACK agar kuch galat ho) karte hain.",
+    example: "Ek single 'UPDATE employees SET salary = 50000 WHERE id = 1' statement (bina explicit transaction ke) turant apply ho jayega. Lekin ek bank transfer ke do statements ko autocommit se bachate hue ek transaction ke andar wrap karna zaroori hai.",
+    sql: "-- Autocommit ON (default): this single statement commits immediately\nUPDATE employees SET salary = 50000 WHERE id = 1;\n\n-- Explicit transaction: autocommit is effectively suspended until COMMIT/ROLLBACK\nSTART TRANSACTION;\nUPDATE accounts SET balance = balance - 5000 WHERE id = 1;\nUPDATE accounts SET balance = balance + 5000 WHERE id = 2;\nCOMMIT;",
+    output: "-- First UPDATE: applied and permanent immediately.\n-- The transaction block: both UPDATEs only become permanent together, at COMMIT.",
+    mistakes: "Beginners assume ki application me long-running scripts me autocommit ON rehne se koi problem nahi hoga — actually agar bulk operations (jaise 10,000 rows ka loop-based insert) autocommit ON ke saath chale, to har row apna alag mini-transaction ban jata hai, jo bahut slow ho sakta hai; bulk operations ko explicit transaction me wrap karna significantly fast hota hai. Ek aur mistake: START TRANSACTION ke baad COMMIT/ROLLBACK call karna bhool jana, jisse locks lambe samay tak hold reh sakte hain.",
+    interviewDefinition: "With autocommit enabled (the default), every individual SQL statement is automatically committed as its own transaction, whereas explicitly starting a transaction suspends this behavior until an explicit COMMIT or ROLLBACK is issued, allowing multiple statements to be grouped into a single atomic unit."
+  },
+  {
+    id: 112,
+    category: "Intermediate",
+    question: "What is a SAVEPOINT within a transaction?",
+    shortAnswer: "SAVEPOINT ek transaction ke andar ek 'checkpoint' marker set karta hai, jisse hum poora transaction rollback kiye bina sirf uss savepoint ke baad ke changes ko selectively rollback kar sakte hain.",
+    explanation: "Kabhi-kabhi ek lambi transaction ke andar hum chahte hain ki agar beech ka koi specific step fail ho jaye, to sirf usi step ke baad ke changes undo hon, poora transaction nahi. SAVEPOINT is granularity ko possible banata hai — hum 'SAVEPOINT name' se ek marker set karte hain, aur baad me 'ROLLBACK TO SAVEPOINT name' se sirf usi point tak wapas ja sakte hain, transaction ke pehle ke steps intact rehte hain. Final COMMIT ya ROLLBACK poori transaction par apply hota hai as usual.",
+    example: "Ek order-processing transaction jisme pehle order create hota hai, phir loyalty points update hote hain — agar loyalty points update fail ho, hum sirf usi part ko rollback karna chahte hain, order creation ko nahi.",
+    sql: "START TRANSACTION;\n\nINSERT INTO orders (customer_id, amount) VALUES (101, 2500);\nSAVEPOINT after_order;\n\nUPDATE loyalty_points SET points = points + 25 WHERE customer_id = 101;\n-- Agar ye step fail ho jaye:\nROLLBACK TO SAVEPOINT after_order;\n\nCOMMIT; -- The order insert is still committed; only the points update was undone",
+    output: "Query OK -- Order insert remains intact after ROLLBACK TO SAVEPOINT\nQuery OK -- Final COMMIT preserves the order but discards the failed points update",
+    mistakes: "Beginners SAVEPOINT ko COMMIT jaisa permanent samajh lete hain — actually SAVEPOINT sirf ek marker hai andar hi transaction ke; jab tak final COMMIT na ho, poora transaction (savepoints sahit) abhi bhi rollback ho sakta hai agar connection drop ho jaye. Ek aur mistake: savepoint names ko unique na rakhna jab multiple savepoints ek transaction me use ho rahe hon.",
+    interviewDefinition: "A SAVEPOINT marks a point within a transaction that allows a partial rollback to that specific point, undoing only the changes made after it while preserving earlier changes within the same transaction, without needing to roll back the entire transaction."
+  },
+  {
+    id: 113,
+    category: "Intermediate",
+    question: "What was the MySQL Query Cache, and why was it removed in MySQL 8.0?",
+    shortAnswer: "Query Cache ek feature tha jo identical SELECT queries ke results ko cache karke rakhta tha taaki repeat queries turant serve ho sakein, lekin isse concurrency-related bottlenecks (especially write-heavy workloads me) itne significant the ki MySQL 8.0 me isse completely remove kar diya gaya.",
+    explanation: "Query Cache theoretically achi idea lagta tha — same query baar-baar chale to result cache se seedha mil jaye. Lekin practically, jab bhi ek table me koi change (INSERT/UPDATE/DELETE) hota, us table se related saare cached queries invalidate ho jaate the — high-write workloads me ye invalidation itni frequently hoti thi ki cache ka benefit kho jata tha, aur cache ko manage karne ka overhead (ek global lock ke through) system ko slow bana deta tha, especially multi-core/high-concurrency servers par. Isliye MySQL team ne 8.0 me isse hata diya aur application-level caching (jaise Redis/Memcached) ko recommend kiya, jo zyada flexible aur scalable solution hai.",
+    example: "Ek high-traffic e-commerce site jaha products ka data frequently update hota hai — Query Cache is scenario me zyada fayda nahi deta kyunki cache baar-baar invalidate hota rehta.",
+    sql: "-- MySQL 5.7 and earlier (deprecated concept, removed in 8.0):\n-- SET GLOBAL query_cache_size = 0;  -- effectively disabling it\n\n-- Modern recommended approach: application-level caching\n-- (conceptual — not raw SQL, e.g. caching a query result in Redis)",
+    output: "-- MySQL 8.0+ has no query_cache_size or query_cache_type variables at all —\n-- attempting to set them will result in an error.",
+    mistakes: "Beginners MySQL 8.0 me query cache settings (jaise 'query_cache_size') set karne ki koshish karte hain purani tutorials follow karke, aur error milne par confuse ho jate hain. Ek aur mistake: sochna ki query cache remove hone se database performance kharab ho gayi — actually zyada saare production systems ke liye ye already disabled ya ineffective tha, aur removal ne overall system ko simplify aur stabilize kiya.",
+    interviewDefinition: "The MySQL Query Cache cached the results of identical SELECT queries for reuse, but it was removed in MySQL 8.0 because its global lock and frequent invalidation on any table write created significant scalability bottlenecks, especially on write-heavy or highly concurrent workloads — application-level caching is now the recommended alternative."
+  },
+  {
+    id: 114,
+    category: "Intermediate",
+    question: "What is the difference between mysqldump and a physical backup tool like Percona XtraBackup?",
+    shortAnswer: "mysqldump ek 'logical' backup tool hai jo data ko SQL statements (INSERT etc.) ke form me export karta hai, jabki Percona XtraBackup jaisa 'physical' backup tool database ke actual data files ko directly copy karta hai — physical backups generally bade databases ke liye kaafi fast (backup aur restore dono) hote hain.",
+    explanation: "mysqldump ek human-readable .sql file generate karta hai jisme CREATE TABLE aur INSERT statements hote hain — ye portable hai (kisi bhi MySQL version/platform par restore ho sakta hai) lekin bade databases (jaise 100GB+) ke liye slow ho sakta hai, kyunki restore karte waqt har statement ko phir se execute karna padta hai. Physical backup tools directly InnoDB ke data files (.ibd) ko copy karte hain (bina table lock kiye InnoDB ke case me, 'hot backup' ki tarah) — ye bahut fast hote hain especially restore ke time, kyunki files ko simply wapas jagah par rakh dena hota hai, statement-by-statement re-execute nahi karna padta.",
+    example: "Ek chhoti application (few GB data) ke liye mysqldump kaafi convenient hai. Ek bade production database (100GB+) ke liye Percona XtraBackup jaisa physical backup tool zyada practical hai — kam downtime aur fast restore ke liye.",
+    sql: "-- Logical backup (mysqldump) — creates a portable SQL file\n-- mysqldump -u root -p mydatabase > backup.sql\n\n-- Restoring a logical backup\n-- mysql -u root -p mydatabase < backup.sql",
+    output: "-- mysqldump output is a plain-text .sql file containing CREATE TABLE\n-- and INSERT statements, restorable on any compatible MySQL version.",
+    mistakes: "Beginners bade production databases ke liye bhi mysqldump hi use karte rehte hain, aur restore ke time hone wali lambi downtime se surprised ho jate hain. Ek aur mistake: backup lete waqt table locking consideration ignore karna — mysqldump by default kuch tables ko lock kar sakta hai jab tak '--single-transaction' flag (InnoDB ke liye) use na kiya jaye, jo consistent backup ke liye zaroori hai bina write-blocking ke.",
+    interviewDefinition: "mysqldump performs a logical backup by exporting data as portable SQL statements, while tools like Percona XtraBackup perform a physical backup by directly copying the underlying data files — physical backups are typically much faster to restore for large databases since they avoid re-executing individual statements."
+  },
+  {
+    id: 115,
+    category: "Advanced",
+    question: "What is the binary log (binlog) in MySQL, and what is it used for?",
+    shortAnswer: "Binary log ek sequential record hai un sabhi changes ka jo database par kiye gaye hain (INSERT/UPDATE/DELETE/schema changes) — ye primarily replication aur point-in-time recovery ke liye use hota hai.",
+    explanation: "Jab bhi koi data-modifying statement execute hoti hai, MySQL (agar binary logging enabled hai) usse binlog me record kar deta hai. Replication is binlog ko hi use karta hai — replica servers primary ke binlog ko continuously read karke apne data ko sync rakhte hain. Isi tarah, agar humare paas ek full backup ho (jaise raat 12 baje ka) aur system subah 10 baje crash ho jaye, hum full backup restore karke, uske baad ke binlogs 'replay' karke database ko exact crash-time state tak restore kar sakte hain — isse 'point-in-time recovery' kehte hain.",
+    example: "Ek e-commerce platform jaha accidental 'DELETE FROM orders' bina WHERE ke chal gaya — agar binlogs available hain, hum backup restore karke, DELETE se pehle tak ke binlog changes replay karke data recover kar sakte hain (us galat DELETE ko chhod kar).",
+    sql: "-- Checking if binary logging is enabled\nSHOW VARIABLES LIKE 'log_bin';\n\n-- Viewing available binary log files\nSHOW BINARY LOGS;",
+    output: "+---------------+-------+\n| Log_name      | Size  |\n+---------------+-------+\n| binlog.000001 | 4096  |\n| binlog.000002 | 8192  |\n+---------------+-------+",
+    mistakes: "Beginners binary logging disable kar dete hain (soch kar ki ye extra disk space/overhead hai) bina samjhe ki isse replication aur disaster-recovery capabilities poori tarah khatam ho jati hain. Ek aur mistake: binlogs ko indefinitely accumulate hone dena bina 'expire_logs_days' jaisi settings configure kiye, jisse disk space khatam ho sakta hai.",
+    interviewDefinition: "The binary log (binlog) is a sequential record of all data-modifying and schema-changing statements executed on a MySQL server, forming the foundation for both replication (replicas apply the primary's binlog) and point-in-time recovery (replaying binlog events after restoring a base backup)."
+  },
+  {
+    id: 116,
+    category: "Advanced",
+    question: "What is the difference between Statement-Based Replication and Row-Based Replication?",
+    shortAnswer: "Statement-Based Replication (SBR) actual SQL statements ko replicas par re-execute karta hai, jabki Row-Based Replication (RBR) sirf ye record karta hai ki kaunse actual rows change hue aur unki nayi values kya hain — MySQL 8.0 me default RBR hai.",
+    explanation: "SBR ka fayda hai ki binlog size chhota hota hai (sirf query text store hoti hai), lekin problem ye hai ki kuch queries 'non-deterministic' ho sakti hain — jaise 'UPDATE ... WHERE created_at < NOW()' — ye primary aur replica par alag time par execute hone ki wajah se different results de sakti hai. RBR is problem ko poori tarah solve karta hai — ye exact row-level changes (before/after values) record karta hai, isliye result hamesha deterministic aur consistent rehta hai chahe query kitni bhi complex/non-deterministic kyun na ho. Trade-off ye hai ki RBR ka binlog size bada ho sakta hai (especially bulk updates ke liye), lekin reliability ke liye ye better maana jata hai — isi wajah se ye MySQL ka default hai.",
+    example: "Ek query 'UPDATE products SET price = price * 1.1 WHERE category = \"Electronics\"' — RBR har affected row ki exact nayi price record karega, jabki SBR sirf ye statement record karega jo replica par phir se calculate hoga.",
+    sql: "-- Checking the current binlog format\nSHOW VARIABLES LIKE 'binlog_format';",
+    output: "+----------------+-------+\n| Variable_name  | Value  |\n+----------------+-------+\n| binlog_format  | ROW    |\n+----------------+-------+",
+    mistakes: "Beginners sochte hain SBR hamesha 'better' hai kyunki binlog size chhota hota hai — ye size ka fayda non-deterministic query issues ke risk ke saamne generally worth nahi hota, isliye RBR hi recommend/default kiya jata hai. Ek aur mistake: replication issues debug karte waqt binlog format ka role samajhna miss karna — SBR-related bugs (non-deterministic queries) RBR me exist hi nahi karte.",
+    interviewDefinition: "Statement-Based Replication replays the original SQL statements on replicas, which can produce inconsistent results for non-deterministic queries, whereas Row-Based Replication records the actual row-level changes made, guaranteeing consistency at the cost of a potentially larger binlog — MySQL 8.0 defaults to row-based replication for this reason."
+  },
+  {
+    id: 117,
+    category: "Advanced",
+    question: "What is a Generated Column in MySQL?",
+    shortAnswer: "Generated Column ek column hai jiski value automatically ek expression (jo dusre columns par based ho) se compute hoti hai — ye manually har baar value calculate karke insert karne ki zaroorat khatam kar deta hai.",
+    explanation: "Kabhi-kabhi ek column ki value simply dusre columns se derive hoti hai — jaise 'full_name' (first_name + last_name se), ya 'total_price' (quantity * unit_price se). Generated columns is calculation ko database level par automate kar dete hain, taaki application code me har jagah ye logic repeat na karni pade, aur data hamesha consistent rahe (kabhi bhi 'first_name'/'last_name' update ho, 'full_name' automatically update ho jayega). Do types hote hain: VIRTUAL (calculate hota hai query time par, disk par store nahi hota) aur STORED (calculate hokar disk par physically store bhi hota hai).",
+    example: "'order_items' table me 'quantity' aur 'unit_price' columns se automatically 'total_price' calculate karna.",
+    sql: "CREATE TABLE order_items (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  quantity INT,\n  unit_price DECIMAL(10,2),\n  total_price DECIMAL(10,2) AS (quantity * unit_price) STORED\n);\n\nINSERT INTO order_items (quantity, unit_price) VALUES (3, 250.00);",
+    output: "+----+-----------+-------------+---------------+\n| id | quantity  | unit_price  | total_price   |\n+----+-----------+-------------+---------------+\n| 1  | 3         | 250.00      | 750.00        |\n+----+-----------+-------------+---------------+",
+    mistakes: "Beginners generated column me directly INSERT/UPDATE karne ki koshish karte hain, jo error deta hai — ye column apni value khud calculate karta hai, isse manually set nahi kiya ja sakta. Ek aur mistake: VIRTUAL columns par index lagane ki zaroorat samajhna, ya STORED vs VIRTUAL ka trade-off (storage vs computation cost) samjhe bina blindly ek choose karna.",
+    interviewDefinition: "A generated column automatically computes its value from an expression based on other columns in the same row, either calculated on-the-fly at query time (VIRTUAL) or physically stored on disk (STORED), eliminating the need to manually maintain derived values in application code."
+  },
+  {
+    id: 118,
+    category: "Advanced",
+    question: "What is the difference between VIRTUAL and STORED generated columns?",
+    shortAnswer: "VIRTUAL generated column ki value disk par store nahi hoti — ye har baar query ke time calculate hoti hai; STORED generated column ki value ek baar calculate hokar physically disk par table ke row ke saath store ho jati hai (INSERT/UPDATE ke time).",
+    explanation: "VIRTUAL columns disk space nahi consume karte (kyunki calculate hi tab hote hain jab query unhe access kare), lekin har read par thoda extra CPU cost lagta hai calculation ke liye. STORED columns disk space use karte hain (kyunki value physically save hoti hai), lekin read fast hota hai kyunki value already calculated hoti hai — write thoda slower ho sakta hai (calculation write ke time honi hoti hai). Important: STORED generated columns par index banaya ja sakta hai directly, jabki VIRTUAL columns par bhi MySQL 5.7.6+ se index bana sakte hain, lekin internally MySQL usse thoda differently handle karta hai.",
+    example: "Ek reporting-heavy table me jaha 'total_price' bahut frequently read hoti hai, STORED behtar hoga (read-optimized). Ek write-heavy table jaha calculated value rarely padhi jaati hai, VIRTUAL storage bacha sakta hai.",
+    sql: "-- VIRTUAL (default if not specified): calculated on read, not stored\nCREATE TABLE demo_virtual (\n  price DECIMAL(10,2),\n  tax DECIMAL(10,2) AS (price * 0.18) VIRTUAL\n);\n\n-- STORED: calculated once, saved to disk\nCREATE TABLE demo_stored (\n  price DECIMAL(10,2),\n  tax DECIMAL(10,2) AS (price * 0.18) STORED\n);",
+    output: "Query OK, 0 rows affected  (x2)\n(Both tables compute 'tax' automatically; only demo_stored physically saves it on disk)",
+    mistakes: "Beginners default behavior ko confuse kar dete hain — agar 'VIRTUAL'/'STORED' explicitly na likha jaye, MySQL by default VIRTUAL choose karta hai. Ek aur mistake: bahut saare heavy-computation VIRTUAL columns ko frequently query karna, jisse read performance significantly degrade ho sakti hai kyunki calculation baar-baar honi padti hai.",
+    interviewDefinition: "A VIRTUAL generated column is computed on-the-fly at query time without consuming disk storage, while a STORED generated column is computed once and physically saved with the row — VIRTUAL favors write performance and storage savings, while STORED favors read performance at the cost of extra disk space."
+  },
+  {
+    id: 119,
+    category: "Advanced",
+    question: "What is the INFORMATION_SCHEMA database used for?",
+    shortAnswer: "INFORMATION_SCHEMA ek special, read-only database hai jo poore MySQL server ke metadata ko contain karta hai — jaise kaunse databases/tables/columns exist karte hain, kaunse constraints hain, aur kaunse permissions kisko diye gaye hain.",
+    explanation: "Ye ek 'database ke baare me database' hai — isme actual application data nahi hota, balki structure/metadata hota hai. Ye tab bahut useful hota hai jab hume programmatically ye jaanna ho ki 'kaunse tables me ek particular column hai', 'kis table ki kaunsi foreign keys hain', ya 'kaunse indexes exist karte hain' — bina manually har table check kiye. Tools (jaise MySQL Workbench, ORMs) internally INFORMATION_SCHEMA ko hi query karke apna 'schema browser' ya migration tools banate hain.",
+    example: "Ye pata karna ki 'employees' table me kaunse columns hain aur unke data types kya hain, bina 'DESCRIBE employees' use kiye.",
+    sql: "SELECT COLUMN_NAME, DATA_TYPE\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = 'company_db' AND TABLE_NAME = 'employees';",
+    output: "+--------------+------------+\n| COLUMN_NAME  | DATA_TYPE  |\n+--------------+------------+\n| id           | int        |\n| name         | varchar    |\n| salary       | decimal    |\n+--------------+------------+",
+    mistakes: "Beginners INFORMATION_SCHEMA queries ko production ke high-frequency operations me (jaise har request par) use kar dete hain — ye metadata queries bade databases (bahut saari tables) par thodi slow ho sakti hain, isliye inhe cache karna ya rarely (jaise application startup par) call karna better practice hai. Ek aur mistake: 'TABLE_SCHEMA' filter lagana bhool jana, jisse query sabhi databases ke across metadata return kar deti hai, jo confusing/unnecessary result deta hai.",
+    interviewDefinition: "INFORMATION_SCHEMA is a special, read-only database that exposes metadata about the entire MySQL server — including databases, tables, columns, constraints, and permissions — commonly queried programmatically by tools and scripts that need to introspect the database structure."
+  },
+  {
+    id: 120,
+    category: "Advanced",
+    question: "How do you find all foreign keys that reference a specific table using INFORMATION_SCHEMA?",
+    shortAnswer: "INFORMATION_SCHEMA.KEY_COLUMN_USAGE table ko query karke, hum ye find kar sakte hain ki kaunse columns (kis table ke) kisi specific table ko REFERENCED_TABLE_NAME ke through reference kar rahe hain.",
+    explanation: "Ye tab bahut useful hota hai jab humein ek table delete/modify karni ho aur pehle ye pata karna ho ki kya koi aur table isse foreign key ke through depend karti hai — production me bina ye check kiye table drop karna cascading errors create kar sakta hai. INFORMATION_SCHEMA.KEY_COLUMN_USAGE me har foreign key relationship ki details (kaunsa column, kis table ka, kise reference kar raha hai) already maintained hoti hain, isse hum manually har table check karne se bach jaate hain.",
+    example: "'customers' table ko delete karne se pehle ye check karna ki kaunsi tables 'customers.id' ko foreign key se reference karti hain.",
+    sql: "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME\nFROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE\nWHERE REFERENCED_TABLE_NAME = 'customers'\n  AND TABLE_SCHEMA = 'ecommerce_db';",
+    output: "+-------------+--------------+-------------------------+\n| TABLE_NAME  | COLUMN_NAME  | CONSTRAINT_NAME         |\n+-------------+--------------+-------------------------+\n| orders      | customer_id  | orders_ibfk_1           |\n+-------------+--------------+-------------------------+\n(This shows that 'orders' depends on 'customers' via its customer_id column)",
+    mistakes: "Beginners is query me 'TABLE_SCHEMA' filter lagana bhool jate hain, jisse dusre databases me maujood similarly-named tables ke references bhi galti se result me aa jate hain. Ek aur mistake: sochna ki ye query sirf 'currently enforced' foreign keys dikhati hai — actually agar koi table drop ho chuki hai, uski entries automatically clean ho jaati hain, isliye ye result hamesha current, valid relationships hi dikhata hai.",
+    interviewDefinition: "Querying INFORMATION_SCHEMA.KEY_COLUMN_USAGE with a filter on REFERENCED_TABLE_NAME reveals every column across the database that holds a foreign key pointing to a given table, allowing safe verification of dependent relationships before altering or dropping that table."
+  },
+  {
+    id: 121,
+    category: "Advanced",
+    question: "What is the utf8mb4 character set, and why is it recommended over utf8 in MySQL?",
+    shortAnswer: "MySQL ka purana 'utf8' character set actually sirf 3-byte Unicode characters support karta hai (incomplete UTF-8 implementation), jabki 'utf8mb4' poore 4-byte UTF-8 characters ko support karta hai — jisme emojis aur kai rare/historic language characters shamil hain.",
+    explanation: "Ye ek historically confusing MySQL quirk hai: standard UTF-8 encoding characters ko 1 se 4 bytes tak use kar sakti hai, lekin MySQL ka 'utf8' character set (jo bahut purana hai) sirf maximum 3 bytes tak support karta tha — isliye 4-byte characters (jaise emojis 😀, kuch Chinese/Japanese rare characters) store hi nahi ho pate the ('utf8' me insert karne par silent truncation ya error aata). 'utf8mb4' ('mb4' = 'max bytes 4') ye limitation fix karta hai aur genuinely complete UTF-8 support deta hai. Isi wajah se aajkal naye projects me hamesha 'utf8mb4' recommend kiya jata hai, 'utf8' nahi.",
+    example: "Ek social media application jaha users apne comments me emojis use karna chahte hain — agar table 'utf8' charset par bani ho, emoji insert karte waqt error ya data corruption ho sakta hai.",
+    sql: "CREATE TABLE comments (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  content TEXT\n) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\n\nINSERT INTO comments (content) VALUES ('Great work! 😀🎉');",
+    output: "Query OK, 1 row affected\n(With utf8mb4, the emoji characters are stored correctly without truncation or error)",
+    mistakes: "Beginners purani tutorials follow karke naye projects me bhi 'utf8' charset use kar dete hain, aur baad me emoji ya kuch specific characters insert karte waqt mysterious errors face karte hain. Ek aur mistake: existing database ko 'utf8' se 'utf8mb4' me migrate karte waqt column lengths ka effect samajhna bhool jana — utf8mb4 me har character zyada bytes le sakta hai, isliye VARCHAR(255) jaisi columns ki max byte-length calculation change ho sakti hai.",
+    interviewDefinition: "MySQL's legacy 'utf8' character set only supports Unicode characters up to 3 bytes, whereas 'utf8mb4' supports the full 4-byte range required for characters like emojis and certain rare scripts — making utf8mb4 the recommended choice for genuinely complete UTF-8 support in modern applications."
+  },
+  {
+    id: 122,
+    category: "Advanced",
+    question: "What is a Collation in MySQL, and how does it affect sorting and comparison?",
+    shortAnswer: "Collation ye define karta hai ki characters ko compare aur sort kaise kiya jaye (jaise case-sensitive honi chahiye ya nahi, accented characters ko kaise treat karna hai) — ek hi character set ke liye multiple collations exist kar sakte hain.",
+    explanation: "Character set decide karta hai ki 'kaunse characters store ho sakte hain', jabki collation decide karta hai ki 'un characters ko compare/sort kaise kiya jaye'. Jaise 'utf8mb4_general_ci' case-insensitive comparison karta hai (matlab 'apple' aur 'Apple' equal maane jayenge WHERE clause me), jabki 'utf8mb4_bin' bit-by-bit binary comparison karta hai (case-sensitive, aur bahut strict). Collation choice search behavior, sorting order, aur unique constraints ke behavior ko directly affect karta hai.",
+    example: "Agar 'email' column 'utf8mb4_general_ci' collation use kare, to 'test@example.com' aur 'TEST@EXAMPLE.COM' ko UNIQUE constraint ke tehat 'same' maana jayega — jo email jaisi cases ke liye actually desirable hai.",
+    sql: "-- Case-insensitive collation: 'Rahul' and 'rahul' are treated as equal in comparisons\nCREATE TABLE users_ci (\n  name VARCHAR(50) COLLATE utf8mb4_general_ci\n);\n\n-- Case-sensitive (binary) collation: 'Rahul' and 'rahul' are treated as different\nCREATE TABLE users_bin (\n  name VARCHAR(50) COLLATE utf8mb4_bin\n);",
+    output: "-- SELECT * FROM users_ci WHERE name = 'rahul' would also match a row stored as 'Rahul'.\n-- SELECT * FROM users_bin WHERE name = 'rahul' would NOT match a row stored as 'Rahul'.",
+    mistakes: "Beginners collation ko sirf 'sorting ke liye' samajhte hain, ye bhool jate hain ki ye WHERE clause comparisons aur UNIQUE constraints ko bhi directly affect karta hai — jaise galat collation se accidentally duplicate 'case-different' emails allow ho sakte hain jab actually unhe unique hona chahiye tha. Ek aur mistake: ek hi database ke different tables/columns me alag-alag collations mix kar dena, jo JOIN operations me 'Illegal mix of collations' error de sakta hai.",
+    interviewDefinition: "Collation determines the rules for comparing and sorting characters within a given character set — such as whether comparisons are case-sensitive — and directly affects query matching, sort order, and the behavior of UNIQUE constraints, independent of which character set is in use."
+  },
+  {
+    id: 123,
+    category: "Advanced",
+    question: "What is the EXISTS operator, and how is it different from IN for subqueries?",
+    shortAnswer: "EXISTS check karta hai ki subquery kam se kam ek row return karti hai ya nahi (TRUE/FALSE), jabki IN subquery ke actual returned values ki list ke against compare karta hai — EXISTS aksar better performance deta hai jab subquery bahut saari rows return kar sakti ho, aur NULL values ke saath IN se zyada predictably behave karta hai.",
+    explanation: "EXISTS ek 'existence check' hai — ye subquery ke andar ki actual values ko care nahi karta, sirf ye check karta hai ki 'kya koi bhi matching row hai'. Optimizer aksar EXISTS ko efficiently handle kar sakta hai kyunki pehli matching row milte hi ye stop kar sakta hai (short-circuit), poori subquery evaluate karne ki zaroorat nahi. IN operator, agar subquery me NULL values return ho, kabhi-kabhi unexpected (empty) results de sakta hai — especially 'NOT IN' ke saath, jahan agar list me ek bhi NULL ho to poora result empty aa sakta hai. EXISTS/NOT EXISTS is NULL-related pitfall se generally safe hota hai.",
+    example: "Un customers ko dhoondna jinhone kam se kam ek order kiya hai — EXISTS ke saath.",
+    sql: "SELECT name\nFROM customers c\nWHERE EXISTS (\n  SELECT 1 FROM orders o WHERE o.customer_id = c.id\n);",
+    output: "+--------+\n| name   |\n+--------+\n| Rahul  |\n| Priya  |\n+--------+",
+    mistakes: "Beginners hamesha IN use karte hain bina NULL-related risks samjhe — especially 'NOT IN (subquery)' jab subquery me NULL aa sakta ho, jo silently 0 rows return kar deta hai (bahut confusing bug). EXISTS/NOT EXISTS is problem se immune hai, isliye jab bhi doubt ho ki subquery me NULL aa sakta hai, EXISTS zyada safe choice hai.",
+    interviewDefinition: "EXISTS checks only whether a subquery returns at least one row, allowing the optimizer to short-circuit on the first match, whereas IN compares against the subquery's actual returned value list and can behave unpredictably (returning no rows at all) if that list contains a NULL, particularly when used as NOT IN."
+  },
+  {
+    id: 124,
+    category: "Advanced",
+    question: "What is the ANY and ALL operator used with subqueries?",
+    shortAnswer: "ANY (ya SOME) operator TRUE return karta hai agar comparison subquery ke returned values me se kisi bhi ek ke saath match ho jaye; ALL operator TRUE return karta hai sirf tabhi jab comparison subquery ke sabhi returned values ke saath match ho.",
+    explanation: "Ye operators comparison operators (=, >, <, etc.) ke saath combine hote hain aur subquery ke multiple returned values ke against compare karte hain. '> ANY (subquery)' ka matlab hai 'kam se kam ek value se bada' (effectively subquery ki minimum value se bada), jabki '> ALL (subquery)' ka matlab hai 'sabhi values se bada' (effectively subquery ki maximum value se bada). Ye kabhi-kabhi MIN()/MAX() ke saath equivalent logic likhne ka alternative tarika hote hain, lekin thoda different readability dete hain.",
+    example: "Un employees ko dhoondna jinki salary kisi bhi 'Sales' department employee se zyada hai (ANY), aur un employees ko dhoondna jinki salary 'Sales' department ke sabhi employees se zyada hai (ALL).",
+    sql: "-- Salary greater than at least one Sales employee (equivalent to > MIN)\nSELECT name, salary FROM employees\nWHERE salary > ANY (SELECT salary FROM employees WHERE department = 'Sales');\n\n-- Salary greater than every Sales employee (equivalent to > MAX)\nSELECT name, salary FROM employees\nWHERE salary > ALL (SELECT salary FROM employees WHERE department = 'Sales');",
+    output: "-- ANY version: returns employees earning more than the lowest-paid Sales employee.\n-- ALL version: returns only employees earning more than the highest-paid Sales employee.",
+    mistakes: "Beginners ANY aur ALL ko ulta samajh lete hain — 'ANY' ko 'sabhi ke saath match karna chahiye' soch lete hain jabki actually ye 'kam se kam ek ke saath match' hai. Ek aur mistake: '= ANY' ko IN operator ke barabar hi treat kar lena (ye technically sahi hai, '= ANY (subquery)' aur 'IN (subquery)' equivalent hain), lekin '> ANY'/'> ALL' jaise inequality operators ke saath in ka behavior IN se completely different hai.",
+    interviewDefinition: "ANY (or SOME) returns TRUE if the comparison holds for at least one value returned by the subquery, while ALL returns TRUE only if the comparison holds for every value returned — commonly used as an alternative way to express comparisons against a subquery's minimum or maximum value."
+  },
+  {
+    id: 125,
+    category: "Advanced",
+    question: "What is a Derived Table (a subquery used in the FROM clause)?",
+    shortAnswer: "Derived Table ek subquery hai jo SELECT ke FROM clause ke andar use hoti hai, jisse uska result set ek temporary, in-query 'virtual table' ki tarah treat kiya ja sakta hai — jise further filter, join, ya aggregate kiya ja sakta hai.",
+    explanation: "Kabhi-kabhi humein pehle kuch data ko summarize/filter karna hota hai, aur phir uss summarized result par further operations (jaise aur filtering, ya kisi aur table se JOIN) karni hoti hai. Derived table isi ko possible banata hai — outer query treat karti hai is subquery ke result ko ek normal table ki tarah, bas ise ek alias dena zaroori hota hai. Ye CTE (WITH clause) ke concept se milta-julta hai, lekin CTE zyada readable hote hain especially jab same subquery multiple jagah reference karni ho.",
+    example: "Pehle har department ki average salary calculate karna (as a derived table), phir un departments ko dhoondna jinki average salary company-wide average se zyada hai.",
+    sql: "SELECT dept_avg.department, dept_avg.avg_salary\nFROM (\n  SELECT department, AVG(salary) AS avg_salary\n  FROM employees\n  GROUP BY department\n) AS dept_avg\nWHERE dept_avg.avg_salary > 50000;",
+    output: "+------------+--------------+\n| department | avg_salary   |\n+------------+--------------+\n| IT         | 60000.00     |\n| Sales      | 55000.00     |\n+------------+--------------+",
+    mistakes: "Beginners derived table ko alias dena bhool jate hain (jaise 'AS dept_avg' likhna miss kar dena), jo MySQL me syntax error deta hai — har derived table ka ek alias hona mandatory hai. Ek aur mistake: complex, deeply nested derived tables likhna jo readability ko bahut kharab kar deta hai — aise cases me CTE (WITH clause) use karna zyada maintainable hota hai.",
+    interviewDefinition: "A derived table is a subquery placed in the FROM clause of an outer query, allowing its result set to be treated as a temporary virtual table that can be further filtered, joined, or aggregated — MySQL requires every derived table to be given an alias."
+  },
+  {
+    id: 126,
+    category: "Advanced",
+    question: "What is the difference between a Temporary Table and a regular table?",
+    shortAnswer: "Temporary Table (CREATE TEMPORARY TABLE se banayi jaati hai) sirf usi database session ke liye visible hoti hai aur session end hote hi automatically drop ho jaati hai, jabki regular table permanently exist karti hai aur sabhi sessions/connections ke liye visible hoti hai.",
+    explanation: "Temporary tables tab useful hote hain jab humein ek complex multi-step operation ke beech me kuch intermediate data store karna ho, bina permanently database me kuch add kiye — jaise ek complex report generate karte waqt beech ke calculations store karna. Ye session-scoped hoti hain, matlab agar do alag users/connections same naam se temporary table banayein, dono ek dusre se completely independent honge (koi naming conflict nahi hoga). Session close (ya connection drop) hote hi MySQL automatically inhe clean up kar deta hai.",
+    example: "Ek complex monthly report generate karte waqt, pehle kuch intermediate aggregated data ko ek temporary table me store karna, phir usse further process karna.",
+    sql: "CREATE TEMPORARY TABLE temp_monthly_sales AS\nSELECT product_id, SUM(amount) AS total_sales\nFROM orders\nWHERE order_date >= '2026-01-01'\nGROUP BY product_id;\n\nSELECT * FROM temp_monthly_sales WHERE total_sales > 10000;\n-- This table disappears automatically once the session ends",
+    output: "+-------------+--------------+\n| product_id  | total_sales  |\n+-------------+--------------+\n| 15          | 25000        |\n+-------------+--------------+",
+    mistakes: "Beginners temporary tables ko permanent data storage ke liye use kar dete hain (galat use case), aur data 'gayab' ho jane par confuse ho jate hain jab session/connection close ho jaye. Ek aur mistake: bahut zyada bade/complex temporary tables banana jab actually CTE ya derived table se hi kaam chal sakta tha — temporary tables ka extra overhead (disk I/O, cleanup) hota hai jo hamesha zaroori nahi hota.",
+    interviewDefinition: "A temporary table, created with CREATE TEMPORARY TABLE, is visible only within the database session that created it and is automatically dropped when that session ends, unlike a regular table which persists permanently and is visible across all connections."
+  },
+  {
+    id: 127,
+    category: "Advanced",
+    question: "What is the difference between a Stored Function and a Stored Procedure in MySQL?",
+    shortAnswer: "Stored Function ek single value return karti hai aur SQL statement ke andar directly use ki ja sakti hai (jaise SELECT ke andar), jabki Stored Procedure multiple values/result sets return kar sakti hai lekin ise SQL expression ke andar directly use nahi kiya ja sakta — isse alag se 'CALL' karna padta hai.",
+    explanation: "Stored function ek 'expression' ki tarah behave karta hai — jaise MySQL ka apna built-in UPPER() ya NOW() function — hum isse SELECT statement, WHERE clause, ya kisi bhi expression context me directly use kar sakte hain, aur ye hamesha exactly ek value return karta hai. Stored procedure zyada flexible hai — ye multiple IN/OUT parameters le sakta hai, multiple statements execute kar sakta hai (jaise ek transaction ke multiple steps), aur multiple result sets bhi return kar sakta hai — lekin isse SELECT ke andar directly embed nahi kiya ja sakta, isse hamesha separately 'CALL procedure_name()' se invoke karna padta hai.",
+    example: "Ek function jo employee ki age calculate kare (birth_date se) — SELECT ke andar directly use ho sakta hai. Ek procedure jo naye employee ko onboard kare (multiple tables me insert kare) — isse CALL karna padega.",
+    sql: "-- Stored FUNCTION: returns a single value, usable inside SELECT\nDELIMITER //\nCREATE FUNCTION CalculateAge(birth_date DATE) RETURNS INT\nDETERMINISTIC\nBEGIN\n  RETURN TIMESTAMPDIFF(YEAR, birth_date, CURDATE());\nEND //\nDELIMITER ;\n\nSELECT name, CalculateAge(date_of_birth) AS age FROM employees;",
+    output: "+-------+------+\n| name  | age  |\n+-------+------+\n| Priya | 29   |\n+-------+------+",
+    mistakes: "Beginners stored function ko procedure ki tarah 'CALL' karne ki koshish karte hain (ya vice versa), jo error deta hai — dono ka invocation syntax alag hai. Ek aur mistake: stored function ke andar data-modifying statements (jaise INSERT/UPDATE) likhne ki koshish karna — MySQL functions par kuch restrictions hote hain (especially agar function 'DETERMINISTIC' declare kiya gaya ho), aur data-modification generally procedures ke liye reserved hai.",
+    interviewDefinition: "A stored function returns a single value and can be used directly within SQL expressions like SELECT, while a stored procedure can accept multiple parameters, execute multiple statements, and return multiple result sets, but must be explicitly invoked with CALL rather than embedded inside an expression."
+  },
+  {
+    id: 128,
+    category: "Advanced",
+    question: "What is the Event Scheduler in MySQL?",
+    shortAnswer: "Event Scheduler ek built-in feature hai jo SQL statements ko ek defined schedule (jaise 'har din raat 2 baje', ya 'har ghante') par automatically execute karta hai — ye database-level 'cron jobs' jaisa kaam karta hai.",
+    explanation: "Kai baar humein kuch maintenance ya business logic tasks regularly (bina kisi external application ke through trigger kiye) chalane hote hain — jaise purane logs delete karna, ya daily summary tables refresh karna. Event Scheduler MySQL ke andar hi ye scheduling capability provide karta hai, bina application-level cron job setup kiye. Ye globally enable/disable ho sakta hai ('event_scheduler' variable se), aur individual events ONE TIME ya RECURRING (with an interval) ho sakte hain.",
+    example: "Har raat 2 baje 30 din se purane 'activity_logs' entries automatically delete karna.",
+    sql: "CREATE EVENT cleanup_old_logs\nON SCHEDULE EVERY 1 DAY\nSTARTS '2026-01-01 02:00:00'\nDO\n  DELETE FROM activity_logs WHERE created_at < NOW() - INTERVAL 30 DAY;",
+    output: "Query OK, 0 rows affected\n(The event is now scheduled to run automatically every day at 2 AM)",
+    mistakes: "Beginners Event Scheduler ko enable karna bhool jate hain (ye by default kai setups me OFF hota hai) — event create hone ke baad bhi wo actually run nahi hoga jab tak 'SET GLOBAL event_scheduler = ON' na kiya jaye. Ek aur mistake: bahut heavy/complex logic events ke andar likhna jab actually ek dedicated application-level scheduled job (jaise Laravel's task scheduler) is kaam ke liye behtar suited hota, especially agar external systems (jaise email sending) involve ho.",
+    interviewDefinition: "The Event Scheduler is a built-in MySQL feature that automatically executes SQL statements on a defined schedule — similar to a database-level cron job — commonly used for recurring maintenance tasks like purging old data or refreshing summary tables."
+  },
+  {
+    id: 129,
+    category: "Advanced",
+    question: "What is the purpose of the SHOW PROCESSLIST command?",
+    shortAnswer: "SHOW PROCESSLIST currently MySQL server par chal rahe (ya waiting) sabhi connections/threads ki ek live list dikhata hai — jisme unki state, kitni der se chal rahe hain, aur actually kya query execute ho rahi hai, ye dikhta hai.",
+    explanation: "Ye debugging/monitoring ke liye ek bahut important tool hai jab production database slow ho ya 'hang' lag raha ho. Isse hum dekh sakte hain ki kaunsi queries lambe samay se chal rahi hain (potentially problematic long-running queries), kaunse connections 'Locked' state me hain (kisi lock ka wait kar rahe hain — deadlock investigation ke liye useful), aur overall kitne active connections hain. Agar koi specific query problematic lage, us thread ko 'KILL <id>' se manually terminate bhi kiya ja sakta hai.",
+    example: "Production database achanak slow ho gaya — SHOW PROCESSLIST chala kar dekhna ki koi lambi-chalti query ya bahut saare 'Locked' connections to nahi hain.",
+    sql: "SHOW FULL PROCESSLIST;",
+    output: "+----+------+-----------+---------+---------+------+----------+------------------------------+\n| Id | User | Host      | db      | Command | Time | State    | Info                         |\n+----+------+-----------+---------+---------+------+----------+------------------------------+\n| 12 | app  | 10.0.1.5  | orders  | Query   | 45   | Sending  | SELECT * FROM orders WHERE...|\n+----+------+-----------+---------+---------+------+----------+------------------------------+",
+    mistakes: "Beginners regular SHOW PROCESSLIST use kar dete hain jab actually 'SHOW FULL PROCESSLIST' chahiye hota hai — regular version 'Info' column me query text truncate kar deta hai, jisse poori query dekhna mushkil ho jata hai. Ek aur mistake: kisi bhi long-running query ko bina samjhe seedha KILL kar dena — kabhi-kabhi wo query genuinely important hoti hai (jaise ek bada backup process), isliye KILL karne se pehle context samajhna zaroori hai.",
+    interviewDefinition: "SHOW PROCESSLIST displays a real-time list of all threads/connections currently active on the MySQL server, including their state and the query they are executing, making it a key diagnostic tool for identifying long-running queries, locking issues, or unusually high connection counts."
+  },
+  {
+    id: 130,
+    category: "Advanced",
+    question: "What is the Slow Query Log, and what does the long_query_time setting do?",
+    shortAnswer: "Slow Query Log un queries ko automatically record karta hai jo ek specified threshold (long_query_time, seconds me) se zyada time lete hain execute hone me — ye slow, problematic queries ko production me identify karne ka ek primary tool hai.",
+    explanation: "Real-time monitoring (jaise SHOW PROCESSLIST) sirf 'is waqt' chal rahi queries dikhata hai, lekin production me humein pata karna hota hai ki 'time ke saath kaunsi queries baar-baar slow hoti hain'. Slow query log isi ke liye hai — ek baar enable hone ke baad, ye automatically har us query ko log file me record kar deta hai jo 'long_query_time' (default 10 seconds, jise aksar 1 second ya usse kam kar diya jata hai) se zyada time leti hai. Is log ko baad me tools (jaise 'mysqldumpslow' ya 'pt-query-digest') se analyze karke sabse zyada problematic queries identify ki ja sakti hain.",
+    example: "Production me ek e-commerce site slow chal rahi thi — slow query log analyze karne par pata chala ki ek specific report query bina index ke chal rahi thi aur 8 seconds tak le rahi thi.",
+    sql: "-- Enabling the slow query log and setting the threshold\nSET GLOBAL slow_query_log = 'ON';\nSET GLOBAL long_query_time = 1; -- log any query taking longer than 1 second\n\n-- Checking where the log file is written\nSHOW VARIABLES LIKE 'slow_query_log_file';",
+    output: "+-----------------------+-------------------------------------+\n| Variable_name         | Value                               |\n+-----------------------+-------------------------------------+\n| slow_query_log_file   | /var/lib/mysql/db-server-slow.log   |\n+-----------------------+-------------------------------------+",
+    mistakes: "Beginners production me slow query log ko permanently disabled rakh dete hain 'overhead' ke daar se, jisse performance issues detect karna bahut mushkil ho jata hai — logging ka overhead generally minimal hota hai aur diagnostic value bahut zyada hoti hai. Ek aur mistake: 'long_query_time' ko bahut high (jaise 10 seconds, default) rakhna production me, jisse actually problematic (jaise 2-3 second wali) queries capture hi nahi hoti — bahut systems is threshold ko 1 second ya usse bhi kam rakhte hain.",
+    interviewDefinition: "The Slow Query Log automatically records any query that takes longer than the long_query_time threshold to execute, providing a persistent record that can be analyzed with tools to identify the database's most problematic and frequently slow queries over time."
+  },
+  {
+    id: 131,
+    category: "Advanced",
+    question: "What is the purpose of ANALYZE TABLE and OPTIMIZE TABLE commands?",
+    shortAnswer: "ANALYZE TABLE table ki index statistics ko update karta hai (jisse query optimizer ko better decisions lene me madad milti hai), jabki OPTIMIZE TABLE table ke physical storage ko defragment/reclaim karta hai (especially bahut saare DELETE/UPDATE operations ke baad).",
+    explanation: "MySQL optimizer decisions (jaise kaunsa index use karna hai) ek internal 'statistics' table par based hote hain jo har index ki cardinality (unique values ki approximate count) track karti hai. Jaise-jaise data change hota hai (bahut saare inserts/deletes), ye statistics stale ho sakti hain, jisse optimizer suboptimal choices le sakta hai — ANALYZE TABLE inhe refresh kar deta hai. OPTIMIZE TABLE ek alag concern solve karta hai: bahut saare DELETE/UPDATE operations ke baad, table ke data files me 'fragmentation' (gaps/wasted space) ho sakta hai — OPTIMIZE TABLE data ko rewrite karke is fragmentation ko clean karta hai, jisse disk usage aur read performance improve hoti hai (especially MyISAM/InnoDB par different degree tak).",
+    example: "Ek 'orders' table jisme bahut saare purane orders regularly delete kiye jaate hain — periodically OPTIMIZE TABLE chalana disk space reclaim karega aur query performance maintain rakhega.",
+    sql: "-- Refresh optimizer statistics\nANALYZE TABLE orders;\n\n-- Reclaim fragmented space and rebuild the table\nOPTIMIZE TABLE orders;",
+    output: "+---------------+---------+----------+----------+\n| Table         | Op      | Msg_type | Msg_text |\n+---------------+---------+----------+----------+\n| ecommerce.orders | optimize | status | OK      |\n+---------------+---------+----------+----------+",
+    mistakes: "Beginners OPTIMIZE TABLE ko production ke peak-hours me chala dete hain bina soche ki bade tables par ye kaafi time le sakta hai aur (InnoDB me kuch cases me) table ko temporarily lock kar sakta hai — is operation ko low-traffic maintenance window me schedule karna better hai. Ek aur mistake: ANALYZE aur OPTIMIZE ko same cheez samajh lena — ANALYZE sirf statistics update karta hai (fast), OPTIMIZE actual data ko rewrite karta hai (potentially slow, resource-intensive).",
+    interviewDefinition: "ANALYZE TABLE refreshes the index statistics that MySQL's query optimizer relies on for choosing efficient execution plans, while OPTIMIZE TABLE physically defragments and rebuilds a table's storage to reclaim space left behind by extensive deletes or updates — both are maintenance operations best scheduled during low-traffic periods on large tables."
+  },
+  {
+    id: 132,
+    category: "Advanced",
+    question: "What is the difference between MySQL's native partitioning and simply archiving old data to a separate table?",
+    shortAnswer: "MySQL's native partitioning (RANGE, LIST, HASH, etc.) ek single logical table ke andar hi data ko physically multiple segments me split karta hai (transparent to queries), jabki manual archiving explicitly purana data ek completely alag table me move karta hai (application ko dono tables ke baare me pata hona zaroori hota hai).",
+    explanation: "Native partitioning ka fayda ye hai ki application/query layer ko partitioning ke baare me kuch bhi jaanne ki zaroorat nahi — 'SELECT * FROM orders WHERE order_date...' hamesha waisa hi likha jayega, MySQL internally sahi partition(s) choose karke scan karega ('partition pruning'). Manual archiving me, agar purana data ek alag 'orders_archive' table me move kar diya jaye, application ko explicitly janna padta hai ki 'kaunsa data kaunsi table me hai', aur agar dono ko ek saath query karna ho, UNION jaisi extra complexity chahiye hoti hai. Native partitioning zyada 'transparent' hai, lekin manual archiving zyada flexible ho sakta hai (jaise archive table ko poori tarah alag server/storage par rakhna).",
+    example: "'orders' table ko date range se partitioned rakhna (native partitioning) vs 2 saal se purane orders ko manually 'orders_archive' table me move kar dena aur unhe main application queries se exclude kar dena.",
+    sql: "-- Native partitioning: transparent to the application\nSELECT * FROM orders WHERE order_date >= '2026-01-01';\n-- MySQL automatically scans only the relevant partition(s)\n\n-- Manual archiving: application must know about the separate table\nINSERT INTO orders_archive SELECT * FROM orders WHERE order_date < '2024-01-01';\nDELETE FROM orders WHERE order_date < '2024-01-01';",
+    output: "-- Native partitioning keeps a single logical table; archiving creates two\n-- physically and logically separate tables that the application must manage.",
+    mistakes: "Beginners in dono approaches ko interchangeable samajh lete hain — actually inke trade-offs (transparency vs flexibility, aur application complexity) kaafi different hain, aur choice depend karta hai specific requirements (jaise 'kya purana data kabhi query hona chahiye application se, ya sirf compliance ke liye retain karna hai') par. Ek aur mistake: partitioning ko bina soche implement karna jab actually simple archiving hi kaafi tha, ya iske ulta.",
+    interviewDefinition: "Native MySQL partitioning splits a single logical table into physical segments transparently, so queries remain unchanged while MySQL prunes irrelevant partitions automatically, whereas manual archiving moves old data into an entirely separate table that the application must explicitly account for when querying — each suited to different flexibility and transparency needs."
+  },
+  {
+    id: 133,
+    category: "Expert",
+    question: "What is a real-world approach to safely handling database schema migrations in a production Laravel application?",
+    shortAnswer: "Safe production migrations me generally shamil hote hain: backward-compatible, incremental changes (jaise pehle nullable column add karna, phir data backfill karna, phir NOT NULL enforce karna), maintenance-window planning for heavy operations, aur hamesha ek tested rollback plan.",
+    explanation: "Production me directly ek breaking schema change (jaise ek used column ko drop karna, ya ek naya NOT NULL column bina default ke add karna) deploy karna risky hai — agar application ka purana code abhi bhi chal raha ho (jaise deployment ke rolling-update phase me), ye immediately errors create kar sakta hai. Best practice hai 'expand-contract' pattern follow karna: (1) 'expand' phase — naya column/table add karo bina kuch remove kiye (backward compatible); (2) application code ko update karo naye structure ko use karne ke liye, dono old aur new ko support karte hue agar zaroorat ho; (3) data ko backfill karo; (4) sabhi traffic naye structure par migrate hone ke baad hi, 'contract' phase me purani cheez (column/table) ko remove karo. Laravel me ye migrations ke through incrementally kiya jata hai, aur bade tables par ALTER TABLE ke locking behavior ko samajhna bhi zaroori hai.",
+    example: "Ek 'users' table me 'phone_number' column add karna jo eventually mandatory (NOT NULL) hona chahiye — pehle nullable add karo, application update karke naye users se collect karo, purane users ka data backfill karo, phir NOT NULL constraint enforce karo.",
+    sql: "-- Step 1 (expand): add as nullable first — safe, backward-compatible\nALTER TABLE users ADD COLUMN phone_number VARCHAR(15) NULL;\n\n-- Step 2: application deployed to start populating it for new/updated users\n-- Step 3: backfill existing rows via a background job\n\n-- Step 4 (contract): only once all rows are populated\nALTER TABLE users MODIFY COLUMN phone_number VARCHAR(15) NOT NULL;",
+    output: "-- Each step is deployed and verified independently, minimizing the risk\n-- of a single breaking change affecting live production traffic.",
+    mistakes: "Beginners ek hi migration me multiple risky changes combine kar dete hain (jaise column add + NOT NULL + old column drop, sab ek saath), jisse agar kuch galat ho, rollback karna bahut mushkil ho jata hai. Ek aur mistake: bade production tables par heavy ALTER TABLE operations (jaise ek naya index add karna) ko peak traffic hours me chala dena bina table-locking behavior consider kiye — aise operations ko low-traffic maintenance window me, aur agar possible ho to online-schema-change tools (jaise 'pt-online-schema-change' ya 'gh-ost') ke saath karna chahiye.",
+    interviewDefinition: "Safe production schema migrations typically follow an incremental 'expand-contract' pattern — adding new structures in a backward-compatible way, migrating application code and data gradually, and only removing old structures once all traffic has fully moved to the new schema — minimizing the risk of breaking changes during deployment."
+  },
+  {
+    id: 134,
+    category: "Expert",
+    question: "What is the difference between a Hash Index and a B-Tree Index?",
+    shortAnswer: "B-Tree index (MySQL/InnoDB ka default) sorted order maintain karta hai isliye range queries (>, <, BETWEEN, ORDER BY) aur exact matches, dono ko efficiently support karta hai; Hash index sirf exact-match (=) lookups ke liye extremely fast hota hai, lekin range queries ko support hi nahi karta.",
+    explanation: "B-Tree ek balanced tree structure hai jisme data sorted order me arranged hota hai — isse MySQL kisi bhi range (jaise 'salary BETWEEN 40000 AND 60000') ko efficiently traverse kar sakta hai, aur ORDER BY jaisi sorting bhi index se directly benefit le sakti hai. Hash index (jo MySQL me MEMORY storage engine ke saath explicitly available hai, aur InnoDB internally 'Adaptive Hash Index' ke through kuch cases me automatically use karta hai) ek hashing function use karta hai jo exact value ko directly ek location tak map kar deta hai — ye '=' comparisons ke liye theoretically O(1) fast hai, lekin '>' ya '<' jaisi range queries ke liye completely useless hai (kyunki hash values sorted order me nahi hote).",
+    example: "Ek session-lookup table (MEMORY engine) jaha sirf exact session_id se lookup hona hai — hash index perfect fit hoga. Ek 'orders' table jaha date ranges par bhi filter/sort hona hai — B-Tree zaroori hai.",
+    sql: "-- MEMORY engine table explicitly using a HASH index (exact-match lookups only)\nCREATE TABLE session_cache (\n  session_id VARCHAR(64) PRIMARY KEY,\n  user_id INT\n) ENGINE=MEMORY;\n\n-- InnoDB (default engine) always uses B-Tree indexes for regular indexes,\n-- which support both exact matches and range queries\nCREATE INDEX idx_salary ON employees(salary);",
+    output: "-- A B-Tree index on salary efficiently supports:\n--   WHERE salary = 50000  (exact match)\n--   WHERE salary BETWEEN 40000 AND 60000  (range)\n--   ORDER BY salary  (sorted traversal)\n-- A hash index would only efficiently support the first of these.",
+    mistakes: "Beginners sochte hain hash index 'hamesha fast' hai kyunki O(1) lookup theoretically B-Tree ke O(log n) se better sound karta hai — practically, InnoDB (jo almost hamesha use hota hai) range queries aur sorting ke liye B-Tree hi use karta hai, aur ye ज्यादातर real-world use cases ke liye zyada versatile hai. Ek aur mistake: MEMORY engine ke saath explicitly HASH index specify karna jab actually range queries bhi chahiye hongi — aise case me B-Tree specify karna better hoga even MEMORY engine ke saath.",
+    interviewDefinition: "A B-Tree index maintains sorted order, efficiently supporting both exact-match and range queries as well as ORDER BY, and is the default in InnoDB, while a hash index offers extremely fast exact-match lookups but cannot support range queries at all since hashed values have no inherent order."
+  },
+  {
+    id: 135,
+    category: "Expert",
+    question: "What is a Cursor in a MySQL stored procedure?",
+    shortAnswer: "Cursor ek database object hai jo ek query ke result set ko row-by-row traverse karne deta hai stored procedure ke andar — ye tab use hota hai jab set-based operations (jaise ek single UPDATE) se kaam na chale aur har row par individually kuch procedural logic chalani ho.",
+    explanation: "SQL fundamentally 'set-based' hai — matlab operations poore result set par ek saath apply hote hain (jaise UPDATE ek query se sabhi matching rows update kar deta hai). Lekin kabhi-kabhi complex procedural logic chahiye hoti hai jaha har row ko individually process karna zaroori ho (jaise har row ke liye alag calculation jo dusre rows par depend kare sequentially). Cursor isi ke liye hai — ye DECLARE, OPEN, FETCH (ek-ek row nikalne ke liye), aur CLOSE steps ke through kaam karta hai. Important: cursors row-by-row processing ki wajah se set-based operations se kaafi slower hote hain, isliye inhe sirf tabhi use karna chahiye jab genuinely koi alternative na ho.",
+    example: "Ek stored procedure jo har employee ke liye row-by-row unki salary history table me ek entry banaye, ek complex condition ke basis par jo pichli row par depend karti ho.",
+    sql: "DELIMITER //\nCREATE PROCEDURE ProcessEmployeesOneByOne()\nBEGIN\n  DECLARE done INT DEFAULT FALSE;\n  DECLARE emp_id INT;\n  DECLARE emp_cursor CURSOR FOR SELECT id FROM employees;\n  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;\n\n  OPEN emp_cursor;\n  read_loop: LOOP\n    FETCH emp_cursor INTO emp_id;\n    IF done THEN\n      LEAVE read_loop;\n    END IF;\n    -- ... row-by-row logic here using emp_id ...\n  END LOOP;\n  CLOSE emp_cursor;\nEND //\nDELIMITER ;",
+    output: "Query OK, 0 rows affected\n(Procedure created — it will iterate through employees one row at a time when called)",
+    mistakes: "Beginners cursors ko unnecessarily use kar dete hain jab actually ek simple set-based UPDATE/SELECT se hi wahi kaam ho sakta tha — isse performance bahut kharab ho jati hai bade tables par. Ek aur mistake: cursor OPEN karne ke baad CLOSE karna bhool jana, jisse resources leak ho sakte hain.",
+    interviewDefinition: "A cursor allows a stored procedure to iterate through a query's result set row by row, enabling procedural logic that a single set-based statement cannot express — though because of this row-by-row processing, cursors are significantly slower than set-based operations and should be used only when no set-based alternative exists."
+  },
+  {
+    id: 136,
+    category: "Expert",
+    question: "What is the difference between a local DECLARE variable and a user-defined @variable in MySQL?",
+    shortAnswer: "DECLARE se banaya gaya local variable sirf stored procedure/function ke andar, uske specific BEGIN...END block tak scoped hota hai, jabki '@variable' (user-defined session variable) poori current session ke duration tak persist karta hai aur alag-alag statements ke beech bhi use ho sakta hai.",
+    explanation: "Local variables (DECLARE se) stored routines ke andar temporary working data ke liye hote hain — ye us specific procedure call ke khatam hone par khatam ho jate hain, aur inhe procedure ke bahar access nahi kiya ja sakta. User-defined variables ('@' prefix ke saath) session-level hote hain — inhe kisi bhi statement me set kiya ja sakta hai aur baad ke kisi bhi statement me (jab tak session close na ho) use kiya ja sakta hai, chahe wo stored procedure ke andar ho ya bahar plain SQL me.",
+    example: "Ek plain SQL script jaha hum ek intermediate value ek query se calculate karke @variable me store karte hain, aur usse agli query me use karte hain.",
+    sql: "-- User-defined session variable — persists across separate statements\nSET @max_salary = (SELECT MAX(salary) FROM employees);\nSELECT name FROM employees WHERE salary = @max_salary;\n\n-- Local variable — only valid inside this procedure's block\nDELIMITER //\nCREATE PROCEDURE ShowDoubleSalary(IN emp_id INT)\nBEGIN\n  DECLARE original_salary DECIMAL(10,2);\n  SELECT salary INTO original_salary FROM employees WHERE id = emp_id;\n  SELECT original_salary * 2 AS doubled;\nEND //\nDELIMITER ;",
+    output: "-- @max_salary remains usable in any later statement of the same session.\n-- original_salary only exists while ShowDoubleSalary is executing.",
+    mistakes: "Beginners local variable ko procedure ke bahar access karne ki koshish karte hain, jo error deta hai — DECLARE se bane variables ka scope strictly us BEGIN...END block tak hota hai. Ek aur mistake: user-defined @variables ko multi-threaded/concurrent contexts me bina samjhe use karna — ye session-specific hote hain, isliye alag connections ke beech share nahi hote (jo kabhi confusion create karta hai jab log ise 'global' samajh lete hain).",
+    interviewDefinition: "A DECLARE-based local variable is scoped strictly to the stored procedure or function block in which it is defined, whereas a user-defined @variable persists for the duration of the entire session and can be referenced across separate, independent SQL statements."
+  },
+  {
+    id: 137,
+    category: "Expert",
+    question: "What is the SIGNAL statement used for in MySQL?",
+    shortAnswer: "SIGNAL statement stored procedures/functions/triggers ke andar explicitly ek custom error (exception) raise karne ke liye use hota hai, jise ek custom SQLSTATE aur message ke saath application ko bheja ja sakta hai.",
+    explanation: "Kabhi-kabhi ek business rule violation ko database level par hi enforce karna hota hai — jaise 'agar koi stock 0 se kam hone wala ho, to operation ko reject karo ek clear error message ke saath'. SIGNAL statement isi ke liye hai — ye ek custom exception raise karta hai jise application layer (jaise PHP/Laravel) catch karke appropriately handle kar sakta hai, jaisi normal database errors (jaise constraint violations) handle karta hai. Ye triggers ke andar bhi commonly use hota hai kisi invalid operation ko explicitly reject karne ke liye.",
+    example: "Ek trigger jo stock ko negative hone se rokta hai, ek clear custom error message ke saath.",
+    sql: "DELIMITER //\nCREATE TRIGGER prevent_negative_stock\nBEFORE UPDATE ON products\nFOR EACH ROW\nBEGIN\n  IF NEW.stock < 0 THEN\n    SIGNAL SQLSTATE '45000'\n    SET MESSAGE_TEXT = 'Stock cannot be negative';\n  END IF;\nEND //\nDELIMITER ;",
+    output: "ERROR 1644 (45000): Stock cannot be negative\n(The application receives this custom, meaningful error instead of a generic constraint failure)",
+    mistakes: "Beginners generic database errors (jaise foreign key violations) par bharosa kar lete hain jab actually specific business rules ke liye clear, custom error messages dena zyada helpful hota — SIGNAL isi gap ko fill karta hai. Ek aur mistake: SQLSTATE '45000' (jo generic 'unhandled user-defined exception' ke liye hai) ke alawa koi random SQLSTATE value use karna bina uska meaning samjhe, jo application-side error handling ko confuse kar sakta hai.",
+    interviewDefinition: "The SIGNAL statement explicitly raises a custom exception within a stored procedure, function, or trigger, allowing a specific SQLSTATE and message to be returned to the calling application — commonly used to enforce business rules at the database level with clear, meaningful error messages."
+  },
+  {
+    id: 138,
+    category: "Expert",
+    question: "What is a Composite Foreign Key?",
+    shortAnswer: "Composite Foreign Key ek foreign key hai jo multiple columns se milkar bani hoti hai, jo dusre table ki ek composite primary/unique key ko reference karti hai — poora combination match hona chahiye, individual columns nahi.",
+    explanation: "Jab kisi table ki primary key composite ho (jaise 'order_id' + 'product_id' mil kar 'order_items' ki key banate hain), aur koi dusri table isse reference karna chahe, to us dusri table ko bhi wahi columns ka combination hold karna hoga ek composite foreign key ke through. Ye ensure karta hai ki referencing table ka data parent table ke exact composite key combination se hi match kare, individual columns se nahi.",
+    example: "'order_item_reviews' table jo (order_id, product_id) ke combination se 'order_items' table ko reference karti hai, taaki review sirf ek specific, valid order-product combination ke liye hi ho sake.",
+    sql: "CREATE TABLE order_items (\n  order_id INT,\n  product_id INT,\n  quantity INT,\n  PRIMARY KEY (order_id, product_id)\n);\n\nCREATE TABLE order_item_reviews (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  order_id INT,\n  product_id INT,\n  rating INT,\n  FOREIGN KEY (order_id, product_id)\n    REFERENCES order_items(order_id, product_id)\n);",
+    output: "Query OK, 0 rows affected  (x2)\n(order_item_reviews can only reference an (order_id, product_id) pair that actually exists together in order_items)",
+    mistakes: "Beginners composite foreign key define karte waqt columns ka order galat rakh dete hain (jo parent table ki composite key ke order se match nahi karta), jo error deta hai — dono taraf column order consistent hona chahiye. Ek aur mistake: sirf ek column ko individually foreign key bana dena jab actually poora combination reference karna zaroori tha, jisse data integrity poori tarah enforce nahi hoti.",
+    interviewDefinition: "A composite foreign key consists of multiple columns that together reference a composite primary or unique key in another table, requiring the entire combination of values to match rather than any individual column alone."
+  },
+  {
+    id: 139,
+    category: "Expert",
+    question: "What is the difference between a column-level constraint and a table-level constraint?",
+    shortAnswer: "Column-level constraint ek single column ke definition ke saath hi inline likha jata hai, jabki table-level constraint alag se, table definition ke end me likha jata hai — ye syntax difference matter karta hai jab constraint multiple columns ko involve kare (jaise composite keys).",
+    explanation: "Simple constraints (jaise ek single column par NOT NULL, ya ek single-column UNIQUE) column-level ya table-level, dono tarike se likhe ja sakte hain — result same hota hai. Lekin jab constraint multiple columns ko involve kare (jaise ek composite PRIMARY KEY, ya ek composite FOREIGN KEY, ya ek CHECK constraint jo do columns compare kare), tab table-level syntax zaroori ho jata hai, kyunki column-level syntax sirf ek single column ke context me hi likha ja sakta hai.",
+    example: "Ek single-column UNIQUE constraint column-level bhi likh sakte hain; ek composite PRIMARY KEY (do columns) sirf table-level hi likha ja sakta hai.",
+    sql: "-- Column-level constraint (single column)\nCREATE TABLE users (\n  id INT PRIMARY KEY,\n  email VARCHAR(100) UNIQUE\n);\n\n-- Table-level constraint (required for multi-column constraints)\nCREATE TABLE enrollments (\n  student_id INT,\n  course_id INT,\n  PRIMARY KEY (student_id, course_id)  -- must be table-level\n);",
+    output: "Query OK, 0 rows affected  (x2)\n(Both tables are created successfully with their respective constraint styles)",
+    mistakes: "Beginners composite key ko column-level syntax me likhne ki koshish karte hain (jaise har column ke saath alag 'PRIMARY KEY' likhna), jo do separate single-column primary keys banane ki koshish ki tarah interpret hota hai aur error deta hai — MySQL me ek table me sirf ek hi PRIMARY KEY definition allowed hai, aur composite ke liye table-level syntax mandatory hai.",
+    interviewDefinition: "A column-level constraint is defined inline with a single column's declaration, while a table-level constraint is defined separately at the end of the table definition — table-level syntax is required whenever a constraint spans multiple columns, such as a composite primary or foreign key."
+  },
+  {
+    id: 140,
+    category: "Expert",
+    question: "What is the SQL_MODE setting in MySQL, and what does STRICT_TRANS_TABLES do?",
+    shortAnswer: "SQL_MODE ek server setting hai jo MySQL ke SQL syntax aur data-validation behavior ko control karti hai; STRICT_TRANS_TABLES mode ensure karta hai ki invalid ya out-of-range data insert/update hone par MySQL usse silently truncate/adjust karne ki bajaye ek proper error throw kare.",
+    explanation: "Purane MySQL versions (aur kuch legacy configurations) me, agar aap ek column me galat-type ya bahut lambi value daalte the (jaise VARCHAR(5) me 10-character string), MySQL usse silently truncate karke bina error diye insert kar deta tha, ya invalid dates ko '0000-00-00' jaisi values me convert kar deta tha — ye silently data corruption create kar sakta tha bina developer ko pata chale. STRICT_TRANS_TABLES (aur related strict modes) is behavior ko badal dete hain — ab MySQL aisi situations me ek proper error throw karta hai, jisse problems turant application development ke dauran hi pakdi ja sakti hain, production me silently data corrupt hone se pehle. MySQL 5.7+ me strict mode by default ON hai.",
+    example: "Agar 'name VARCHAR(5)' column me 'Rahulkumar' (10 characters) insert karne ki koshish ho — strict mode ke bina ye silently 'Rahul' (truncate hokar) store ho jata; strict mode ke saath, MySQL error throw karega.",
+    sql: "-- Checking the current sql_mode\nSELECT @@sql_mode;\n\n-- Attempting an insert that violates the column length, with strict mode ON\nINSERT INTO users (name) VALUES ('Rahulkumar123456'); -- name VARCHAR(10)",
+    output: "ERROR 1406 (22001): Data too long for column 'name' at row 1\n(Without STRICT_TRANS_TABLES, this would have silently truncated instead of erroring)",
+    mistakes: "Beginners production issues face karte hain jaha silently truncated ya corrupted data unhe bahut baad me pata chalta hai, kyunki unka MySQL configuration strict mode ke bina chal raha tha. Ek aur mistake: application code (jaise Laravel migrations) test karte waqt local environment ka sql_mode production se different hona — isse local me kaam karne wala code production me unexpectedly error throw kar sakta hai (ya ulta), isliye environments ke beech consistency zaroori hai.",
+    interviewDefinition: "SQL_MODE is a server setting that governs MySQL's SQL syntax interpretation and data validation strictness; STRICT_TRANS_TABLES specifically causes invalid or out-of-range data to raise an error during INSERT/UPDATE rather than being silently truncated or adjusted, helping catch data integrity issues early rather than allowing silent corruption."
+  },
+  {
+    id: 141,
+    category: "Expert",
+    question: "What does the ONLY_FULL_GROUP_BY SQL mode do, and why does it matter?",
+    shortAnswer: "ONLY_FULL_GROUP_BY mode (jo MySQL 5.7.5+ me by default enabled hai) MySQL ko strictly enforce karne ke liye kehta hai ki SELECT list me har non-aggregated column ya to GROUP BY me ho, ya kisi aggregate function ke andar ho — warna query reject ho jaati hai.",
+    explanation: "Purane MySQL versions me (ya is mode ke disabled hone par), aap ek 'invalid' GROUP BY query likh sakte the jaha SELECT me aisi columns ho jo na GROUP BY me hon na aggregate function ke andar — MySQL aisi query ko silently allow kar deta tha aur us column ke liye group ke andar se 'kisi bhi ek arbitrary row' ki value pick kar leta tha (jo unpredictable aur potentially misleading result deta tha). ONLY_FULL_GROUP_BY is 'invalid' pattern ko poori tarah reject kar deta hai, force karta hai ki developer explicitly decide kare ki non-grouped columns ka kya karna hai (jaise unhe aggregate function me wrap karna, jaise ANY_VALUE() ya MAX()).",
+    example: "Ek query 'SELECT name, department, COUNT(*) FROM employees GROUP BY department' — is mode ke saath ye error dega kyunki 'name' na GROUP BY me hai na aggregate ke andar.",
+    sql: "-- This fails under ONLY_FULL_GROUP_BY:\n-- SELECT name, department, COUNT(*) FROM employees GROUP BY department;\n\n-- Fixed: explicitly indicate what to do with the non-grouped column\nSELECT ANY_VALUE(name) AS a_name, department, COUNT(*) AS total\nFROM employees\nGROUP BY department;",
+    output: "ERROR 1055 (42000): 'company.employees.name' isn't in GROUP BY clause and contains nonaggregated column\n(This is exactly what ONLY_FULL_GROUP_BY is designed to catch)",
+    mistakes: "Beginners purani, legacy queries (jo shayad ek purane MySQL server par likhi gayi thi) ko naye MySQL version par migrate karte waqt in errors se surprised ho jate hain — ye actually queries me pehle se maujood ek latent bug ko surface kar raha hota hai, naya bug create nahi kar raha. Ek aur mistake: is mode ko simply globally disable kar dena 'quick fix' ke liye, jo underlying ambiguous-query problem ko fix nahi karta, sirf usse chhupa deta hai.",
+    interviewDefinition: "ONLY_FULL_GROUP_BY is a SQL mode, enabled by default since MySQL 5.7.5, that rejects any GROUP BY query where a selected non-aggregated column is neither part of the GROUP BY clause nor wrapped in an aggregate function, preventing the previously allowed but unpredictable behavior of silently picking an arbitrary row's value for that column."
+  },
+  {
+    id: 142,
+    category: "Expert",
+    question: "In PHP, what is the difference between the mysqli extension and PDO for connecting to MySQL?",
+    shortAnswer: "mysqli sirf MySQL/MariaDB ke liye specifically banaya gaya extension hai (procedural aur object-oriented, dono styles support karta hai), jabki PDO (PHP Data Objects) ek database-agnostic abstraction layer hai jo same API ke saath MySQL, PostgreSQL, SQLite, aur kai dusre databases ko support karta hai.",
+    explanation: "mysqli MySQL-specific features (jaise multi-query support) ko directly expose karta hai, aur kuch cases me thoda better performance de sakta hai kyunki ye MySQL ke liye hi optimized hai. PDO ek zyada generic, driver-based approach follow karta hai — application code largely wahi rehta hai chahe underlying database MySQL ho ya PostgreSQL, sirf connection string (DSN) badalti hai. PDO named placeholders (jaise ':name') bhi support karta hai jo mysqli ke prepared statements (jo sirf positional '?' placeholders support karte hain) se zyada readable ho sakte hain. Modern frameworks (jaise Laravel) internally PDO use karte hain apne database abstraction ke liye, taaki multiple database drivers ko support kar sakein.",
+    example: "Ek application jo future me MySQL se PostgreSQL migrate ho sakti hai, PDO use karke migration ka effort kam kar sakti hai — application code largely same rahega.",
+    sql: "-- PDO example (conceptual PHP, not raw SQL):\n-- $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');\n-- $stmt->execute(['email' => $userInput]);\n\n-- mysqli example (conceptual PHP, not raw SQL):\n-- $stmt = $mysqli->prepare('SELECT * FROM users WHERE email = ?');\n-- $stmt->bind_param('s', $userInput);\n-- $stmt->execute();",
+    output: "-- Both prevent SQL injection via prepared statements — the difference\n-- is primarily API style and database portability, not core security.",
+    mistakes: "Beginners sochte hain ek dono me se genuinely 'better' hai har situation ke liye — actually choice project ki requirements par depend karta hai (multi-database support chahiye ya nahi, existing codebase kya use kar raha hai). Ek aur mistake: dono APIs ko mix kar dena ek hi project me (jaise kuch jagah mysqli, kuch jagah PDO), jo maintenance ko unnecessarily complex bana deta hai — ek hi approach consistently use karna best practice hai.",
+    interviewDefinition: "mysqli is a MySQL/MariaDB-specific PHP extension supporting both procedural and object-oriented styles, while PDO (PHP Data Objects) is a database-agnostic abstraction layer offering a consistent API across multiple database systems — frameworks like Laravel use PDO internally to support multiple database drivers with the same application code."
+  },
+  {
+    id: 143,
+    category: "Expert",
+    question: "How does a Laravel application configure its MySQL database connection, and what is a DSN?",
+    shortAnswer: "Laravel apni MySQL connection details (host, port, database name, username, password) '.env' file me store karta hai, jise 'config/database.php' read karke ek DSN (Data Source Name) — connection ki details wala ek single string — internally construct karta hai jab PDO se actually connect kiya jata hai.",
+    explanation: "'.env' file me sensitive/environment-specific values (jaise 'DB_HOST', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD') alag rakhi jaati hain, taaki alag-alag environments (local, staging, production) me alag configuration ho sake bina application code change kiye. Laravel ka 'config/database.php' in .env values ko read karta hai aur ek proper connection configuration banata hai, jo internally PDO ke liye ek DSN string me convert hoti hai (jaise 'mysql:host=127.0.0.1;dbname=my_app;port=3306') jisse actual connection establish hoti hai. Ye separation security ke liye bhi important hai — '.env' file ko version control (git) me commit nahi kiya jata, isliye sensitive credentials repository me expose nahi hote.",
+    example: "Ek Laravel project ka '.env' file local development me SQLite use kar raha ho, aur production me MySQL — bina application code me kuch change kiye, sirf '.env' values badal kar.",
+    sql: "-- Illustrative .env entries (not SQL):\n-- DB_CONNECTION=mysql\n-- DB_HOST=127.0.0.1\n-- DB_PORT=3306\n-- DB_DATABASE=my_app\n-- DB_USERNAME=root\n-- DB_PASSWORD=secret\n\n-- The resulting PDO DSN Laravel builds internally, conceptually:\n-- mysql:host=127.0.0.1;port=3306;dbname=my_app;charset=utf8mb4",
+    output: "-- Laravel uses this DSN, along with the username/password, to establish\n-- the actual PDO connection to the MySQL server when a query is first run.",
+    mistakes: "Beginners database credentials ko directly 'config/database.php' me hardcode kar dete hain (bajaye '.env' use karne ke), jisse alag-alag environments ke liye code change karna padta hai aur sensitive credentials accidentally version control me commit hone ka risk badh jata hai. Ek aur mistake: '.env' file ko '.gitignore' me shamil karna bhool jana, jisse credentials repository history me permanently expose ho sakte hain.",
+    interviewDefinition: "Laravel stores database connection details as environment-specific values in the .env file, which config/database.php reads to build the connection configuration that is ultimately assembled into a DSN (Data Source Name) — the connection string PDO uses to actually establish the database connection."
+  },
+  {
+    id: 144,
+    category: "Expert",
+    question: "What is the difference between a Soft Delete and a Hard Delete (Laravel context)?",
+    shortAnswer: "Hard Delete row ko database se permanently remove kar deta hai (SQL DELETE ke through), jabki Soft Delete row ko physically rakhta hai lekin usse ek 'deleted_at' timestamp column set karke 'deleted' mark kar deta hai — normal queries automatically aise rows ko exclude kar deti hain.",
+    explanation: "Real-world applications me aksar hume purana data poori tarah delete nahi karna hota — jaise audit/compliance requirements ke liye, ya accidentally delete hua data recover karne ke liye. Laravel ka Eloquent ORM 'SoftDeletes' trait provide karta hai jo isse automate kar deta hai: jab hum '$model->delete()' call karte hain, actual SQL DELETE nahi chalti — instead ek UPDATE chalti hai jo 'deleted_at' column ko current timestamp set kar deti hai. Normal Eloquent queries automatically 'WHERE deleted_at IS NULL' add kar deti hain (behind the scenes), isliye soft-deleted records default queries me nahi dikhte, lekin explicitly 'withTrashed()' se access kiye ja sakte hain, ya 'restore()' se wapas activate kiye ja sakte hain.",
+    example: "Ek user apna account 'delete' karta hai — Laravel usse soft-delete karta hai (deleted_at set karke), taaki agar user 30 din ke andar wapas aaye, account restore kiya ja sake, poora data dobara enter kiye bina.",
+    sql: "-- Soft delete mechanism, conceptually — Eloquent's delete() generates this:\nUPDATE users SET deleted_at = NOW() WHERE id = 42;\n\n-- Normal Eloquent queries automatically add this filter behind the scenes:\nSELECT * FROM users WHERE deleted_at IS NULL;\n\n-- A hard delete, by contrast, is irreversible:\nDELETE FROM users WHERE id = 42;",
+    output: "-- After a soft delete, the row for id=42 still exists in the table,\n-- but is invisible to standard queries (which filter deleted_at IS NULL).",
+    mistakes: "Beginners soft-deleted table par ek naya row insert karne ki koshish karte hain jab uniqueness (jaise 'email' UNIQUE) enforce karni ho — agar 'email' column par simple UNIQUE constraint hai, ek soft-deleted user ka email dobara use nahi ho payega kyunki wo row abhi bhi physically exist karti hai. Solution hai composite unique index (email + deleted_at) ya application-level handling. Ek aur mistake: sochna ki soft-deleted data automatically disk space bhi bacha raha hai — actually ye poora row abhi bhi physically store hota hai, isliye storage/growth considerations hard delete jaisi hi rehti hain.",
+    interviewDefinition: "A hard delete permanently removes a row from the database via SQL DELETE, whereas a soft delete (implemented in Laravel via the SoftDeletes trait) marks a row as deleted by setting a deleted_at timestamp while leaving it physically intact, allowing standard queries to automatically exclude it while still permitting recovery via an explicit restore."
+  },
+  {
+    id: 145,
+    category: "Expert",
+    question: "What is the read-after-write consistency problem when using MySQL read replicas, and how might a Laravel application handle it?",
+    shortAnswer: "Read-after-write consistency problem tab hota hai jab ek user data write karta hai (primary database par) aur turant baad usi data ko read karne ki koshish karta hai, lekin agar read ek replica se serve ho jo abhi tak sync nahi hua (replication lag), to user ko apna hi abhi-abhi kiya gaya change 'missing' dikh sakta hai.",
+    explanation: "Replication asynchronous hoti hai (Question 94/similar dekho) — matlab primary se replica tak change propagate hone me thoda time (usually milliseconds, lekin high-load me zyada bhi) lag sakta hai. Agar application logic 'writes primary par, reads replicas se' pattern follow kare bina is lag ko account kiye, to ek common bug ye hota hai: user ek naya comment post karta hai (primary par write), aur turant page reload karta hai jo comments ko replica se fetch karta hai — agar replica abhi tak sync nahi hua, user ka apna comment temporarily 'gayab' dikhta hai. Laravel applications me isse handle karne ke common tarike hain: (1) critical, 'just-written' data ke liye specifically primary connection force karna (jaise Laravel ke 'DB::connection()' ya 'sticky' option se), (2) ya application-level caching se turant response de dena jab tak replica catch up na kar le.",
+    example: "Ek user ek naya order place karta hai aur turant order-confirmation page dekhta hai — agar wo page data replica se read kare aur replica abhi tak sync na hua ho, order 'not found' jaisa dikh sakta hai.",
+    sql: "-- Laravel's 'sticky' read/write connection option (config/database.php), conceptually:\n-- 'read' => ['host' => [replica_ips]],\n-- 'write' => ['host' => [primary_ip]],\n-- 'sticky' => true,\n-- With sticky=true, any reads within the same request that follows a write\n-- are forced back to the primary connection, avoiding the lag issue.",
+    output: "-- Without 'sticky': a read immediately after a write might miss the just-written data.\n-- With 'sticky' enabled: that specific request's subsequent reads go to the primary.",
+    mistakes: "Beginners is problem ko notice hi nahi karte development me (kyunki local environment me typically ek hi database hota hai, replication hoti hi nahi), aur production me jaake unexpected 'data missing' bugs report hone lagte hain — ye ek classic 'works on my machine but not in production' scenario hai jo specifically replication-related hota hai. Ek aur mistake: har single read ko 'safety ke liye' primary se serve karna, jo replicas add karne ka poora fayda (read scaling) khatam kar deta hai — targeted solutions (jaise sticky sessions sirf just-written data ke liye) zyada balanced approach hain.",
+    interviewDefinition: "The read-after-write consistency problem occurs when a write is committed to the primary database but an immediately following read is served from a replica that hasn't yet caught up due to replication lag, making the just-written data appear temporarily missing — commonly mitigated in Laravel by routing reads within the same request back to the primary connection (a 'sticky' read strategy) after a write."
+  },
+  {
+    id: 146,
+    category: "Expert",
+    question: "What is Database Seeding, and what are Model Factories, in the context of Laravel testing?",
+    shortAnswer: "Database Seeding predefined, consistent data ko database me populate karne ka process hai (jaise initial admin user, ya default settings), jabki Model Factories realistic-looking, randomized fake data generate karte hain — dono mil kar testing aur local development ke liye database ko meaningful data se bhar dete hain.",
+    explanation: "Jab hum ek application develop ya test kar rahe hon, humein realistic data chahiye hota hai bina manually har baar UI se entries create kiye. Seeders specific, known data insert karte hain (jaise ek default admin account, ya fixed lookup values jaise 'countries' table). Factories random-lekin-realistic data generate karte hain (jaise naam, email, addresses — libraries jaise Faker use karke) — ye especially automated tests me useful hote hain jaha humein 'kisi bhi' valid user chahiye hota hai testing ke liye, exact values matter nahi karti. Factories ke saath hum easily 50 fake employees ek line of code se generate kar sakte hain, testing ke liye.",
+    example: "Ek test jo verify karta hai ki 'employees list page pagination sahi kaam karti hai' — Factory se 50 fake employees generate karke, phir pagination logic test karna.",
+    sql: "-- Conceptual PHP (Laravel), not raw SQL:\n-- Seeder: inserting known, fixed data\n-- User::create(['name' => 'Admin', 'email' => 'admin@example.com']);\n\n-- Factory: generating realistic fake data for testing\n-- Employee::factory()->count(50)->create();\n-- Each of the 50 records gets randomized (but realistic) names, emails, etc.",
+    output: "-- Seeders create the same, predictable data every time they run.\n-- Factories generate different randomized data on each run (unless a fixed seed is used).",
+    mistakes: "Beginners seeders aur factories ko interchangeably use kar dete hain — seeders 'known/fixed' data ke liye best hain (jaise ek default admin, ya required lookup tables jinke bina application chal hi nahi sakti), jabki factories 'bulk, randomized' testing data ke liye best hain. Ek aur mistake: production database par accidentally test/seed data run kar dena — seeders/factories ko strictly local/testing environments tak limit rakhna chahiye.",
+    interviewDefinition: "Database seeding populates the database with known, fixed data (such as default accounts or required lookup values), while model factories generate realistic but randomized fake data (typically via Faker) — both are commonly used together in Laravel to prepare a database for local development and automated testing without manual data entry."
+  },
+  {
+    id: 147,
+    category: "Expert",
+    question: "Why is VARCHAR(255) such a common default length choice, and when should you choose a more specific length?",
+    shortAnswer: "VARCHAR(255) historically popular hua kyunki purane MySQL versions me 255 characters tak ki length ko store karne ke liye sirf 1 byte length-prefix chahiye hota tha (256 se zyada length ke liye 2 bytes chahiye) — lekin 'har jagah bas 255 daal do' ek anti-pattern hai; column ki actual real-world requirement ke hisaab se specific, meaningful length choose karni chahiye.",
+    explanation: "255 ek somewhat 'historical/technical' number hai, business requirement nahi. Har VARCHAR column ke liye humein sochna chahiye — 'is field me realistically kitna text aa sakta hai?' — jaise 'country_code' shayad sirf 2-3 characters ka hona chahiye, 'phone_number' 15-20 characters, 'email' shayad 100-150 characters (RFC ke hisaab se technically 254 tak ja sakta hai, lekin practically bahut lamba email rare hai). Meaningful lengths choose karna documentation ki tarah kaam karta hai (agle developer ko pata chalta hai field ka intended use), aur kuch edge cases me storage/index efficiency ko bhi thoda improve karta hai.",
+    example: "Ek 'state_code' column ke liye VARCHAR(255) rakhna (jab actual data hamesha 2 characters ka hoga, jaise 'MH', 'DL') vs VARCHAR(2) ya VARCHAR(10) rakhna jo actual requirement ko reflect kare.",
+    sql: "-- Anti-pattern: arbitrary, oversized length that doesn't reflect real data\nCREATE TABLE demo_bad (state_code VARCHAR(255));\n\n-- Better: length reflects the actual expected data\nCREATE TABLE demo_good (state_code VARCHAR(10));",
+    output: "-- Both technically 'work' the same for typical queries — the difference\n-- is primarily about intent, documentation value, and minor storage/index efficiency.",
+    mistakes: "Beginners sochte hain VARCHAR(255) 'safe default' hai jo hamesha use kiya ja sakta hai bina soche — ye technically kaam to kar jata hai, lekin schema ki readability aur intent ko kharab karta hai, aur kabhi-kabhi genuinely bahut lambi values (jaise ek description field) ke liye actually insufficient bhi ho sakta hai, jisse baad me ALTER TABLE karna padta hai. Ek aur mistake: bahut zyada strict/chhoti length choose kar dena bina future growth consider kiye (jaise 'name VARCHAR(20)' jab kuch full names isse lambe ho sakte hain).",
+    interviewDefinition: "VARCHAR(255) became a common historical default partly because lengths up to 255 required only a single-byte length prefix internally, but blindly using it everywhere is an anti-pattern — column lengths should instead reflect the realistic maximum size of the actual data being stored, improving schema clarity and intent."
+  },
+  {
+    id: 148,
+    category: "Expert",
+    question: "What is the conceptual difference between a Backup and a Replica?",
+    shortAnswer: "Backup ek point-in-time snapshot hai jo data-loss/disaster recovery ke liye store kiya jata hai (aur normally 'stale'/offline hota hai jab tak restore na kiya jaye), jabki Replica ek continuously-updated, 'live' copy hai jo real-time (near real-time) queries serve karne ya failover ke liye ready rehta hai.",
+    explanation: "Ye ek common misconception hai ki 'agar humare paas replicas hain, hume backups ki zaroorat nahi'. Ye galat hai — replica primary ke changes ko turant reflect karta hai, isliye agar koi accidentally 'DELETE FROM orders' bina WHERE ke chala de primary par, wo galti turant (ya kuch second/minute ke andar) replica par bhi ho jayegi — replica isse 'protect' nahi karta. Backup specifically is scenario ke liye hai — ek purani, 'frozen' copy jisse hum wapas jaa sakte hain agar primary (aur uske replicas) me kuch galat ho jaye. Isliye robust production systems dono rakhte hain: replicas (scaling/availability ke liye) AUR regular backups (disaster recovery ke liye), ye do alag purposes serve karte hain.",
+    example: "Ek accidental 'DROP TABLE orders' production par — agar sirf replicas hain (koi backup nahi), ye galti turant replicas par bhi propagate ho jayegi, aur data poori tarah kho jayega. Ek recent backup se hi is scenario me recovery possible hai.",
+    sql: "-- Illustrative: replication propagates mistakes just as fast as correct changes\n-- (this is why it is NOT a substitute for backups)\nDROP TABLE orders; -- this mistake replicates to all read replicas almost immediately\n\n-- A backup taken before this mistake remains a safe, independent recovery point\n-- mysqldump --single-transaction mydb orders > orders_backup_2026-09-01.sql",
+    output: "-- Replicas: reflect mistakes almost as fast as correct data.\n-- Backups: remain isolated, unaffected 'snapshots' from before the mistake.",
+    mistakes: "Beginners replicas ko backup ka substitute samajh lete hain aur regular backup strategy hi implement nahi karte, jisse ek genuine disaster (jaise accidental data deletion, ya corruption) recover-unable ho jata hai. Ek aur mistake: backups lete rehna lekin unhe kabhi restore test na karna — ek backup jo actually restore nahi ho pata (corrupted ya incomplete) practically bekaar hai; periodic restore-testing zaroori hai.",
+    interviewDefinition: "A backup is a point-in-time, isolated snapshot retained specifically for disaster recovery, unaffected by subsequent changes (including mistakes) made to the live database, whereas a replica is a continuously synchronized live copy used for scaling reads or failover — replication propagates mistakes just as it propagates correct changes, so replicas do not substitute for a proper backup strategy."
+  },
+  {
+    id: 149,
+    category: "Expert",
+    question: "What should you consider when planning a major MySQL version upgrade (e.g., 5.7 to 8.0) for a production application?",
+    shortAnswer: "Key considerations me shamil hain: deprecated/removed features check karna (jaise Query Cache removal), default behavior changes (jaise ONLY_FULL_GROUP_BY, naye default character sets), application/ORM compatibility (jaise Laravel version support), aur ek tested rollback/staging plan before production deployment.",
+    explanation: "Major version upgrades sirf 'naye features milenge' nahi hote — inme aksar breaking changes bhi hote hain jo existing application ko silently affect kar sakte hain. Jaise MySQL 5.7 se 8.0 upgrade karte waqt: Query Cache poori tarah remove ho gaya (agar application/config ismein depend karta ho), ONLY_FULL_GROUP_BY default ON ho gaya (jo legacy 'invalid' GROUP BY queries ko break kar sakta hai), default authentication plugin change hua (jo purane clients/drivers ke saath connection issues create kar sakta hai), aur default character set/collation bhi change hue. Isliye best practice hai: pehle staging environment me full upgrade test karna (poori application ke saath, sirf schema nahi), application/ORM/driver compatibility explicitly check karna, aur agar sab theek lage, tabhi production me carefully (backup lekar, rollback plan ke saath) upgrade karna.",
+    example: "Ek Laravel application ko MySQL 5.7 se 8.0 upgrade karne se pehle staging environment me poori application (sabhi queries, migrations, reports) test karna — especially koi legacy GROUP BY queries jo ONLY_FULL_GROUP_BY ke wajah se break ho sakti hain.",
+    sql: "-- Checking version-specific compatibility issues before upgrading, e.g.:\nSELECT @@sql_mode;\nSHOW VARIABLES LIKE 'query_cache%'; -- confirm nothing critically depends on this\n\n-- After upgrading, verifying legacy queries still behave as expected\n-- (run the application's actual test suite against the new version)",
+    output: "-- The goal of this pre-upgrade check is to surface breaking changes\n-- (deprecated features, new default modes) before they hit production.",
+    mistakes: "Beginners production database ko directly (bina staging test kiye) major version upgrade kar dete hain, aur baad me subtle breakages (jaise kuch reports ka silently different output dena, ya specific queries ka error throw karna) discover karte hain — jo debug karna mushkil hota hai kyunki root cause 'version upgrade' turant obvious nahi hota. Ek aur mistake: sirf 'MySQL server' ko upgrade karna, application ke MySQL client library/driver (jaise PHP ka mysqlnd, ya specific PDO driver version) ki compatibility check kiye bina.",
+    interviewDefinition: "Planning a major MySQL version upgrade requires reviewing deprecated or removed features, changed default behaviors (such as stricter SQL modes), and application/driver compatibility, then validating the entire application against the new version in a staging environment with a tested rollback plan before applying the upgrade to production."
+  },
+  {
+    id: 150,
+    category: "Expert",
+    question: "How would you design database indexes for a multi-tenant SaaS application where data for many customers lives in shared tables?",
+    shortAnswer: "In a shared-table multi-tenant design, almost every query filters by 'tenant_id' (or 'company_id'), so tenant_id should almost always be the leftmost column in composite indexes — combined with whatever other columns each specific query pattern filters or sorts by.",
+    explanation: "Multi-tenant SaaS applications (jaha ek hi database ke tables me multiple customers/companies ka data ek saath rehta hai, ek 'tenant_id' column se differentiate hokar) me sabse important indexing principle hai: 'tenant_id' almost hamesha query ke WHERE clause me present hoga (kyunki har query kisi ek specific tenant ke data tak restricted honi chahiye, security aur performance dono ke liye). Isliye composite indexes ka pehla column (leftmost prefix rule ke hisaab se) hamesha 'tenant_id' hona chahiye, uske baad wo columns jo us specific query pattern ke liye filter/sort karte hain (jaise 'tenant_id + created_at' ek tenant ke recent records ke liye, ya 'tenant_id + status' ek tenant ke pending orders ke liye). Bina is principle ke, agar indexes sirf 'created_at' jaisi columns par bane hon (bina tenant_id ke), MySQL ko poori table (sabhi tenants ka data) scan karna pad sakta hai just ek tenant ka data dhoondne ke liye.",
+    example: "Ek SaaS 'orders' table jisme sabhi companies ka data ek saath hai — 'har company apne recent orders dekh sakti hai' feature ke liye 'idx(tenant_id, created_at)' composite index perfect hai.",
+    sql: "CREATE TABLE orders (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  tenant_id INT NOT NULL,\n  customer_name VARCHAR(150),\n  status VARCHAR(20),\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\n-- tenant_id first (leftmost), since nearly every query filters by it\nCREATE INDEX idx_tenant_created ON orders(tenant_id, created_at);\nCREATE INDEX idx_tenant_status ON orders(tenant_id, status);\n\n-- This query efficiently uses idx_tenant_created:\nSELECT * FROM orders\nWHERE tenant_id = 42\nORDER BY created_at DESC\nLIMIT 20;",
+    output: "-- Without tenant_id as the leftmost index column, this query would scan\n-- every tenant's rows before filtering/sorting for tenant_id = 42.",
+    mistakes: "Beginners indexes design karte waqt 'tenant_id' ko bhool jate hain ya usse index ke end me daal dete hain (jaise 'idx(created_at, tenant_id)'), jisse leftmost prefix rule ki wajah se index effectively useless ho jata hai us common query pattern ke liye. Ek aur mistake: application-level 'tenant scoping' (jaise Laravel me a global scope) implement karna lekin corresponding indexes na banana — application logic sahi hone ke bawajood, bina sahi indexes ke queries production scale par bahut slow ho jayengi.",
+    interviewDefinition: "In a shared-table multi-tenant architecture, since nearly every query filters by tenant_id, composite indexes should place tenant_id as the leftmost column — combined with whatever additional columns a specific query pattern filters or sorts by — ensuring MySQL can narrow down to a single tenant's rows efficiently rather than scanning across all tenants' data."
+  }
+];
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = QUESTIONS_101_150;
+}
