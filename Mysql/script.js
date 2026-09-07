@@ -1215,7 +1215,9 @@ const QUESTIONS = [
   }
 ];
 
-QUESTIONS.push(...QUESTIONS_101_150);
+QUESTIONS.push(...window.QUESTIONS_101_150);
+
+console.log(QUESTIONS.length);
 
 /* ================================ STATE ================================= */
 const state = {
