@@ -15,7 +15,7 @@
      const fullList = QUESTIONS.concat(QUESTIONS_101_150);
    ========================================================================= */
 
-const QUESTIONS_101_150 = [
+window.QUESTIONS_101_150 = [
   {
     id: 101,
     category: "Basic",
