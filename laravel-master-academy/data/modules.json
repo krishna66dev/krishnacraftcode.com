@@ -1,0 +1,325 @@
+{
+ "modules": [
+  {
+   "id": "m01",
+   "slug": "php-fundamentals-and-oop",
+   "title": "PHP Fundamentals and OOP",
+   "level": "beginner",
+   "icon": "code-slash",
+   "lessons": [
+    {
+     "id": "m01-l01",
+     "title": "PHP Basics: Variables, Data Types aur Operators",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m01-l02",
+     "title": "Control Flow, Functions aur Arrays",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m01-l03",
+     "title": "OOP Basics: Classes, Objects aur Constructors",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m01-l04",
+     "title": "Inheritance, Interfaces, Traits, Namespaces aur Composer",
+     "minutes": 45,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m02",
+   "slug": "laravel-introduction-and-installation",
+   "title": "Laravel Introduction and Installation",
+   "level": "beginner",
+   "icon": "rocket-takeoff",
+   "lessons": [
+    {
+     "id": "m02-l01",
+     "title": "Laravel Kya Hai aur Kaise Kaam Karta Hai",
+     "minutes": 25,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m02-l02",
+     "title": "Local Setup: PHP, Composer, Node aur Laravel Installer",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m02-l03",
+     "title": "Pehla Laravel Project Banana aur Chalana",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m02-l04",
+     "title": "Laravel Project Structure: Folder-by-Folder Tour",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m02-l05",
+     "title": "Configuration, .env aur Artisan Basics",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m03",
+   "slug": "laravel-architecture-and-mvc",
+   "title": "Laravel Architecture and MVC",
+   "level": "beginner",
+   "icon": "diagram-3",
+   "lessons": []
+  },
+  {
+   "id": "m04",
+   "slug": "routing-and-controllers",
+   "title": "Routing and Controllers",
+   "level": "beginner",
+   "icon": "signpost-split",
+   "lessons": [
+    {
+     "id": "m04-l01",
+     "title": "Laravel Routing \u2013 Basic to Advanced",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m04-l02",
+     "title": "Route Parameters aur Constraints",
+     "minutes": 20,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m05",
+   "slug": "blade-template-engine",
+   "title": "Blade Template Engine",
+   "level": "beginner",
+   "icon": "layout-text-window",
+   "lessons": []
+  },
+  {
+   "id": "m06",
+   "slug": "database-and-migrations",
+   "title": "Database and Migrations",
+   "level": "intermediate",
+   "icon": "database",
+   "lessons": []
+  },
+  {
+   "id": "m07",
+   "slug": "eloquent-orm",
+   "title": "Eloquent ORM",
+   "level": "intermediate",
+   "icon": "table",
+   "lessons": []
+  },
+  {
+   "id": "m08",
+   "slug": "eloquent-relationships",
+   "title": "Eloquent Relationships",
+   "level": "intermediate",
+   "icon": "link-45deg",
+   "lessons": []
+  },
+  {
+   "id": "m09",
+   "slug": "crud-operations",
+   "title": "CRUD Operations",
+   "level": "intermediate",
+   "icon": "pencil-square",
+   "lessons": []
+  },
+  {
+   "id": "m10",
+   "slug": "forms-and-validation",
+   "title": "Forms and Validation",
+   "level": "intermediate",
+   "icon": "ui-checks",
+   "lessons": []
+  },
+  {
+   "id": "m11",
+   "slug": "authentication",
+   "title": "Authentication",
+   "level": "intermediate",
+   "icon": "shield-lock",
+   "lessons": []
+  },
+  {
+   "id": "m12",
+   "slug": "authorization-and-permissions",
+   "title": "Authorization and Permissions",
+   "level": "intermediate",
+   "icon": "key",
+   "lessons": []
+  },
+  {
+   "id": "m13",
+   "slug": "middleware",
+   "title": "Middleware",
+   "level": "intermediate",
+   "icon": "funnel",
+   "lessons": []
+  },
+  {
+   "id": "m14",
+   "slug": "file-upload-and-storage",
+   "title": "File Upload and Storage",
+   "level": "intermediate",
+   "icon": "cloud-upload",
+   "lessons": []
+  },
+  {
+   "id": "m15",
+   "slug": "rest-api-development",
+   "title": "REST API Development",
+   "level": "advanced",
+   "icon": "braces",
+   "lessons": []
+  },
+  {
+   "id": "m16",
+   "slug": "laravel-sanctum-and-passport",
+   "title": "Laravel Sanctum and Passport",
+   "level": "advanced",
+   "icon": "shield-check",
+   "lessons": []
+  },
+  {
+   "id": "m17",
+   "slug": "events-listeners-and-queues",
+   "title": "Events, Listeners and Queues",
+   "level": "advanced",
+   "icon": "lightning-charge",
+   "lessons": []
+  },
+  {
+   "id": "m18",
+   "slug": "mail-and-notifications",
+   "title": "Mail and Notifications",
+   "level": "advanced",
+   "icon": "envelope",
+   "lessons": []
+  },
+  {
+   "id": "m19",
+   "slug": "broadcasting-and-websockets",
+   "title": "Broadcasting and WebSockets",
+   "level": "advanced",
+   "icon": "broadcast",
+   "lessons": []
+  },
+  {
+   "id": "m20",
+   "slug": "cache-and-redis",
+   "title": "Cache and Redis",
+   "level": "advanced",
+   "icon": "speedometer2",
+   "lessons": []
+  },
+  {
+   "id": "m21",
+   "slug": "testing-and-debugging",
+   "title": "Testing and Debugging",
+   "level": "advanced",
+   "icon": "bug",
+   "lessons": []
+  },
+  {
+   "id": "m22",
+   "slug": "security-and-performance",
+   "title": "Security and Performance",
+   "level": "advanced",
+   "icon": "lock",
+   "lessons": []
+  },
+  {
+   "id": "m23",
+   "slug": "advanced-laravel-architecture",
+   "title": "Advanced Laravel Architecture",
+   "level": "expert",
+   "icon": "cpu",
+   "lessons": []
+  },
+  {
+   "id": "m24",
+   "slug": "laravel-react-inertia",
+   "title": "Laravel + React + Inertia",
+   "level": "expert",
+   "icon": "window-stack",
+   "lessons": []
+  },
+  {
+   "id": "m25",
+   "slug": "saas-and-multi-tenancy",
+   "title": "SaaS and Multi-Tenancy",
+   "level": "expert",
+   "icon": "buildings",
+   "lessons": []
+  },
+  {
+   "id": "m26",
+   "slug": "deployment-and-production",
+   "title": "Deployment and Production",
+   "level": "expert",
+   "icon": "globe2",
+   "lessons": []
+  }
+ ]
+}

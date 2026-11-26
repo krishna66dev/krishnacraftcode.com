@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Playground · Laravel Master Academy</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
+<link rel="stylesheet" href="assets/css/tokens.css"><link rel="stylesheet" href="assets/css/base.css"><link rel="stylesheet" href="assets/css/layout.css">
+<script>try{var t=JSON.parse(localStorage.getItem('lma:theme'));if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-bs-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css"><link rel="stylesheet" href="assets/css/lesson.css">
+</head>
+<body data-page="playground">
+<main id="lma-main" class="lma-main lma-main-wide"><h1 class="h3">Code Playground</h1><p class="lma-muted">Code edit, copy aur compare kar sakte ho. PHP yahan run nahi hota, run karne ke liye apna Laravel project use karo.</p>
+<div class="lma-pg-bar"><label class="visually-hidden" for="pg-lang">Language</label><select id="pg-lang" class="form-select form-select-sm w-auto"><option value="php">PHP</option><option value="html">Blade / HTML</option><option value="js">JavaScript</option><option value="sql">SQL</option><option value="bash">Terminal</option></select>
+<button type="button" class="btn btn-sm btn-outline-secondary" id="pg-copy"><i class="bi bi-clipboard"></i> Copy</button><button type="button" class="btn btn-sm btn-outline-secondary" id="pg-reset">Reset</button><button type="button" class="btn btn-sm btn-outline-secondary" id="pg-compare" aria-pressed="false">Before / After</button></div>
+<div class="lma-pg-panes"><div class="lma-code"><div class="lma-code-head"><span>Aapka code (after)</span></div><textarea id="pg-code"></textarea></div><div class="lma-code d-none" id="pg-orig-wrap"><div class="lma-code-head"><span>Original (before)</span></div><textarea id="pg-orig" readonly></textarea></div></div></main>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+<script src="assets/js/core/config.js"></script><script src="assets/js/core/utils.js"></script><script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/data.js"></script><script src="assets/js/core/theme.js"></script><script src="assets/js/core/version.js"></script>
+<script src="assets/js/components/header.js"></script><script src="assets/js/components/sidebar.js"></script><script src="assets/js/core/ui.js"></script><script src="assets/js/core/course.js"></script><script src="assets/js/components/search.js"></script><script src="assets/js/core/shell.js"></script>
+<script src="assets/js/pages/dashboard.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+<script src="assets/js/components/progress.js"></script><script src="assets/js/components/code-block.js"></script><script src="assets/js/components/quiz.js"></script><script src="assets/js/pages/playground.js"></script></body>
+</html>

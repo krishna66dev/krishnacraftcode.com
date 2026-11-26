@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · Laravel Master Academy</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
+<link rel="stylesheet" href="assets/css/tokens.css"><link rel="stylesheet" href="assets/css/base.css"><link rel="stylesheet" href="assets/css/layout.css">
+<script>try{var t=JSON.parse(localStorage.getItem('lma:theme'));if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-bs-theme',t)}catch(e){}</script>
+</head>
+<body data-page="dashboard">
+<main id="lma-main" class="lma-main">
+<h1 class="h3 mb-4">Dashboard</h1>
+<section class="lma-dash" aria-label="Your progress"><div class="lma-card" id="d-continue"></div><div class="lma-statgrid" id="d-stats"></div></section>
+<section class="lma-dash" aria-label="Details"><div class="lma-card"><h2 class="h5">Module progress</h2><div id="d-chart"></div></div><div class="lma-card"><h2 class="h5">Recent lessons</h2><ul class="lma-recent" id="d-recent"></ul></div></section>
+<section aria-labelledby="v-h"><h2 class="h4 mb-3" id="v-h">Apna Laravel version chuno</h2><div class="lma-vers" id="lma-versions"></div></section></main>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+<script src="assets/js/core/config.js"></script><script src="assets/js/core/utils.js"></script><script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/data.js"></script><script src="assets/js/core/theme.js"></script><script src="assets/js/core/version.js"></script>
+<script src="assets/js/components/header.js"></script><script src="assets/js/components/sidebar.js"></script><script src="assets/js/core/ui.js"></script><script src="assets/js/core/course.js"></script><script src="assets/js/components/search.js"></script><script src="assets/js/core/shell.js"></script>
+<script src="assets/js/pages/dashboard.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script><script src="assets/js/pages/dashboard.js"></script></body>
+</html>

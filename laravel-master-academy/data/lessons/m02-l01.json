@@ -1,0 +1,173 @@
+{
+ "id": "m02-l01",
+ "title": "Laravel Kya Hai aur Kaise Kaam Karta Hai",
+ "minutes": 25,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Laravel kya hai aur framework ki zarurat kyun padti hai samajhna",
+  "Plain PHP aur Laravel ka farak dekhna",
+  "Browser request ka Laravel mein safar (high level) jaanna",
+  "Laravel ecosystem ke main tools pehchanna",
+  "Laravel 11, 12, 13 ke support aur PHP requirements jaanna"
+ ],
+ "prerequisites": [
+  "PHP Basics aur OOP (Module 01)"
+ ],
+ "sections": [
+  {
+   "heading": "Laravel kya hai?",
+   "body": "Laravel ek **web application framework** hai jiska syntax expressive aur saaf hai. Framework tumhe ek **structure aur starting point** deta hai, taaki tum login, database, email jaise common kaam baar-baar scratch se na likho.\n\nLaravel mein dependency injection, database abstraction layer, queues aur scheduled jobs, aur testing jaise powerful features milte hain.",
+   "callout": {
+    "kind": "tip",
+    "text": "Framework ko ghar ka ready-made structure samjho: neev, deewarein aur wiring pehle se hai. Tum sirf kamre apne hisaab se sajate ho."
+   }
+  },
+  {
+   "heading": "Real-world example: Restaurant",
+   "body": "Browser (customer) URL maangta hai. **Route** waiter hai jo order lekar sahi jagah bhejta hai. **Controller** kitchen ka head hai. **Model** store-room hai jahan se ingredients (data) aate hain. **View** plate hai jo customer ke saamne aati hai.\n\nHar role alag hai, isliye code organized rehta hai."
+  },
+  {
+   "heading": "Plain PHP vs Laravel",
+   "body": "Bina framework ke har URL ko `if` se check karna padta hai. Laravel mein ek line ka route kaafi hai.",
+   "code": [
+    {
+     "file": "index.php (plain PHP)",
+     "lang": "php",
+     "code": "<?php\n\n$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);\n\nif ($path === '/products') {\n    echo 'Product List';\n} elseif ($path === '/about') {\n    echo 'About';\n} else {\n    http_response_code(404);\n    echo 'Not found';\n}\n",
+     "editable": true
+    },
+    {
+     "file": "routes/web.php (Laravel)",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/products', fn () => 'Product List');\nRoute::get('/about', fn () => 'About');\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "Plain PHP mein 404, URL parsing sab khud likhna padta hai.",
+    "Laravel mein routing, 404 response, security aur baaki sab framework sambhalta hai."
+   ]
+  },
+  {
+   "heading": "Request ka safar (high level)",
+   "body": "Jab browser `/products` maangta hai, to Laravel mein yeh hota hai:\n\n- Request `public/index.php` se andar aati hai (yeh sab requests ka entry point hai).\n- Application boot hoti hai aur router URL ko kisi route se match karta hai.\n- Route ka closure ya controller chalta hai (zarurat ho to model se data aata hai).\n- Result ek response (HTML ya JSON) ban kar browser ko wapas jaata hai.\n\nIs safar ko detail mein Module 03 (Architecture and MVC) mein padhenge."
+  },
+  {
+   "heading": "Laravel ecosystem",
+   "body": "Laravel sirf framework nahi, tools ka poora ecosystem hai. Abhi naam jaan lo, aage ke modules mein har ek ko seekhenge:\n\n- **Artisan** – command line tool\n- **Blade** – template engine\n- **Eloquent** – database ORM\n- **Queues** – background jobs\n- **Sanctum / Passport** – API authentication\n- **Livewire / Inertia** – modern frontend ke tareeke\n- **Vite** – CSS/JS bundling\n- **Herd, Sail** – local development environments\n- **Laravel Cloud** – hosting platform"
+  }
+ ],
+ "versionDiff": {
+  "heading": "Laravel 11, 12 aur 13: support aur PHP",
+  "intro": "Teeno versions ka core idea same hai. Farak PHP requirement aur support dates mein hai.",
+  "items": {
+   "11": "PHP 8.2 se 8.4. March 12, 2024 ko release hua. Security fixes March 12, 2026 ko khatam ho gaye, yani ab yeh legacy hai. Naye project ke liye mat chuno.",
+   "12": "PHP 8.2 se 8.5. February 24, 2025 ko release hua. Bug fixes August 13, 2026 tak the, ab sirf security fixes February 24, 2027 tak milenge.",
+   "13": "PHP 8.3 se 8.5. March 2026 mein release hua. Bug fixes Q3 2027 tak aur security fixes Q1 2028 tak. Naye project ke liye yehi current version hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "Laravel ko subfolder se serve karna (jaise localhost/laravel/public)",
+   "cause": "Web server ka document root project ka `public` folder nahi hai. Isse `.env` jaisi private files expose ho sakti hain.",
+   "fix": "Document root hamesha `public` rakho. Local par `php artisan serve` ya Herd use karo."
+  },
+  {
+   "error": "Your PHP version does not satisfy the requirement",
+   "cause": "Laravel version ki minimum PHP se purana PHP chal raha hai.",
+   "fix": "`php -v` se check karo. Laravel 11/12 ko 8.2+, Laravel 13 ko 8.3+ chahiye."
+  },
+  {
+   "error": "Class/Interface samajh nahi aa raha (Laravel code confusing lagta hai)",
+   "cause": "PHP OOP (classes, interfaces, namespaces) ki neev kamzor hai.",
+   "fix": "Module 01 ke lesson dobara padho, phir yahan wapas aao."
+  }
+ ],
+ "debug": {
+  "body": "Setup shuru karne se pehle apna environment check karo.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php -v\ncomposer -V"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Apne shabdon mein samjho:",
+  "tasks": [
+   "Restaurant example ko apni pasand ke kisi doosre example se likho (jaise library ya hospital)",
+   "Plain PHP ke routing code mein ek aur page (`/contact`) jodo, phir socho Laravel mein kitni lines lagengi",
+   "Laravel ki official website par Release Notes khol kar 11, 12, 13 ke support dates dekho",
+   "`php -v` chalao aur check karo kaunsa Laravel version tumhare PHP par chalega"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Laravel kya hai?",
+   "options": [
+    "Ek programming language",
+    "Ek PHP web application framework",
+    "Ek database",
+    "Ek web browser"
+   ],
+   "answer": 1,
+   "why": "Laravel PHP ka framework hai. Language PHP hi rehti hai."
+  },
+  {
+   "q": "Laravel mein sab requests ka entry point kaunsi file hai?",
+   "options": [
+    "routes/web.php",
+    "app/Http/Kernel.php",
+    "public/index.php",
+    "artisan"
+   ],
+   "answer": 2,
+   "why": "`public/index.php` se request application mein daakhil hoti hai."
+  },
+  {
+   "q": "Laravel 13 ko minimum kaunsa PHP chahiye?",
+   "options": [
+    "PHP 8.1",
+    "PHP 8.2",
+    "PHP 8.3",
+    "PHP 8.5"
+   ],
+   "answer": 2,
+   "why": "Laravel 13 PHP 8.3 ya upar maangta hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is Laravel?",
+   "a": "Laravel ek open-source PHP web framework hai jo routing, database access, templating, queues, testing jaise features ek structured tareeke se deta hai."
+  },
+  {
+   "q": "Framework ka fayda kya hai?",
+   "a": "Common kaam (routing, security, database) ready milte hain, code organized rehta hai aur team ke liye maintain karna aasan hota hai."
+  },
+  {
+   "q": "Laravel kaun sa architectural pattern follow karta hai?",
+   "a": "MVC (Model-View-Controller) ka flexible version. Detail Module 03 mein."
+  },
+  {
+   "q": "Laravel ko `public` folder se hi serve kyun karte hain?",
+   "a": "Taaki `.env`, `app`, `vendor` jaisi private files web se access na ho sakein."
+  },
+  {
+   "q": "Laravel ke kuch popular packages batao.",
+   "a": "Sanctum (API auth), Livewire, Inertia, Horizon (queues dashboard), Telescope (debugging), Scout (search), Cashier (billing)."
+  }
+ ],
+ "summary": [
+  "Laravel PHP ka web framework hai, structure aur ready tools ke saath.",
+  "Route, controller, model aur view alag-alag roles sambhalte hain.",
+  "Sab requests `public/index.php` se andar aati hain.",
+  "Laravel 11 legacy hai, 12 mein sirf security fixes, 13 current hai.",
+  "Naye project ke liye supported version aur supported PHP chuno."
+ ]
+}

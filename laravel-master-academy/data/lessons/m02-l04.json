@@ -1,0 +1,204 @@
+{
+ "id": "m02-l04",
+ "title": "Laravel Project Structure: Folder-by-Folder Tour",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Har main folder ka kaam samajhna",
+  "`app`, `routes`, `resources`, `public`, `storage` ka farak jaanna",
+  "`bootstrap/app.php` ka role samajhna",
+  "Naye folders kab banenge yeh jaanna",
+  "Laravel 10 aur Laravel 11+ ke structure ka farak jaanna"
+ ],
+ "prerequisites": [
+  "Pehla Laravel Project Banana aur Chalana (m02-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "Real-world example: Ghar ka naksha",
+   "body": "Laravel project ek ghar jaisa hai. `routes` darwaza hai, `app` mein kamre (logic) hain, `resources/views` drawing room hai jo mehman dekhte hain, `storage` store-room hai, aur `public` ghar ka gate hai jo bahar ke logon se milta hai."
+  },
+  {
+   "heading": "Folder tree",
+   "body": "Naye Laravel project ka default structure kuch aisa dikhta hai:",
+   "code": [
+    {
+     "file": "project tree",
+     "lang": "text",
+     "code": "example-app/\n├── app/\n│   ├── Http/\n│   │   └── Controllers/\n│   ├── Models/\n│   └── Providers/\n├── bootstrap/        (app.php, providers.php, cache/)\n├── config/\n├── database/         (factories, migrations, seeders)\n├── public/           (index.php, assets)\n├── resources/        (css, js, views)\n├── routes/           (web.php, console.php)\n├── storage/          (app, framework, logs)\n├── tests/\n├── vendor/\n├── .env\n├── artisan\n├── composer.json\n└── package.json"
+    }
+   ],
+   "explain": [
+    "`app/` – tumhare application ka zyada tar code. Default mein sirf `Http`, `Models`, `Providers` hote hain. Baaki folders tab bante hain jab tum `make:` commands chalate ho.",
+    "`bootstrap/` – framework ko boot karne wali `app.php`, aur performance ke liye `cache/`.",
+    "`config/` – saari configuration files.",
+    "`database/` – migrations, factories, seeders.",
+    "`public/` – web server ka document root. `index.php` yahin hai aur images/CSS/JS bhi.",
+    "`resources/` – views aur raw CSS/JS.",
+    "`routes/` – `web.php` (browser routes) aur `console.php` (Artisan closure commands).",
+    "`storage/` – logs, cache, compiled views, uploaded files.",
+    "`tests/` – automated tests.",
+    "`vendor/` – Composer packages. Isme kabhi edit mat karo."
+   ]
+  },
+  {
+   "heading": "bootstrap/app.php: application ka control room",
+   "body": "Laravel 11 se routing, middleware aur exception handling yahin configure hoti hai. Yeh file tumhare version ke hisaab se thodi alag dikh sakti hai, par structure yahi rehta hai.",
+   "code": [
+    {
+     "file": "bootstrap/app.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Foundation\\Application;\nuse Illuminate\\Foundation\\Configuration\\Exceptions;\nuse Illuminate\\Foundation\\Configuration\\Middleware;\n\nreturn Application::configure(basePath: dirname(__DIR__))\n    ->withRouting(\n        web: __DIR__.'/../routes/web.php',\n        commands: __DIR__.'/../routes/console.php',\n        health: '/up',\n    )\n    ->withMiddleware(function (Middleware $middleware) {\n        //\n    })\n    ->withExceptions(function (Exceptions $exceptions) {\n        //\n    })->create();\n"
+    }
+   ],
+   "explain": [
+    "`withRouting()` – kaunsi route files load hongi. `health: '/up'` ek health-check URL deta hai.",
+    "`withMiddleware()` – global middleware yahin set hota hai (Module 13).",
+    "`withExceptions()` – errors kaise handle ya report hon."
+   ]
+  },
+  {
+   "heading": "public aur storage ka rishta",
+   "body": "User ki uploaded files `storage/app/public` mein rakhte hain, par browser sirf `public` folder dekh sakta hai. Isliye ek **symbolic link** banate hain:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan storage:link"
+    }
+   ],
+   "explain": [
+    "Yeh `public/storage` ko `storage/app/public` se jodta hai.",
+    "Baad mein file upload wale module (Module 14) mein ise dobara use karenge."
+   ]
+  },
+  {
+   "heading": "Optional route files",
+   "body": "Agar tumhe API ya broadcasting chahiye, to default project mein `api.php` aur `channels.php` nahi hote. Unhe yeh commands banate hain:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan install:api\nphp artisan install:broadcasting"
+    }
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Naya class chahiye? Folder khud mat banao, `php artisan make:controller`, `make:model` jaisi commands chalao. Woh sahi jagah aur sahi namespace mein file bana deti hain."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Laravel 10 aur 11, 12, 13 ka structure",
+  "intro": "Laravel 11 mein skeleton bahut slim hua. Laravel 12 aur 13 us layout ko hi aage badhate hain.",
+  "items": {
+   "11": "Slim skeleton: `app/Http/Kernel.php`, `app/Console/Kernel.php`, `app/Exceptions/Handler.php` aur `RouteServiceProvider` nahi hote. Yeh sab `bootstrap/app.php` mein configure hota hai.",
+   "12": "Layout 11 jaisa hi hai.",
+   "13": "Default `app` mein `Http`, `Models`, `Providers` hi hote hain. Layout 11 aur 12 jaisa hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "Class \"App\\Services\\Foo\" not found",
+   "cause": "File galat folder mein hai ya namespace folder path se match nahi karta.",
+   "fix": "Namespace aur folder path match karo, case-sensitive (Linux server), aur `composer dump-autoload` chalao."
+  },
+  {
+   "error": "The stream or file \"storage/logs/laravel.log\" could not be opened: Permission denied",
+   "cause": "`storage` ya `bootstrap/cache` par web server ko write permission nahi hai.",
+   "fix": "In folders ko web server user ke liye writable banao (jaise `chmod -R 775 storage bootstrap/cache` aur sahi owner)."
+  },
+  {
+   "error": "Uploaded file ka URL 404 de raha hai",
+   "cause": "`public/storage` link nahi bana.",
+   "fix": "`php artisan storage:link` chalao."
+  }
+ ],
+ "debug": {
+  "body": "Structure aur environment ka quick summary `php artisan about` deta hai. Registered routes `route:list` se dikhte hain.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan about\nphp artisan route:list\nphp artisan list make"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Project ka tour karo:",
+  "tasks": [
+   "Apne project mein har folder kholo aur ek line mein uska kaam likho",
+   "`php artisan make:controller TestController` chalao aur dekho file kahan bani",
+   "`bootstrap/app.php` kholo aur `withRouting()` ke arguments pehchano",
+   "`php artisan storage:link` chalao aur `public/storage` check karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Web server ka document root kaunsa folder hona chahiye?",
+   "options": [
+    "app",
+    "public",
+    "storage",
+    "bootstrap"
+   ],
+   "answer": 1,
+   "why": "Sirf `public` web se accessible hona chahiye."
+  },
+  {
+   "q": "Laravel 11+ mein routing aur middleware kahan configure hote hain?",
+   "options": [
+    "app/Http/Kernel.php",
+    "bootstrap/app.php",
+    "config/app.php",
+    "routes/web.php"
+   ],
+   "answer": 1,
+   "why": "Laravel 11 se `bootstrap/app.php` mein `withRouting()` aur `withMiddleware()` hain."
+  },
+  {
+   "q": "`php artisan storage:link` kya karta hai?",
+   "options": [
+    "Database link karta hai",
+    "`public/storage` ko `storage/app/public` se jodta hai",
+    "Cache clear karta hai",
+    "Server start karta hai"
+   ],
+   "answer": 1,
+   "why": "Yeh ek symbolic link banata hai taaki uploaded files browser se dikh sakein."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Laravel ka `app` folder kya hota hai?",
+   "a": "Application ka core code, PSR-4 se `App` namespace mein autoload hota hai. Default mein `Http`, `Models`, `Providers`."
+  },
+  {
+   "q": "`routes/web.php` aur `routes/console.php` mein farak?",
+   "a": "`web.php` browser ke HTTP routes (web middleware group ke saath: session, CSRF). `console.php` Artisan console commands ke liye."
+  },
+  {
+   "q": "`vendor` folder ka kya kaam hai? Ise commit kyun nahi karte?",
+   "a": "Composer ke packages hote hain. `composer install` se dobara ban sakta hai, isliye version control mein nahi daalte."
+  },
+  {
+   "q": "Laravel 11 ne structure mein kya badla?",
+   "a": "Skeleton slim hua: Kernel files, Handler aur RouteServiceProvider hataye gaye aur `bootstrap/app.php` mein configuration aayi."
+  },
+  {
+   "q": "`public/index.php` kya hai?",
+   "a": "Sab HTTP requests ka entry point, jo autoloader aur application bootstrap karke request handle karta hai."
+  }
+ ],
+ "summary": [
+  "`app` logic, `routes` URLs, `resources` views, `public` gate, `storage` generated files.",
+  "Laravel 11+ mein configuration `bootstrap/app.php` mein hai.",
+  "`make:` commands sahi folder aur namespace mein files banati hain.",
+  "`storage:link` se uploaded files public hoti hain.",
+  "Layout Laravel 11, 12, 13 mein lagbhag same hai."
+ ]
+}

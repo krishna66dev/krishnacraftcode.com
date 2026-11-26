@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Center · Laravel Master Academy</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
+<link rel="stylesheet" href="assets/css/tokens.css"><link rel="stylesheet" href="assets/css/base.css"><link rel="stylesheet" href="assets/css/layout.css">
+<script>try{var t=JSON.parse(localStorage.getItem('lma:theme'));if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-bs-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"><link rel="stylesheet" href="assets/css/lesson.css">
+</head>
+<body data-page="practice">
+<main id="lma-main" class="lma-main lma-main-wide"><h1 class="h3">Practice Center</h1><p class="lma-muted">Topic chuno, phir MCQs, assignments ya interview questions practice karo.</p>
+<label class="form-label small" for="pr-topic">Topic</label><select id="pr-topic" class="form-select form-select-sm w-auto mb-2"></select>
+<div id="pr-tabs"><div class="lma-tabs" role="tablist" aria-label="Practice sections"><button type="button" role="tab" data-tab="mcq">MCQs</button><button type="button" role="tab" data-tab="assign">Assignments</button><button type="button" role="tab" data-tab="iv">Interview questions</button></div>
+<section data-panel="mcq" role="tabpanel"><p class="lma-muted small" id="pr-mcq-meta"></p><div id="pr-mcq"></div></section>
+<section data-panel="assign" role="tabpanel" class="d-none"><div id="pr-assign"></div></section>
+<section data-panel="iv" role="tabpanel" class="d-none"><div class="d-flex flex-wrap gap-3 align-items-center mb-3"><label class="visually-hidden" for="pr-iq">Search questions</label><input id="pr-iq" class="form-control form-control-sm w-auto" type="search" placeholder="Question dhundo…"><span class="small lma-muted" id="pr-iq-meta"></span></div><div id="pr-iv"></div></section></div></main>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+<script src="assets/js/core/config.js"></script><script src="assets/js/core/utils.js"></script><script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/data.js"></script><script src="assets/js/core/theme.js"></script><script src="assets/js/core/version.js"></script>
+<script src="assets/js/components/header.js"></script><script src="assets/js/components/sidebar.js"></script><script src="assets/js/core/ui.js"></script><script src="assets/js/core/course.js"></script><script src="assets/js/components/search.js"></script><script src="assets/js/core/shell.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><script src="assets/js/components/progress.js"></script><script src="assets/js/components/code-block.js"></script><script src="assets/js/pages/practice.js"></script></body>
+</html>

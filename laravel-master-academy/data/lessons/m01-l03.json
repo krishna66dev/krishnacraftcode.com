@@ -1,0 +1,188 @@
+{
+ "id": "m01-l03",
+ "title": "OOP Basics: Classes, Objects aur Constructors",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Class aur object ka farak samajhna",
+  "Properties, methods aur `$this` use karna",
+  "Constructor property promotion likhna",
+  "`public`, `protected`, `private` visibility samajhna",
+  "`readonly` aur `static` ka use jaanna"
+ ],
+ "prerequisites": [
+  "Control Flow, Functions aur Arrays (m01-l02)"
+ ],
+ "sections": [
+  {
+   "heading": "OOP kya hai?",
+   "body": "Class ek **blueprint** hai, object uss blueprint se bana asli cheez. Jaise `Product` class ek blueprint hai, aur `Wireless Mouse` ek object.\n\nLaravel poora OOP par bana hai: Controller, Model, Request, sab classes hain. Isliye is lesson ko dhyan se samjho."
+  },
+  {
+   "heading": "Real-world example: Product class",
+   "body": "Product ke paas data hai (naam, price, stock) aur kaam hain (stock kam karna, availability batana). Data ko **properties** aur kaam ko **methods** kehte hain.",
+   "code": [
+    {
+     "file": "Product.php",
+     "lang": "php",
+     "code": "<?php\n\ndeclare(strict_types=1);\n\nclass Product\n{\n    public const CURRENCY = 'INR';\n\n    public function __construct(\n        public readonly string $name,\n        private float $price,\n        private int $stock = 0,\n    ) {}\n\n    public function price(): float\n    {\n        return $this->price;\n    }\n\n    public function isAvailable(): bool\n    {\n        return $this->stock > 0;\n    }\n\n    public function reduceStock(int $qty): void\n    {\n        if ($qty > $this->stock) {\n            throw new InvalidArgumentException('Stock kam hai');\n        }\n\n        $this->stock -= $qty;\n    }\n}\n\n$mouse = new Product('Wireless Mouse', 799.50, 12);\n$mouse->reduceStock(2);\n\necho $mouse->name;        // Wireless Mouse\necho $mouse->isAvailable() ? ' available' : ' out';\necho Product::CURRENCY;   // INR\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`__construct` – object banate hi chalta hai.",
+    "Constructor ke parameters mein `public`/`private` likhne se woh seedha property ban jaate hain (**constructor promotion**, PHP 8.0+).",
+    "`public` – kahin se bhi access. `private` – sirf isi class ke andar. `protected` – class aur uski child classes.",
+    "`readonly` – value ek baar set hone ke baad badal nahi sakti (PHP 8.1+).",
+    "`$this` – current object.",
+    "`new Product(...)` – object banata hai. `->` se property/method milti hai. `::` se constant ya static milta hai."
+   ]
+  },
+  {
+   "heading": "Static methods",
+   "body": "Static method object banaye bina class se hi call hota hai. Laravel ke `Route::get()` jaisi calls aise hi dikhti hain (asal mein woh Facades hain, jo aage seekhenge).",
+   "code": [
+    {
+     "file": "Slugger.php",
+     "lang": "php",
+     "code": "<?php\n\nclass Slugger\n{\n    public static function make(string $text): string\n    {\n        return strtolower(str_replace(' ', '-', trim($text)));\n    }\n}\n\necho Slugger::make('Laravel Routing Guide'); // laravel-routing-guide\n",
+     "editable": true
+    }
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Rule of thumb: properties ko `private` rakho, aur zarurat ho to hi `public` method do. Isse object ka data safe rehta hai."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "PHP 8.2 aur 8.3 ke OOP features",
+  "intro": "Laravel 11/12 minimum PHP 8.2 maangte hain, Laravel 13 minimum PHP 8.3. Isliye kuch OOP features sirf naye PHP par milte hain.",
+  "items": {
+   "11": "PHP 8.2+: `readonly class` available. Typed class constants (8.3) tabhi use karo jab pakka PHP 8.3 ho.",
+   "12": "Same as 11. PHP 8.2 se 8.5 tak.",
+   "13": "PHP 8.3 guaranteed hai, to typed class constants (`public const string X`) aur `#[\\Override]` safely use kar sakte ho."
+  },
+  "code": [
+   {
+    "file": "Product.php",
+    "lang": "php",
+    "code": "public const CURRENCY = 'INR';",
+    "variants": {
+     "11": "public const CURRENCY = 'INR';",
+     "12": "public const CURRENCY = 'INR';",
+     "13": "public const string CURRENCY = 'INR';"
+    }
+   },
+   {
+    "file": "Money.php",
+    "lang": "php",
+    "code": "readonly class Money\n{\n    public function __construct(\n        public int $amount,\n        public string $currency = 'INR',\n    ) {}\n}\n"
+   }
+  ]
+ },
+ "errors": [
+  {
+   "error": "Cannot modify readonly property Product::$name",
+   "cause": "`readonly` property ko object banne ke baad badalne ki koshish.",
+   "fix": "Naya object banao, ya property se `readonly` hatao agar badalna zaroori hai."
+  },
+  {
+   "error": "Cannot access private property Product::$price",
+   "cause": "Class ke bahar se `private` property padhi.",
+   "fix": "Public getter method (jaise `price()`) use karo."
+  },
+  {
+   "error": "Typed property must not be accessed before initialization",
+   "cause": "Typed property ko value diye bina padha.",
+   "fix": "Constructor mein value set karo ya default value do."
+  }
+ ],
+ "debug": {
+  "body": "Object ke andar kya hai dekhne ke liye `var_dump($obj)`. Type check ke liye `instanceof` aur `get_class()`.",
+  "code": [
+   {
+    "file": "debug.php",
+    "lang": "php",
+    "code": "var_dump($mouse);\nvar_dump($mouse instanceof Product); // true\necho get_class($mouse);              // Product\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "`Student` class banao:",
+  "tasks": [
+   "Constructor promotion se `name` (readonly) aur private `marks` (array) rakho",
+   "`average(): float` method likho",
+   "`grade(): string` method mein `match` ya `if` se grade return karo",
+   "Do students ke objects banakar result print karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Constructor property promotion kya hai?",
+   "options": [
+    "Constructor ko public banana",
+    "Constructor parameters ko seedha properties banana",
+    "Class ko inherit karna",
+    "Static method banana"
+   ],
+   "answer": 1,
+   "why": "Parameter ke saath `public`/`private` likhne se property apne aap ban jaati hai."
+  },
+  {
+   "q": "`private` property kahan se access hoti hai?",
+   "options": [
+    "Kahin se bhi",
+    "Sirf usi class ke andar",
+    "Class aur child classes se",
+    "Sirf static methods se"
+   ],
+   "answer": 1,
+   "why": "`private` sirf declare karne wali class ke andar visible hota hai."
+  },
+  {
+   "q": "`readonly` property ke baare mein sahi kya hai?",
+   "options": [
+    "Value baar-baar badal sakte hain",
+    "Ek baar set hone ke baad badal nahi sakti",
+    "Sirf static ho sakti hai",
+    "PHP 7 se hai"
+   ],
+   "answer": 1,
+   "why": "`readonly` PHP 8.1 se hai aur value ek baar hi set ho sakti hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Class aur object mein farak?",
+   "a": "Class blueprint hai, object uska instance (asli cheez) jo `new` se banta hai."
+  },
+  {
+   "q": "`public`, `protected`, `private` mein farak?",
+   "a": "`public` sab jagah, `protected` class aur child classes mein, `private` sirf usi class mein."
+  },
+  {
+   "q": "Constructor promotion ka fayda?",
+   "a": "Properties declare karne aur constructor mein assign karne ka boilerplate kam hota hai."
+  },
+  {
+   "q": "`static` method kab use karte hain?",
+   "a": "Jab object ki state ki zarurat na ho, jaise helper ya factory methods. Zyada use se testing mushkil hoti hai."
+  },
+  {
+   "q": "`$this` kya hai?",
+   "a": "Current object ka reference, jisse class ke andar properties aur methods access karte hain."
+  }
+ ],
+ "summary": [
+  "Class blueprint hai, object uska instance.",
+  "Properties data hain, methods kaam.",
+  "Constructor promotion boilerplate bachata hai.",
+  "Visibility: `public`, `protected`, `private`.",
+  "`readonly` (8.1+), `readonly class` (8.2+) aur typed constants (8.3+) naye PHP ke features hain."
+ ]
+}

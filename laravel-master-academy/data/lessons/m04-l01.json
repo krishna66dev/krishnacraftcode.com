@@ -1,0 +1,209 @@
+{
+ "id": "m04-l01",
+ "title": "Laravel Routing – Basic to Advanced",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Routing ka purpose aur request ka route tak ka safar samajhna",
+  "`Route::get()` aur baaki HTTP method routes likhna",
+  "Closure aur controller routes mein farak jaanna",
+  "Named routes banana aur `route()` helper se use karna",
+  "`php artisan route:list` se routes check karna"
+ ],
+ "prerequisites": [
+  "PHP basics aur functions (Module 01)",
+  "Laravel project install ho chuka ho (Module 02)",
+  "MVC ka basic idea (Module 03)"
+ ],
+ "sections": [
+  {
+   "heading": "Routing kya hoti hai?",
+   "body": "Jab browser mein koi URL khulta hai, Laravel ko decide karna padta hai ki **kaunsa code chalega**. Yeh decision routing karti hai. Simple bhasha mein: **URL + HTTP method** ko **code** se jodna.\n\nLaravel mein saare web routes `routes/web.php` file mein likhe jaate hain.",
+   "callout": {
+    "kind": "tip",
+    "text": "Route ko ek receptionist samjho: visitor (request) aata hai, receptionist dekhta hai kis department (controller/closure) ko bhejna hai."
+   }
+  },
+  {
+   "heading": "Real-world example: E-commerce website",
+   "body": "Ek online store mein yeh pages chahiye: Home, Products, Cart aur Checkout. Har page ka ek URL hota hai, aur har URL ke peeche ek route.\n\n- `/` – Home page\n- `/products` – Products list\n- `/cart` – Customer ki cart\n- `/checkout` – Order place karna (POST request)"
+  },
+  {
+   "heading": "Basic syntax",
+   "body": "Sabse chhota route ek URL aur ek closure leta hai. Neeche wala code edit karke dekho (PHP yahan run nahi hota, sirf practice ke liye).",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/products', function () {\n    return 'Product List';\n});\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`Route::get()` – sirf HTTP GET request handle karta hai.",
+    "`'/products'` – URL path hai (`http://localhost:8000/products`).",
+    "`function () {...}` – Closure hai, jo request aane par chalta hai.",
+    "`return 'Product List';` – Response browser ko wapas jaata hai."
+   ]
+  },
+  {
+   "heading": "Advanced example: controller aur named route",
+   "body": "Real projects mein closure ki jagah controller use hota hai, aur route ko ek **name** diya jaata hai taaki URL badle to poora code na badalna pade.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Http\\Controllers\\ProductController;\n\nRoute::get('/products/{id}', [ProductController::class, 'show'])\n    ->name('products.show');\n"
+    },
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Http\\Controllers;\n\nclass ProductController extends Controller\n{\n    public function show(string $id)\n    {\n        return \"Product #{$id}\";\n    }\n}\n"
+    },
+    {
+     "file": "resources/views/example.blade.php",
+     "lang": "html",
+     "code": "<a href=\"{{ route('products.show', ['id' => 5]) }}\">Product 5</a>\n"
+    }
+   ],
+   "explain": [
+    "`{id}` – route parameter hai, URL ka dynamic hissa.",
+    "`[ProductController::class, 'show']` – controller aur uska method.",
+    "`->name('products.show')` – route ka naam. `route('products.show', ['id' => 5])` sahi URL bana deta hai."
+   ]
+  },
+  {
+   "heading": "HTTP methods",
+   "body": "Har action ke liye alag method:\n\n- `Route::get()` – data padhna\n- `Route::post()` – naya data bhejna (form submit)\n- `Route::put()` / `Route::patch()` – update karna\n- `Route::delete()` – delete karna\n- `Route::any()` – koi bhi method\n\nHTML form sirf GET aur POST bhejta hai. PUT, PATCH, DELETE ke liye form mein `@method('PUT')` likhna padta hai.",
+   "callout": {
+    "kind": "tip",
+    "text": "Har POST form mein `@csrf` zaroor lagao, warna Laravel 419 error dega."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Laravel 11, 12 aur 13 mein farak",
+  "intro": "Routing ka syntax teeno versions mein lagbhag same hai. Farak project structure aur requirements mein hai.",
+  "items": {
+   "11": "Slim skeleton: sirf `routes/web.php` aur `routes/console.php` milte hain. API routes ke liye `php artisan install:api` chalao. Routing config `bootstrap/app.php` ke `withRouting()` mein hoti hai.",
+   "12": "Routing syntax 11 jaisa hi hai, structure bhi same. PHP 8.2 ya upar.",
+   "13": "Routing basics same. PHP 8.3 ya upar chahiye. Controllers par middleware aur policy checks attributes se declare kar sakte ho (optional). Exact syntax official docs se verify karo."
+  },
+  "code": [
+   {
+    "file": "composer.json",
+    "lang": "json",
+    "code": "\"require\": {\n    \"php\": \"^8.2\",\n    \"laravel/framework\": \"^12.0\"\n}",
+    "variants": {
+     "11": "\"require\": {\n    \"php\": \"^8.2\",\n    \"laravel/framework\": \"^11.0\"\n}",
+     "12": "\"require\": {\n    \"php\": \"^8.2\",\n    \"laravel/framework\": \"^12.0\"\n}",
+     "13": "\"require\": {\n    \"php\": \"^8.3\",\n    \"laravel/framework\": \"^13.0\"\n}"
+    }
+   }
+  ]
+ },
+ "errors": [
+  {
+   "error": "Route [products.show] not defined",
+   "cause": "`route()` mein naam galat hai ya route par `->name()` nahi lagaya.",
+   "fix": "Naam check karo aur `php artisan route:list` chalao."
+  },
+  {
+   "error": "404 Page Not Found",
+   "cause": "URL ya HTTP method route se match nahi hua.",
+   "fix": "URL ka spelling dekho. Agar routes cached hain to `php artisan route:clear` chalao."
+  },
+  {
+   "error": "Target class [ProductController] does not exist",
+   "cause": "Controller ka `use` statement missing hai ya naam galat hai.",
+   "fix": "File ke upar `use App\\Http\\Controllers\\ProductController;` likho."
+  }
+ ],
+ "debug": {
+  "body": "Routing ki problem mein sabse pehle saare registered routes dekho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan route:list\nphp artisan route:list --name=products\nphp artisan route:clear"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "`routes/web.php` mein yeh routes banao aur browser mein test karo:",
+  "tasks": [
+   "Home route (`/`) jo 'Welcome' return kare",
+   "About route (`/about`)",
+   "Contact route (`/contact`)",
+   "Product route (`/products/{id}`) jo `ProductController@show` call kare, naam `products.show`"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Route::get() ka purpose kya hai?",
+   "options": [
+    "Database records insert karna",
+    "HTTP GET requests handle karna",
+    "Files delete karna",
+    "Cache clear karna"
+   ],
+   "answer": 1,
+   "why": "`Route::get()` sirf GET requests ko handle karta hai."
+  },
+  {
+   "q": "Saare registered routes dekhne ki command kaunsi hai?",
+   "options": [
+    "php artisan routes",
+    "php artisan route:list",
+    "php artisan list:routes",
+    "php artisan show"
+   ],
+   "answer": 1,
+   "why": "`php artisan route:list` sab routes dikhata hai."
+  },
+  {
+   "q": "Named route ka fayda kya hai?",
+   "options": [
+    "Route tez chalta hai",
+    "URL badle to code mein har jagah badalna nahi padta",
+    "Route secure ho jaata hai",
+    "Controller ki zarurat nahi padti"
+   ],
+   "answer": 1,
+   "why": "`route('name')` URL khud bana deta hai, to URL badalne par sirf route definition badalni padti hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is Laravel routing?",
+   "a": "Routing URL aur HTTP method ko closure ya controller action se map karti hai. Web routes `routes/web.php` mein hote hain."
+  },
+  {
+   "q": "Difference between GET and POST?",
+   "a": "GET data padhne ke liye hai aur URL mein parameters jaate hain. POST data bhejne ke liye hai (body mein) aur Laravel mein CSRF token chahiye."
+  },
+  {
+   "q": "What is named routing?",
+   "a": "Route ko `->name()` se naam dena, taaki `route('naam')` se URL generate ho."
+  },
+  {
+   "q": "Closure route aur controller route mein kya farak hai?",
+   "a": "Closure chhote kaam ke liye theek hai. Controller organized rehta hai, aur `route:cache` bhi controller routes ke saath hi chalta hai."
+  },
+  {
+   "q": "Route parameter kya hota hai?",
+   "a": "URL ka dynamic hissa, jaise `/products/{id}`. Value controller ya closure ko argument ke roop mein milti hai."
+  }
+ ],
+ "summary": [
+  "Routing URL + method ko code se jodti hai.",
+  "Web routes `routes/web.php` mein likhte hain.",
+  "Controller routes aur named routes real projects mein standard hain.",
+  "Debugging ke liye `php artisan route:list` use karo.",
+  "Syntax 11, 12, 13 mein same hai. PHP requirement 13 mein 8.3 hai."
+ ]
+}

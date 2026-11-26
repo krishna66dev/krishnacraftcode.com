@@ -1,0 +1,202 @@
+{
+ "id": "m01-l02",
+ "title": "Control Flow, Functions aur Arrays",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`if`, `match` aur `foreach` se logic likhna",
+  "Typed functions, default values aur named arguments use karna",
+  "Arrow functions (`fn`) samajhna",
+  "Indexed aur associative arrays banana",
+  "`array_map`, `array_filter`, `array_sum` use karna"
+ ],
+ "prerequisites": [
+  "PHP Basics: Variables, Data Types aur Operators (m01-l01)"
+ ],
+ "sections": [
+  {
+   "heading": "Decisions: if aur match",
+   "body": "Program ko decision lene ke liye `if` use hota hai. Jab ek value ke kai options ho, to `match` zyada saaf hota hai (PHP 8.0+). `match` strict comparison (`===`) karta hai aur value return karta hai.",
+   "code": [
+    {
+     "file": "flow.php",
+     "lang": "php",
+     "code": "<?php\n\n$stock = 4;\n\nif ($stock > 10) {\n    echo 'Plenty';\n} elseif ($stock > 0) {\n    echo 'Low stock';\n} else {\n    echo 'Out of stock';\n}\n\n$status = 'shipped';\n\n$message = match ($status) {\n    'pending'   => 'Order process ho raha hai',\n    'shipped'   => 'Order bhej diya gaya',\n    'delivered' => 'Order mil gaya',\n    default     => 'Unknown status',\n};\n\necho $message;\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`match` ek value return karta hai, isliye seedha `$message` mein store ho gaya.",
+    "Agar koi arm match na kare aur `default` na ho, to `UnhandledMatchError` aata hai."
+   ]
+  },
+  {
+   "heading": "Real-world example: Shopping cart",
+   "body": "Cart ek array hai, jisme har item ek chhota array hai (name, price, qty). Total nikalne ke liye `foreach` se har item par loop chalate hain.",
+   "code": [
+    {
+     "file": "cart.php",
+     "lang": "php",
+     "code": "<?php\n\n$cart = [\n    ['name' => 'Mouse',    'price' => 799,  'qty' => 2],\n    ['name' => 'Keyboard', 'price' => 1499, 'qty' => 1],\n];\n\n$total = 0;\n\nforeach ($cart as $item) {\n    $total += $item['price'] * $item['qty'];\n}\n\necho \"Total: {$total}\"; // 3097\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`['name' => 'Mouse', ...]` – associative array (key => value).",
+    "`$item['price']` – key se value nikalte hain.",
+    "`+=` – total mein jodta jaata hai."
+   ]
+  },
+  {
+   "heading": "Functions",
+   "body": "Function ek reusable code block hai. Parameters aur return ka type likhna achhi aadat hai. PHP 8 mein **named arguments** se order ki chinta nahi rehti.",
+   "code": [
+    {
+     "file": "functions.php",
+     "lang": "php",
+     "code": "<?php\n\ndeclare(strict_types=1);\n\nfunction lineTotal(int $price, int $qty = 1): int\n{\n    return $price * $qty;\n}\n\necho lineTotal(799, 2);          // 1598\necho lineTotal(qty: 3, price: 100); // 300\n\n$gst = fn (int $amount): float => $amount * 0.18;\n\necho $gst(1000); // 180\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`int $qty = 1` – default value; argument na do to 1 lagega.",
+    "`qty: 3, price: 100` – named arguments.",
+    "`fn (...) => ...` – arrow function, ek line ka chhota function. Bahar ke variables apne aap mil jaate hain."
+   ]
+  },
+  {
+   "heading": "Array functions",
+   "body": "Arrays par kaam karne ke liye built-in functions hain. Laravel mein inka bada version **Collections** hai (aage ke modules mein).",
+   "code": [
+    {
+     "file": "arrays.php",
+     "lang": "php",
+     "code": "<?php\n\n$prices = [799, 1499, 250];\n\n$withGst   = array_map(fn ($p) => $p * 1.18, $prices);\n$expensive = array_filter($prices, fn ($p) => $p > 500);\n\necho array_sum($prices); // 2548\necho count($prices);     // 3\n\nprint_r($expensive);     // [0 => 799, 1 => 1499]\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`array_map` – har element par function chalata hai, naya array deta hai.",
+    "`array_filter` – sirf wahi elements rakhta hai jinke liye function `true` de. Original keys bani rehti hain.",
+    "`array_sum`, `count` – total aur length."
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Laravel mein `collect($prices)->map(...)->filter(...)` likhte hain. Concept yahi hai, bas syntax aur saaf hota hai."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Version notes",
+  "intro": "Control flow, functions aur arrays ka behaviour teeno Laravel versions mein same hai (sab PHP 8.2+ par chalte hain).",
+  "items": {
+   "11": "`match`, named arguments, arrow functions sab available hain (PHP 8.2+).",
+   "12": "Same as 11.",
+   "13": "Same as 11. Minimum PHP 8.3 hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "Warning: Undefined array key \"qty\"",
+   "cause": "Array mein woh key nahi hai jo tum padh rahe ho.",
+   "fix": "Key ka spelling dekho, ya `$item['qty'] ?? 1` se default do."
+  },
+  {
+   "error": "TypeError: lineTotal(): Argument #1 ($price) must be of type int, string given",
+   "cause": "`strict_types=1` ke saath string pass ki.",
+   "fix": "Int pass karo ya `(int) $value` se cast karo."
+  },
+  {
+   "error": "Fatal error: Cannot redeclare lineTotal()",
+   "cause": "Same naam ka function do baar define hua (aksar file do baar include hone se).",
+   "fix": "Function ek hi jagah define karo, aur `require_once` use karo."
+  }
+ ],
+ "debug": {
+  "body": "Array ko readable form mein dekhne ke liye `print_r()` ko `<pre>` ke saath use karo (browser mein), ya terminal mein seedha `print_r()`/`var_dump()`.",
+  "code": [
+   {
+    "file": "debug.php",
+    "lang": "php",
+    "code": "echo '<pre>';\nprint_r($cart);\necho '</pre>';\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "`practice.php` mein yeh karo:",
+  "tasks": [
+   "Ek `$marks` array banao (5 numbers) aur average nikalo",
+   "`match` se marks ko grade (A/B/C) do",
+   "Ek function `average(array $nums): float` likho",
+   "`array_filter` se 40 se kam marks wale subjects nikalo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`match` kis type ki comparison karta hai?",
+   "options": [
+    "Loose (`==`)",
+    "Strict (`===`)",
+    "Koi comparison nahi",
+    "Sirf strings ki"
+   ],
+   "answer": 1,
+   "why": "`match` strict comparison karta hai aur value return karta hai."
+  },
+  {
+   "q": "`array_filter` kya karta hai?",
+   "options": [
+    "Array sort karta hai",
+    "Condition pass karne wale elements rakhta hai",
+    "Array ki length deta hai",
+    "Array ko string banata hai"
+   ],
+   "answer": 1,
+   "why": "`array_filter` callback ke `true` dene par hi element rakhta hai."
+  },
+  {
+   "q": "Named argument ka example kaunsa hai?",
+   "options": [
+    "lineTotal(100, 3)",
+    "lineTotal(qty: 3, price: 100)",
+    "lineTotal[qty => 3]",
+    "lineTotal(->qty(3))"
+   ],
+   "answer": 1,
+   "why": "Named arguments `naam: value` format mein likhte hain."
+  }
+ ],
+ "interview": [
+  {
+   "q": "`match` aur `switch` mein farak?",
+   "a": "`match` strict comparison karta hai, value return karta hai, fall-through nahi hota aur match na ho to `UnhandledMatchError` deta hai."
+  },
+  {
+   "q": "Arrow function kya hai?",
+   "a": "`fn ($x) => expression` – ek expression wala chhota function jo parent scope ke variables automatically capture karta hai."
+  },
+  {
+   "q": "Indexed aur associative array mein farak?",
+   "a": "Indexed array mein keys numbers (0, 1, 2) hoti hain. Associative mein keys naam hote hain (`'name' => 'Mouse'`)."
+  },
+  {
+   "q": "`array_map` aur `foreach` mein kab kya use karein?",
+   "a": "Jab har element ko transform karke naya array chahiye to `array_map`. Jab side effects ya complex logic ho to `foreach`."
+  },
+  {
+   "q": "Named arguments ka fayda?",
+   "a": "Order ki chinta nahi rehti, aur code padhne mein saaf hota hai, khaaskar jab bahut optional parameters hon."
+  }
+ ],
+ "summary": [
+  "`if` aur `match` se decisions lete hain; `match` strict hai.",
+  "`foreach` arrays par loop chalata hai.",
+  "Typed functions, default values aur named arguments code ko saaf banate hain.",
+  "`array_map`, `array_filter`, `array_sum` arrays ke liye kaam ke tools hain.",
+  "Laravel Collections inhi ideas par bane hain."
+ ]
+}

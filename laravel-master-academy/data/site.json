@@ -1,0 +1,5 @@
+{"versions":[
+ {"id":"11","label":"Laravel 11","status":"Legacy","tone":"muted","php":"8.2 – 8.4","released":"Mar 12, 2024","bugFixes":"Sep 3, 2025","security":"Mar 12, 2026","highlights":"Slimmer application skeleton, per-second rate limiting, health route."},
+ {"id":"12","label":"Laravel 12","status":"Security fixes only","tone":"warn","php":"8.2 – 8.5","released":"Feb 24, 2025","bugFixes":"Aug 13, 2026","security":"Feb 24, 2027","highlights":"Few breaking changes, new starter kits, same structure as 11."},
+ {"id":"13","label":"Laravel 13","status":"Current","tone":"ok","php":"8.3 – 8.5","released":"Q1 2026","bugFixes":"Q3 2027","security":"Q1 2028","highlights":"PHP Attributes, Laravel AI SDK, JSON:API resources, vector search, queue routing."}
+]}

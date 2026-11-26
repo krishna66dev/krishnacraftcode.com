@@ -1,0 +1,219 @@
+{
+ "id": "m01-l04",
+ "title": "Inheritance, Interfaces, Traits, Namespaces aur Composer",
+ "minutes": 45,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`extends` se inheritance aur abstract classes samajhna",
+  "Interface (contract) banana aur implement karna",
+  "Trait se code reuse karna",
+  "Namespace aur `use` statement likhna",
+  "Composer PSR-4 autoloading samajhna"
+ ],
+ "prerequisites": [
+  "OOP Basics: Classes, Objects aur Constructors (m01-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "Inheritance aur abstract class",
+   "body": "Child class parent ki properties aur methods le leti hai (`extends`). **Abstract class** ka object nahi banta; woh sirf base ka kaam karti hai aur child ko kuch methods likhne par majboor karti hai.",
+   "code": [
+    {
+     "file": "Notification.php",
+     "lang": "php",
+     "code": "<?php\n\nabstract class Notification\n{\n    abstract public function message(): string;\n\n    public function send(): void\n    {\n        echo $this->message();\n    }\n}\n\nclass OrderShipped extends Notification\n{\n    public function __construct(private string $orderId) {}\n\n    public function message(): string\n    {\n        return \"Order {$this->orderId} ship ho gaya\";\n    }\n}\n\n(new OrderShipped('A101'))->send();\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`abstract public function message()` – body nahi hai; child ko likhni padegi.",
+    "`send()` parent mein ek baar likha, har child use karega.",
+    "`(new OrderShipped('A101'))->send()` – object banakar seedha method call."
+   ]
+  },
+  {
+   "heading": "Real-world example: Interface aur payment gateway",
+   "body": "Checkout ko farak nahi padna chahiye ki payment Razorpay se ho ya Stripe se. Isliye ek **interface** (contract) banate hain jo batata hai ki gateway ke paas kya methods honge. Laravel mein isi idea ko \"Contracts\" kehte hain.",
+   "code": [
+    {
+     "file": "checkout.php",
+     "lang": "php",
+     "code": "<?php\n\ninterface PaymentGateway\n{\n    public function charge(int $amount): bool;\n}\n\nclass RazorpayGateway implements PaymentGateway\n{\n    public function charge(int $amount): bool\n    {\n        return $amount > 0; // asli API call yahan aayegi\n    }\n}\n\nclass CheckoutService\n{\n    public function __construct(private PaymentGateway $gateway) {}\n\n    public function pay(int $amount): bool\n    {\n        return $this->gateway->charge($amount);\n    }\n}\n\n$checkout = new CheckoutService(new RazorpayGateway());\nvar_dump($checkout->pay(500)); // true\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`CheckoutService` interface par depend karta hai, concrete class par nahi.",
+    "Gateway badalna ho to sirf ek nayi class likho jo `PaymentGateway` implement kare.",
+    "Laravel ka **service container** aage ke module mein yeh objects khud inject karega."
+   ]
+  },
+  {
+   "heading": "Traits",
+   "body": "Trait ek aisa code bundle hai jo kai classes mein `use` se paste ho jaata hai. Laravel ke `HasFactory` aur `Notifiable` traits yahi hain.",
+   "code": [
+    {
+     "file": "HasSlug.php",
+     "lang": "php",
+     "code": "<?php\n\ntrait HasSlug\n{\n    public function slug(): string\n    {\n        return strtolower(str_replace(' ', '-', $this->title));\n    }\n}\n\nclass Post\n{\n    use HasSlug;\n\n    public function __construct(public string $title) {}\n}\n\necho (new Post('Hello Laravel'))->slug(); // hello-laravel\n",
+     "editable": true
+    }
+   ]
+  },
+  {
+   "heading": "Namespaces aur Composer autoloading",
+   "body": "Namespace class ke naam ko ek \"address\" deta hai taaki do classes ka naam same ho to takraav na ho. Laravel mein `App\\Services\\CheckoutService` ki file `app/Services/CheckoutService.php` mein honi chahiye. Composer ki **PSR-4** setting yeh mapping sambhalti hai, to tumhe `require` nahi likhna padta.",
+   "code": [
+    {
+     "file": "app/Services/CheckoutService.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Services;\n\nuse App\\Contracts\\PaymentGateway;\n\nclass CheckoutService\n{\n    public function __construct(private PaymentGateway $gateway) {}\n}\n"
+    },
+    {
+     "file": "composer.json",
+     "lang": "json",
+     "code": "\"autoload\": {\n    \"psr-4\": {\n        \"App\\\\\": \"app/\"\n    }\n}"
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "composer dump-autoload"
+    }
+   ],
+   "explain": [
+    "`namespace App\\Services;` – folder `app/Services` ke barabar.",
+    "`use App\\Contracts\\PaymentGateway;` – doosre namespace ki class ko chhote naam se use karne ke liye.",
+    "`composer dump-autoload` – naye class files ka map dobara banata hai."
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Linux server par file aur folder ke naam **case-sensitive** hote hain. `Services` aur `services` alag hain. Windows par chal jaata hai, server par fail hota hai."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Laravel 11, 12 aur 13 mein farak",
+  "intro": "PSR-4 mapping (`App\\` -> `app/`) teeno versions mein same hai. Farak project skeleton aur PHP version mein hai.",
+  "items": {
+   "11": "Slim skeleton: `app/Http/Kernel.php` aur `app/Console/Kernel.php` nahi hote. Middleware aur routing `bootstrap/app.php` mein configure hote hain.",
+   "12": "Skeleton 11 jaisa hi hai. Autoloading same.",
+   "13": "Autoloading same. PHP 8.3+ guaranteed hai, to `#[\\Override]` se confirm kar sakte ho ki method sach mein parent ko override kar raha hai."
+  },
+  "code": [
+   {
+    "file": "OrderShipped.php",
+    "lang": "php",
+    "code": "public function message(): string\n{\n    return \"Order {$this->orderId} ship ho gaya\";\n}",
+    "variants": {
+     "11": "public function message(): string\n{\n    return \"Order {$this->orderId} ship ho gaya\";\n}",
+     "12": "public function message(): string\n{\n    return \"Order {$this->orderId} ship ho gaya\";\n}",
+     "13": "#[\\Override]\npublic function message(): string\n{\n    return \"Order {$this->orderId} ship ho gaya\";\n}"
+    }
+   }
+  ]
+ },
+ "errors": [
+  {
+   "error": "Class \"App\\Services\\CheckoutService\" not found",
+   "cause": "Namespace, folder path ya file ka naam match nahi karta (case bhi dekho), ya autoload map purana hai.",
+   "fix": "Namespace aur path match karo, phir `composer dump-autoload` chalao."
+  },
+  {
+   "error": "Cannot instantiate abstract class Notification",
+   "cause": "Abstract class ka object banane ki koshish.",
+   "fix": "Uski child class (jaise `OrderShipped`) ka object banao."
+  },
+  {
+   "error": "Class OrderShipped contains 1 abstract method and must therefore be declared abstract or implement the remaining methods",
+   "cause": "Child class ne `message()` implement nahi kiya.",
+   "fix": "Sab abstract/interface methods child class mein likho."
+  }
+ ],
+ "debug": {
+  "body": "Class load nahi ho rahi to pehle autoload refresh karo, aur dekho ki class kis namespace mein hai.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "composer dump-autoload\nphp -r \"var_dump(class_exists('App\\\\Services\\\\CheckoutService'));\""
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Ek chhota notification system banao:",
+  "tasks": [
+   "Abstract class `Notification` banao jisme abstract `message(): string` ho",
+   "`EmailNotification` aur `SmsNotification` child classes banao",
+   "Ek `Loggable` trait banao jo `log(string $text): void` method de",
+   "Ek `Notifier` class banao jo `Notification` type ka object constructor mein le"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Interface mein kya hota hai?",
+   "options": [
+    "Poora implementation",
+    "Sirf method signatures (contract)",
+    "Sirf properties",
+    "Database queries"
+   ],
+   "answer": 1,
+   "why": "Interface batata hai ki kaunse methods honge. Implementation class likhti hai."
+  },
+  {
+   "q": "Trait ko class mein kaise use karte hain?",
+   "options": [
+    "extends Trait",
+    "implements Trait",
+    "use TraitName;",
+    "include TraitName;"
+   ],
+   "answer": 2,
+   "why": "Class ke andar `use TraitName;` likhte hain."
+  },
+  {
+   "q": "`composer dump-autoload` kab chalate hain?",
+   "options": [
+    "Har request par",
+    "Naya class file/namespace map badalne par",
+    "Sirf deploy par",
+    "Kabhi nahi"
+   ],
+   "answer": 1,
+   "why": "Autoload map refresh karne ke liye, jab naye class files ya autoload settings badli hon."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Abstract class aur interface mein farak?",
+   "a": "Abstract class mein kuch implementation bhi ho sakta hai aur state (properties) bhi. Interface sirf contract hai. Ek class kai interfaces implement kar sakti hai, par extend sirf ek class ko."
+  },
+  {
+   "q": "Trait kya hai aur kab use karein?",
+   "a": "Code reuse ka tareeka jab inheritance fit nahi baithti, jaise `HasFactory`, `Notifiable`. Zyada traits se code samajhna mushkil ho sakta hai."
+  },
+  {
+   "q": "PSR-4 autoloading kya hai?",
+   "a": "Ek standard jo namespace ko folder path se map karta hai, jisse classes automatically load hoti hain."
+  },
+  {
+   "q": "Laravel mein 'Contract' kya hota hai?",
+   "a": "Laravel ke interfaces (`Illuminate\\Contracts`) jo framework ki services ka contract batate hain."
+  },
+  {
+   "q": "Namespace kyun zaroori hai?",
+   "a": "Naam takraav rokne aur code ko organized rakhne ke liye. Alag packages mein same naam ki classes ho sakti hain."
+  }
+ ],
+ "summary": [
+  "`extends` se inheritance, `abstract` se base class jo child ko force kare.",
+  "Interface sirf contract hai; Laravel isse bahut use karta hai.",
+  "Trait code reuse deta hai.",
+  "Namespace + PSR-4 se classes khud load hoti hain; naye files par `composer dump-autoload`.",
+  "`App\\` -> `app/` mapping teeno Laravel versions mein same hai."
+ ]
+}

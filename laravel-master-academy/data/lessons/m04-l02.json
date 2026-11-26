@@ -1,0 +1,84 @@
+{
+ "id": "m04-l02",
+ "title": "Route Parameters aur Constraints",
+ "minutes": 20,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Required aur optional parameters likhna",
+  "`where()` se parameter ko restrict karna"
+ ],
+ "prerequisites": [
+  "Laravel Routing – Basic to Advanced (m04-l01)"
+ ],
+ "sections": [
+  {
+   "heading": "Parameters kya hote hain?",
+   "body": "URL ke dynamic hisse ko parameter kehte hain. `/users/{id}` mein `{id}` kuch bhi ho sakta hai.\n\nOptional parameter ke liye `?` lagao aur function mein default value do.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::get('/users/{id}', function (string $id) {\n    return \"User {$id}\";\n})->whereNumber('id');\n\nRoute::get('/search/{term?}', function (?string $term = null) {\n    return $term ?? 'Kuch type karo';\n});\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`whereNumber('id')` – sirf digits allow karta hai, warna 404.",
+    "`{term?}` – optional parameter, default `null`."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Version notes",
+  "intro": "Parameters ka behaviour teeno versions mein same hai.",
+  "items": {
+   "11": "`where()`, `whereNumber()`, `whereAlpha()` available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11. PHP 8.3 chahiye."
+  }
+ },
+ "errors": [
+  {
+   "error": "404 on /users/abc",
+   "cause": "`whereNumber('id')` ki wajah se.",
+   "fix": "Number do, ya constraint hatao."
+  }
+ ],
+ "debug": {
+  "body": "Parameters wale routes bhi `php artisan route:list` mein dikhte hain."
+ },
+ "exercise": {
+  "intro": "Yeh routes banao:",
+  "tasks": [
+   "`/posts/{slug}` jahan slug sirf letters aur `-` ho",
+   "`/orders/{id?}` optional id ke saath"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Optional parameter kaise likhte hain?",
+   "options": [
+    "{id!}",
+    "{id?}",
+    "{?id}",
+    "[id]"
+   ],
+   "answer": 1,
+   "why": "Naam ke baad `?` lagate hain aur function mein default value dete hain."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Route constraint kya hai?",
+   "a": "Parameter ki allowed format, jaise `where('id', '[0-9]+')`."
+  }
+ ],
+ "summary": [
+  "`{id}` required, `{id?}` optional hota hai.",
+  "`where*` methods format restrict karte hain."
+ ]
+}

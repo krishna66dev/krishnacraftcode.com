@@ -1,0 +1,189 @@
+{
+ "mcq": [
+  {
+   "q": "Web routes Laravel 11, 12 aur 13 mein kis file mein likhte hain?",
+   "options": [
+    "routes/api.php",
+    "routes/web.php",
+    "app/Routes.php",
+    "config/routes.php"
+   ],
+   "answer": 1,
+   "why": "Browser wale routes `routes/web.php` mein hote hain."
+  },
+  {
+   "q": "Kisi resource ko delete karne ke liye kaunsa route method use hota hai?",
+   "options": [
+    "Route::remove()",
+    "Route::delete()",
+    "Route::drop()",
+    "Route::post() hi sirf"
+   ],
+   "answer": 1,
+   "why": "`Route::delete()` DELETE requests handle karta hai."
+  },
+  {
+   "q": "`php artisan route:list` kya karta hai?",
+   "options": [
+    "Naye routes banata hai",
+    "Cache saaf karta hai",
+    "Registered routes dikhata hai",
+    "Server start karta hai"
+   ],
+   "answer": 2,
+   "why": "Yeh sab registered routes, unke methods aur names dikhata hai."
+  },
+  {
+   "q": "Naye Laravel 11+ project mein `routes/api.php` ke liye kya karna padta hai?",
+   "options": [
+    "Kuch nahi, pehle se hota hai",
+    "`php artisan install:api` chalana",
+    "Manually composer package install karna",
+    "`.env` mein API=true likhna"
+   ],
+   "answer": 1,
+   "why": "Slim skeleton mein api.php default nahi hota. `php artisan install:api` use karo."
+  },
+  {
+   "q": "Named route `products.show` ka URL kaise banate hain?",
+   "options": [
+    "url('products.show')",
+    "route('products.show', ['id' => 5])",
+    "link('products.show', 5)",
+    "path('products.show')"
+   ],
+   "answer": 1,
+   "why": "`route()` helper naam se URL generate karta hai."
+  },
+  {
+   "q": "Optional route parameter kaise likhte hain?",
+   "options": [
+    "{id!}",
+    "{id?}",
+    "[id]",
+    "{?id}"
+   ],
+   "answer": 1,
+   "why": "Naam ke baad `?` lagao aur function mein default value do."
+  },
+  {
+   "q": "HTML form se PUT request bhejne ke liye Blade mein kya likhte hain?",
+   "options": [
+    "@put",
+    "@method('PUT')",
+    "@verb('PUT')",
+    "method=\"PUT\" kaafi hai"
+   ],
+   "answer": 1,
+   "why": "Browser form sirf GET/POST bhejta hai, isliye `@method('PUT')` spoof karta hai."
+  },
+  {
+   "q": "POST form mein `@csrf` na ho to kya hoga?",
+   "options": [
+    "Form chal jayega",
+    "404 error",
+    "419 Page Expired",
+    "500 error hamesha"
+   ],
+   "answer": 2,
+   "why": "CSRF token missing hone par Laravel 419 deta hai."
+  }
+ ],
+ "assignments": [
+  {
+   "title": "Basic website routes",
+   "level": "Beginner",
+   "brief": "Ek chhoti website ke liye saare basic routes banao.",
+   "tasks": [
+    "`/` par 'Welcome' return karo",
+    "`/about` aur `/contact` routes banao",
+    "`/contact` ke liye POST route banao",
+    "`php artisan route:list` se check karo"
+   ],
+   "explain": "Closure routes chhote kaam ke liye theek hain. POST route ko real form se test karne ke liye `@csrf` lagana padega.",
+   "solution": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/', fn () => 'Welcome');\nRoute::get('/about', fn () => 'About us');\nRoute::get('/contact', fn () => 'Contact form');\nRoute::post('/contact', fn () => 'Message received');\n"
+    }
+   ]
+  },
+  {
+   "title": "Products with controller",
+   "level": "Beginner",
+   "brief": "Products ke liye controller aur named routes banao.",
+   "tasks": [
+    "`php artisan make:controller ProductController` chalao",
+    "`index` aur `show` methods likho",
+    "`products.index` aur `products.show` naam do",
+    "`show` route par sirf numeric id allow karo"
+   ],
+   "explain": "`whereNumber('id')` ki wajah se `/products/abc` par 404 aayega.",
+   "solution": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Http\\Controllers\\ProductController;\n\nRoute::get('/products', [ProductController::class, 'index'])\n    ->name('products.index');\n\nRoute::get('/products/{id}', [ProductController::class, 'show'])\n    ->name('products.show')\n    ->whereNumber('id');\n"
+    },
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Http\\Controllers;\n\nclass ProductController extends Controller\n{\n    public function index()\n    {\n        return 'Product List';\n    }\n\n    public function show(string $id)\n    {\n        return \"Product #{$id}\";\n    }\n}\n"
+    }
+   ]
+  },
+  {
+   "title": "Constraints aur optional parameters",
+   "level": "Intermediate",
+   "brief": "Parameters ko restrict karo aur optional value handle karo.",
+   "tasks": [
+    "`/posts/{slug}` jahan slug sirf lowercase letters, numbers aur `-` ho",
+    "`/orders/{id?}` optional id ke saath",
+    "Id na ho to 'Saare orders' return karo"
+   ],
+   "explain": "Optional parameter ke saath function mein default value (`null`) dena zaroori hai.",
+   "solution": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::get('/posts/{slug}', fn (string $slug) => \"Post: {$slug}\")\n    ->where('slug', '[a-z0-9-]+');\n\nRoute::get('/orders/{id?}', function (?string $id = null) {\n    return $id ? \"Order #{$id}\" : 'Saare orders';\n});\n"
+    }
+   ]
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is Laravel routing?",
+   "a": "URL aur HTTP method ko closure ya controller action se map karna. Web routes `routes/web.php` mein hote hain."
+  },
+  {
+   "q": "Difference between GET and POST?",
+   "a": "GET data padhne ke liye hai. POST data bhejne ke liye hai aur Laravel mein CSRF token chahiye."
+  },
+  {
+   "q": "What is named routing?",
+   "a": "Route ko `->name()` se naam dena, taaki `route('naam')` se URL ban jaye aur URL badalne par code na badalna pade."
+  },
+  {
+   "q": "Closure route aur controller route mein kya farak hai?",
+   "a": "Closure chhote kaam ke liye hai. Controller code ko organized rakhta hai. Route caching ke liye closure routes ko controller mein badalna padta hai."
+  },
+  {
+   "q": "PUT aur PATCH mein kya farak hai?",
+   "a": "PUT poore resource ko replace karta hai, PATCH sirf kuch fields update karta hai."
+  },
+  {
+   "q": "Route parameter aur query string mein farak?",
+   "a": "Route parameter URL path ka hissa hai (`/users/5`), query string `?page=2` jaisa hota hai aur `request()->query()` se milta hai."
+  },
+  {
+   "q": "Route::fallback() kab use hota hai?",
+   "a": "Jab koi bhi route match na kare, tab custom 404 jaisa response dene ke liye."
+  },
+  {
+   "q": "419 Page Expired error kyun aata hai?",
+   "a": "Aksar POST/PUT/DELETE form mein CSRF token missing ya expire hone par."
+  }
+ ]
+}

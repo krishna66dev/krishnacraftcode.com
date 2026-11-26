@@ -1,0 +1,219 @@
+{
+ "id": "m01-l01",
+ "title": "PHP Basics: Variables, Data Types aur Operators",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "PHP file ka structure aur `<?php` tag samajhna",
+  "Variables (`$name`) banana aur `echo` se output dena",
+  "String, int, float, bool, array aur null types pehchanna",
+  "`==` aur `===` ka farak jaanna",
+  "`??` aur ternary operator use karna",
+  "PHP file terminal se run karna"
+ ],
+ "prerequisites": [
+  "Terminal ka basic use",
+  "PHP 8.2 ya upar installed (`php -v` se check karo)",
+  "Koi bhi code editor (VS Code recommended)"
+ ],
+ "sections": [
+  {
+   "heading": "PHP aur Laravel ka rishta",
+   "body": "Laravel ek **PHP framework** hai. Laravel mein jo bhi likhoge, woh PHP hi hai: routes, controllers, models, sab. Isliye Laravel seekhne se pehle PHP ki neev pakki honi chahiye.\n\nPHP server par chalti hai, aur browser ko HTML (ya JSON) bhejti hai.",
+   "callout": {
+    "kind": "version",
+    "text": "Laravel 11 aur 12 ko **PHP 8.2+** chahiye. Laravel 13 ko **PHP 8.3+** chahiye. Is course ka code modern PHP 8 style mein hai."
+   }
+  },
+  {
+   "heading": "Real-world example: Product ki details",
+   "body": "Ek online store mein har product ke paas naam, price, stock aur availability hoti hai. PHP mein har ek cheez ek **variable** mein store hoti hai, aur variable ka ek **type** hota hai (text, number, true/false)."
+  },
+  {
+   "heading": "Syntax: pehla PHP program",
+   "body": "PHP code `<?php` se shuru hota hai. Variable ka naam `$` se shuru hota hai. Neeche wala code edit karke dekho (yahan run nahi hota, apne computer par chalao).",
+   "code": [
+    {
+     "file": "product.php",
+     "lang": "php",
+     "code": "<?php\n\ndeclare(strict_types=1);\n\n$name = 'Wireless Mouse';\n$price = 799.50;\n$stock = 12;\n$inStock = $stock > 0;\n\necho \"Product: {$name}\\n\";\necho \"Price: Rs. {$price}\\n\";\necho 'In stock: ' . ($inStock ? 'Haan' : 'Nahi') . \"\\n\";\n",
+     "editable": true
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php product.php"
+    }
+   ],
+   "explain": [
+    "`declare(strict_types=1);` – type checking strict kar deta hai (file ki pehli statement honi chahiye).",
+    "`$name = '...'` – variable banaya. `$` zaroori hai.",
+    "`\"...{$name}...\"` – double quotes ke andar variable ki value aa jaati hai (interpolation). Single quotes mein nahi aati.",
+    "`.` – strings ko jodta hai (concatenation).",
+    "`?:` – ternary operator: condition sahi ho to pehli value, warna doosri."
+   ]
+  },
+  {
+   "heading": "Data types",
+   "body": "PHP mein sabse common types:\n\n- `string` – text, jaise `'Laravel'`\n- `int` – poora number, jaise `2026`\n- `float` – decimal number, jaise `4.8`\n- `bool` – `true` ya `false`\n- `array` – values ki list\n- `null` – koi value nahi\n\nFunction mein type likhne se galtiyan jaldi pakdi jaati hain.",
+   "code": [
+    {
+     "file": "types.php",
+     "lang": "php",
+     "code": "<?php\n\ndeclare(strict_types=1);\n\n$title = 'Laravel';\n$year = 2026;\n$rating = 4.8;\n$published = true;\n$tags = ['php', 'web'];\n$author = null;\n\nvar_dump($year, $rating, $published);\n\nfunction addGst(float $amount, int $percent): float\n{\n    return $amount + ($amount * $percent / 100);\n}\n\necho addGst(1000, 18); // 1180\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`var_dump()` value ke saath uska type bhi dikhata hai.",
+    "`float $amount` – parameter ka type. `: float` – function kya return karega.",
+    "`strict_types=1` ke saath `addGst('1000', 18)` likhoge to TypeError aayega, kyunki `'1000'` string hai."
+   ]
+  },
+  {
+   "heading": "Operators: == vs ===, ?? aur ?:",
+   "body": "Sabse zaroori farak: `==` sirf value compare karta hai, `===` value aur type dono.",
+   "code": [
+    {
+     "file": "operators.php",
+     "lang": "php",
+     "code": "<?php\n\nvar_dump(5 == '5');   // true  (value same hai)\nvar_dump(5 === '5');  // false (type alag hai)\n\n$city = $_GET['city'] ?? 'Delhi';   // value na ho to default\n$stock = 0;\n$label = $stock > 0 ? 'Available' : 'Out of stock';\n\necho $city . ' - ' . $label;\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`??` (null coalescing) – left side set na ho ya `null` ho to right side ki value milti hai. Laravel mein bahut use hota hai.",
+    "`$_GET['city']` URL ke `?city=...` se aata hai."
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Aadat daal lo: hamesha `===` use karo. Isse type-confusion wale bugs nahi aate."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "PHP version aur Laravel 11, 12, 13",
+  "intro": "Is lesson ka syntax teeno versions mein same chalta hai. Farak sirf minimum PHP version ka hai.",
+  "items": {
+   "11": "PHP 8.2 se 8.4 tak. Is lesson ka poora code chalega.",
+   "12": "PHP 8.2 se 8.5 tak. Poora code same.",
+   "13": "PHP 8.3 se 8.5 tak. Naye project mein 8.3 ke features bina soche use kar sakte ho."
+  },
+  "code": [
+   {
+    "file": "composer.json",
+    "lang": "json",
+    "code": "\"require\": {\n    \"php\": \"^8.2\"\n}",
+    "variants": {
+     "11": "\"require\": {\n    \"php\": \"^8.2\"\n}",
+     "12": "\"require\": {\n    \"php\": \"^8.2\"\n}",
+     "13": "\"require\": {\n    \"php\": \"^8.3\"\n}"
+    }
+   }
+  ]
+ },
+ "errors": [
+  {
+   "error": "Warning: Undefined variable $name",
+   "cause": "Variable banane se pehle use kiya, ya naam ka spelling alag hai (PHP case-sensitive hai: `$Name` aur `$name` alag hain).",
+   "fix": "Variable ka naam check karo aur use pehle define karo."
+  },
+  {
+   "error": "Parse error: syntax error, unexpected token",
+   "cause": "Semicolon `;` ya bracket/quote band karna bhool gaye.",
+   "fix": "Error line ke upar wali line bhi dekho. `php -l file.php` se syntax check karo."
+  },
+  {
+   "error": "TypeError: Argument #1 ($amount) must be of type float, string given",
+   "cause": "`strict_types=1` ke saath galat type pass kiya.",
+   "fix": "Sahi type bhejo, ya zarurat ho to `(float) $value` se cast karo."
+  }
+ ],
+ "debug": {
+  "body": "Variable ki value aur type dekhne ke liye `var_dump()` use karo. Syntax check ke liye `php -l`.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php -v\nphp -l product.php\nphp -S localhost:8000"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Ek `profile.php` file banao aur terminal se chalao:",
+  "tasks": [
+   "`$name`, `$age`, `$city` variables banao aur ek sentence print karo",
+   "`$age >= 18` se `$isAdult` bool banao",
+   "`??` se `$country` ko default 'India' do",
+   "`var_dump()` se har variable ka type dekho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`===` aur `==` mein kya farak hai?",
+   "options": [
+    "Koi farak nahi",
+    "`===` value aur type dono check karta hai",
+    "`===` sirf numbers ke liye hai",
+    "`==` zyada strict hai"
+   ],
+   "answer": 1,
+   "why": "`===` strict comparison hai: value aur type dono same hone chahiye."
+  },
+  {
+   "q": "`$x = $_GET['id'] ?? 1;` ka matlab kya hai?",
+   "options": [
+    "`id` na mile to error aayega",
+    "`id` set na ho ya null ho to 1 use hoga",
+    "`id` hamesha 1 hoga",
+    "Yeh syntax galat hai"
+   ],
+   "answer": 1,
+   "why": "`??` default value deta hai jab left side set na ho ya null ho."
+  },
+  {
+   "q": "Variable ka naam kis character se shuru hota hai?",
+   "options": [
+    "@",
+    "#",
+    "$",
+    "&"
+   ],
+   "answer": 2,
+   "why": "PHP variables `$` se shuru hote hain."
+  }
+ ],
+ "interview": [
+  {
+   "q": "PHP mein `==` aur `===` ka farak?",
+   "a": "`==` loose comparison hai (type convert karke compare karta hai). `===` strict hai: value aur type dono same hone chahiye."
+  },
+  {
+   "q": "`strict_types=1` kya karta hai?",
+   "a": "Us file mein function calls ke liye strict type checking on karta hai. Galat type (jaise string ki jagah int) dene par TypeError aata hai."
+  },
+  {
+   "q": "`null` aur empty string mein farak?",
+   "a": "`null` ka matlab value hai hi nahi. `''` ek valid string hai jo khali hai. `isset()` null par false deta hai."
+  },
+  {
+   "q": "`??` operator kya hai?",
+   "a": "Null coalescing operator. Left side defined aur non-null ho to wahi value, warna right side ki value."
+  },
+  {
+   "q": "Single quote aur double quote strings mein farak?",
+   "a": "Double quotes mein variables aur escape sequences (`\\n`) process hote hain. Single quotes mein nahi."
+  }
+ ],
+ "summary": [
+  "PHP code `<?php` se shuru hota hai, variables `$` se.",
+  "Main types: string, int, float, bool, array, null.",
+  "Hamesha `===` use karo.",
+  "`??` default value deta hai.",
+  "Laravel 11/12 ko PHP 8.2+, Laravel 13 ko PHP 8.3+ chahiye."
+ ]
+}

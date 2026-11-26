@@ -1,0 +1,217 @@
+{
+ "id": "m02-l03",
+ "title": "Pehla Laravel Project Banana aur Chalana",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`laravel new` se project banana",
+  "Development server chalana aur browser mein dekhna",
+  "Default SQLite database aur MySQL par switch karna",
+  "Pehla route aur Blade view banana"
+ ],
+ "prerequisites": [
+  "Local Setup: PHP, Composer, Node aur Laravel Installer (m02-l02)"
+ ],
+ "sections": [
+  {
+   "heading": "Project banana",
+   "body": "Terminal mein woh folder kholo jahan project rakhna hai aur yeh command chalao. Installer tumse kuch sawaal poochta hai (jaise starter kit, testing framework). Seekhne ke liye starter kit **None** rakhna theek hai.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "laravel new example-app\ncd example-app"
+    }
+   ],
+   "explain": [
+    "`example-app` – project ka folder naam.",
+    "Project banate waqt Laravel ek `database/database.sqlite` file banata hai aur zaroori migrations bhi chala deta hai."
+   ]
+  },
+  {
+   "heading": "Server chalana",
+   "body": "Assets build karo aur development server shuru karo. Browser mein `http://localhost:8000` kholo. Tumhe Laravel ka welcome page dikhna chahiye.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "npm install && npm run build\ncomposer run dev"
+    },
+    {
+     "file": "terminal (alternative)",
+     "lang": "bash",
+     "code": "php artisan serve"
+    }
+   ],
+   "explain": [
+    "`composer run dev` – local server, queue worker aur Vite dev server ek saath chalata hai (Laravel 13 docs mein yahi tareeka hai).",
+    "`php artisan serve` – sirf PHP server chalata hai. Port badalna ho to `php artisan serve --port=8001`.",
+    "Server band karne ke liye terminal mein `Ctrl + C`."
+   ]
+  },
+  {
+   "heading": "Database: SQLite default hai",
+   "body": "Default `.env` mein Laravel SQLite use karta hai, to abhi koi database install karne ki zarurat nahi. Agar MySQL ya PostgreSQL chahiye, to `.env` ke `DB_*` variables badlo, database banao aur migrate chalao.",
+   "code": [
+    {
+     "file": ".env",
+     "lang": "ini",
+     "code": "DB_CONNECTION=mysql\nDB_HOST=127.0.0.1\nDB_PORT=3306\nDB_DATABASE=laravel\nDB_USERNAME=root\nDB_PASSWORD="
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan migrate"
+    }
+   ]
+  },
+  {
+   "heading": "Real-world example: Apna pehla page",
+   "body": "Chalo ek `/hello` page banate hain. Pehle route, phir uska Blade view.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/', function () {\n    return view('welcome');\n});\n\nRoute::get('/hello', fn () => view('hello', ['name' => 'Dost']));\n",
+     "editable": true
+    },
+    {
+     "file": "resources/views/hello.blade.php",
+     "lang": "html",
+     "code": "<h1>Namaste, {{ $name }}!</h1>\n<p>Yeh mera pehla Laravel page hai.</p>\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`view('hello', [...])` – `resources/views/hello.blade.php` ko data ke saath render karta hai.",
+    "`{{ $name }}` – Blade mein variable print karne ka tareeka (aage Module 05 mein detail).",
+    "Browser mein `http://localhost:8000/hello` kholo."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Project banane aur chalane ke tareeke",
+  "intro": "`laravel new` hamesha latest version (abhi Laravel 13) banata hai. Purana version chahiye to Composer se version dena padta hai.",
+  "items": {
+   "11": "`composer create-project laravel/laravel:^11.0 example-app` se banta hai. Server ke liye `php artisan serve` safe tareeka hai.",
+   "12": "`composer create-project laravel/laravel:^12.0 example-app` se banta hai. 12 ke skeleton mein bhi `composer run dev` milta hai.",
+   "13": "`laravel new example-app` se seedha Laravel 13 banta hai. Server aur Vite ek saath `composer run dev` se."
+  },
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "composer create-project laravel/laravel:^12.0 example-app",
+    "variants": {
+     "11": "composer create-project laravel/laravel:^11.0 example-app",
+     "12": "composer create-project laravel/laravel:^12.0 example-app",
+     "13": "laravel new example-app"
+    }
+   }
+  ]
+ },
+ "errors": [
+  {
+   "error": "Vite manifest not found at: public/build/manifest.json",
+   "cause": "Frontend assets build nahi hue.",
+   "fix": "`npm install && npm run build` chalao, ya development ke liye `npm run dev` (ya `composer run dev`) chalu rakho."
+  },
+  {
+   "error": "Failed to listen on 127.0.0.1:8000 (reason: Address already in use)",
+   "cause": "Port 8000 par pehle se koi aur server chal raha hai.",
+   "fix": "Purana server band karo, ya `php artisan serve --port=8001` use karo."
+  },
+  {
+   "error": "SQLSTATE[HY000] [2002] Connection refused",
+   "cause": "`.env` mein MySQL set hai par MySQL server band hai ya credentials galat hain.",
+   "fix": "MySQL start karo, `DB_*` values check karo, ya wapas `DB_CONNECTION=sqlite` karke seekho."
+  }
+ ],
+ "debug": {
+  "body": "Project ki sehat dekhne ke liye `php artisan about` use karo. Errors `storage/logs/laravel.log` mein milte hain.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan about\nphp artisan route:list\ntail -f storage/logs/laravel.log   # Windows PowerShell: Get-Content storage/logs/laravel.log -Wait"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Apna pehla project banao:",
+  "tasks": [
+   "`laravel new example-app` se project banao aur welcome page dekho",
+   "`/hello` route aur `hello.blade.php` view banao",
+   "View mein apna naam dikhao",
+   "`php artisan serve --port=8001` se alag port par chalao"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Laravel ka default database kaunsa hai?",
+   "options": [
+    "MySQL",
+    "PostgreSQL",
+    "SQLite",
+    "MongoDB"
+   ],
+   "answer": 2,
+   "why": "Naye project mein `.env` SQLite use karta hai aur `database/database.sqlite` ban jaati hai."
+  },
+  {
+   "q": "Server band karne ka tareeka?",
+   "options": [
+    "Terminal band karna zaroori hai",
+    "Ctrl + C",
+    "php artisan stop",
+    "Browser refresh"
+   ],
+   "answer": 1,
+   "why": "Running process ko `Ctrl + C` se rokte hain."
+  },
+  {
+   "q": "`view('hello')` kaunsi file render karta hai?",
+   "options": [
+    "routes/hello.php",
+    "resources/views/hello.blade.php",
+    "app/hello.php",
+    "public/hello.html"
+   ],
+   "answer": 1,
+   "why": "Views `resources/views` mein hote hain."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Laravel project kaise banate hain?",
+   "a": "`laravel new app-name` (installer) ya `composer create-project laravel/laravel app-name`."
+  },
+  {
+   "q": "`php artisan serve` kya karta hai?",
+   "a": "PHP ka built-in development server chalata hai, default `http://localhost:8000` par. Production ke liye nahi hai."
+  },
+  {
+   "q": "Default database ko MySQL kaise karte hain?",
+   "a": "`.env` mein `DB_CONNECTION=mysql` aur `DB_*` values set karke `php artisan migrate` chalate hain."
+  },
+  {
+   "q": "`composer run dev` kya karta hai?",
+   "a": "`composer.json` ki `dev` script chalata hai jo development server, queue worker aur Vite ek saath start karti hai."
+  },
+  {
+   "q": "Vite manifest error kyun aata hai?",
+   "a": "Jab assets build nahi hue hote. `npm run build` ya `npm run dev` se solve hota hai."
+  }
+ ],
+ "summary": [
+  "`laravel new` se project banta hai, default database SQLite.",
+  "`composer run dev` ya `php artisan serve` se server chalta hai.",
+  "MySQL ke liye `.env` ke `DB_*` badlo aur `php artisan migrate` chalao.",
+  "Route + Blade view se pehla page banta hai.",
+  "Errors `storage/logs/laravel.log` mein dekho."
+ ]
+}

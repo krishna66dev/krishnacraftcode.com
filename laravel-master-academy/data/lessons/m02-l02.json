@@ -1,0 +1,219 @@
+{
+ "id": "m02-l02",
+ "title": "Local Setup: PHP, Composer, Node aur Laravel Installer",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Laravel ke liye zaroori tools jaanna (PHP, Composer, Node, installer)",
+  "Setup ke teen raaste samajhna: `php.new`, Laravel Herd, manual",
+  "Tools ke versions verify karna",
+  "`laravel` command PATH mein na mile to fix karna"
+ ],
+ "prerequisites": [
+  "Laravel Kya Hai aur Kaise Kaam Karta Hai (m02-l01)",
+  "Terminal ya PowerShell ka basic use"
+ ],
+ "sections": [
+  {
+   "heading": "Kya kya chahiye?",
+   "body": "Pehla Laravel project banane se pehle machine par yeh hona chahiye:\n\n- **PHP** (version Laravel ke hisaab se)\n- **Composer** – PHP packages ka manager\n- **Laravel installer** – `laravel new` command ke liye\n- **Node.js aur npm** (ya Bun) – CSS/JS assets compile karne ke liye\n\nDatabase abhi zaroori nahi, kyunki Laravel ka default SQLite hai."
+  },
+  {
+   "heading": "Real-world example: Kitchen ready karna",
+   "body": "Khana banane se pehle gas, bartan aur saaman chahiye. Waise hi code likhne se pehle PHP (gas), Composer (saaman ka supplier) aur Node (frontend ka saaman) ready hona chahiye. Ek baar setup ho gaya to har naya project minutes mein banta hai."
+  },
+  {
+   "heading": "Raasta 1: php.new (ek command mein)",
+   "body": "Agar PHP aur Composer nahi hain, to official `php.new` command PHP, Composer aur Laravel installer teeno install kar deta hai. Command chalane ke baad terminal restart karo.",
+   "code": [
+    {
+     "file": "terminal (macOS)",
+     "lang": "bash",
+     "code": "/bin/bash -c \"$(curl -fsSL https://php.new/install/mac/8.5)\""
+    },
+    {
+     "file": "terminal (Linux)",
+     "lang": "bash",
+     "code": "/bin/bash -c \"$(curl -fsSL https://php.new/install/linux/8.5)\""
+    },
+    {
+     "file": "PowerShell (Windows, administrator)",
+     "lang": "bash",
+     "code": "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))"
+    }
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Yeh commands official docs ke hisaab se PHP **8.5** install karte hain. Laravel 11 sirf PHP 8.2 se 8.4 tak supported hai. Agar tumhe Laravel 11 chalana hai to PHP 8.5 mat lo. Update ke liye wahi command dobara chalao."
+   }
+  },
+  {
+   "heading": "Raasta 2: Laravel Herd (macOS aur Windows)",
+   "body": "Herd ek native development environment hai jisme PHP aur Nginx included hain, aur `php`, `composer`, `laravel`, `node`, `npm` commands bhi milti hain. Install karne ke baad `~/Herd` (Windows par `%USERPROFILE%\\Herd`) folder mein banaya har Laravel app `.test` domain par apne aap khulta hai.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "cd ~/Herd\nlaravel new my-app\ncd my-app\nherd open"
+    }
+   ]
+  },
+  {
+   "heading": "Raasta 3: Pehle se PHP aur Composer hain",
+   "body": "Agar PHP aur Composer pehle se installed hain, to sirf installer Composer se lagao:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "composer global require laravel/installer"
+    }
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Agar tum Herd ya `php.new` se install karte ho to yeh step alag se nahi karna padta."
+   }
+  },
+  {
+   "heading": "Sab verify karo",
+   "body": "Install ke baad har tool ka version check karo. Agar koi command na mile, to terminal restart karo.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php -v\ncomposer -V\nnode -v\nnpm -v\nlaravel --version",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`php -v` – PHP version. Laravel 11/12 ke liye 8.2+, Laravel 13 ke liye 8.3+.",
+    "`laravel --version` – installer ka version.",
+    "Koi extension ka error aaye to `php -m` se installed extensions dekho."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Version ke hisaab se PHP chuno",
+  "intro": "Tumhara Laravel version tumhara PHP version decide karta hai.",
+  "items": {
+   "11": "PHP 8.2, 8.3 ya 8.4. PHP 8.5 par Laravel 11 officially supported nahi hai.",
+   "12": "PHP 8.2 se 8.5 tak koi bhi.",
+   "13": "PHP 8.3, 8.4 ya 8.5. PHP 8.2 par Laravel 13 install nahi hoga."
+  },
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "# Laravel 12: php -v mein 8.2 se 8.5 dikhna chahiye\nphp -v",
+    "variants": {
+     "11": "# Laravel 11: php -v mein 8.2, 8.3 ya 8.4 dikhna chahiye\nphp -v",
+     "12": "# Laravel 12: php -v mein 8.2 se 8.5 dikhna chahiye\nphp -v",
+     "13": "# Laravel 13: php -v mein 8.3, 8.4 ya 8.5 dikhna chahiye\nphp -v"
+    }
+   }
+  ]
+ },
+ "errors": [
+  {
+   "error": "laravel: command not found (ya 'laravel' is not recognized)",
+   "cause": "Composer ka global `vendor/bin` folder PATH mein nahi hai.",
+   "fix": "Composer ka global bin folder PATH mein jodo (Linux/macOS par aksar `~/.config/composer/vendor/bin` ya `~/.composer/vendor/bin`, Windows par `%APPDATA%\\Composer\\vendor\\bin`). Phir terminal restart karo."
+  },
+  {
+   "error": "Your requirements could not be resolved ... requires php ^8.3",
+   "cause": "Machine ka PHP version Laravel ki requirement se purana hai.",
+   "fix": "PHP upgrade karo (php.new ya Herd se), ya apne PHP ke hisaab se Laravel version chuno."
+  },
+  {
+   "error": "The requested PHP extension ext-xxx is missing",
+   "cause": "PHP ka koi zaroori extension enable nahi hai.",
+   "fix": "`php -m` se check karo aur `php.ini` mein extension enable karo, ya php.new/Herd use karo jo extensions ke saath aate hain."
+  }
+ ],
+ "debug": {
+  "body": "Environment ki problem pakadne ke liye yeh commands kaam aati hain.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php --ini\nphp -m\ncomposer diagnose\nwhich php    # Windows par: where php"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Apni machine set up karo:",
+  "tasks": [
+   "Teen raaston mein se ek chuno aur PHP, Composer, Node install karo",
+   "`php -v`, `composer -V`, `node -v`, `laravel --version` ka output note karo",
+   "Dekho tumhara PHP version kaunse Laravel versions ko support karta hai",
+   "Agar `laravel` command na mile to PATH fix karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Composer kis kaam aata hai?",
+   "options": [
+    "Database banane",
+    "PHP packages manage karne",
+    "Frontend design karne",
+    "Server restart karne"
+   ],
+   "answer": 1,
+   "why": "Composer PHP dependencies (packages) install aur manage karta hai."
+  },
+  {
+   "q": "Laravel Herd kis par available hai?",
+   "options": [
+    "Sirf Linux",
+    "macOS aur Windows",
+    "Sirf Windows",
+    "Sirf browser mein"
+   ],
+   "answer": 1,
+   "why": "Herd macOS aur Windows ke liye native environment hai."
+  },
+  {
+   "q": "Laravel 13 chalane ke liye minimum PHP kaunsa hai?",
+   "options": [
+    "8.1",
+    "8.2",
+    "8.3",
+    "8.4"
+   ],
+   "answer": 2,
+   "why": "Laravel 13 ke liye PHP 8.3 ya upar chahiye."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Composer kya hai?",
+   "a": "PHP ka dependency manager. `composer.json` mein packages likhte hain aur Composer unhe `vendor` mein install karta hai aur autoloader banata hai."
+  },
+  {
+   "q": "Laravel project ke liye Node.js kyun chahiye?",
+   "a": "CSS aur JavaScript assets ko Vite se compile karne ke liye."
+  },
+  {
+   "q": "Laravel installer aur `composer create-project` mein farak?",
+   "a": "Installer (`laravel new`) interactive sawal poochta hai aur setup steps khud chalata hai. `composer create-project` seedha skeleton download karta hai."
+  },
+  {
+   "q": "Herd kya hai?",
+   "a": "Laravel ka native local development environment (macOS aur Windows) jisme PHP, Nginx aur CLI tools included hain."
+  },
+  {
+   "q": "PHP extension missing error kaise solve karte hain?",
+   "a": "`php -m` se check karke `php.ini` mein extension enable karte hain, ya aisa environment lete hain jisme extensions pehle se hon."
+  }
+ ],
+ "summary": [
+  "PHP, Composer, Laravel installer aur Node chahiye.",
+  "Teen raaste: php.new, Herd, ya manual installer.",
+  "Versions hamesha verify karo.",
+  "Laravel 11/12 ko PHP 8.2+, Laravel 13 ko PHP 8.3+ chahiye.",
+  "`laravel` command na mile to PATH check karo."
+ ]
+}

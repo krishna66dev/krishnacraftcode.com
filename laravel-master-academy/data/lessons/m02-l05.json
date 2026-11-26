@@ -1,0 +1,231 @@
+{
+ "id": "m02-l05",
+ "title": "Configuration, .env aur Artisan Basics",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`config/` files aur `.env` ka rishta samajhna",
+  "`config()` aur `env()` kab use karna hai jaanna",
+  "`APP_KEY`, `APP_DEBUG`, `APP_ENV` ka matlab samajhna",
+  "Zaroori Artisan commands chalana",
+  "Tinker se code test karna aur apni command banana"
+ ],
+ "prerequisites": [
+  "Laravel Project Structure (m02-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "Configuration kaise kaam karti hai",
+   "body": "Saari configuration files `config/` folder mein hain. Jo values machine ke hisaab se badalti hain (database password, debug on/off), woh `.env` file mein rakhte hain. Config file `env()` se woh value padhti hai, aur application ka baaki code `config()` se padhta hai.",
+   "code": [
+    {
+     "file": "config/app.php",
+     "lang": "php",
+     "code": "<?php\n\nreturn [\n    'name' => env('APP_NAME', 'Laravel'),\n    'debug' => (bool) env('APP_DEBUG', false),\n];\n"
+    },
+    {
+     "file": "kahin bhi application code mein",
+     "lang": "php",
+     "code": "$name = config('app.name');\n$debug = config('app.debug');\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`env('APP_NAME', 'Laravel')` – `.env` se value, na mile to default.",
+    "`config('app.name')` – `config/app.php` ki `name` key.",
+    "Application code mein seedha `env()` mat use karo. Config cache hone par `env()` `null` de sakta hai. Hamesha config file ke through `config()` use karo."
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "`.env` ko Git mein commit mat karo. Usme passwords aur secret keys hoti hain. Repo mein sirf `.env.example` jaata hai."
+   }
+  },
+  {
+   "heading": "Real-world example: .env file",
+   "body": "Local par debug chahiye, production par nahi. Dono jagah code same, sirf `.env` alag.",
+   "code": [
+    {
+     "file": ".env",
+     "lang": "ini",
+     "code": "APP_NAME=\"Laravel Master\"\nAPP_ENV=local\nAPP_KEY=base64:...\nAPP_DEBUG=true\nAPP_URL=http://localhost:8000\n\nDB_CONNECTION=sqlite"
+    }
+   ],
+   "explain": [
+    "`APP_ENV` – `local`, `staging`, `production` jaisa environment naam.",
+    "`APP_DEBUG=true` – detailed error page dikhata hai. **Production mein hamesha `false`.**",
+    "`APP_KEY` – encryption aur sessions ke liye secret key. Naya project banane par apne aap ban jaati hai.",
+    "`APP_URL` – application ka base URL."
+   ]
+  },
+  {
+   "heading": "APP_KEY aur project clone karna",
+   "body": "Git se koi project clone karte ho to `.env` nahi milti. Yeh steps chalao:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "cp .env.example .env\ncomposer install\nphp artisan key:generate\nnpm install && npm run build"
+    }
+   ]
+  },
+  {
+   "heading": "Artisan: Laravel ka command line tool",
+   "body": "`artisan` project ke root mein ek file hai. Iske commands code generate karte hain aur routine kaam karte hain.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan list\nphp artisan help migrate\nphp artisan about\nphp artisan route:list\nphp artisan make:controller ProductController\nphp artisan make:model Product -m\nphp artisan config:clear\nphp artisan optimize:clear"
+    }
+   ],
+   "explain": [
+    "`list` – saari commands. `help <command>` – ek command ke options.",
+    "`about` – project, PHP aur environment ki summary.",
+    "`make:model Product -m` – model ke saath migration bhi banata hai.",
+    "`config:clear` / `optimize:clear` – cache saaf karte hain. `.env` badalne ke baad kaam aate hain."
+   ]
+  },
+  {
+   "heading": "Tinker aur apni Artisan command",
+   "body": "`tinker` ek interactive shell hai jahan Laravel ka code seedha chala kar dekh sakte ho. Chhoti commands `routes/console.php` mein closure se bhi bana sakte ho.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan tinker\n>>> config('app.name')\n>>> 2 + 2"
+    },
+    {
+     "file": "routes/console.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Artisan;\n\nArtisan::command('hello', function () {\n    $this->info('Namaste, Laravel!');\n})->purpose('Greeting dikhao');\n",
+     "editable": true
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan hello"
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Config aur .env: Laravel 11, 12, 13",
+  "intro": "Laravel 11 ne kuch defaults badle. Neeche ka `.env` structure teeno versions mein lagbhag same hai, par apni `.env` aur `config/` hamesha dekh lo.",
+  "items": {
+   "11": "Slim config: kuch config files default mein nahi hoti. `php artisan config:publish` se publish karo. Defaults: SQLite, aur `SESSION_DRIVER`, `CACHE_STORE`, `QUEUE_CONNECTION` `database` par. (`CACHE_DRIVER` ka naam `CACHE_STORE` hua.)",
+   "12": "Same pattern. `php artisan config:publish` available hai.",
+   "13": "Naye project mein bhi `.env` ka default database SQLite hai (13 ke installation docs ke hisaab se). Baaki defaults ke liye apni `.env` check karo."
+  },
+  "code": [
+   {
+    "file": ".env",
+    "lang": "ini",
+    "code": "DB_CONNECTION=sqlite\nSESSION_DRIVER=database\nCACHE_STORE=database\nQUEUE_CONNECTION=database"
+   }
+  ]
+ },
+ "errors": [
+  {
+   "error": "No application encryption key has been specified",
+   "cause": "`APP_KEY` khali hai (aksar clone ke baad).",
+   "fix": "`php artisan key:generate` chalao."
+  },
+  {
+   "error": "`.env` badli par change nahi dikh raha",
+   "cause": "Configuration cache purani hai.",
+   "fix": "`php artisan config:clear` (ya `optimize:clear`) chalao."
+  },
+  {
+   "error": "`env('SOMETHING')` production mein null aa raha hai",
+   "cause": "`config:cache` chalne ke baad `.env` direct nahi padhi jaati. Tumne `env()` config file ke bahar use kiya.",
+   "fix": "Value ko config file mein `env()` se lo aur code mein `config('...')` use karo."
+  }
+ ],
+ "debug": {
+  "body": "Config ya environment par shak ho to yeh dekho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan about\nphp artisan tinker\n>>> config('app.debug')\nphp artisan config:clear"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Configuration ke saath khelo:",
+  "tasks": [
+   "`.env` mein `APP_NAME` badlo aur `config('app.name')` Tinker se check karo",
+   "`APP_DEBUG=false` karke ek galat URL kholo aur error page ka farak dekho",
+   "`routes/console.php` mein ek `hello` command banao aur chalao",
+   "`php artisan make:model Product -m` chalao aur dekho kaunsi do files bani"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Application code mein config value kaise padhni chahiye?",
+   "options": [
+    "env('KEY') seedha",
+    "config('file.key')",
+    "$_ENV['KEY']",
+    "getenv('KEY')"
+   ],
+   "answer": 1,
+   "why": "Config cache ke saath safe rehne ke liye `config()` use karo."
+  },
+  {
+   "q": "Production mein `APP_DEBUG` kya hona chahiye?",
+   "options": [
+    "true",
+    "false",
+    "null",
+    "1"
+   ],
+   "answer": 1,
+   "why": "Debug true hone par errors mein sensitive details dikh sakti hain."
+  },
+  {
+   "q": "Naya `APP_KEY` banane ki command?",
+   "options": [
+    "php artisan key:make",
+    "php artisan key:generate",
+    "php artisan app:key",
+    "php artisan generate"
+   ],
+   "answer": 1,
+   "why": "`php artisan key:generate` naya key set karta hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "`.env` file ko Git mein commit kyun nahi karte?",
+   "a": "Usme passwords aur secret keys hoti hain. Har environment ki `.env` alag hoti hai. Repo mein `.env.example` rakhte hain."
+  },
+  {
+   "q": "`env()` aur `config()` mein farak?",
+   "a": "`env()` `.env` se raw value padhta hai. `config()` config files se padhta hai jo cache ho sakti hain. Code mein `config()` use karte hain."
+  },
+  {
+   "q": "`php artisan config:cache` kya karta hai?",
+   "a": "Saari config files ko ek cached file mein jod deta hai taaki application tez chale. Iske baad `.env` direct nahi padhi jaati."
+  },
+  {
+   "q": "Tinker kya hai?",
+   "a": "Interactive REPL jisme Laravel application ka code (models, config) seedha chala kar test karte hain."
+  },
+  {
+   "q": "Artisan command kaise banate hain?",
+   "a": "`php artisan make:command Name` se class banate hain, ya chhoti command `routes/console.php` mein `Artisan::command()` se."
+  }
+ ],
+ "summary": [
+  "`.env` machine-specific values rakhta hai, config files unhe `env()` se padhti hain.",
+  "Application code mein `config()` use karo.",
+  "Production mein `APP_DEBUG=false` aur `.env` commit nahi.",
+  "Artisan: `list`, `about`, `route:list`, `make:*`, `tinker`, `config:clear`.",
+  "Clone ke baad: `.env`, `composer install`, `key:generate`."
+ ]
+}
