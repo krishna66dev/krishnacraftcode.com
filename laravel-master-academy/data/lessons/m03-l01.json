@@ -1,0 +1,185 @@
+{
+ "id": "m03-l01",
+ "title": "MVC Pattern: Model, View aur Controller",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "MVC ka matlab aur teen roles samajhna",
+  "Laravel mein Model, View, Controller ki files kahan hoti hain jaanna",
+  "Ek request ko route se view tak follow karna",
+  "Business logic controller mein kyun nahi bharni chahiye samajhna"
+ ],
+ "prerequisites": [
+  "Laravel Project Structure (m02-l04)",
+  "OOP Basics (m01-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "MVC kya hai?",
+   "body": "MVC ek design pattern hai jo code ko teen hisson mein baantta hai:\n\n- **Model** – data aur database ka kaam (Product, User)\n- **View** – user ko jo dikhta hai (HTML page)\n- **Controller** – request lekar Model se baat karta hai aur View ko data deta hai\n\nFayda: har hissa ek kaam karta hai, isliye code padhna aur badalna aasan hota hai.",
+   "callout": {
+    "kind": "tip",
+    "text": "Restaurant yaad karo: Controller kitchen head hai, Model store-room, View plate. Waiter (Route) in sab ko jodta hai."
+   }
+  },
+  {
+   "heading": "Laravel mein files kahan hoti hain?",
+   "body": "Laravel MVC ko flexible tareeke se follow karta hai. Default jagahein:\n\n- Model: `app/Models/Product.php`\n- View: `resources/views/products/show.blade.php`\n- Controller: `app/Http/Controllers/ProductController.php`\n- Route: `routes/web.php`\n\nYeh files `php artisan make:model`, `make:controller` se banti hain."
+  },
+  {
+   "heading": "Real-world example: Product detail page",
+   "body": "Customer `/products/5` kholta hai. Route request controller ko deta hai. Controller model se product 5 maangta hai, aur view ko deta hai jo page banata hai. Eloquent (Model) aur Blade (View) ki detail aage ke modules mein aayegi, abhi sirf flow samjho.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "<?php\n\nuse App\\Http\\Controllers\\ProductController;\nuse Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/products/{id}', [ProductController::class, 'show']);\n"
+    },
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Http\\Controllers;\n\nuse App\\Models\\Product;\n\nclass ProductController extends Controller\n{\n    public function show(int $id)\n    {\n        $product = Product::findOrFail($id);\n\n        return view('products.show', ['product' => $product]);\n    }\n}\n"
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Models;\n\nuse Illuminate\\Database\\Eloquent\\Model;\n\nclass Product extends Model\n{\n    protected $fillable = ['name', 'price'];\n}\n"
+    },
+    {
+     "file": "resources/views/products/show.blade.php",
+     "lang": "html",
+     "code": "<h1>{{ $product->name }}</h1>\n<p>Rs. {{ $product->price }}</p>\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "Route sirf URL ko `ProductController@show` se jodta hai.",
+    "Controller: `Product::findOrFail($id)` – product na mile to automatically 404.",
+    "Model `Product` database table `products` se baat karta hai (naam se pata chalta hai).",
+    "View `view('products.show', [...])` – `resources/views/products/show.blade.php` render hoti hai.",
+    "Blade mein `{{ $product->name }}` data print karta hai."
+   ]
+  },
+  {
+   "heading": "Fat controller se bacho",
+   "body": "Beginners sab kuch controller mein likh dete hain: validation, calculation, email. Isse controller bahut bhari ho jaata hai. Rule: **controller patla rakho**. Business logic Model, Service class ya Action class mein rakho (Module 23 mein detail).",
+   "callout": {
+    "kind": "warn",
+    "text": "Controller ka kaam: request lena, kisi aur class se kaam karwana, response dena. Calculation aur database ki lambi logic controller mein mat bharo."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Laravel 11, 12 aur 13 mein Controller",
+  "intro": "MVC ka concept teeno versions mein same hai. Base Controller class mein farak hai.",
+  "items": {
+   "11": "Base `Controller` ek khali abstract class hai. Controller middleware ke liye route par `->middleware()` ya controller mein `HasMiddleware` interface use karte hain (Module 04 aur 13).",
+   "12": "Same as 11.",
+   "13": "Same default. 13 docs mein controller par `#[Middleware]` aur `#[Authorize]` attributes bhi hain (optional). Detail Module 04 mein."
+  }
+ },
+ "errors": [
+  {
+   "error": "Class \"App\\Models\\Product\" not found",
+   "cause": "Model file nahi bani, ya namespace/naam galat hai.",
+   "fix": "`php artisan make:model Product` chalao aur `use App\\Models\\Product;` check karo."
+  },
+  {
+   "error": "View [products.show] not found",
+   "cause": "View ka naam aur file path match nahi karte.",
+   "fix": "`products.show` ka matlab `resources/views/products/show.blade.php`. Folder aur file ka naam dekho."
+  },
+  {
+   "error": "No query results for model [App\\Models\\Product] 5",
+   "cause": "`findOrFail()` ko id 5 wala record nahi mila, isliye 404 aaya.",
+   "fix": "Record database mein hai ya nahi check karo, ya migration/seed chalao."
+  }
+ ],
+ "debug": {
+  "body": "MVC flow ko step-by-step dekhne ke liye har layer mein `dd()` ya `logger()` lagao, aur `route:list` se route check karo.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan route:list --path=products\nphp artisan make:model Product -m\nphp artisan make:controller ProductController"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Ek chhota MVC flow banao:",
+  "tasks": [
+   "`php artisan make:controller PageController` chalao",
+   "`/about` route PageController ke `about` method se jodo",
+   "`about` method se `view('about', ['title' => 'About Us'])` return karo",
+   "`resources/views/about.blade.php` banao aur title dikhao"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "MVC mein 'M' kya hai?",
+   "options": [
+    "Middleware",
+    "Model",
+    "Method",
+    "Module"
+   ],
+   "answer": 1,
+   "why": "M = Model, jo data aur database ka kaam sambhalta hai."
+  },
+  {
+   "q": "Laravel mein views kahan rakhte hain?",
+   "options": [
+    "app/Views",
+    "resources/views",
+    "public/views",
+    "routes/views"
+   ],
+   "answer": 1,
+   "why": "Views `resources/views` folder mein hoti hain."
+  },
+  {
+   "q": "Controller ka sahi kaam kaunsa hai?",
+   "options": [
+    "HTML design karna",
+    "Request lena aur response banwana",
+    "Database table banana",
+    "Packages install karna"
+   ],
+   "answer": 1,
+   "why": "Controller request handle karke model/service se kaam karwata hai aur response deta hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is MVC?",
+   "a": "Model-View-Controller design pattern jo application ko data (Model), UI (View) aur request handling (Controller) mein baantta hai."
+  },
+  {
+   "q": "Laravel MVC strictly follow karta hai?",
+   "a": "Nahi, flexible hai. Model, View, Controller ke saath Form Requests, Services, Jobs, Policies jaise extra layers bhi hote hain."
+  },
+  {
+   "q": "Fat controller problem kya hai?",
+   "a": "Jab controller mein bahut logic bhar jaati hai, to testing aur reuse mushkil ho jaata hai. Logic ko model ya service/action classes mein rakhna chahiye."
+  },
+  {
+   "q": "`findOrFail()` kya karta hai?",
+   "a": "Record mile to return karta hai, warna `ModelNotFoundException` throw karta hai jo 404 response banta hai."
+  },
+  {
+   "q": "View ko data kaise bhejte hain?",
+   "a": "`view('name', ['key' => $value])`, ya `compact('value')`, ya `->with('key', $value)`."
+  }
+ ],
+ "summary": [
+  "Model data, View UI, Controller request ka coordinator.",
+  "Route request ko controller se jodta hai.",
+  "Files ki default jagah: `app/Models`, `resources/views`, `app/Http/Controllers`.",
+  "Controller patla rakho, logic alag classes mein.",
+  "Laravel MVC flexible hai, extra layers add kar sakte ho."
+ ]
+}

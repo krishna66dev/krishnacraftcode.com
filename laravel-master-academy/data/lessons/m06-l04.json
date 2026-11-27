@@ -1,0 +1,201 @@
+{
+ "id": "m06-l04",
+ "title": "Foreign Keys aur Table Relationships",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Foreign key kyun zaroori hai samajhna",
+  "`foreignId()->constrained()` use karna",
+  "`cascadeOnDelete`, `nullOnDelete`, `restrictOnDelete` ka farak jaanna",
+  "Many-to-many ke liye pivot table banana",
+  "Migration ka order sahi rakhna"
+ ],
+ "prerequisites": [
+  "Column Types, Modifiers aur Indexes (m06-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "Foreign key kya hai?",
+   "body": "Ek table ka column doosri table ki row ko point karta hai. Jaise `products.category_id`, `categories.id` ko point karta hai. Foreign key constraint database ko batata hai ki galat ya na-maujood category_id allow mat karo.",
+   "callout": {
+    "kind": "tip",
+    "text": "Foreign key = database ka rule: product ek asli category se jude, hawa mein latki hui category se nahi."
+   }
+  },
+  {
+   "heading": "Real-world example: Category aur Product",
+   "body": "Ek category ke kai products ho sakte hain. Pehle `categories` banao, phir `products` jo us par depend karti hai. **Parent table ki migration pehle chalni chahiye.**",
+   "code": [
+    {
+     "file": "xxxx_create_categories_table.php",
+     "lang": "php",
+     "code": "Schema::create('categories', function (Blueprint $table) {\n    $table->id();\n    $table->string('name');\n    $table->timestamps();\n});\n"
+    },
+    {
+     "file": "xxxx_create_products_table.php",
+     "lang": "php",
+     "code": "Schema::create('products', function (Blueprint $table) {\n    $table->id();\n    $table->foreignId('category_id')->constrained()->cascadeOnDelete();\n    $table->string('name');\n    $table->decimal('price', 8, 2);\n    $table->timestamps();\n});\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`foreignId('category_id')` – unsigned bigint column.",
+    "`constrained()` – column ke naam (`category_id`) se table `categories` guess karke foreign key banata hai.",
+    "Table ka naam alag ho to `constrained('product_categories')`.",
+    "`cascadeOnDelete()` – category delete ho to uske products bhi delete."
+   ]
+  },
+  {
+   "heading": "On delete ke options",
+   "body": "Parent delete hone par child ka kya ho:",
+   "code": [
+    {
+     "file": "migration",
+     "lang": "php",
+     "code": "$table->foreignId('category_id')->constrained()->cascadeOnDelete();   // products bhi delete\n$table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete(); // brand_id NULL ho jaye\n$table->foreignId('seller_id')->constrained()->restrictOnDelete();   // delete rok do\n"
+    }
+   ],
+   "explain": [
+    "`cascadeOnDelete` – saath mein delete.",
+    "`nullOnDelete` – column nullable hona chahiye.",
+    "`restrictOnDelete` – child hone par parent delete nahi hone dega."
+   ]
+  },
+  {
+   "heading": "Many-to-many: pivot table",
+   "body": "Ek product kai tags ka ho sakta hai aur ek tag kai products ka. Beech mein pivot table banti hai. Naam do models ke naam alphabetical order mein, singular: `product_tag`.",
+   "code": [
+    {
+     "file": "xxxx_create_product_tag_table.php",
+     "lang": "php",
+     "code": "Schema::create('product_tag', function (Blueprint $table) {\n    $table->foreignId('product_id')->constrained()->cascadeOnDelete();\n    $table->foreignId('tag_id')->constrained()->cascadeOnDelete();\n    $table->primary(['product_id', 'tag_id']);\n});\n",
+     "editable": true
+    }
+   ]
+  },
+  {
+   "heading": "Foreign key hatana",
+   "body": "Rollback ya badlaav mein foreign key ko sahi tareeke se drop karna padta hai:",
+   "code": [
+    {
+     "file": "migration",
+     "lang": "php",
+     "code": "Schema::table('products', function (Blueprint $table) {\n    $table->dropConstrainedForeignId('category_id');\n    // ya: $table->dropForeign(['category_id']);\n});\n"
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Foreign keys: Laravel 11, 12, 13",
+  "intro": "`foreignId()->constrained()` aur on-delete helpers teeno versions mein same hain.",
+  "items": {
+   "11": "`foreignId`, `constrained`, `cascadeOnDelete`, `nullOnDelete`, `dropConstrainedForeignId` available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE[HY000]: General error: 1215 Cannot add foreign key constraint",
+   "cause": "Parent table pehle nahi bani, ya dono columns ke type alag hain.",
+   "fix": "Migration order theek karo (parent pehle) aur `foreignId()` use karo jo `id()` ke type se match karta hai."
+  },
+  {
+   "error": "SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row",
+   "cause": "Child rows hain aur constraint `restrict` hai.",
+   "fix": "Pehle children delete karo ya `cascadeOnDelete()` lagao."
+  },
+  {
+   "error": "Base table or view not found: 1146 Table '...categories' doesn't exist",
+   "cause": "`constrained()` ne jo table guess ki woh maujood nahi (ya naam alag hai).",
+   "fix": "`constrained('sahi_table_naam')` likho aur migration order check karo."
+  }
+ ],
+ "debug": {
+  "body": "Foreign keys aur structure dekhne ke liye:",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan db:table products\nphp artisan migrate:status\nphp artisan migrate:fresh"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Relationships ki tables banao:",
+  "tasks": [
+   "`categories` migration banao, phir `products` mein `category_id` foreign key jodo",
+   "`cascadeOnDelete()` lagao aur `nullOnDelete()` ka farak samjho",
+   "`tags` table aur `product_tag` pivot banao",
+   "`migrate:fresh` chalao aur `db:table` se foreign keys dekho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`foreignId('category_id')->constrained()` kaunsi table se jodta hai?",
+   "options": [
+    "category",
+    "categories",
+    "category_id",
+    "products"
+   ],
+   "answer": 1,
+   "why": "Laravel `category_id` se `categories` table guess karta hai."
+  },
+  {
+   "q": "Many-to-many ke liye kya chahiye?",
+   "options": [
+    "Ek extra column",
+    "Pivot table",
+    "Index",
+    "Soft delete"
+   ],
+   "answer": 1,
+   "why": "Beech mein pivot table banti hai jisme dono tables ke ids hote hain."
+  },
+  {
+   "q": "Foreign key wali table ki migration kab chalni chahiye?",
+   "options": [
+    "Pehle",
+    "Parent table ke baad",
+    "Kabhi bhi",
+    "Sabse last"
+   ],
+   "answer": 1,
+   "why": "Parent table pehle bani honi chahiye, isliye child ki migration baad mein."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Foreign key kya hota hai?",
+   "a": "Ek table ka column jo doosri table ke primary key ko point karta hai aur data integrity banaye rakhta hai."
+  },
+  {
+   "q": "`cascadeOnDelete` aur `nullOnDelete` mein farak?",
+   "a": "`cascade` mein child rows bhi delete hoti hain. `nullOnDelete` mein child ka foreign key NULL ho jaata hai."
+  },
+  {
+   "q": "Pivot table kya hoti hai?",
+   "a": "Many-to-many relation ke liye beech ki table jisme dono taraf ke ids hote hain."
+  },
+  {
+   "q": "`constrained()` kaise table pehchanta hai?",
+   "a": "Column ke naam se (`category_id` -> `categories`). Alag ho to naam khud do."
+  },
+  {
+   "q": "Foreign key constraint error ka aam wajah?",
+   "a": "Parent table ka order, type mismatch, ya na-maujood id."
+  }
+ ],
+ "summary": [
+  "Foreign key data ko consistent rakhta hai.",
+  "`foreignId()->constrained()` standard tareeka hai.",
+  "On delete: `cascade`, `null`, `restrict`.",
+  "Pivot table `a_b` naam se, dono foreign keys ke saath.",
+  "Parent migration hamesha pehle."
+ ]
+}

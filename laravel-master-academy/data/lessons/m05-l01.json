@@ -1,0 +1,204 @@
+{
+ "id": "m05-l01",
+ "title": "Blade Basics: Echo, Escaping aur Data",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Blade kya hai aur `.blade.php` files kaise kaam karti hain samajhna",
+  "`{{ }}` se data dikhana aur automatic escaping jaanna",
+  "`{!! !!}` kab aur kyun khatarnak hai samajhna",
+  "View ko data bhejne ke teen tareeke jaanna",
+  "JavaScript frameworks ke saath `@` aur `@verbatim` use karna"
+ ],
+ "prerequisites": [
+  "MVC Pattern (m03-l01)",
+  "Controllers (m04-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "Blade kya hai?",
+   "body": "Blade Laravel ka built-in template engine hai. Blade tumhe plain PHP likhne se rokta nahi, aur sab Blade templates compile hokar plain PHP ban jaate hain aur cache ho jaate hain, isliye extra overhead lagbhag zero hota hai. Blade files `.blade.php` extension ke saath `resources/views` mein hoti hain.",
+   "callout": {
+    "kind": "tip",
+    "text": "Blade = HTML + chhote shortcuts (`{{ }}`, `@if`, `@foreach`). Saari logic nahi, sirf dikhane ka kaam yahan karo."
+   }
+  },
+  {
+   "heading": "Real-world example: Product page",
+   "body": "Customer ko page par product ka naam aur price dikhana hai. Controller data bhejta hai, Blade use HTML mein daal deta hai.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/greeting', function () {\n    return view('greeting', [\n        'name' => 'Asha',\n        'comment' => '<script>alert(\"hi\")</script>',\n    ]);\n});\n",
+     "editable": true
+    },
+    {
+     "file": "resources/views/greeting.blade.php",
+     "lang": "html",
+     "code": "<h1>Hello, {{ $name }}</h1>\n\n<p>Escaped: {{ $comment }}</p>\n<p>Raw (khatarnak): {!! $comment !!}</p>\n\n<p>Default value: {{ $city ?? 'Delhi' }}</p>\n<p>PHP function: {{ strtoupper($name) }}</p>\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`{{ $name }}` – variable ki value print karta hai.",
+    "`{{ ... }}` ke andar koi bhi PHP expression likh sakte ho.",
+    "`{{ $city ?? 'Delhi' }}` – variable na ho to default value.",
+    "Browser mein `http://localhost:8000/greeting` kholo."
+   ]
+  },
+  {
+   "heading": "Escaping: XSS se bachav",
+   "body": "Blade ke `{{ }}` statements apne aap PHP ke `htmlspecialchars` se guzarte hain, jisse XSS attack se bachav hota hai. Upar wale example mein `<script>` tag text ban kar dikhega, chalega nahi.\n\n`{!! !!}` escaping band kar deta hai. Isse sirf tab use karo jab data poori tarah tumhara apna aur trusted ho.",
+   "callout": {
+    "kind": "warn",
+    "text": "User se aaya data (comment, name, bio) hamesha `{{ }}` se dikhao. `{!! !!}` mein user ka data daloge to XSS vulnerability banegi."
+   }
+  },
+  {
+   "heading": "View ko data bhejne ke tareeke",
+   "body": "Teen common tareeke:",
+   "code": [
+    {
+     "file": "controller ya route",
+     "lang": "php",
+     "code": "// 1. Array ke saath\nreturn view('products.index', ['products' => $products]);\n\n// 2. with() se\nreturn view('products.index')->with('products', $products);\n\n// 3. compact() se (variable ka naam aur key same ho)\nreturn view('products.index', compact('products'));\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "Teeno ka natija same hai. Array wala tareeka sabse saaf hai.",
+    "`compact('products')` ka matlab `['products' => $products]`."
+   ]
+  },
+  {
+   "heading": "Comments, @php aur JavaScript ke saath",
+   "body": "Blade comment HTML output mein nahi aata. Agar JavaScript framework (Vue, Alpine) ki `{{ }}` ko Blade se bachana hai, to `@` lagao ya `@verbatim` use karo. PHP array ko JavaScript mein dene ke liye `Js::from` use karo.",
+   "code": [
+    {
+     "file": "resources/views/example.blade.php",
+     "lang": "html",
+     "code": "{{-- Yeh Blade comment hai, HTML mein nahi dikhega --}}\n\n@php\n    $total = 100 + 18;\n@endphp\n<p>Total: {{ $total }}</p>\n\n{{-- Vue/Alpine ke liye Blade ko chhodo --}}\n<p>Hello, @{{ name }}.</p>\n\n@verbatim\n    <div>{{ name }} aur {{ price }} Blade nahi chhuega</div>\n@endverbatim\n\n<script>\n    var app = {{ Illuminate\\Support\\Js::from($data) }};\n</script>\n"
+    }
+   ],
+   "explain": [
+    "`@{{ name }}` – `@` hat jaata hai aur `{{ name }}` waise hi browser ko jaata hai.",
+    "`@verbatim ... @endverbatim` – bade hisse ke liye.",
+    "`Js::from($data)` – array/object ko safe JavaScript value bana deta hai."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Blade: Laravel 11, 12 aur 13",
+  "intro": "Blade ka core syntax teeno versions mein same hai.",
+  "items": {
+   "11": "`{{ }}`, `{!! !!}`, `@verbatim`, `Js::from` sab available hain.",
+   "12": "Same as 11.",
+   "13": "Same core. Latest docs mein kuch naye helper directives (jaise `@context`) bhi dikhte hain. Zarurat par official Blade docs dekho."
+  }
+ },
+ "errors": [
+  {
+   "error": "Undefined variable $products",
+   "cause": "View ko `products` data pass hi nahi hua, ya naam alag hai.",
+   "fix": "`view('x', compact('products'))` ya array mein sahi key do."
+  },
+  {
+   "error": "View [products.index] not found",
+   "cause": "View ka naam file path se match nahi karta.",
+   "fix": "`products.index` ka matlab `resources/views/products/index.blade.php`."
+  },
+  {
+   "error": "Page par `<script>` ya HTML text ban kar dikh raha hai",
+   "cause": "`{{ }}` escape karta hai (yeh sahi behaviour hai).",
+   "fix": "Agar HTML dikhana hi hai aur data trusted hai to `{!! !!}`, warna data ko HTML mein mat daalo."
+  }
+ ],
+ "debug": {
+  "body": "View mein variable ki value dekhne ke liye `@dump($var)` ya `{{ dd($var) }}` use karo. Purani compiled view cache clear karne ke liye `view:clear`.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan view:clear\nphp artisan view:cache"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Pehla Blade page banao:",
+  "tasks": [
+   "`/profile` route banao jo `name`, `city`, `bio` data view ko bheje",
+   "`profile.blade.php` mein teeno dikhao, city ke liye default value do",
+   "`bio` mein `<b>bold</b>` daal kar `{{ }}` aur `{!! !!}` ka farak dekho",
+   "Ek `@php` block se do numbers ka total nikal kar dikhao"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`{{ $name }}` kya karta hai?",
+   "options": [
+    "Raw HTML dikhata hai",
+    "Escape karke value dikhata hai",
+    "Database query chalata hai",
+    "View include karta hai"
+   ],
+   "answer": 1,
+   "why": "`{{ }}` data ko `htmlspecialchars` se escape karke dikhata hai."
+  },
+  {
+   "q": "User ka comment dikhane ke liye kaunsa syntax sahi hai?",
+   "options": [
+    "{!! $comment !!}",
+    "{{ $comment }}",
+    "@php echo $comment @endphp",
+    "@raw($comment)"
+   ],
+   "answer": 1,
+   "why": "User data ke liye hamesha escaped `{{ }}`."
+  },
+  {
+   "q": "Blade comment kaise likhte hain?",
+   "options": [
+    "<!-- comment -->",
+    "// comment",
+    "{{-- comment --}}",
+    "# comment"
+   ],
+   "answer": 2,
+   "why": "`{{-- --}}` HTML output mein nahi aata."
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is Blade?",
+   "a": "Laravel ka template engine. `.blade.php` templates plain PHP mein compile hokar cache hote hain."
+  },
+  {
+   "q": "`{{ }}` aur `{!! !!}` mein farak?",
+   "a": "`{{ }}` output ko escape karta hai (XSS se bachav). `{!! !!}` raw output deta hai, isliye sirf trusted data ke liye."
+  },
+  {
+   "q": "View ko data kaise bhejte hain?",
+   "a": "`view('name', ['key' => $v])`, `->with('key', $v)`, ya `compact('v')`."
+  },
+  {
+   "q": "Vue/Alpine ke saath Blade ke `{{ }}` ka conflict kaise solve karte hain?",
+   "a": "`@{{ }}` se ya `@verbatim` block se."
+  },
+  {
+   "q": "Blade ko plain PHP kyun kehte hain?",
+   "a": "Kyunki Blade templates compile hokar plain PHP files banti hain aur tum template mein seedha PHP bhi likh sakte ho."
+  }
+ ],
+ "summary": [
+  "Blade `.blade.php` files `resources/views` mein hoti hain.",
+  "`{{ }}` escape karta hai, `{!! !!}` nahi.",
+  "View ko data array, `with()` ya `compact()` se do.",
+  "`@php`, `{{-- --}}`, `@verbatim`, `Js::from` kaam ke tools hain.",
+  "Logic kam rakho, sirf dikhane ka kaam Blade mein."
+ ]
+}

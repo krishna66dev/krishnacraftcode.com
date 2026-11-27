@@ -48,5 +48,10 @@ Open http://localhost:8000. An internet connection is needed for the CDN librari
 ## Phase 5 progress (content)
 - [x] Module 01: PHP Fundamentals and OOP (4 lessons)
 - [x] Module 02: Laravel Introduction and Installation (5 lessons)
-- [ ] Module 03, 04 (rest of Batch 1), then Batches 2 to 6
+- [x] Module 03: Laravel Architecture and MVC (5 lessons)
+- [x] Module 04: Routing and Controllers (5 lessons)
+- [x] Batch 1 complete (Modules 01 to 04, 19 lessons) with practice sets for each module
+- [x] Module 05: Blade Template Engine (5 lessons, with practice set)
+- [x] Module 06: Database and Migrations (6 lessons, with practice set)
+- [ ] Batch 2 remaining: Modules 07 to 09, then Batches 3 to 6
 - After adding lessons: add them to `data/modules.json`, then run `python tools/build_search_index.py`.

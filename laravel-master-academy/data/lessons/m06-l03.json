@@ -1,0 +1,188 @@
+{
+ "id": "m06-l03",
+ "title": "Column Types, Modifiers aur Indexes",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Common column types sahi chunna",
+  "`nullable`, `default`, `unique`, `index` jaise modifiers lagana",
+  "`timestamps()` aur `softDeletes()` samajhna",
+  "Column ko `change()` se badalna, rename aur drop karna"
+ ],
+ "prerequisites": [
+  "Migrations: Tables banana aur Chalana (m06-l02)"
+ ],
+ "sections": [
+  {
+   "heading": "Column types",
+   "body": "Har column ka ek type hota hai. Sahi type chunne se data safe aur database tez rehta hai.",
+   "code": [
+    {
+     "file": "migration",
+     "lang": "php",
+     "code": "Schema::create('products', function (Blueprint $table) {\n    $table->id();                                  // BIGINT auto-increment primary key\n    $table->string('name', 150);                   // VARCHAR(150)\n    $table->string('sku')->unique();               // unique value\n    $table->text('description')->nullable();       // lamba text\n    $table->decimal('price', 8, 2);                // paise: 123456.78 tak\n    $table->unsignedInteger('stock')->default(0);  // negative nahi\n    $table->boolean('is_active')->default(true);   // true/false\n    $table->date('launch_date')->nullable();       // sirf date\n    $table->json('meta')->nullable();              // JSON data\n    $table->softDeletes();                         // deleted_at\n    $table->timestamps();                          // created_at, updated_at\n});\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "Paison ke liye `decimal` use karo, `float` nahi (rounding galtiyan).",
+    "`softDeletes()` – record delete hone par asli mein hata nahi, `deleted_at` bhar jaata hai (Eloquent module mein detail).",
+    "Aur types: `integer`, `bigInteger`, `dateTime`, `time`, `uuid`, `foreignId` (agle lesson mein)."
+   ]
+  },
+  {
+   "heading": "Modifiers",
+   "body": "Column ke baad chain karke extra rules lagate hain:",
+   "code": [
+    {
+     "file": "migration",
+     "lang": "php",
+     "code": "$table->string('nickname')->nullable();          // NULL allow\n$table->integer('rating')->default(5);           // default value\n$table->string('email')->unique();               // duplicate nahi\n$table->string('code')->index();                 // search tez\n$table->string('note')->comment('Admin ka note');// comment\n$table->string('slug')->after('name');           // sirf MySQL: name ke baad\n"
+    }
+   ]
+  },
+  {
+   "heading": "Real-world example: Index lagana",
+   "body": "Agar tum hamesha active products ko price se filter karte ho, to dono par composite index lagao:",
+   "code": [
+    {
+     "file": "migration",
+     "lang": "php",
+     "code": "$table->index(['is_active', 'price']);\n$table->unique(['sku', 'name']);   // dono ka combination unique\n"
+    }
+   ],
+   "explain": [
+    "Index search tez karta hai par insert/update thoda dheema. Sirf jo columns filter/sort mein aate hain unpar lagao.",
+    "`unique` index duplicate rokta hai."
+   ]
+  },
+  {
+   "heading": "Column badalna, rename aur drop",
+   "body": "Existing column badalne ke liye nayi migration mein `change()` use hota hai.",
+   "code": [
+    {
+     "file": "migration",
+     "lang": "php",
+     "code": "Schema::table('products', function (Blueprint $table) {\n    // change(): purane saare modifiers dobara likhne padte hain\n    $table->string('name', 200)->nullable()->change();\n\n    $table->renameColumn('description', 'details');\n    $table->dropColumn(['meta', 'launch_date']);\n});\n"
+    }
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Laravel 11 se `change()` mein jo modifiers (nullable, default...) rakhna chahte ho woh sab dobara likhne padte hain, warna woh hat jaate hain."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Column modify: Laravel 10 vs 11, 12, 13",
+  "intro": "Column types aur modifiers teeno versions mein same hain. Farak column badalne ke tareeke mein hai.",
+  "items": {
+   "11": "`change()`, `renameColumn`, `dropColumn` native hain, `doctrine/dbal` package ki zarurat nahi. `change()` mein saare modifiers dobara likho.",
+   "12": "Same as 11.",
+   "13": "Same as 11. Latest column types ki list official migrations docs mein dekho."
+  }
+ },
+ "errors": [
+  {
+   "error": "Column ka default ya nullable `change()` ke baad gayab ho gaya",
+   "cause": "`change()` mein purane modifiers dobara nahi likhe.",
+   "fix": "`change()` ke saath saare modifiers likho (`nullable()`, `default()`...)."
+  },
+  {
+   "error": "SQLSTATE[23000]: Integrity constraint violation: UNIQUE constraint failed",
+   "cause": "Unique column mein duplicate value daali.",
+   "fix": "Unique value do, ya constraint ki zarurat dobara socho."
+  },
+  {
+   "error": "Data truncated / Numeric value out of range",
+   "cause": "Value column ke type ki limit se badi hai (jaise `decimal(8,2)`).",
+   "fix": "Sahi type/size chuno (jaise `decimal(10,2)`) aur nayi migration se badlo."
+  }
+ ],
+ "debug": {
+  "body": "Table ka asli structure dekhne ke liye `db:table` use karo.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan db:table products\nphp artisan migrate --pretend"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Products table ko behtar banao:",
+  "tasks": [
+   "`price` ko `decimal(10,2)` banao (nayi migration mein `change()`)",
+   "`sku` par unique index lagao",
+   "`is_active` boolean default true jodo",
+   "`db:table products` se structure check karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Paison ke liye kaunsa type best hai?",
+   "options": [
+    "float",
+    "decimal",
+    "string",
+    "boolean"
+   ],
+   "answer": 1,
+   "why": "`decimal` exact values rakhta hai, `float` mein rounding galtiyan ho sakti hain."
+  },
+  {
+   "q": "`softDeletes()` kya jodta hai?",
+   "options": [
+    "`deleted_at` column",
+    "`soft` table",
+    "Ek index",
+    "Foreign key"
+   ],
+   "answer": 0,
+   "why": "Yeh `deleted_at` nullable timestamp column jodta hai."
+  },
+  {
+   "q": "Laravel 11+ mein `change()` ke saath kya yaad rakhna hai?",
+   "options": [
+    "Kuch nahi",
+    "Purane modifiers dobara likhne hain",
+    "Table drop karni hai",
+    "doctrine/dbal install karna hai"
+   ],
+   "answer": 1,
+   "why": "Jo modifiers rakhne hain unhe `change()` ke saath dobara likhna padta hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "`nullable()` kya karta hai?",
+   "a": "Column mein NULL value allow karta hai."
+  },
+  {
+   "q": "Index kab lagate hain?",
+   "a": "Jab column par baar-baar filter, sort ya join hota ho. Zyada index insert/update dheema karte hain."
+  },
+  {
+   "q": "`unique()` aur `index()` mein farak?",
+   "a": "`index()` sirf search tez karta hai. `unique()` duplicate bhi rokta hai."
+  },
+  {
+   "q": "Paise `float` mein store kyun nahi karte?",
+   "a": "Floating point rounding errors deta hai. `decimal` ya integer (paise mein) use karte hain."
+  },
+  {
+   "q": "`softDeletes()` ka kya fayda?",
+   "a": "Record permanently delete nahi hota, `deleted_at` bharta hai, to recover kar sakte ho."
+  }
+ ],
+ "summary": [
+  "Sahi column type chuno: paise ke liye `decimal`.",
+  "`nullable`, `default`, `unique`, `index` modifiers hain.",
+  "`timestamps()` aur `softDeletes()` common helpers hain.",
+  "`change()` mein purane modifiers dobara likho.",
+  "Index sirf zaroori columns par."
+ ]
+}

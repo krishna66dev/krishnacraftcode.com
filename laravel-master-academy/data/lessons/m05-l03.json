@@ -1,0 +1,193 @@
+{
+ "id": "m05-l03",
+ "title": "Layouts aur Template Inheritance",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Layout kyun zaroori hai samajhna",
+  "Component-based layout (`<x-layout>`) banana",
+  "`@extends`, `@section`, `@yield` wala template inheritance samajhna",
+  "`@parent`, default values aur `@stack` ka basic use jaanna"
+ ],
+ "prerequisites": [
+  "Blade Directives (m05-l02)"
+ ],
+ "sections": [
+  {
+   "heading": "Layout kya hai?",
+   "body": "Website ke har page par header, navbar aur footer same hote hain. Har page mein dohrane ki jagah ek **layout** banate ho aur har page sirf apna content deta hai. Blade mein layout banane ke do tareeke hain: **components** aur **template inheritance**. Naye projects mein docs components wala tareeka pehle batate hain."
+  },
+  {
+   "heading": "Tareeka 1: Layout component (recommended)",
+   "body": "Layout ek component hai jisme `{{ $slot }}` mein page ka content aata hai aur named slot `title` mein page ka title.",
+   "code": [
+    {
+     "file": "resources/views/components/layout.blade.php",
+     "lang": "html",
+     "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\">\n    <title>{{ $title ?? 'Laravel Master' }}</title>\n</head>\n<body>\n    <nav>\n        <a href=\"{{ route('home') }}\">Home</a>\n        <a href=\"{{ route('products.index') }}\">Products</a>\n    </nav>\n\n    <main>\n        {{ $slot }}\n    </main>\n\n    <footer>&copy; Laravel Master</footer>\n</body>\n</html>\n",
+     "editable": true
+    },
+    {
+     "file": "resources/views/products/index.blade.php",
+     "lang": "html",
+     "code": "<x-layout>\n    <x-slot:title>Products</x-slot:title>\n\n    <h1>Products</h1>\n    <p>Yahan products ki list aayegi.</p>\n</x-layout>\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`components/layout.blade.php` ko `<x-layout>` se use karte hain.",
+    "Tag ke andar ka content `{{ $slot }}` mein jaata hai.",
+    "`<x-slot:title>` – naam wala slot, layout mein `{{ $title }}` ban jaata hai.",
+    "Slot na ho to `$title ?? 'default'` se default title.",
+    "`route('home')` ke liye `home` naam ka route hona chahiye."
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Layout mein CSS/JS ke liye `@vite([...])` lagate hain (lesson 05). Abhi seekhte waqt use mat lagao, warna build ke bina 'Vite manifest not found' error aayega."
+   }
+  },
+  {
+   "heading": "Tareeka 2: Template inheritance (@extends)",
+   "body": "Yeh purana par abhi bhi poori tarah supported tareeka hai. Layout mein `@yield` se jagah chhodte ho, aur child page `@section` se bharta hai.",
+   "code": [
+    {
+     "file": "resources/views/layouts/app.blade.php",
+     "lang": "html",
+     "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <title>@yield('title', 'Laravel Master')</title>\n    @stack('styles')\n</head>\n<body>\n    @include('partials.nav')\n\n    <main>\n        @yield('content')\n    </main>\n\n    @stack('scripts')\n</body>\n</html>\n",
+     "editable": true
+    },
+    {
+     "file": "resources/views/products/index.blade.php",
+     "lang": "html",
+     "code": "@extends('layouts.app')\n\n@section('title', 'Products')\n\n@section('content')\n    <h1>Products</h1>\n@endsection\n\n@push('scripts')\n    <script>console.log('Products page');</script>\n@endpush\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`@extends('layouts.app')` – `resources/views/layouts/app.blade.php` ko base banao.",
+    "`@yield('content')` – layout mein jagah. Child `@section('content') ... @endsection` se bharta hai.",
+    "`@section('title', 'Products')` – chhota section ek line mein.",
+    "`@yield('title', 'default')` – section na ho to default.",
+    "`@push('scripts')` / `@stack('scripts')` – child ka script layout ke neeche daalne ke liye.",
+    "`@parent` – child section mein layout ka original content bhi rakhna ho to."
+   ]
+  },
+  {
+   "heading": "Kaunsa tareeka chunein?",
+   "body": "Naya project ho to **component layout** chuno: saaf hai aur slots, props aur attributes ke saath achha chalta hai. Purane projects ya tutorials mein `@extends` milega, usse padhna zaroor aana chahiye, kyunki dono tareeke ek hi project mein saath chal sakte hain."
+  }
+ ],
+ "versionDiff": {
+  "heading": "Layouts: Laravel 11, 12 aur 13",
+  "intro": "Dono tareeke (components aur `@extends`) teeno versions mein kaam karte hain.",
+  "items": {
+   "11": "Components (`<x-...>`) aur `@extends` dono supported. Starter kits ke apne layouts hote hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11. `<x-slot:title>` jaisa short slot syntax standard hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "View [layouts.app] not found",
+   "cause": "Layout file ka path galat hai.",
+   "fix": "`layouts.app` ka matlab `resources/views/layouts/app.blade.php`. Folder aur naam check karo."
+  },
+  {
+   "error": "Undefined variable $slot / content dikh nahi raha",
+   "cause": "Component use kiya par tag ke andar content nahi diya, ya `@extends` aur component ko mila diya.",
+   "fix": "Ek page mein ek hi tareeka rakho: `<x-layout>` ya `@extends` + `@section`."
+  },
+  {
+   "error": "Section ka content do baar aa raha hai ya gayab hai",
+   "cause": "`@section` ko `@endsection` se band nahi kiya, ya child mein `@extends` ke bahar content likha.",
+   "fix": "`@extends` wale child mein sab content `@section` ke andar likho."
+  }
+ ],
+ "debug": {
+  "body": "Layout ka koi hissa nahi dikh raha to view cache clear karo aur browser mein 'View Source' dekho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan view:clear"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Apna layout banao:",
+  "tasks": [
+   "`<x-layout>` component banao jisme navbar, `{{ $slot }}` aur footer ho",
+   "Do pages (`home`, `about`) us layout ke saath banao, har ek ka alag title do",
+   "Wahi layout `@extends` + `@yield` se bhi banao aur farak dekho",
+   "Ek page par `@push('scripts')` se chhota script jodo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Component layout mein page ka content kahan aata hai?",
+   "options": [
+    "{{ $content }}",
+    "{{ $slot }}",
+    "@yield('slot')",
+    "@content"
+   ],
+   "answer": 1,
+   "why": "Tag ke andar ka default content `$slot` mein aata hai."
+  },
+  {
+   "q": "`@yield('content')` kahan define hota hai?",
+   "options": [
+    "Child page mein",
+    "Layout mein",
+    "Controller mein",
+    "Route mein"
+   ],
+   "answer": 1,
+   "why": "`@yield` layout mein jagah chhodta hai, child `@section` se bharta hai."
+  },
+  {
+   "q": "Naam wala slot kaise likhte hain?",
+   "options": [
+    "<slot name=title>",
+    "<x-slot:title>",
+    "@slot('title')",
+    "<x:title>"
+   ],
+   "answer": 1,
+   "why": "`<x-slot:title>...</x-slot:title>` naam wala slot hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Layout kyun use karte hain?",
+   "a": "Header, navbar, footer jaisa common hissa ek jagah rakhne ke liye, taaki har page mein dohrana na pade."
+  },
+  {
+   "q": "`@extends` aur component layout mein farak?",
+   "a": "`@extends` mein layout `@yield` se aur child `@section` se bharta hai. Component layout mein `<x-layout>` ke andar content `$slot` aur named slots mein jaata hai."
+  },
+  {
+   "q": "`@stack` aur `@push` kis kaam ke hain?",
+   "a": "Child page se layout ke kisi jagah (jaise body ke end) script/style daalne ke liye."
+  },
+  {
+   "q": "`@parent` kya karta hai?",
+   "a": "Child section mein layout ke section ka original content bhi shaamil karta hai."
+  },
+  {
+   "q": "Layout mein page title kaise badalte hain?",
+   "a": "Component mein `<x-slot:title>` se, ya `@extends` mein `@section('title', '...')` se."
+  }
+ ],
+ "summary": [
+  "Layout common header/footer ek jagah rakhta hai.",
+  "Component layout: `<x-layout>` aur `{{ $slot }}`.",
+  "`@extends`/`@section`/`@yield` purana par supported tareeka hai.",
+  "`@push`/`@stack` se page-specific script ya style daalte hain.",
+  "Ek page mein ek hi tareeka use karo."
+ ]
+}

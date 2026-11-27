@@ -1,0 +1,226 @@
+{
+ "id": "m06-l06",
+ "title": "Query Builder Basics",
+ "minutes": 45,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`DB::table()` se select, insert, update, delete karna",
+  "`where`, `orderBy`, `limit`, aggregates aur `join` use karna",
+  "SQL injection se bachav (parameter binding) samajhna",
+  "`paginate()` aur transactions ka basic use jaanna"
+ ],
+ "prerequisites": [
+  "Seeders aur Factories (m06-l05)"
+ ],
+ "sections": [
+  {
+   "heading": "Query Builder kya hai?",
+   "body": "Query Builder SQL ko PHP method chain mein likhne ka tareeka hai. Tum `DB::table('products')->where(...)->get()` likhte ho, aur Laravel sahi SQL bana kar chalata hai. Isme **PDO parameter binding** hoti hai, isliye SQL injection se bachav milta hai. Eloquent ORM (agla module) isi ke upar bana hai.",
+   "callout": {
+    "kind": "tip",
+    "text": "Pehle query builder samjho. Eloquent mein bhi jab model methods se kaam nahi chalta, to isi tarah ki chaining use hoti hai."
+   }
+  },
+  {
+   "heading": "Select: data padhna",
+   "body": "`get()` collection deta hai, `first()` ek row, `find()` primary key se.",
+   "code": [
+    {
+     "file": "controller ya Tinker",
+     "lang": "php",
+     "code": "use Illuminate\\Support\\Facades\\DB;\n\n$all     = DB::table('products')->get();\n$cheap   = DB::table('products')->where('price', '<', 500)->orderBy('name')->get();\n$one     = DB::table('products')->where('id', 1)->first();\n$byId    = DB::table('products')->find(1);\n$names   = DB::table('products')->pluck('name');\n$top5    = DB::table('products')->orderByDesc('price')->limit(5)->get();\n\necho $one->name; // row ek stdClass object hai\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`where('price', '<', 500)` – column, operator, value. Do argument ho to `=` maan liya jaata hai.",
+    "`get()` – `Collection` jisme har row `stdClass` object hoti hai.",
+    "`pluck('name')` – sirf ek column ki values.",
+    "`orderBy`, `orderByDesc`, `limit` – sort aur limit."
+   ]
+  },
+  {
+   "heading": "Insert, update, delete",
+   "body": "Query builder `created_at`/`updated_at` apne aap nahi bharta, Eloquent bharta hai.",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "DB::table('products')->insert([\n    'name' => 'Wireless Mouse',\n    'price' => 799.50,\n    'stock' => 10,\n    'created_at' => now(),\n    'updated_at' => now(),\n]);\n\nDB::table('products')->where('id', 1)->update(['stock' => 5]);\nDB::table('products')->where('id', 1)->delete();\n",
+     "editable": true
+    }
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "`update` ya `delete` mein `where` lagana mat bhoolo, warna poori table ki rows badal/delete ho jaayengi."
+   }
+  },
+  {
+   "heading": "Aggregates aur join",
+   "body": "Count, sum, average aur do tables ko jodna:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$count = DB::table('products')->count();\n$total = DB::table('products')->sum('stock');\n$avg   = DB::table('products')->avg('price');\n\n$rows = DB::table('products')\n    ->join('categories', 'categories.id', '=', 'products.category_id')\n    ->select('products.name', 'categories.name as category')\n    ->get();\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`count`, `sum`, `avg`, `max`, `min` aggregates hain.",
+    "`join(table, left, operator, right)` – do tables jodta hai.",
+    "`select('categories.name as category')` – column ko alias dete hain."
+   ]
+  },
+  {
+   "heading": "Real-world example: Products page with pagination",
+   "body": "Controller mein query builder, aur Blade mein `links()` se pages.",
+   "code": [
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "public function index()\n{\n    $products = DB::table('products')\n        ->where('is_active', true)\n        ->orderByDesc('created_at')\n        ->paginate(10);\n\n    return view('products.index', compact('products'));\n}\n"
+    },
+    {
+     "file": "resources/views/products/index.blade.php",
+     "lang": "html",
+     "code": "@foreach ($products as $product)\n    <p>{{ $product->name }} - Rs. {{ $product->price }}</p>\n@endforeach\n\n{{ $products->links() }}\n"
+    }
+   ],
+   "explain": [
+    "`paginate(10)` – 10 rows per page aur `?page=2` ko khud sambhalta hai.",
+    "`{{ $products->links() }}` – page links dikhata hai."
+   ]
+  },
+  {
+   "heading": "Raw SQL aur transactions",
+   "body": "Kabhi raw SQL chahiye ho to **hamesha bindings** use karo. Kai queries ko ek saath safe chalane ke liye transaction.",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "// Sahi: ? placeholder ke saath\n$rows = DB::select('select * from products where price > ?', [500]);\n\n// GALAT: user input string mein jodna (SQL injection!)\n// DB::select(\"select * from products where name = '$name'\");\n\nDB::transaction(function () {\n    DB::table('products')->where('id', 1)->decrement('stock', 1);\n    DB::table('orders')->insert(['product_id' => 1, 'qty' => 1]);\n});\n\n// Query dekhna:\nDB::table('products')->where('price', '>', 500)->dd();\n"
+    }
+   ],
+   "explain": [
+    "`?` placeholder aur array se values safe jaati hain.",
+    "`DB::transaction()` – andar ki koi query fail ho to sab undo.",
+    "`->dd()` – query builder ki SQL aur bindings dikhata hai (debugging).",
+    "`decrement('stock', 1)` – column ko ek se kam karta hai."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Query Builder: Laravel 11, 12, 13",
+  "intro": "Query Builder ka syntax teeno versions mein same hai.",
+  "items": {
+   "11": "`DB::table()`, `paginate()`, `transaction()`, aggregates sab available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11. Naye helper methods ke liye official Query Builder docs dekho."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE[42S22]: Column not found: 1054 Unknown column 'x' in 'where clause'",
+   "cause": "Column ka naam table se match nahi karta (ya migration nahi chali).",
+   "fix": "`db:table products` se columns dekho aur spelling theek karo."
+  },
+  {
+   "error": "Trying to get property 'name' of non-object",
+   "cause": "`first()` ne null diya (row nahi mili) aur tumne use seedha padha.",
+   "fix": "Pehle check karo: `if ($row) {...}`, ya `firstOrFail()` jaisa method use karo."
+  },
+  {
+   "error": "Poori table update/delete ho gayi",
+   "cause": "`update()`/`delete()` se pehle `where()` nahi lagaya.",
+   "fix": "Hamesha `where` lagao, aur pehle `select` se rows check karo."
+  }
+ ],
+ "debug": {
+  "body": "Query ki asli SQL dekhne ke liye `toSql()` ya `dd()`.",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "DB::table('products')->where('price', '>', 500)->toSql();\nDB::table('products')->where('price', '>', 500)->dd();\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Query Builder se practice:",
+  "tasks": [
+   "Tinker mein `DB::table('products')->get()` chalao",
+   "500 se mehnge products price ke hisaab se descending nikalo",
+   "`count`, `sum('stock')` aur `avg('price')` nikalo",
+   "`/products` page banao jo `paginate(10)` se products dikhaye"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`DB::table('x')->get()` kya return karta hai?",
+   "options": [
+    "Ek row",
+    "Collection of rows",
+    "Sirf count",
+    "String"
+   ],
+   "answer": 1,
+   "why": "`get()` rows ka Collection deta hai."
+  },
+  {
+   "q": "SQL injection se bachne ke liye kya karna chahiye?",
+   "options": [
+    "String concatenation",
+    "Parameter binding (`?`)",
+    "Sab kuch escape karna",
+    "Kuch nahi"
+   ],
+   "answer": 1,
+   "why": "Bindings (`?` placeholder) values ko SQL se alag rakhte hain."
+  },
+  {
+   "q": "Query builder `created_at` apne aap bharta hai?",
+   "options": [
+    "Haan",
+    "Nahi, khud dena padta hai",
+    "Sirf update mein",
+    "Sirf delete mein"
+   ],
+   "answer": 1,
+   "why": "Timestamps apne aap Eloquent bharta hai, query builder nahi."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Query Builder aur Eloquent mein farak?",
+   "a": "Query builder table par SQL-jaisi chaining deta hai aur stdClass rows lata hai. Eloquent models ke saath kaam karta hai aur relationships, timestamps jaise features deta hai."
+  },
+  {
+   "q": "`get()` aur `first()` mein farak?",
+   "a": "`get()` saari matching rows ka collection, `first()` sirf pehli row (ya null)."
+  },
+  {
+   "q": "Query Builder SQL injection se kaise bachata hai?",
+   "a": "PDO parameter binding se: values query string mein nahi, alag bheji jaati hain."
+  },
+  {
+   "q": "`DB::transaction()` kab use karte hain?",
+   "a": "Jab kai queries ek saath safe chalani hon: ek fail ho to sab undo ho jaaye."
+  },
+  {
+   "q": "`paginate()` kya karta hai?",
+   "a": "Results ko pages mein baantta hai aur view ke liye `links()` ke saath page numbers deta hai."
+  }
+ ],
+ "summary": [
+  "`DB::table()` se SQL ko method chain mein likhte hain.",
+  "`get`, `first`, `find`, `pluck` padhne ke liye.",
+  "`insert`, `update`, `delete` (hamesha `where` ke saath).",
+  "Bindings se SQL injection se bachav.",
+  "`paginate()` aur `DB::transaction()` real projects mein kaam aate hain."
+ ]
+}

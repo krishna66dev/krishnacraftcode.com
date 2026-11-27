@@ -91,7 +91,7 @@
   "items": {
    "11": "Slim skeleton: sirf `routes/web.php` aur `routes/console.php` milte hain. API routes ke liye `php artisan install:api` chalao. Routing config `bootstrap/app.php` ke `withRouting()` mein hoti hai.",
    "12": "Routing syntax 11 jaisa hi hai, structure bhi same. PHP 8.2 ya upar.",
-   "13": "Routing basics same. PHP 8.3 ya upar chahiye. Controllers par middleware aur policy checks attributes se declare kar sakte ho (optional). Exact syntax official docs se verify karo."
+   "13": "Routing basics same. PHP 8.3 ya upar chahiye. Controllers par middleware aur policy checks PHP attributes se declare kar sakte ho (13 docs: `#[Middleware]`, `#[Authorize]`). Detail lesson 04 mein."
   },
   "code": [
    {

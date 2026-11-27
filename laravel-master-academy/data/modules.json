@@ -114,7 +114,58 @@
    "title": "Laravel Architecture and MVC",
    "level": "beginner",
    "icon": "diagram-3",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "m03-l01",
+     "title": "MVC Pattern: Model, View aur Controller",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m03-l02",
+     "title": "Request Lifecycle: Request se Response tak",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m03-l03",
+     "title": "Service Container aur Dependency Injection",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m03-l04",
+     "title": "Service Providers: register aur boot",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m03-l05",
+     "title": "Facades, Contracts aur Helper Functions",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    }
+   ]
   },
   {
    "id": "m04",
@@ -136,7 +187,37 @@
     {
      "id": "m04-l02",
      "title": "Route Parameters aur Constraints",
-     "minutes": 20,
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m04-l03",
+     "title": "Named Routes, Route Groups aur Special Routes",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m04-l04",
+     "title": "Controllers: Basic, Invokable aur Resource",
+     "minutes": 45,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m04-l05",
+     "title": "Route Model Binding",
+     "minutes": 35,
      "versions": [
       "11",
       "12",
@@ -151,7 +232,58 @@
    "title": "Blade Template Engine",
    "level": "beginner",
    "icon": "layout-text-window",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "m05-l01",
+     "title": "Blade Basics: Echo, Escaping aur Data",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m05-l02",
+     "title": "Blade Directives: Conditions, Loops aur $loop",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m05-l03",
+     "title": "Layouts aur Template Inheritance",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m05-l04",
+     "title": "Blade Components, Slots aur Attributes",
+     "minutes": 45,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m05-l05",
+     "title": "Includes, Stacks, Custom Directives aur Vite Assets",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    }
+   ]
   },
   {
    "id": "m06",
@@ -159,7 +291,68 @@
    "title": "Database and Migrations",
    "level": "intermediate",
    "icon": "database",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "m06-l01",
+     "title": "Database Configuration: SQLite aur MySQL",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m06-l02",
+     "title": "Migrations: Tables banana aur Chalana",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m06-l03",
+     "title": "Column Types, Modifiers aur Indexes",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m06-l04",
+     "title": "Foreign Keys aur Table Relationships",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m06-l05",
+     "title": "Seeders aur Factories: Test Data banana",
+     "minutes": 35,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m06-l06",
+     "title": "Query Builder Basics",
+     "minutes": 45,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    }
+   ]
   },
   {
    "id": "m07",

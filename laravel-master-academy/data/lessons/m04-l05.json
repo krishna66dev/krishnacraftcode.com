@@ -1,0 +1,218 @@
+{
+ "id": "m04-l05",
+ "title": "Route Model Binding",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Implicit route model binding samajhna",
+  "`{product:slug}` aur `getRouteKeyName()` se custom key lagana",
+  "Explicit binding (`Route::bind`) aur scoped bindings jaanna",
+  "Soft deleted aur missing model behaviour handle karna"
+ ],
+ "prerequisites": [
+  "Controllers (m04-l04)",
+  "MVC Pattern (m03-l01)"
+ ],
+ "sections": [
+  {
+   "heading": "Route model binding kya hai?",
+   "body": "Aksar hum route se id lete hain aur `Product::findOrFail($id)` likhte hain. Route model binding yeh kaam Laravel ko de deta hai: route parameter ka naam aur controller ka variable same ho to model apne aap mil jaata hai. Na mile to 404.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Http\\Controllers\\ProductController;\n\nRoute::get('/products/{product}', [ProductController::class, 'show']);\n"
+    },
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "use App\\Models\\Product;\n\npublic function show(Product $product)\n{\n    // $product pehle se database se aa chuka hai\n    return view('products.show', ['product' => $product]);\n}\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`{product}` aur `$product` ka naam **same** hona chahiye.",
+    "`Product` type-hint se Laravel `products` table mein primary key (id) se record dhundhta hai.",
+    "Record na mile to automatically 404 aata hai, `findOrFail` likhne ki zarurat nahi."
+   ]
+  },
+  {
+   "heading": "Real-world example: Slug se URL",
+   "body": "SEO ke liye `/products/wireless-mouse` jaise URL chahiye. Route mein `{product:slug}` likho.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::get('/products/{product:slug}', [ProductController::class, 'show']);\n"
+    },
+    {
+     "file": "app/Models/Product.php (poore model ke liye)",
+     "lang": "php",
+     "code": "public function getRouteKeyName(): string\n{\n    return 'slug';\n}\n"
+    }
+   ],
+   "explain": [
+    "`{product:slug}` – sirf is route ke liye `slug` column se dhundo.",
+    "`getRouteKeyName()` – is model ke saare bindings ke liye default key badal deta hai."
+   ]
+  },
+  {
+   "heading": "Explicit binding aur custom logic",
+   "body": "Agar lookup ka apna logic chahiye (jaise sirf published products), to `AppServiceProvider::boot()` mein `Route::bind` use karo.",
+   "code": [
+    {
+     "file": "app/Providers/AppServiceProvider.php",
+     "lang": "php",
+     "code": "use App\\Models\\Product;\nuse Illuminate\\Support\\Facades\\Route;\n\npublic function boot(): void\n{\n    Route::bind('product', function (string $value) {\n        return Product::where('slug', $value)\n            ->where('published', true)\n            ->firstOrFail();\n    });\n}\n"
+    }
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Pehle implicit binding se kaam chalao. Custom logic zarurat par hi lagao."
+   }
+  },
+  {
+   "heading": "Scoped bindings: parent ke andar child",
+   "body": "`/users/{user}/posts/{post:slug}` mein hum chahte hain ki post usi user ki ho. Child par custom key (`:slug`) dene par Laravel parent ke relationship se query karta hai.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Models\\Post;\nuse App\\Models\\User;\n\nRoute::get('/users/{user}/posts/{post:slug}', function (User $user, Post $post) {\n    return $post;\n});\n"
+    }
+   ],
+   "explain": [
+    "Laravel maan leta hai ki `User` model mein `posts` naam ka relationship hai (parameter ka plural naam).",
+    "Isse doosre user ki post us URL se nahi khulti."
+   ]
+  },
+  {
+   "heading": "Soft deleted aur missing models",
+   "body": "Soft deleted models by default 404 dete hain. Alag behaviour chahiye to:",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::get('/products/{product}', [ProductController::class, 'show'])\n    ->withTrashed();\n\nRoute::resource('products', ProductController::class)\n    ->missing(function (Request $request) {\n        return redirect()->route('products.index');\n    });\n"
+    }
+   ],
+   "explain": [
+    "`withTrashed()` – soft deleted models bhi milenge.",
+    "`missing()` – model na mile to 404 ki jagah apna response (jaise redirect)."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Route model binding: Laravel 11, 12, 13",
+  "intro": "Implicit binding, `{model:column}` aur `Route::bind` teeno versions mein same kaam karte hain.",
+  "items": {
+   "11": "`getRouteKeyName()` aur `{product:slug}` se custom key. `Route::bind` ko `AppServiceProvider::boot()` mein likhte hain.",
+   "12": "Same as 11.",
+   "13": "Same, aur 13 docs mein `Illuminate\\Database\\Eloquent\\Attributes\\RouteKey` attribute bhi dikhta hai (route key set karne ke liye). Exact use ke liye official routing docs dekho."
+  }
+ },
+ "errors": [
+  {
+   "error": "No query results for model [App\\Models\\Product]",
+   "cause": "Us id/slug ka record database mein nahi hai (yeh 404 hi hai).",
+   "fix": "Record check karo, seed chalao, ya `missing()` se custom response do."
+  },
+  {
+   "error": "Model inject nahi ho raha (string/id mil rahi hai)",
+   "cause": "Route parameter `{product}` aur controller variable `$item` ka naam alag hai.",
+   "fix": "Dono naam same rakho: `{product}` aur `Product $product`."
+  },
+  {
+   "error": "Soft deleted record par 404",
+   "cause": "Implicit binding soft deleted models ko skip karti hai.",
+   "fix": "Route par `->withTrashed()` lagao."
+  }
+ ],
+ "debug": {
+  "body": "Pehle Tinker mein check karo ki record sach mein hai aur key sahi hai.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan tinker\n>>> App\\Models\\Product::where('slug', 'wireless-mouse')->first()\nphp artisan route:list --path=products"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Binding ke saath practice:",
+  "tasks": [
+   "Product model aur table banao (`php artisan make:model Product -m`)",
+   "`/products/{product}` route aur controller banao jo `Product $product` inject kare",
+   "`slug` column jodo aur route ko `{product:slug}` se badlo",
+   "Ek na-maujood slug kholo aur 404 dekho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Implicit binding ke liye kya zaroori hai?",
+   "options": [
+    "Route name",
+    "Route parameter aur controller variable ka same naam",
+    "Middleware",
+    "Cache"
+   ],
+   "answer": 1,
+   "why": "`{product}` aur `Product $product` ka naam match hona chahiye."
+  },
+  {
+   "q": "`{product:slug}` ka matlab?",
+   "options": [
+    "slug naam ka route",
+    "Model ko id ki jagah `slug` column se dhundo",
+    "Slug ko delete karo",
+    "Slug ko validate karo"
+   ],
+   "answer": 1,
+   "why": "Colon ke baad wala column lookup key banta hai."
+  },
+  {
+   "q": "Model na mile to default kya hota hai?",
+   "options": [
+    "500 error",
+    "404 response",
+    "Redirect home",
+    "Null milta hai"
+   ],
+   "answer": 1,
+   "why": "Implicit binding mein missing model par 404 aata hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Route model binding kya hai?",
+   "a": "Route parameter ko automatically Eloquent model instance mein badalna, naam match hone par."
+  },
+  {
+   "q": "Default key kaunsi hoti hai aur use kaise badalte hain?",
+   "a": "Primary key (`id`). `{model:column}` ya model mein `getRouteKeyName()` se badal sakte ho."
+  },
+  {
+   "q": "Implicit aur explicit binding mein farak?",
+   "a": "Implicit naming convention se chalti hai. Explicit mein `Route::bind` se apna lookup logic likhte hain."
+  },
+  {
+   "q": "Scoped binding kya hai?",
+   "a": "Nested routes mein child model ko parent ke relationship ke andar dhundhna, taaki child usi parent ki ho."
+  },
+  {
+   "q": "Soft deleted model ke saath binding kaise chalate hain?",
+   "a": "`->withTrashed()` lagakar, warna 404 aata hai."
+  }
+ ],
+ "summary": [
+  "Naam match karo, model apne aap mil jaayega.",
+  "`{model:column}` ya `getRouteKeyName()` se custom key.",
+  "`Route::bind` se custom lookup logic.",
+  "Scoped binding child ko parent se bandhti hai.",
+  "`withTrashed()` aur `missing()` se edge cases handle hote hain."
+ ]
+}

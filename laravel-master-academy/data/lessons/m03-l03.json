@@ -1,0 +1,214 @@
+{
+ "id": "m03-l03",
+ "title": "Service Container aur Dependency Injection",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Dependency Injection kya hai samajhna",
+  "Service container ka role jaanna",
+  "Auto-resolution aur interface binding karna",
+  "`bind`, `singleton` aur contextual binding ka farak jaanna",
+  "Container ko testing mein swap karna"
+ ],
+ "prerequisites": [
+  "Request Lifecycle (m03-l02)",
+  "Interfaces aur Constructors (m01-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "Dependency Injection kya hai?",
+   "body": "Agar class ko kisi aur class ki zarurat hai (dependency), to woh use khud `new` se nahi banati, balki bahar se **inject** hoti hai. Isse code loosely coupled aur testable rehta hai.\n\n**Service container** Laravel ka woh tool hai jo classes banata hai aur unki dependencies khud dhundh kar inject karta hai."
+  },
+  {
+   "heading": "Real-world example: Payment gateway",
+   "body": "Checkout ko payment gateway chahiye. Aaj Razorpay hai, kal doosra ho sakta hai. Agar `new RazorpayGateway()` controller mein likh diya to badalna mushkil hoga. Interface + container se ek jagah badalna kaafi hai.",
+   "code": [
+    {
+     "file": "app/Contracts/PaymentGateway.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Contracts;\n\ninterface PaymentGateway\n{\n    public function charge(int $amount): bool;\n}\n"
+    },
+    {
+     "file": "app/Services/RazorpayGateway.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Services;\n\nuse App\\Contracts\\PaymentGateway;\n\nclass RazorpayGateway implements PaymentGateway\n{\n    public function charge(int $amount): bool\n    {\n        return $amount > 0; // asli API call yahan aayegi\n    }\n}\n"
+    },
+    {
+     "file": "app/Http/Controllers/CheckoutController.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Http\\Controllers;\n\nuse App\\Contracts\\PaymentGateway;\nuse Illuminate\\Http\\Request;\n\nclass CheckoutController extends Controller\n{\n    public function __construct(private PaymentGateway $gateway) {}\n\n    public function pay(Request $request)\n    {\n        $paid = $this->gateway->charge(500);\n\n        return $paid ? 'Payment ho gaya' : 'Payment fail';\n    }\n}\n"
+    }
+   ],
+   "explain": [
+    "Controller sirf `PaymentGateway` interface jaanta hai, concrete class nahi.",
+    "Laravel controller banate waqt constructor ke type-hint dekhta hai aur object inject karta hai."
+   ]
+  },
+  {
+   "heading": "Auto-resolution aur binding",
+   "body": "Agar type-hint ek normal class hai (jiski dependencies bhi resolve ho sakti hain), to container bina setup ke object bana deta hai. **Interface** ke liye batana padta hai ki kaunsi class use karni hai. Yeh **binding** service provider ke `register` mein karte hain.",
+   "code": [
+    {
+     "file": "app/Providers/AppServiceProvider.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Providers;\n\nuse App\\Contracts\\PaymentGateway;\nuse App\\Services\\RazorpayGateway;\nuse Illuminate\\Support\\ServiceProvider;\n\nclass AppServiceProvider extends ServiceProvider\n{\n    public function register(): void\n    {\n        $this->app->bind(PaymentGateway::class, RazorpayGateway::class);\n    }\n\n    public function boot(): void\n    {\n        //\n    }\n}\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`bind()` – jab bhi `PaymentGateway` maango, `RazorpayGateway` ka naya object do.",
+    "Is binding ke baad controller mein kuch badalna nahi padta."
+   ]
+  },
+  {
+   "heading": "singleton, contextual binding aur manual resolve",
+   "body": "Alag zarurat ke liye alag tareeke:",
+   "code": [
+    {
+     "file": "register() ke andar",
+     "lang": "php",
+     "code": "// Ek hi object poori request mein share hota hai\n$this->app->singleton(CartService::class, fn ($app) => new CartService());\n\n// Sirf is controller ke liye alag implementation\n$this->app->when(CheckoutController::class)\n    ->needs(PaymentGateway::class)\n    ->give(RazorpayGateway::class);\n"
+    },
+    {
+     "file": "manual resolve",
+     "lang": "php",
+     "code": "$gateway = app(PaymentGateway::class);\n$gateway->charge(100);\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`bind` har baar naya object, `singleton` ek hi object baar-baar.",
+    "Contextual binding mein alag classes ko alag implementation de sakte ho.",
+    "`app(Foo::class)` helper se kahin bhi object mil jaata hai, par normally constructor injection behtar hai."
+   ]
+  },
+  {
+   "heading": "Testing mein swap",
+   "body": "Test mein asli payment nahi chahiye. Container mein fake object daal do:",
+   "code": [
+    {
+     "file": "tests/Feature/CheckoutTest.php",
+     "lang": "php",
+     "code": "$this->app->instance(PaymentGateway::class, new class implements PaymentGateway {\n    public function charge(int $amount): bool\n    {\n        return true;\n    }\n});\n"
+    }
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Yehi DI ka sabse bada fayda hai: asli cheez ki jagah fake dena bahut aasaan ho jaata hai."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Container: Laravel 11, 12, 13",
+  "intro": "Service container ka behaviour teeno versions mein same hai. Farak sirf yeh hai ki bindings kahan likhte hain.",
+  "items": {
+   "11": "Bindings `app/Providers/AppServiceProvider.php` ke `register()` mein. Naye providers `bootstrap/providers.php` mein listed hote hain.",
+   "12": "Same as 11.",
+   "13": "Same. PHP 8.3+ guaranteed hai, to `#[\\Override]` jaise features use kar sakte ho."
+  }
+ },
+ "errors": [
+  {
+   "error": "Target [App\\Contracts\\PaymentGateway] is not instantiable while building [App\\Http\\Controllers\\CheckoutController]",
+   "cause": "Interface ki binding nahi hai, container ko pata nahi kaunsi class deni hai.",
+   "fix": "Service provider ke `register()` mein `$this->app->bind(Interface::class, Concrete::class)` jodo."
+  },
+  {
+   "error": "Unresolvable dependency resolving [Parameter #0 [ <required> string $apiKey ]] in class ...",
+   "cause": "Constructor mein simple type (string/int) hai jiski value container ko nahi pata.",
+   "fix": "Binding closure mein value do, ya `->needs('$apiKey')->give(config('services.x.key'))` use karo."
+  },
+  {
+   "error": "Binding badli par purana object chal raha hai",
+   "cause": "Cache ya provider ka cached data.",
+   "fix": "`php artisan optimize:clear` chalao."
+  }
+ ],
+ "debug": {
+  "body": "Container se kya resolve ho raha hai Tinker mein turant dekh sakte ho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan tinker\n>>> app(App\\Contracts\\PaymentGateway::class)\n>>> get_class(app(App\\Contracts\\PaymentGateway::class))"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "DI ka apna example banao:",
+  "tasks": [
+   "`SmsSender` interface aur `TwilioSender`/`LogSender` do classes banao",
+   "`AppServiceProvider` mein interface ko `LogSender` se bind karo",
+   "Ek controller ke constructor mein interface inject karo",
+   "Binding `TwilioSender` par badal kar dekho ki controller mein kuch nahi badalna pada"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Dependency Injection ka matlab?",
+   "options": [
+    "Class khud dependency banaye",
+    "Dependency bahar se di jaye",
+    "Sab kuch static ho",
+    "Database inject karna"
+   ],
+   "answer": 1,
+   "why": "Class ki zarurat ki cheezein bahar se (constructor/method) di jaati hain."
+  },
+  {
+   "q": "Interface ko concrete class se kahan bind karte hain?",
+   "options": [
+    "routes/web.php",
+    "Service provider ke `register()` mein",
+    "`.env` mein",
+    "View mein"
+   ],
+   "answer": 1,
+   "why": "Bindings service provider ke `register()` method mein hote hain."
+  },
+  {
+   "q": "`singleton` aur `bind` mein farak?",
+   "options": [
+    "Koi farak nahi",
+    "`singleton` ek hi object share karta hai, `bind` har baar naya",
+    "`bind` sirf interface ke liye",
+    "`singleton` sirf testing ke liye"
+   ],
+   "answer": 1,
+   "why": "Singleton ek baar banta hai aur reuse hota hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is the service container?",
+   "a": "Laravel ka dependency management tool jo classes ko resolve karta hai aur unki dependencies inject karta hai."
+  },
+  {
+   "q": "Constructor injection aur method injection mein farak?",
+   "a": "Constructor injection class ki dependencies object ke liye set karta hai. Method injection sirf us method ke liye dependency deta hai, jaise controller method mein `Request $request`."
+  },
+  {
+   "q": "Interface binding kyun karte hain?",
+   "a": "Taaki code concrete class par depend na kare aur implementation badalna ya fake dena aasan ho."
+  },
+  {
+   "q": "`bind` aur `singleton` mein farak?",
+   "a": "`bind` har resolve par naya instance, `singleton` ek shared instance."
+  },
+  {
+   "q": "Container testing mein kaise madad karta hai?",
+   "a": "`$this->app->instance()` ya `bind()` se asli service ki jagah fake/mock inject kar sakte ho."
+  }
+ ],
+ "summary": [
+  "DI mein dependencies bahar se aati hain.",
+  "Service container objects banata aur inject karta hai.",
+  "Normal classes auto-resolve hoti hain, interfaces ko binding chahiye.",
+  "`bind` har baar naya, `singleton` ek hi object.",
+  "Testing mein `instance()` se fake inject karo."
+ ]
+}

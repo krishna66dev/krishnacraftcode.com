@@ -1,0 +1,136 @@
+{
+ "mcq": [
+  {
+   "q": "`5 === '5'` ka result kya hai?",
+   "options": [
+    "true",
+    "false",
+    "error",
+    "null"
+   ],
+   "answer": 1,
+   "why": "`===` value aur type dono check karta hai. Number aur string ka type alag hai."
+  },
+  {
+   "q": "Constructor property promotion kya hai?",
+   "options": [
+    "Constructor ko public banana",
+    "Constructor parameters ko seedha properties banana",
+    "Class ko inherit karna",
+    "Static method banana"
+   ],
+   "answer": 1,
+   "why": "Parameter ke saath `public`/`private` likhne se property apne aap ban jaati hai."
+  },
+  {
+   "q": "`$city = $_GET['city'] ?? 'Delhi';` mein `??` kya karta hai?",
+   "options": [
+    "Dono values jodta hai",
+    "Left side set na ho ya null ho to right side deta hai",
+    "Hamesha 'Delhi' deta hai",
+    "Error deta hai"
+   ],
+   "answer": 1,
+   "why": "`??` null coalescing operator hai: default value deta hai."
+  },
+  {
+   "q": "Inheritance ke bina code ek se zyada classes mein reuse karne ke liye kya use hota hai?",
+   "options": [
+    "Trait",
+    "Interface",
+    "Constant",
+    "Namespace"
+   ],
+   "answer": 0,
+   "why": "Trait ek code bundle hai jo `use TraitName;` se classes mein aata hai."
+  },
+  {
+   "q": "`private` property kahan se access hoti hai?",
+   "options": [
+    "Kahin se bhi",
+    "Sirf usi class ke andar",
+    "Class aur child classes se",
+    "Sirf static methods se"
+   ],
+   "answer": 1,
+   "why": "`private` sirf declare karne wali class ke andar visible hota hai."
+  },
+  {
+   "q": "Composer ke PSR-4 autoload ka kaam kya hai?",
+   "options": [
+    "Database connect karna",
+    "Namespace ko folder path se map karke classes load karna",
+    "Server start karna",
+    "Templates compile karna"
+   ],
+   "answer": 1,
+   "why": "PSR-4 `App\\` jaise namespace ko `app/` folder se jodta hai."
+  }
+ ],
+ "assignments": [
+  {
+   "title": "Cart total calculator",
+   "level": "Beginner",
+   "brief": "Functions aur arrays se shopping cart ka total nikalo.",
+   "tasks": [
+    "`lineTotal(int $price, int $qty = 1): int` function likho",
+    "`$cart` array mein 3 items rakho (name, price, qty)",
+    "`array_map` aur `array_sum` se total nikalo",
+    "`declare(strict_types=1);` lagao aur total print karo"
+   ],
+   "explain": "`array_map` har item ka line total banata hai, `array_sum` unka jod deta hai.",
+   "solution": [
+    {
+     "file": "cart.php",
+     "lang": "php",
+     "code": "<?php\n\ndeclare(strict_types=1);\n\nfunction lineTotal(int $price, int $qty = 1): int\n{\n    return $price * $qty;\n}\n\n$cart = [\n    ['name' => 'Mouse',    'price' => 799,  'qty' => 2],\n    ['name' => 'Keyboard', 'price' => 1499, 'qty' => 1],\n    ['name' => 'Cable',    'price' => 150,  'qty' => 3],\n];\n\n$total = array_sum(array_map(\n    fn (array $item) => lineTotal($item['price'], $item['qty']),\n    $cart\n));\n\necho \"Total: {$total}\"; // 3547\n"
+    }
+   ]
+  },
+  {
+   "title": "Student class",
+   "level": "Intermediate",
+   "brief": "OOP se ek Student class banao jo average aur grade nikale.",
+   "tasks": [
+    "Constructor promotion se `name` (readonly) aur private `marks` (array) rakho",
+    "`average(): float` method likho",
+    "`grade(): string` method mein `match(true)` se A/B/C do",
+    "Do students ke objects banakar result print karo"
+   ],
+   "explain": "`match(true)` har arm ko `true` se compare karta hai, isliye conditions likh sakte ho.",
+   "solution": [
+    {
+     "file": "Student.php",
+     "lang": "php",
+     "code": "<?php\n\ndeclare(strict_types=1);\n\nclass Student\n{\n    public function __construct(\n        public readonly string $name,\n        private array $marks,\n    ) {}\n\n    public function average(): float\n    {\n        return array_sum($this->marks) / count($this->marks);\n    }\n\n    public function grade(): string\n    {\n        return match (true) {\n            $this->average() >= 75 => 'A',\n            $this->average() >= 50 => 'B',\n            default => 'C',\n        };\n    }\n}\n\n$s = new Student('Asha', [80, 70, 90]);\necho \"{$s->name}: {$s->average()} ({$s->grade()})\";\n"
+    }
+   ]
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is the difference between == and ===?",
+   "a": "`==` loose comparison hai (type convert karta hai). `===` strict hai: value aur type dono same hone chahiye."
+  },
+  {
+   "q": "What is constructor property promotion?",
+   "a": "PHP 8 ka feature jisme constructor parameters ke saath visibility likhne se woh seedha properties ban jaati hain."
+  },
+  {
+   "q": "Abstract class aur interface mein farak?",
+   "a": "Abstract class mein implementation aur state ho sakti hai, interface sirf contract hai. Ek class kai interfaces implement kar sakti hai par extend sirf ek class ko."
+  },
+  {
+   "q": "What is a trait?",
+   "a": "Code reuse ka tareeka jo `use` se class mein aata hai, jaise `HasFactory`."
+  },
+  {
+   "q": "What is PSR-4 autoloading?",
+   "a": "Namespace ko folder path se map karne ka standard, jisse Composer classes khud load karta hai."
+  },
+  {
+   "q": "`match` aur `switch` mein farak?",
+   "a": "`match` strict comparison karta hai, value return karta hai, fall-through nahi hota aur match na ho to `UnhandledMatchError` deta hai."
+  }
+ ]
+}

@@ -1,0 +1,210 @@
+{
+ "id": "m04-l03",
+ "title": "Named Routes, Route Groups aur Special Routes",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Named routes banana aur `route()`/`redirect()->route()` se use karna",
+  "`prefix`, `name` aur `middleware` ke saath groups banana",
+  "Controller group, `redirect`, `view`, `fallback` routes samajhna",
+  "`match` aur `any` ka use jaanna",
+  "Route cache ka basic idea jaanna"
+ ],
+ "prerequisites": [
+  "Route Parameters aur Constraints (m04-l02)"
+ ],
+ "sections": [
+  {
+   "heading": "Named routes",
+   "body": "Route ko naam do aur URL kabhi hardcode mat karo. Kal URL badla to sirf route definition badalni padegi.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::get('/products/{id}', [ProductController::class, 'show'])\n    ->name('products.show');\n",
+     "editable": true
+    },
+    {
+     "file": "kahin bhi",
+     "lang": "php",
+     "code": "$url = route('products.show', ['id' => 5]);   // /products/5\nreturn redirect()->route('products.show', ['id' => 5]);\n",
+     "editable": true
+    },
+    {
+     "file": "resources/views/example.blade.php",
+     "lang": "html",
+     "code": "<a href=\"{{ route('products.show', ['id' => 5]) }}\">Product 5</a>\n"
+    }
+   ],
+   "explain": [
+    "`route('naam', [...])` – URL banata hai.",
+    "Extra array keys query string ban jaati hain (`?page=2`).",
+    "`request()->routeIs('products.*')` se current route check kar sakte ho."
+   ]
+  },
+  {
+   "heading": "Real-world example: Admin panel",
+   "body": "Admin ke saare routes ka URL `/admin/...` se shuru hota hai aur route naam `admin.` se. Har route par yeh dohrane ki jagah group use karo.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::prefix('admin')->name('admin.')->group(function () {\n    Route::get('/dashboard', [AdminController::class, 'dashboard'])\n        ->name('dashboard');          // route('admin.dashboard') => /admin/dashboard\n\n    Route::get('/users', [UserController::class, 'index'])\n        ->name('users.index');        // route('admin.users.index') => /admin/users\n});\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`prefix('admin')` – URL ke aage `admin/` lagata hai.",
+    "`name('admin.')` – route ke naam ke aage `admin.` lagata hai.",
+    "Group mein `->middleware('auth')` bhi laga sakte ho (Authentication module mein seekhenge)."
+   ]
+  },
+  {
+   "heading": "Controller group aur special routes",
+   "body": "Same controller ke routes ek group mein likh sakte ho. Kuch aur kaam ke routes:",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::controller(OrderController::class)->group(function () {\n    Route::get('/orders/{id}', 'show');\n    Route::post('/orders', 'store');\n});\n\nRoute::redirect('/here', '/there', 301);\nRoute::view('/welcome', 'welcome', ['name' => 'Dost']);\n\nRoute::match(['get', 'post'], '/contact', [ContactController::class, 'handle']);\nRoute::any('/webhook', [WebhookController::class, 'handle']);\n\nRoute::fallback(function () {\n    return response('Page nahi mila', 404);\n});\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`Route::controller()` – group ke saare routes ke liye ek controller.",
+    "`Route::redirect` – seedha redirect, controller ki zarurat nahi.",
+    "`Route::view` – sirf view dikhana ho to.",
+    "`match([...])` – kuch chune hue methods. `any` – saare methods.",
+    "`fallback` – koi bhi route match na ho to chalta hai. Ise hamesha sabse last mein rakho."
+   ]
+  },
+  {
+   "heading": "Route cache",
+   "body": "Production mein routes ko cache karne se application tez chalti hai. Cache ke liye saare routes controller-based hone chahiye (closure routes cache nahi hote).",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan route:cache\nphp artisan route:clear"
+    }
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Development mein `route:cache` mat chalao, warna route badalne par asar nahi dikhega. Dikhe nahi to `php artisan route:clear` chalao."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Version notes",
+  "intro": "Named routes aur groups teeno versions mein same hain. Farak API routes ki file mein hai.",
+  "items": {
+   "11": "`routes/api.php` default mein nahi hota. `php artisan install:api` se banta hai, aur uske routes par `/api` prefix lagta hai.",
+   "12": "Same as 11.",
+   "13": "Same as 11. Groups, `Route::controller()` aur `fallback` same kaam karte hain."
+  }
+ },
+ "errors": [
+  {
+   "error": "Route [login] not defined",
+   "cause": "Group mein `->middleware('auth')` lagaya par login route abhi bana hi nahi, to auth middleware redirect nahi kar pata.",
+   "fix": "Authentication module tak `auth` middleware mat lagao, ya `login` naam ka route banao."
+  },
+  {
+   "error": "Route [admin.dashboard] not defined",
+   "cause": "Group mein `name('admin.')` lagaya par route par `->name('dashboard')` nahi hai, ya naam alag hai.",
+   "fix": "Poora naam `route:list` se dekho: prefix + route ka naam."
+  },
+  {
+   "error": "Fallback route sab kuch pakad raha hai",
+   "cause": "`fallback` route sabse upar likh diya.",
+   "fix": "Fallback ko file ke bilkul end mein rakho."
+  }
+ ],
+ "debug": {
+  "body": "Naam aur URL ka poora mapping `route:list` mein dikhta hai.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan route:list --name=admin\nphp artisan route:list --except-vendor"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Ek chhota admin section banao:",
+  "tasks": [
+   "`admin` prefix aur `admin.` naam ke saath group banao",
+   "Group mein `dashboard` aur `users` routes banao",
+   "`/old-page` se `/new-page` ka redirect route banao",
+   "Sabse end mein ek `fallback` route banao jo custom 404 message de"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`Route::prefix('admin')->name('admin.')` ka route naam `dashboard` ho to poora naam?",
+   "options": [
+    "dashboard",
+    "admin.dashboard",
+    "admin/dashboard",
+    "dashboard.admin"
+   ],
+   "answer": 1,
+   "why": "Prefix naam ke aage jud jaata hai: `admin.dashboard`."
+  },
+  {
+   "q": "Fallback route kahan likhna chahiye?",
+   "options": [
+    "Sabse upar",
+    "Sabse neeche",
+    "Kahin bhi",
+    "Controller mein"
+   ],
+   "answer": 1,
+   "why": "Fallback sirf tab chalta hai jab koi route match na kare, isliye last mein."
+  },
+  {
+   "q": "Route cache ke liye kya zaroori hai?",
+   "options": [
+    "Sab routes closure hon",
+    "Closure routes na hon, controller-based hon",
+    "Database ho",
+    "Sirf web routes ho"
+   ],
+   "answer": 1,
+   "why": "Closure routes cache nahi hote, controller routes hote hain."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Named route ka fayda?",
+   "a": "URL hardcode nahi karna padta. URL badalne par sirf route definition badalti hai."
+  },
+  {
+   "q": "Route group kyun use karte hain?",
+   "a": "Common cheezein (prefix, name, middleware, controller) ek baar likhne ke liye."
+  },
+  {
+   "q": "`Route::redirect` aur `redirect()` helper mein farak?",
+   "a": "`Route::redirect` route file mein hi chhota redirect define karta hai. `redirect()` controller ke andar response ke roop mein use hota hai."
+  },
+  {
+   "q": "Fallback route kya hai?",
+   "a": "Aisa route jo tab chalta hai jab koi aur route match na kare, custom 404 ke liye."
+  },
+  {
+   "q": "`route:cache` kab chalate hain?",
+   "a": "Production deployment mein, performance ke liye. Closure routes ho to fail hota hai."
+  }
+ ],
+ "summary": [
+  "Named routes URL hardcode hone se bachate hain.",
+  "Groups prefix, name, middleware aur controller share karte hain.",
+  "`redirect`, `view`, `match`, `any`, `fallback` special routes hain.",
+  "Fallback hamesha last mein.",
+  "`route:cache` sirf production mein, closure routes ke bina."
+ ]
+}

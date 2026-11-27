@@ -1,0 +1,217 @@
+{
+ "id": "m03-l05",
+ "title": "Facades, Contracts aur Helper Functions",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Facade kya hai aur andar se kaise kaam karta hai samajhna",
+  "Facade, helper aur dependency injection ka farak jaanna",
+  "Apna simple Facade banana",
+  "Testing mein Facade fake karna"
+ ],
+ "prerequisites": [
+  "Service Container aur Dependency Injection (m03-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "Facade kya hai?",
+   "body": "Facade container mein bandi hui class ka **static jaisa interface** hai. `Cache::get('key')` dekhne mein static call lagti hai, par andar se Laravel container se asli `cache` object nikalta hai aur uska method chalata hai. Isse code chhota aur padhne mein aasan hota hai.",
+   "callout": {
+    "kind": "tip",
+    "text": "Facade = shortcut. Piche asli object hai jo container se aata hai, isliye testing mein fake bhi ho sakta hai."
+   }
+  },
+  {
+   "heading": "Real-world example: Cache ke teen tareeke",
+   "body": "Ek hi kaam teen tareeke se: Facade, helper aur dependency injection.",
+   "code": [
+    {
+     "file": "Facade",
+     "lang": "php",
+     "code": "use Illuminate\\Support\\Facades\\Cache;\n\nCache::put('visits', 10, 600); // 600 seconds\n$visits = Cache::get('visits', 0);\n",
+     "editable": true
+    },
+    {
+     "file": "Helper function",
+     "lang": "php",
+     "code": "cache()->put('visits', 10, 600);\n$visits = cache('visits', 0);\n",
+     "editable": true
+    },
+    {
+     "file": "Dependency injection",
+     "lang": "php",
+     "code": "use Illuminate\\Contracts\\Cache\\Repository;\n\nclass VisitController extends Controller\n{\n    public function index(Repository $cache)\n    {\n        return $cache->get('visits', 0);\n    }\n}\n"
+    }
+   ],
+   "explain": [
+    "Facade: chhota aur popular, controllers aur routes mein aam hai.",
+    "Helper: `cache()`, `config()`, `route()`, `view()`, `request()`, `logger()`, `now()`, `collect()` jaise global functions.",
+    "DI: dependency constructor/method mein saaf dikhti hai. `Illuminate\\Contracts\\...` ke interfaces ko **Contracts** kehte hain."
+   ]
+  },
+  {
+   "heading": "Facade andar se kaise kaam karta hai",
+   "body": "Har facade ek chhoti class hoti hai jo batati hai ki container mein kaunsi cheez maangni hai. Apna facade bana ke samjho:",
+   "code": [
+    {
+     "file": "app/Services/CartService.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Services;\n\nclass CartService\n{\n    public function total(): int\n    {\n        return 3097;\n    }\n}\n"
+    },
+    {
+     "file": "app/Facades/Cart.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Facades;\n\nuse App\\Services\\CartService;\nuse Illuminate\\Support\\Facades\\Facade;\n\nclass Cart extends Facade\n{\n    protected static function getFacadeAccessor(): string\n    {\n        return CartService::class;\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Facades\\Cart;\n\nRoute::get('/cart-total', fn () => Cart::total());\n"
+    }
+   ],
+   "explain": [
+    "`getFacadeAccessor()` container ko batata hai ki kaunsi service resolve karni hai.",
+    "`Cart::total()` -> container se `CartService` ka object -> uska `total()` method.",
+    "`CartService` auto-resolve hoti hai, alag binding ki zarurat nahi."
+   ]
+  },
+  {
+   "heading": "Testing mein Facade fake karna",
+   "body": "Facade ka bada fayda testing hai: asli kaam ki jagah fake chalana.",
+   "code": [
+    {
+     "file": "tests/Feature/CacheTest.php",
+     "lang": "php",
+     "code": "Cache::shouldReceive('get')\n    ->once()\n    ->with('visits')\n    ->andReturn(5);\n"
+    },
+    {
+     "file": "popular fakes",
+     "lang": "php",
+     "code": "Mail::fake();\nQueue::fake();\nHttp::fake();\n"
+    }
+   ],
+   "explain": [
+    "`shouldReceive()` – facade ko mock banata hai.",
+    "`Mail::fake()`, `Queue::fake()`, `Http::fake()` – asli email/job/HTTP call roke bina test chalate hain."
+   ]
+  },
+  {
+   "heading": "Facade ya DI?",
+   "body": "Dono sahi hain. Thumb rule:\n\n- Chhote kaam aur routes/controllers mein facade ya helper chalega.\n- Badi classes (services) mein constructor injection se dependencies saaf dikhti hain.\n- Facade ke saath dhyan rakho ki ek class mein bahut saare facades na bhar jaayein, class ka kaam badhta jaata hai."
+  }
+ ],
+ "versionDiff": {
+  "heading": "Facades: Laravel 11, 12, 13",
+  "intro": "Facades aur helpers teeno versions mein same kaam karte hain.",
+  "items": {
+   "11": "Facades `Illuminate\\Support\\Facades\\...` namespace mein. Class file ke andar hamesha `use` likho.",
+   "12": "Same as 11.",
+   "13": "Same. Koi breaking change nahi, facade code waise hi chalta hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "Class \"App\\Http\\Controllers\\Cache\" not found",
+   "cause": "Controller ya kisi namespaced class mein facade ka `use` nahi likha, to PHP usi namespace mein `Cache` dhundta hai.",
+   "fix": "File ke upar `use Illuminate\\Support\\Facades\\Cache;` likho."
+  },
+  {
+   "error": "Facade does not implement getFacadeAccessor method",
+   "cause": "Custom facade mein `getFacadeAccessor()` nahi likha.",
+   "fix": "Method banao jo class ka naam ya container key return kare."
+  },
+  {
+   "error": "Call to undefined method on facade",
+   "cause": "Jis class ke piche facade hai usme woh method hai hi nahi.",
+   "fix": "Facade ki asli class ki documentation/source dekho aur sahi method naam use karo."
+  }
+ ],
+ "debug": {
+  "body": "Facade ke piche kaunsi class hai Tinker se dekho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan tinker\n>>> Illuminate\\Support\\Facades\\Cache::getFacadeRoot()\n>>> get_class(Illuminate\\Support\\Facades\\Cache::getFacadeRoot())"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Facades ke saath practice:",
+  "tasks": [
+   "Ek value `Cache::put` se store karo aur `Cache::get` se padho (Tinker mein)",
+   "Wahi kaam `cache()` helper se karo",
+   "`Cart` jaisa apna facade banao",
+   "`config('app.name')`, `route()`, `now()` helpers Tinker mein chalao"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Facade kya deta hai?",
+   "options": [
+    "Naya database",
+    "Container ki class ka static-jaisa interface",
+    "Nayi route file",
+    "Naya template engine"
+   ],
+   "answer": 1,
+   "why": "Facade container ke object tak chhota static-jaisa raasta deta hai."
+  },
+  {
+   "q": "Custom facade mein kaunsa method zaroori hai?",
+   "options": [
+    "boot()",
+    "register()",
+    "getFacadeAccessor()",
+    "handle()"
+   ],
+   "answer": 2,
+   "why": "`getFacadeAccessor()` batata hai ki container se kya resolve karna hai."
+  },
+  {
+   "q": "Namespaced class mein `Cache::get()` par 'Class not found' aaye to kya karein?",
+   "options": [
+    "Server restart",
+    "`use Illuminate\\Support\\Facades\\Cache;` likhein",
+    "Composer reinstall",
+    "`.env` badlein"
+   ],
+   "answer": 1,
+   "why": "Facade ka `use` statement likhna padta hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is a Facade in Laravel?",
+   "a": "Container mein registered service ka static-jaisa proxy. Static call andar se container ke object ka method chalati hai."
+  },
+  {
+   "q": "Facade aur helper function mein farak?",
+   "a": "Dono shortcut hain. Facade class-based hai (`Cache::get`), helper global function (`cache()`). Dono same underlying service use karte hain."
+  },
+  {
+   "q": "Facade testable kyun hai?",
+   "a": "Kyunki piche container ka object hota hai, to `shouldReceive()` ya `fake()` se use mock kiya ja sakta hai."
+  },
+  {
+   "q": "Contracts kya hain?",
+   "a": "`Illuminate\\Contracts` ke interfaces jo framework services ka contract batate hain. DI mein type-hint karne ke liye use hote hain."
+  },
+  {
+   "q": "Facade ya dependency injection kab use karein?",
+   "a": "Chhote kaam mein facade/helper theek hai. Badi classes mein DI se dependencies saaf dikhti hain."
+  }
+ ],
+ "summary": [
+  "Facade container ki service ka static-jaisa shortcut hai.",
+  "Helpers (`cache()`, `config()`, `view()`) bhi shortcuts hain.",
+  "Custom facade ke liye `getFacadeAccessor()` likho.",
+  "Testing mein `shouldReceive()` aur `fake()` kaam aate hain.",
+  "Facade aur DI dono valid hain, jagah dekh kar chuno."
+ ]
+}

@@ -1,0 +1,146 @@
+{
+ "mcq": [
+  {
+   "q": "Blade ka `{{ }}` output ke saath kya karta hai?",
+   "options": [
+    "Raw HTML deta hai",
+    "Escape karke deta hai",
+    "Database se lata hai",
+    "Cache karta hai"
+   ],
+   "answer": 1,
+   "why": "`{{ }}` `htmlspecialchars` se escape karta hai."
+  },
+  {
+   "q": "Khali list ke liye kaunsa directive best hai?",
+   "options": [
+    "@foreach",
+    "@forelse ... @empty",
+    "@while",
+    "@unless"
+   ],
+   "answer": 1,
+   "why": "`@forelse` ke `@empty` section se khali list handle hoti hai."
+  },
+  {
+   "q": "Component mein PHP variable pass karne ke liye kya likhte hain?",
+   "options": [
+    "amount=\"$x\"",
+    ":amount=\"$x\"",
+    "@amount($x)",
+    "{{ amount }}"
+   ],
+   "answer": 1,
+   "why": "Colon wala `:prop` PHP expression leta hai."
+  },
+  {
+   "q": "`resources/views/components/forms/input.blade.php` ka tag kya hai?",
+   "options": [
+    "<x-forms-input />",
+    "<x-forms.input />",
+    "<forms.input />",
+    "<x:forms.input />"
+   ],
+   "answer": 1,
+   "why": "Subfolder ko dot se likhte hain."
+  },
+  {
+   "q": "Layout mein child ka script daalne ke liye kya use hota hai?",
+   "options": [
+    "@yield('scripts')",
+    "@push / @stack",
+    "@include('scripts')",
+    "@script"
+   ],
+   "answer": 1,
+   "why": "Child `@push('scripts')` karta hai, layout `@stack('scripts')` se dikhata hai."
+  },
+  {
+   "q": "`@vite` lagaya par 'Vite manifest not found' aaye to kya karein?",
+   "options": [
+    "Server restart",
+    "`npm run dev` ya `npm run build` chalao",
+    "Composer update",
+    "Cache hata do"
+   ],
+   "answer": 1,
+   "why": "Assets build nahi hue, to `npm run dev` ya `build` chalana padta hai."
+  }
+ ],
+ "assignments": [
+  {
+   "title": "Product card component",
+   "level": "Intermediate",
+   "brief": "Ek reusable product card banao.",
+   "tasks": [
+    "`php artisan make:component product-card --view` chalao",
+    "`@props(['name','price'])` se name aur price lo",
+    "Card mein `{{ $slot }}` se description dikhao",
+    "Ek page par 3 cards `@foreach` se dikhao"
+   ],
+   "explain": "`@props` data leta hai, `$slot` tag ke andar ka content.",
+   "solution": [
+    {
+     "file": "resources/views/components/product-card.blade.php",
+     "lang": "html",
+     "code": "@props(['name', 'price'])\n\n<div {{ $attributes->merge(['class' => 'card']) }}>\n    <h3>{{ $name }}</h3>\n    <p>Rs. {{ $price }}</p>\n    {{ $slot }}\n</div>\n"
+    },
+    {
+     "file": "use karna",
+     "lang": "html",
+     "code": "@foreach ($products as $p)\n    <x-product-card :name=\"$p['name']\" :price=\"$p['price']\">\n        Stock mein hai.\n    </x-product-card>\n@endforeach\n"
+    }
+   ]
+  },
+  {
+   "title": "Layout ke saath multi-page site",
+   "level": "Intermediate",
+   "brief": "Ek layout component se do pages banao.",
+   "tasks": [
+    "`components/layout.blade.php` banao (navbar, `{{ $slot }}`, footer)",
+    "`home` aur `about` routes aur views banao",
+    "Har page ka alag title `<x-slot:title>` se do",
+    "Layout mein `@stack('scripts')` jodo aur ek page se script push karo"
+   ],
+   "explain": "Layout ek baar banta hai, har page sirf apna content deta hai.",
+   "solution": [
+    {
+     "file": "resources/views/components/layout.blade.php",
+     "lang": "html",
+     "code": "<!DOCTYPE html>\n<html>\n<head><title>{{ $title ?? 'Site' }}</title></head>\n<body>\n    <nav><a href=\"/\">Home</a> <a href=\"/about\">About</a></nav>\n    <main>{{ $slot }}</main>\n    @stack('scripts')\n</body>\n</html>\n"
+    },
+    {
+     "file": "resources/views/about.blade.php",
+     "lang": "html",
+     "code": "<x-layout>\n    <x-slot:title>About</x-slot:title>\n    <h1>About us</h1>\n\n    @push('scripts')\n        <script>console.log('about');</script>\n    @endpush\n</x-layout>\n"
+    }
+   ]
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is Blade?",
+   "a": "Laravel ka template engine. Templates plain PHP mein compile hokar cache hote hain."
+  },
+  {
+   "q": "Difference between {{ }} and {!! !!}?",
+   "a": "`{{ }}` escape karta hai (XSS se bachav), `{!! !!}` raw output deta hai."
+  },
+  {
+   "q": "What is the $loop variable?",
+   "a": "`@foreach` ke andar milne wala object jisme iteration, index, first, last, even, odd, count jaisi properties hoti hain."
+  },
+  {
+   "q": "Anonymous vs class-based components?",
+   "a": "Anonymous sirf Blade file hota hai, class-based mein PHP class bhi hoti hai jo logic deti hai."
+  },
+  {
+   "q": "What are slots?",
+   "a": "Component ke andar ka content. Default slot `$slot`, naam wale slots `<x-slot:name>` se."
+  },
+  {
+   "q": "How do you create a custom Blade directive?",
+   "a": "`Blade::directive()` ko service provider ke `boot()` mein register karke, phir `view:clear` chalate hain."
+  }
+ ]
+}

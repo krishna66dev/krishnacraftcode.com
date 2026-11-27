@@ -1,0 +1,208 @@
+{
+ "id": "m06-l01",
+ "title": "Database Configuration: SQLite aur MySQL",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`config/database.php` aur `.env` ka rishta samajhna",
+  "SQLite ke saath shuru karna",
+  "MySQL par switch karke database banana",
+  "`php artisan db:show` aur Tinker se connection check karna"
+ ],
+ "prerequisites": [
+  "Configuration, .env aur Artisan Basics (m02-l05)"
+ ],
+ "sections": [
+  {
+   "heading": "Laravel database se kaise baat karta hai?",
+   "body": "Laravel SQLite, MySQL/MariaDB, PostgreSQL aur SQL Server ko support karta hai. Connection ki saari settings `config/database.php` mein hoti hain, aur asli values (host, naam, password) `.env` se aati hain. Tumhara code kisi bhi database par same chalta hai, kyunki Laravel ek common layer deta hai."
+  },
+  {
+   "heading": "SQLite: bina setup ke shuru",
+   "body": "Naye Laravel project ka default database SQLite hai. Yeh ek single file (`database/database.sqlite`) hoti hai, to alag server install nahi karna padta. Seekhne ke liye perfect.",
+   "code": [
+    {
+     "file": ".env",
+     "lang": "ini",
+     "code": "DB_CONNECTION=sqlite"
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan migrate\nphp artisan db:show"
+    }
+   ],
+   "explain": [
+    "Project banate waqt Laravel `database.sqlite` file khud banata hai.",
+    "`php artisan migrate` default tables (users, cache, jobs) banata hai.",
+    "`db:show` – connection, database aur tables ki summary."
+   ]
+  },
+  {
+   "heading": "Real-world example: MySQL par switch",
+   "body": "Production aur bade projects mein aksar MySQL use hota hai. Pehle MySQL mein database banao, phir `.env` badlo.",
+   "code": [
+    {
+     "file": "MySQL console / phpMyAdmin",
+     "lang": "sql",
+     "code": "CREATE DATABASE laravel_master\n    CHARACTER SET utf8mb4\n    COLLATE utf8mb4_unicode_ci;"
+    },
+    {
+     "file": ".env",
+     "lang": "ini",
+     "code": "DB_CONNECTION=mysql\nDB_HOST=127.0.0.1\nDB_PORT=3306\nDB_DATABASE=laravel_master\nDB_USERNAME=root\nDB_PASSWORD="
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan config:clear\nphp artisan migrate"
+    }
+   ],
+   "explain": [
+    "`utf8mb4` – emoji aur sab languages ke liye.",
+    "`.env` badalne ke baad `config:clear` chalana na bhoolo.",
+    "Password khali sirf local development mein theek hai."
+   ]
+  },
+  {
+   "heading": "config/database.php ek nazar mein",
+   "body": "Yeh file default connection aur har connection ki settings batati hai. Zyada tar kaam `.env` se ho jaata hai, file ko chhedne ki kam hi zarurat padti hai.",
+   "code": [
+    {
+     "file": "config/database.php (chhota hissa)",
+     "lang": "php",
+     "code": "<?php\n\nreturn [\n    'default' => env('DB_CONNECTION', 'sqlite'),\n\n    'connections' => [\n        'sqlite' => [\n            'driver' => 'sqlite',\n            'database' => env('DB_DATABASE', database_path('database.sqlite')),\n            // ...\n        ],\n\n        'mysql' => [\n            'driver' => 'mysql',\n            'host' => env('DB_HOST', '127.0.0.1'),\n            'port' => env('DB_PORT', '3306'),\n            'database' => env('DB_DATABASE', 'laravel'),\n            'username' => env('DB_USERNAME', 'root'),\n            'password' => env('DB_PASSWORD', ''),\n            // ...\n        ],\n    ],\n];\n"
+    }
+   ]
+  },
+  {
+   "heading": "Connection check karna",
+   "body": "Tinker se ek chhoti query chala ke dekho:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan tinker\n>>> DB::select('select 1 as ok');\n>>> DB::connection()->getDatabaseName();"
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Database defaults: Laravel 11, 12, 13",
+  "intro": "Default database SQLite hai (13 ke installation docs mein confirmed). Naye projects mein migrations ke saath kuch default tables bhi aate hain.",
+  "items": {
+   "11": "Default SQLite. `php artisan migrate` users, cache aur jobs tables jaisi default tables banata hai.",
+   "12": "Same as 11.",
+   "13": "Same default SQLite. Apni `.env` aur `database/migrations` check karo, kyunki starter kit chunne par extra tables aa sakti hain."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE[HY000] [1049] Unknown database 'laravel_master'",
+   "cause": "MySQL mein woh database bana hi nahi.",
+   "fix": "Pehle `CREATE DATABASE ...` chalao, ya naam `.env` mein sahi karo."
+  },
+  {
+   "error": "SQLSTATE[HY000] [1045] Access denied for user",
+   "cause": "Username ya password galat hai.",
+   "fix": "`.env` mein `DB_USERNAME` aur `DB_PASSWORD` check karo, phir `php artisan config:clear`."
+  },
+  {
+   "error": "could not find driver",
+   "cause": "PHP ka `pdo_mysql` (ya `pdo_sqlite`) extension enabled nahi hai.",
+   "fix": "`php -m` se check karo aur `php.ini` mein extension enable karo, ya Herd/php.new use karo."
+  },
+  {
+   "error": "Database file at path [...] does not exist",
+   "cause": "SQLite file nahi bani ya path galat hai.",
+   "fix": "`touch database/database.sqlite` (Windows par khali file banao) aur `DB_DATABASE` path check karo."
+  }
+ ],
+ "debug": {
+  "body": "Connection ki problem mein pehle config cache saaf karo, phir `db:show` aur Tinker se check karo.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan config:clear\nphp artisan db:show\nphp artisan about"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Database set up karo:",
+  "tasks": [
+   "`php artisan migrate` chalao aur `db:show` se tables dekho",
+   "MySQL install ho to naya database banao aur `.env` badlo",
+   "`php artisan migrate` dobara chalao aur MySQL mein tables dekho",
+   "Tinker mein `DB::select('select 1 as ok')` chalao"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Naye Laravel project ka default database kaunsa hai?",
+   "options": [
+    "MySQL",
+    "PostgreSQL",
+    "SQLite",
+    "MongoDB"
+   ],
+   "answer": 2,
+   "why": "Default `.env` SQLite use karta hai."
+  },
+  {
+   "q": "`.env` mein database change karne ke baad kya chalana chahiye?",
+   "options": [
+    "php artisan serve",
+    "php artisan config:clear",
+    "composer install",
+    "npm run build"
+   ],
+   "answer": 1,
+   "why": "Config cache purani ho sakti hai, isliye `config:clear`."
+  },
+  {
+   "q": "Connection ki settings kis file mein hoti hain?",
+   "options": [
+    "config/app.php",
+    "config/database.php",
+    "routes/web.php",
+    "bootstrap/app.php"
+   ],
+   "answer": 1,
+   "why": "`config/database.php` mein saare connections define hain."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Laravel kaunse databases support karta hai?",
+   "a": "SQLite, MySQL/MariaDB, PostgreSQL aur SQL Server."
+  },
+  {
+   "q": "Database credentials kahan rakhte hain?",
+   "a": "`.env` mein, aur `config/database.php` unhe `env()` se padhta hai."
+  },
+  {
+   "q": "SQLite ke fayde?",
+   "a": "Alag server nahi chahiye, ek file mein database hota hai, seekhne aur chhote testing ke liye aasaan."
+  },
+  {
+   "q": "`php artisan db:show` kya karta hai?",
+   "a": "Current database connection ki summary aur tables dikhata hai."
+  },
+  {
+   "q": "MySQL ke liye `utf8mb4` kyun?",
+   "a": "Emoji aur sab languages ke characters sahi store karne ke liye."
+  }
+ ],
+ "summary": [
+  "Settings `config/database.php`, values `.env` mein.",
+  "SQLite default hai, bina server ke chalta hai.",
+  "MySQL ke liye pehle database banao, phir `.env` badlo.",
+  "`.env` badalne par `config:clear`.",
+  "`db:show` aur Tinker se connection check karo."
+ ]
+}

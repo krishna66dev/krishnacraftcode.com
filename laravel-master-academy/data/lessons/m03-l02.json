@@ -1,0 +1,188 @@
+{
+ "id": "m03-l02",
+ "title": "Request Lifecycle: Request se Response tak",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`public/index.php` se response tak ka poora safar jaanna",
+  "HTTP Kernel, bootstrappers aur service providers ka role samajhna",
+  "Middleware stack ka order dekhna",
+  "Ek chhote experiment se lifecycle ko khud trace karna"
+ ],
+ "prerequisites": [
+  "MVC Pattern (m03-l01)"
+ ],
+ "sections": [
+  {
+   "heading": "Real-world example: Courier ka safar",
+   "body": "Tumhara order (request) warehouse ke gate par aata hai, security check hota hai (middleware), sahi department mein jaata hai (router), packing hoti hai (controller), aur wapas courier se customer tak pahunchta hai (response). Laravel ka lifecycle bhi aisa hi hai."
+  },
+  {
+   "heading": "Poora safar, step by step",
+   "body": "Official docs ke hisaab se Laravel 11, 12 aur 13 mein yeh flow hota hai:\n\n- **1. Entry point:** Web server har request `public/index.php` ko deta hai.\n- **2. Application:** `index.php` Composer ka autoloader load karta hai, aur `bootstrap/app.php` se application (service container) ka instance leta hai.\n- **3. Kernel:** Application ka `handleRequest` method request ko HTTP kernel ko deta hai (Artisan commands ke liye console kernel).\n- **4. Bootstrappers:** Kernel error handling, logging, environment detection jaise kaam pehle karta hai.\n- **5. Service providers:** Sab providers load hote hain (pehle sab `register`, phir sab `boot`). Tumhare providers ki list `bootstrap/providers.php` mein hoti hai.\n- **6. Middleware aur Router:** Request middleware stack se guzarti hai aur router use route/controller tak bhejta hai.\n- **7. Response:** Controller ka response middleware se wapas guzarta hai, kernel use lautata hai, aur `handleRequest` response ko `send` kar deta hai.",
+   "code": [
+    {
+     "file": "public/index.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Http\\Request;\n\ndefine('LARAVEL_START', microtime(true));\n\n// Maintenance mode check\nif (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {\n    require $maintenance;\n}\n\nrequire __DIR__.'/../vendor/autoload.php';\n\n(require_once __DIR__.'/../bootstrap/app.php')\n    ->handleRequest(Request::capture());\n"
+    }
+   ],
+   "explain": [
+    "`Request::capture()` – PHP ke `$_GET`, `$_POST` etc se ek Request object banata hai.",
+    "`bootstrap/app.php` – application banata hai (pichhle module mein dekha).",
+    "`handleRequest(...)` – kernel ko request deta hai, aur response bhejta hai.",
+    "Tumhare version mein yeh file thodi alag ho sakti hai. Apni `public/index.php` khol kar dekho."
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Naam yaad rakhne ka tareeka: **index.php > app.php > kernel > providers > middleware > router > controller > response**."
+   }
+  },
+  {
+   "heading": "Experiment: lifecycle ko khud trace karo",
+   "body": "Ek middleware banao jo request aur response ke raaste mein log likhe. Route ke andar bhi ek log lagao. Phir `/trace` kholo aur log file dekho: order hoga middleware (aate waqt), route, middleware (jaate waqt).",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:middleware TraceMiddleware"
+    },
+    {
+     "file": "app/Http/Middleware/TraceMiddleware.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Http\\Middleware;\n\nuse Closure;\nuse Illuminate\\Http\\Request;\nuse Symfony\\Component\\HttpFoundation\\Response;\n\nclass TraceMiddleware\n{\n    public function handle(Request $request, Closure $next): Response\n    {\n        logger('1. Middleware: request aayi');\n\n        $response = $next($request);\n\n        logger('3. Middleware: response wapas ja raha hai');\n\n        return $response;\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Http\\Middleware\\TraceMiddleware;\n\nRoute::get('/trace', function () {\n    logger('2. Route: closure chala');\n\n    return 'Trace done';\n})->middleware(TraceMiddleware::class);\n",
+     "editable": true
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "tail -f storage/logs/laravel.log   # Windows PowerShell: Get-Content storage/logs/laravel.log -Wait"
+    }
+   ],
+   "explain": [
+    "`$next($request)` – request ko aage (agle middleware ya route) bhejta hai.",
+    "`$next` ke pehle ka code request aate waqt chalta hai, baad ka code response jaate waqt.",
+    "`logger()` – log file mein message likhta hai."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Lifecycle: Laravel 10 vs 11, 12, 13",
+  "intro": "Laravel 11 se lifecycle ka flow wahi hai, par configuration ki jagah badli.",
+  "items": {
+   "11": "Providers ki list `bootstrap/providers.php` mein. HTTP kernel framework ke andar hai, tumhari `app/Http/Kernel.php` nahi hoti. Middleware `bootstrap/app.php` mein configure hota hai.",
+   "12": "Same as 11.",
+   "13": "Same flow. Official docs ke hisaab se `index.php` se `handleRequest` tak ka raasta wahi hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "Har URL 404 deta hai (sirf / chalta hai)",
+   "cause": "Web server `public/index.php` par sab requests nahi bhej raha (rewrite rules missing) ya document root galat hai.",
+   "fix": "Document root `public` rakho aur rewrite rules (Apache `.htaccess` ya Nginx `try_files`) enable karo. Local par `php artisan serve` use karo."
+  },
+  {
+   "error": "Target class [App\\Http\\Middleware\\TraceMiddleware] does not exist",
+   "cause": "Middleware ka `use` ya namespace galat hai.",
+   "fix": "`use App\\Http\\Middleware\\TraceMiddleware;` aur file ka naam/namespace check karo."
+  },
+  {
+   "error": "Route change ka asar nahi dikh raha",
+   "cause": "Route cache purana hai.",
+   "fix": "`php artisan route:clear` (ya `optimize:clear`) chalao."
+  }
+ ],
+ "debug": {
+  "body": "Lifecycle ke beech mein kya ho raha hai dekhne ke liye logs aur `route:list` best hain. Middleware order bhi `route:list -v` mein dikh jaata hai.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan route:list -v\nphp artisan optimize:clear"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Lifecycle ko samjho:",
+  "tasks": [
+   "Apni `public/index.php` aur `bootstrap/app.php` kholo aur upar ke steps se match karo",
+   "`TraceMiddleware` banao aur `/trace` par chalao, log ka order note karo",
+   "Middleware mein `logger('time: '.microtime(true));` jodkar request ka time dekho",
+   "Lifecycle ko apne shabdon mein 7 lines mein likho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Laravel mein sab requests kis file se shuru hoti hain?",
+   "options": [
+    "bootstrap/app.php",
+    "public/index.php",
+    "routes/web.php",
+    "artisan"
+   ],
+   "answer": 1,
+   "why": "Web server har request `public/index.php` ko deta hai."
+  },
+  {
+   "q": "Response kis raaste se wapas jaata hai?",
+   "options": [
+    "Seedha browser",
+    "Middleware stack se wapas, phir kernel se",
+    "Database se",
+    "Service provider se"
+   ],
+   "answer": 1,
+   "why": "Response middleware se wapas guzarta hai aur kernel use lautata hai."
+  },
+  {
+   "q": "Providers ki list Laravel 11+ mein kahan hoti hai?",
+   "options": [
+    "config/app.php",
+    "bootstrap/providers.php",
+    "routes/web.php",
+    "app/Kernel.php"
+   ],
+   "answer": 1,
+   "why": "Laravel 11+ mein user-defined providers `bootstrap/providers.php` mein hote hain."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Explain Laravel request lifecycle.",
+   "a": "`public/index.php` -> autoloader -> `bootstrap/app.php` (application) -> HTTP kernel -> bootstrappers aur service providers -> middleware -> router -> controller -> response -> middleware se wapas -> response send."
+  },
+  {
+   "q": "HTTP kernel ka kya role hai?",
+   "a": "Request lena, bootstrappers chalana, middleware stack se guzaarna aur response lautana."
+  },
+  {
+   "q": "Service providers lifecycle mein kab chalte hain?",
+   "a": "Kernel bootstrap ke dauran: pehle sab providers ka `register`, phir sab ka `boot`."
+  },
+  {
+   "q": "Middleware kab chalta hai?",
+   "a": "Router ke route/controller tak pahunchne se pehle (request) aur response wapas jaate waqt."
+  },
+  {
+   "q": "Console kernel aur HTTP kernel mein farak?",
+   "a": "HTTP kernel web requests handle karta hai, console kernel Artisan commands."
+  }
+ ],
+ "summary": [
+  "Entry: `public/index.php`; application: `bootstrap/app.php`.",
+  "`handleRequest` request ko HTTP kernel ko deta hai.",
+  "Bootstrappers aur service providers application ko ready karte hain.",
+  "Request middleware aur router se controller tak jaati hai.",
+  "Response wapas middleware se guzar kar `send` hota hai."
+ ]
+}

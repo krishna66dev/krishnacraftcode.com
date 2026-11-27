@@ -1,0 +1,136 @@
+{
+ "mcq": [
+  {
+   "q": "Table banane ke liye kaunsa method use hota hai?",
+   "options": [
+    "Schema::new()",
+    "Schema::create()",
+    "Schema::make()",
+    "Schema::table()"
+   ],
+   "answer": 1,
+   "why": "`Schema::create()` nayi table banata hai."
+  },
+  {
+   "q": "Chali hui migration mein naya column chahiye to?",
+   "options": [
+    "Purani migration edit karo",
+    "Nayi migration banao",
+    "migrate:fresh production mein chalao",
+    "Table manually badlo"
+   ],
+   "answer": 1,
+   "why": "Chali hui migration edit nahi karte."
+  },
+  {
+   "q": "Paison ke liye best column type?",
+   "options": [
+    "float",
+    "decimal",
+    "string",
+    "boolean"
+   ],
+   "answer": 1,
+   "why": "`decimal` exact values rakhta hai."
+  },
+  {
+   "q": "`foreignId('category_id')->constrained()` kaunsi table se jodta hai?",
+   "options": [
+    "category",
+    "categories",
+    "category_id",
+    "products"
+   ],
+   "answer": 1,
+   "why": "Laravel naam se `categories` guess karta hai."
+  },
+  {
+   "q": "Database reset karke seed karne ki command?",
+   "options": [
+    "migrate:rollback --seed",
+    "migrate:fresh --seed",
+    "db:reset",
+    "seed:fresh"
+   ],
+   "answer": 1,
+   "why": "`php artisan migrate:fresh --seed`."
+  },
+  {
+   "q": "SQL injection se bachne ke liye raw query mein kya karte hain?",
+   "options": [
+    "String concatenation",
+    "`?` bindings",
+    "Sab escape",
+    "Kuch nahi"
+   ],
+   "answer": 1,
+   "why": "Bindings values ko query se alag rakhte hain."
+  }
+ ],
+ "assignments": [
+  {
+   "title": "Categories aur Products schema",
+   "level": "Intermediate",
+   "brief": "Do related tables ki migrations banao.",
+   "tasks": [
+    "`create_categories_table` banao (name)",
+    "`create_products_table` banao (category_id foreign key, name, price, stock, is_active)",
+    "`cascadeOnDelete()` lagao",
+    "`migrate:fresh` chalao aur `db:table products` se check karo"
+   ],
+   "explain": "Parent table (`categories`) ki migration pehle chalni chahiye.",
+   "solution": [
+    {
+     "file": "create_products_table.php",
+     "lang": "php",
+     "code": "Schema::create('products', function (Blueprint $table) {\n    $table->id();\n    $table->foreignId('category_id')->constrained()->cascadeOnDelete();\n    $table->string('name');\n    $table->decimal('price', 8, 2);\n    $table->unsignedInteger('stock')->default(0);\n    $table->boolean('is_active')->default(true);\n    $table->timestamps();\n});\n"
+    }
+   ]
+  },
+  {
+   "title": "Seed aur query",
+   "level": "Intermediate",
+   "brief": "Fake data bharo aur query builder se padho.",
+   "tasks": [
+    "`ProductFactory` aur `ProductSeeder` banao (20 products)",
+    "`migrate:fresh --seed` chalao",
+    "Tinker mein 500 se mehnge products price descending nikalo",
+    "`count`, `sum('stock')` aur `avg('price')` nikalo"
+   ],
+   "explain": "`Product::factory()->count(20)->create()` rows banata hai, query builder unhe padhta hai.",
+   "solution": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "use Illuminate\\Support\\Facades\\DB;\n\nDB::table('products')->where('price', '>', 500)->orderByDesc('price')->get();\nDB::table('products')->count();\nDB::table('products')->sum('stock');\nDB::table('products')->avg('price');\n"
+    }
+   ]
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is a migration?",
+   "a": "Database schema ka version control: table aur column badlaav PHP code mein, jo team ke saath share hota hai."
+  },
+  {
+   "q": "Difference between migrate:fresh and migrate:refresh?",
+   "a": "`fresh` saari tables drop karke migrate karta hai. `refresh` rollback karke dobara migrate karta hai."
+  },
+  {
+   "q": "What is a foreign key?",
+   "a": "Ek table ka column jo doosri table ke primary key ko point karta hai aur data integrity rakhta hai."
+  },
+  {
+   "q": "What is a pivot table?",
+   "a": "Many-to-many relation ke liye beech ki table jisme dono tables ke ids hote hain."
+  },
+  {
+   "q": "What is the difference between a seeder and a factory?",
+   "a": "Seeder data bharta hai, factory fake data ka blueprint hai."
+  },
+  {
+   "q": "How does the query builder prevent SQL injection?",
+   "a": "PDO parameter binding se: values SQL string mein nahi, alag bheji jaati hain."
+  }
+ ]
+}

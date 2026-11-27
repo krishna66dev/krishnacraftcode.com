@@ -1,0 +1,235 @@
+{
+ "id": "m05-l04",
+ "title": "Blade Components, Slots aur Attributes",
+ "minutes": 45,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Anonymous aur class-based components ka farak samajhna",
+  "`@props` aur data pass karna (`:prop`)",
+  "Default aur named slots use karna",
+  "`$attributes->merge()` se attributes forward karna",
+  "Folders mein components (`<x-forms.input>`) banana"
+ ],
+ "prerequisites": [
+  "Layouts aur Template Inheritance (m05-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "Component kya hai?",
+   "body": "Component ek reusable Blade tukda hai, jaise alert, card ya button. Ek baar banao aur har jagah `<x-naam />` se use karo. Do tarah ke hote hain:\n\n- **Anonymous component** – sirf ek Blade file (`resources/views/components`).\n- **Class-based component** – ek PHP class (`app/View/Components`) aur uska view.",
+   "callout": {
+    "kind": "tip",
+    "text": "Zyada tar kaam anonymous components se chal jaata hai. Class tab banao jab component ko logic ya data tayyar karna ho."
+   }
+  },
+  {
+   "heading": "Anonymous component: alert",
+   "body": "`@props` batata hai ki component kaunse data leta hai. Defaults bhi de sakte ho.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:component alert --view"
+    },
+    {
+     "file": "resources/views/components/alert.blade.php",
+     "lang": "html",
+     "code": "@props(['type' => 'info', 'message' => null])\n\n<div {{ $attributes->merge(['class' => \"alert alert-{$type}\"]) }}>\n    {{ $message }}\n    {{ $slot }}\n</div>\n",
+     "editable": true
+    },
+    {
+     "file": "use karna",
+     "lang": "html",
+     "code": "<x-alert type=\"danger\" message=\"Kuch galat hua!\" class=\"mt-3\" />\n\n<x-alert type=\"success\">\n    Order ho gaya. <strong>Shukriya!</strong>\n</x-alert>\n\n<x-alert :message=\"$errorText\" />\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`<x-alert />` – `components/alert.blade.php` ko chalata hai.",
+    "`type=\"danger\"` – normal string. `:message=\"$errorText\"` – colon lagane se PHP variable/expression.",
+    "`@props` mein jo naam hain woh variable ban jaate hain (`$type`, `$message`). Baaki attributes `$attributes` mein.",
+    "`$attributes->merge(['class' => ...])` – bahar se aaya `class=\"mt-3\"` aur component ki class mil jaati hain.",
+    "Tag ke andar ka content `{{ $slot }}` mein aata hai."
+   ]
+  },
+  {
+   "heading": "Real-world example: Card with named slots",
+   "body": "Card ka title aur body alag slots mein. Named slot na diya to dikhega nahi, isliye `isset` jaisa check ya default de sakte ho.",
+   "code": [
+    {
+     "file": "resources/views/components/card.blade.php",
+     "lang": "html",
+     "code": "<div class=\"card\">\n    @isset($title)\n        <div class=\"card-header\">{{ $title }}</div>\n    @endisset\n\n    <div class=\"card-body\">\n        {{ $slot }}\n    </div>\n</div>\n",
+     "editable": true
+    },
+    {
+     "file": "use karna",
+     "lang": "html",
+     "code": "<x-card>\n    <x-slot:title>Wireless Mouse</x-slot:title>\n\n    Rs. 799. Stock mein hai.\n</x-card>\n",
+     "editable": true
+    }
+   ]
+  },
+  {
+   "heading": "Class-based component",
+   "body": "Jab component ko apna logic chahiye, to class banao. Constructor ke public properties view mein apne aap milti hain.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:component Price"
+    },
+    {
+     "file": "app/View/Components/Price.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\View\\Components;\n\nuse Illuminate\\Contracts\\View\\View;\nuse Illuminate\\View\\Component;\n\nclass Price extends Component\n{\n    public function __construct(public int|float $amount) {}\n\n    public function formatted(): string\n    {\n        return 'Rs. ' . number_format($this->amount, 2);\n    }\n\n    public function render(): View\n    {\n        return view('components.price');\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "resources/views/components/price.blade.php",
+     "lang": "html",
+     "code": "<span {{ $attributes->class(['price']) }}>{{ $formatted() }}</span>\n"
+    },
+    {
+     "file": "use karna",
+     "lang": "html",
+     "code": "<x-price :amount=\"799.5\" class=\"text-success\" />"
+    }
+   ],
+   "explain": [
+    "`make:component Price` class aur view dono banata hai.",
+    "Class ka public method (`formatted`) view mein `$formatted()` se call hota hai.",
+    "Naam `Price` -> tag `<x-price />`. Do shabdon ka naam (`OrderCard`) -> `<x-order-card />`."
+   ]
+  },
+  {
+   "heading": "Folders mein components",
+   "body": "Components ko folder mein rakhne par dot se use karte hain:",
+   "code": [
+    {
+     "file": "resources/views/components/forms/input.blade.php",
+     "lang": "html",
+     "code": "@props(['name', 'label', 'type' => 'text'])\n\n<label for=\"{{ $name }}\">{{ $label }}</label>\n<input id=\"{{ $name }}\" name=\"{{ $name }}\" type=\"{{ $type }}\"\n       value=\"{{ old($name) }}\" {{ $attributes }}>\n@error($name)\n    <small class=\"text-danger\">{{ $message }}</small>\n@enderror\n"
+    },
+    {
+     "file": "use karna",
+     "lang": "html",
+     "code": "<x-forms.input name=\"email\" label=\"Email\" type=\"email\" required />"
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Components: Laravel 11, 12 aur 13",
+  "intro": "Anonymous aur class-based components, slots aur attributes teeno versions mein same kaam karte hain.",
+  "items": {
+   "11": "`<x-...>`, `@props`, `<x-slot:name>`, `$attributes->merge()` sab available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11. Component syntax mein koi badlaav nahi."
+  }
+ },
+ "errors": [
+  {
+   "error": "Unable to locate a class or view for component [alert]",
+   "cause": "Component file/class nahi mili ya naam galat hai.",
+   "fix": "`resources/views/components/alert.blade.php` hona chahiye (ya class `App\\View\\Components\\Alert`). Naam ka spelling check karo."
+  },
+  {
+   "error": "Undefined variable $type",
+   "cause": "`@props` mein `type` nahi likha ya tag mein pass nahi kiya.",
+   "fix": "`@props(['type' => 'info'])` mein default do ya tag mein `type=\"...\"` do."
+  },
+  {
+   "error": "Component mein variable mein string ki jagah PHP value chahiye par text aa raha hai",
+   "cause": "`:` lagana bhool gaye (`amount=\"$x\"` string hota hai).",
+   "fix": "PHP value ke liye `:amount=\"$x\"` likho."
+  }
+ ],
+ "debug": {
+  "body": "Components ki list aur cache ke liye:",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan view:clear\nphp artisan make:component forms.button --view"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Apni component library banao:",
+  "tasks": [
+   "`<x-alert>` component banao (type aur message ke saath, class forward ho)",
+   "`<x-card>` banao jisme `title` named slot ho",
+   "`<x-forms.input>` banao jo label, input aur error dikhaye",
+   "Ek class-based `<x-price>` banao jo number ko Rs. format mein dikhaye"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Component mein PHP variable pass karne ke liye kya likhte hain?",
+   "options": [
+    "amount=\"$x\"",
+    ":amount=\"$x\"",
+    "@amount($x)",
+    "{{ amount }}"
+   ],
+   "answer": 1,
+   "why": "Colon wala `:prop` PHP expression leta hai."
+  },
+  {
+   "q": "`$attributes->merge()` kya karta hai?",
+   "options": [
+    "Database merge karta hai",
+    "Bahar se aaye attributes ko component ke attributes se jodta hai",
+    "Slots ko jodta hai",
+    "Views ko jodta hai"
+   ],
+   "answer": 1,
+   "why": "Forward kiye gaye `class` jaise attributes component ke apne attributes ke saath mil jaate hain."
+  },
+  {
+   "q": "`resources/views/components/forms/input.blade.php` ko kaise use karte hain?",
+   "options": [
+    "<x-forms-input />",
+    "<x-forms.input />",
+    "<x-form:input />",
+    "<forms.input />"
+   ],
+   "answer": 1,
+   "why": "Folder ko dot se likhte hain: `<x-forms.input />`."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Anonymous aur class-based component mein farak?",
+   "a": "Anonymous sirf Blade file hota hai. Class-based mein PHP class bhi hoti hai jo logic aur data tayyar kar sakti hai."
+  },
+  {
+   "q": "`@props` kya karta hai?",
+   "a": "Component ke accepted data aur unke default values batata hai. Baaki attributes `$attributes` mein jaate hain."
+  },
+  {
+   "q": "Slot kya hota hai?",
+   "a": "Component ke andar ka content. Default slot `$slot` hai, aur `<x-slot:name>` se named slots bante hain."
+  },
+  {
+   "q": "Attributes component mein kaise forward hote hain?",
+   "a": "`{{ $attributes }}` ya `$attributes->merge([...])` se."
+  },
+  {
+   "q": "Component naam se tag kaise banta hai?",
+   "a": "Class `OrderCard` ya file `order-card.blade.php` -> `<x-order-card />`. Subfolder ke liye dot: `<x-forms.input />`."
+  }
+ ],
+ "summary": [
+  "Component = reusable Blade tukda: `<x-naam />`.",
+  "Anonymous: sirf `resources/views/components/*.blade.php`.",
+  "`@props` aur `:prop` se data, slots se content.",
+  "`$attributes->merge()` se class jaise attributes forward hote hain.",
+  "Logic chahiye to class-based, warna anonymous."
+ ]
+}

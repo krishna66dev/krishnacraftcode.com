@@ -1,0 +1,184 @@
+{
+ "id": "m03-l04",
+ "title": "Service Providers: register aur boot",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Service provider ka role samajhna",
+  "`register()` aur `boot()` ka farak jaanna",
+  "Naya provider banana aur register karna",
+  "`bootstrap/providers.php` ka use jaanna"
+ ],
+ "prerequisites": [
+  "Service Container aur Dependency Injection (m03-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "Service provider kya hai?",
+   "body": "Service provider woh jagah hai jahan application **start hone par** cheezein set up hoti hain: container bindings, event listeners, routes, view settings. Laravel ke apne saare features (database, queue, validation, routing) bhi providers se hi boot hote hain, isliye inhe Laravel ke bootstrap ka dil kehte hain.",
+   "callout": {
+    "kind": "tip",
+    "text": "Agar tumhe app shuru hote hi kuch tayyar karna hai, to jawab hamesha service provider hai."
+   }
+  },
+  {
+   "heading": "register() aur boot()",
+   "body": "Har provider mein do main methods hote hain:\n\n- **`register()`** – sirf container mein cheezein bind karo. Yahan doosri services use mat karo, kyunki abhi sab providers register nahi hue.\n- **`boot()`** – sab providers register hone ke baad chalta hai. Yahan kisi bhi service ko use kar sakte ho (routes, events, model settings, view composers).\n\nLifecycle mein pehle sab `register`, phir sab `boot` chalte hain."
+  },
+  {
+   "heading": "Real-world example: Payment provider",
+   "body": "Payment se jude saare bindings aur settings ek hi provider mein rakho. Isse `AppServiceProvider` saaf rehta hai.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:provider PaymentServiceProvider"
+    },
+    {
+     "file": "app/Providers/PaymentServiceProvider.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Providers;\n\nuse App\\Contracts\\PaymentGateway;\nuse App\\Services\\RazorpayGateway;\nuse Illuminate\\Support\\ServiceProvider;\n\nclass PaymentServiceProvider extends ServiceProvider\n{\n    public function register(): void\n    {\n        $this->app->bind(PaymentGateway::class, RazorpayGateway::class);\n    }\n\n    public function boot(): void\n    {\n        // Yahan routes, events ya settings ka setup aata hai\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "bootstrap/providers.php",
+     "lang": "php",
+     "code": "<?php\n\nreturn [\n    App\\Providers\\AppServiceProvider::class,\n    App\\Providers\\PaymentServiceProvider::class,\n];\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`make:provider` Laravel 11+ mein naye provider ko `bootstrap/providers.php` mein khud jodta hai. Phir bhi file check kar lena.",
+    "Agar provider yahan listed nahi hai, to woh chalega hi nahi."
+   ]
+  },
+  {
+   "heading": "boot() mein kya karte hain?",
+   "body": "`AppServiceProvider::boot()` chhote global settings ke liye achhi jagah hai. Jaise development mein lazy loading ke galat use ko pakadne ke liye:",
+   "code": [
+    {
+     "file": "app/Providers/AppServiceProvider.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Model;\n\npublic function boot(): void\n{\n    // Production ke alawa lazy loading par error do (N+1 pakadne ke liye)\n    Model::preventLazyLoading(! $this->app->isProduction());\n}\n"
+    }
+   ],
+   "explain": [
+    "`isProduction()` – environment `production` hai ya nahi.",
+    "Yeh Eloquent ka topic aage Module 07/08 mein detail se aayega, abhi sirf dekho ki `boot()` mein settings aati hain."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Providers kahan register hote hain",
+  "intro": "Provider ka kaam same hai. Register karne ki jagah Laravel 11 se badal gayi.",
+  "items": {
+   "11": "`bootstrap/providers.php` mein list. Laravel 10 ki tarah `config/app.php` ke `providers` array mein nahi.",
+   "12": "Same as 11.",
+   "13": "Same. User-defined providers `bootstrap/providers.php` mein hi rehte hain."
+  }
+ },
+ "errors": [
+  {
+   "error": "Provider ka code chal hi nahi raha",
+   "cause": "Provider `bootstrap/providers.php` mein listed nahi hai.",
+   "fix": "Provider class ko `bootstrap/providers.php` ki array mein jodo."
+  },
+  {
+   "error": "register() mein kisi doosri service ko use karne par error",
+   "cause": "`register()` ke waqt baaki providers abhi register nahi hue.",
+   "fix": "Wahan sirf `bind`/`singleton` karo. Service use karni ho to `boot()` mein karo."
+  },
+  {
+   "error": "Class \"App\\Providers\\PaymentServiceProvider\" not found",
+   "cause": "Namespace ya file ka naam galat hai.",
+   "fix": "Namespace `App\\Providers` aur file `app/Providers/PaymentServiceProvider.php` check karo, phir `composer dump-autoload`."
+  }
+ ],
+ "debug": {
+  "body": "Cache ki wajah se purana provider/config chal sakta hai.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan optimize:clear\nphp artisan about"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Apna provider banao:",
+  "tasks": [
+   "`php artisan make:provider SmsServiceProvider` chalao",
+   "`register()` mein pichhle lesson ka `SmsSender` interface bind karo",
+   "`bootstrap/providers.php` mein provider ka entry check karo",
+   "`boot()` mein `logger('SmsServiceProvider boot hua');` likho aur log check karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Providers ki list Laravel 11+ mein kahan hoti hai?",
+   "options": [
+    "config/app.php",
+    "bootstrap/providers.php",
+    "routes/web.php",
+    "app/Providers/list.php"
+   ],
+   "answer": 1,
+   "why": "User-defined providers `bootstrap/providers.php` mein listed hote hain."
+  },
+  {
+   "q": "`register()` mein kya karna chahiye?",
+   "options": [
+    "Routes define karna",
+    "Sirf container bindings",
+    "Database query chalana",
+    "Views render karna"
+   ],
+   "answer": 1,
+   "why": "`register()` mein sirf bindings, doosri services use mat karo."
+  },
+  {
+   "q": "Pehle kya chalta hai?",
+   "options": [
+    "Sab `boot()` phir `register()`",
+    "Sab `register()` phir sab `boot()`",
+    "Ek provider ka dono, phir doosre ka",
+    "Koi order nahi"
+   ],
+   "answer": 1,
+   "why": "Pehle sab providers ka `register`, uske baad sab ka `boot`."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Service provider kya hota hai?",
+   "a": "Woh class jo application ko bootstrap karti hai: bindings, events, routes, settings. Laravel ke saare core features bhi providers se load hote hain."
+  },
+  {
+   "q": "`register()` aur `boot()` mein farak?",
+   "a": "`register()` sirf container binding ke liye, jab baaki providers ready nahi. `boot()` sab register hone ke baad chalta hai aur kisi bhi service ko use kar sakta hai."
+  },
+  {
+   "q": "Naya provider kaise banate hain?",
+   "a": "`php artisan make:provider Name` aur `bootstrap/providers.php` mein listed hona chahiye (Laravel 11+ mein command khud jod deti hai)."
+  },
+  {
+   "q": "Laravel 10 aur 11 mein providers register karne ka farak?",
+   "a": "Laravel 10 mein `config/app.php` ke `providers` array mein. Laravel 11+ mein `bootstrap/providers.php` mein."
+  },
+  {
+   "q": "AppServiceProvider mein kya rakhein?",
+   "a": "Chhote application-wide bindings aur settings. Badi cheezon ke liye alag providers banao."
+  }
+ ],
+ "summary": [
+  "Provider application ke startup ka setup hai.",
+  "`register()` mein sirf bindings, `boot()` mein baaki setup.",
+  "Pehle sab `register`, phir sab `boot`.",
+  "Laravel 11+ mein providers `bootstrap/providers.php` mein.",
+  "Alag topics ke liye alag providers rakho."
+ ]
+}

@@ -1,0 +1,151 @@
+{
+ "mcq": [
+  {
+   "q": "Laravel mein sab requests kis file se shuru hoti hain?",
+   "options": [
+    "bootstrap/app.php",
+    "public/index.php",
+    "routes/web.php",
+    "artisan"
+   ],
+   "answer": 1,
+   "why": "Web server har request `public/index.php` ko deta hai."
+  },
+  {
+   "q": "Interface ko concrete class se kahan bind karte hain?",
+   "options": [
+    "routes/web.php",
+    "Service provider ke `register()` mein",
+    "`.env` mein",
+    "View mein"
+   ],
+   "answer": 1,
+   "why": "Bindings service provider ke `register()` method mein hote hain."
+  },
+  {
+   "q": "Laravel 11+ mein providers ki list kahan hoti hai?",
+   "options": [
+    "config/app.php",
+    "bootstrap/providers.php",
+    "routes/web.php",
+    "app/Kernel.php"
+   ],
+   "answer": 1,
+   "why": "User-defined providers `bootstrap/providers.php` mein listed hote hain."
+  },
+  {
+   "q": "Custom facade mein kaunsa method zaroori hai?",
+   "options": [
+    "boot()",
+    "register()",
+    "getFacadeAccessor()",
+    "handle()"
+   ],
+   "answer": 2,
+   "why": "`getFacadeAccessor()` batata hai ki container se kya resolve karna hai."
+  },
+  {
+   "q": "Service providers ka order kya hai?",
+   "options": [
+    "Pehle sab `boot`, phir `register`",
+    "Pehle sab `register`, phir sab `boot`",
+    "Ek provider ka dono, phir agla",
+    "Koi order nahi"
+   ],
+   "answer": 1,
+   "why": "Pehle sab providers ka `register`, uske baad sab ka `boot`."
+  },
+  {
+   "q": "MVC mein Controller ka kaam kya hai?",
+   "options": [
+    "HTML design karna",
+    "Request lena aur model/view ke beech coordinate karna",
+    "Database table banana",
+    "Packages install karna"
+   ],
+   "answer": 1,
+   "why": "Controller request handle karke model/service se kaam karwata hai aur response deta hai."
+  }
+ ],
+ "assignments": [
+  {
+   "title": "Interface binding",
+   "level": "Intermediate",
+   "brief": "Container se interface ko implementation se bind karo.",
+   "tasks": [
+    "`SmsSender` interface banao (`send(string $to, string $text): bool`)",
+    "`LogSender` class banao jo `logger()` se message likhe",
+    "`AppServiceProvider::register()` mein interface ko `LogSender` se bind karo",
+    "Ek controller ke constructor mein `SmsSender` inject karke use karo"
+   ],
+   "explain": "Controller sirf interface jaanta hai, isliye implementation badalna aasan hai.",
+   "solution": [
+    {
+     "file": "app/Contracts/SmsSender.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Contracts;\n\ninterface SmsSender\n{\n    public function send(string $to, string $text): bool;\n}\n"
+    },
+    {
+     "file": "app/Services/LogSender.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Services;\n\nuse App\\Contracts\\SmsSender;\n\nclass LogSender implements SmsSender\n{\n    public function send(string $to, string $text): bool\n    {\n        logger(\"SMS to {$to}: {$text}\");\n\n        return true;\n    }\n}\n"
+    },
+    {
+     "file": "app/Providers/AppServiceProvider.php",
+     "lang": "php",
+     "code": "public function register(): void\n{\n    $this->app->bind(\n        \\App\\Contracts\\SmsSender::class,\n        \\App\\Services\\LogSender::class\n    );\n}\n"
+    }
+   ]
+  },
+  {
+   "title": "Lifecycle trace middleware",
+   "level": "Intermediate",
+   "brief": "Middleware se request lifecycle ka order dekho.",
+   "tasks": [
+    "`php artisan make:middleware TraceMiddleware` chalao",
+    "`handle()` mein request aate aur response jaate waqt `logger()` se message likho",
+    "`/trace` route par middleware lagao",
+    "Log file mein order dekho: middleware, route, middleware"
+   ],
+   "explain": "`$next($request)` se pehle ka code request par, baad ka code response par chalta hai.",
+   "solution": [
+    {
+     "file": "app/Http/Middleware/TraceMiddleware.php",
+     "lang": "php",
+     "code": "public function handle(Request $request, Closure $next): Response\n{\n    logger('1. request aayi');\n\n    $response = $next($request);\n\n    logger('3. response ja raha hai');\n\n    return $response;\n}\n"
+    },
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Http\\Middleware\\TraceMiddleware;\n\nRoute::get('/trace', function () {\n    logger('2. route chala');\n\n    return 'ok';\n})->middleware(TraceMiddleware::class);\n"
+    }
+   ]
+  }
+ ],
+ "interview": [
+  {
+   "q": "Explain the Laravel request lifecycle.",
+   "a": "`public/index.php` -> autoloader -> `bootstrap/app.php` -> HTTP kernel -> bootstrappers aur service providers -> middleware -> router -> controller -> response -> middleware se wapas -> response send."
+  },
+  {
+   "q": "What is the service container?",
+   "a": "Laravel ka dependency management tool jo classes resolve karta hai aur unki dependencies inject karta hai."
+  },
+  {
+   "q": "What is the difference between register() and boot()?",
+   "a": "`register()` sirf container bindings ke liye. `boot()` sab providers register hone ke baad chalta hai aur kisi bhi service ko use kar sakta hai."
+  },
+  {
+   "q": "What is a Facade?",
+   "a": "Container mein registered service ka static-jaisa proxy. Static call andar se container ke object ka method chalati hai."
+  },
+  {
+   "q": "What are Laravel Contracts?",
+   "a": "`Illuminate\\Contracts` ke interfaces jo framework services ka contract batate hain, DI mein type-hint ke liye use hote hain."
+  },
+  {
+   "q": "What is the fat controller problem?",
+   "a": "Controller mein bahut logic bhar jaane se testing aur reuse mushkil hota hai. Logic ko model ya service/action classes mein rakhna chahiye."
+  }
+ ]
+}

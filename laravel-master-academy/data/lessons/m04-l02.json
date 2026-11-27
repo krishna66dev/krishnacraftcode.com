@@ -1,61 +1,143 @@
 {
  "id": "m04-l02",
  "title": "Route Parameters aur Constraints",
- "minutes": 20,
+ "minutes": 30,
  "versions": [
   "11",
   "12",
   "13"
  ],
  "objectives": [
-  "Required aur optional parameters likhna",
-  "`where()` se parameter ko restrict karna"
+  "Required aur optional route parameters likhna",
+  "Ek se zyada parameters aur unka order samajhna",
+  "`where()` aur helpers (`whereNumber`, `whereAlpha`, `whereIn`, `whereUuid`) use karna",
+  "`Route::pattern()` se global constraint lagana"
  ],
  "prerequisites": [
   "Laravel Routing – Basic to Advanced (m04-l01)"
  ],
  "sections": [
   {
-   "heading": "Parameters kya hote hain?",
-   "body": "URL ke dynamic hisse ko parameter kehte hain. `/users/{id}` mein `{id}` kuch bhi ho sakta hai.\n\nOptional parameter ke liye `?` lagao aur function mein default value do.",
+   "heading": "Route parameter kya hota hai?",
+   "body": "URL ke dynamic hisse ko parameter kehte hain. `/users/{id}` mein `{id}` kuch bhi ho sakta hai, aur woh value closure ya controller method ko mil jaati hai.",
    "code": [
     {
      "file": "routes/web.php",
      "lang": "php",
-     "code": "Route::get('/users/{id}', function (string $id) {\n    return \"User {$id}\";\n})->whereNumber('id');\n\nRoute::get('/search/{term?}', function (?string $term = null) {\n    return $term ?? 'Kuch type karo';\n});\n",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/users/{id}', function (string $id) {\n    return \"User #{$id}\";\n});\n\nRoute::get('/users/{user}/posts/{post}', function (string $user, string $post) {\n    return \"User {$user}, Post {$post}\";\n});\n",
      "editable": true
     }
    ],
    "explain": [
-    "`whereNumber('id')` – sirf digits allow karta hai, warna 404.",
-    "`{term?}` – optional parameter, default `null`."
+    "`{id}` – required parameter. URL mein na ho to route match nahi hota (404).",
+    "Parameters ka naam sirf letters aur `_` ho sakta hai.",
+    "Parameters **order** ke hisaab se inject hote hain, naam se nahi. Pehla `{user}` pehla argument banta hai."
+   ]
+  },
+  {
+   "heading": "Real-world example: Blog aur orders",
+   "body": "Blog mein `/posts/{slug}` jahan slug `laravel-routing` jaisa hota hai. Orders mein `/orders/{id?}` jahan id na ho to saare orders dikhao.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::get('/posts/{slug}', fn (string $slug) => \"Post: {$slug}\");\n\nRoute::get('/orders/{id?}', function (?string $id = null) {\n    return $id ? \"Order #{$id}\" : 'Saare orders';\n});\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`{id?}` – optional parameter. Function mein default value zaroor do (`= null`).",
+    "Optional parameter hamesha last mein rakho."
+   ]
+  },
+  {
+   "heading": "Constraints: parameter ko restrict karna",
+   "body": "Bina constraint ke `{id}` mein `abc` bhi chal jaata hai. Constraint lagane se galat format par seedha 404 aata hai.",
+   "code": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::get('/users/{id}', fn (string $id) => \"User #{$id}\")\n    ->whereNumber('id');\n\nRoute::get('/posts/{slug}', fn (string $slug) => $slug)\n    ->where('slug', '[a-z0-9-]+');\n\nRoute::get('/category/{type}', fn (string $type) => $type)\n    ->whereIn('type', ['movie', 'song']);\n\nRoute::get('/files/{uuid}', fn (string $uuid) => $uuid)\n    ->whereUuid('uuid');\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`whereNumber('id')` – sirf digits.",
+    "`where('slug', 'regex')` – apna regular expression.",
+    "`whereIn('type', [...])` – sirf diye gaye options.",
+    "`whereAlpha`, `whereAlphaNumeric`, `whereUuid`, `whereUlid` bhi available hain."
+   ]
+  },
+  {
+   "heading": "Global constraint: Route::pattern()",
+   "body": "Agar har jagah `{id}` numeric hona chahiye, to ek baar `AppServiceProvider::boot()` mein pattern set kar do.",
+   "code": [
+    {
+     "file": "app/Providers/AppServiceProvider.php",
+     "lang": "php",
+     "code": "use Illuminate\\Support\\Facades\\Route;\n\npublic function boot(): void\n{\n    Route::pattern('id', '[0-9]+');\n}\n"
+    }
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Route parameter mein `/` by default allow nahi hota. Agar chahiye to `->where('search', '.*')` use karo, par yeh sirf last parameter ke liye kaam karta hai."
+   }
+  },
+  {
+   "heading": "Controller mein parameters",
+   "body": "Controller method mein pehle dependencies (jaise `Request`), phir route parameters likho.",
+   "code": [
+    {
+     "file": "app/Http/Controllers/UserController.php",
+     "lang": "php",
+     "code": "use Illuminate\\Http\\Request;\n\npublic function update(Request $request, string $id)\n{\n    return \"Update user {$id}\";\n}\n"
+    }
    ]
   }
  ],
  "versionDiff": {
   "heading": "Version notes",
-  "intro": "Parameters ka behaviour teeno versions mein same hai.",
+  "intro": "Parameters aur constraints ka behaviour teeno versions mein same hai.",
   "items": {
-   "11": "`where()`, `whereNumber()`, `whereAlpha()` available hain.",
+   "11": "`where*` helpers, `Route::pattern()` sab available hain. PHP 8.2+.",
    "12": "Same as 11.",
-   "13": "Same as 11. PHP 8.3 chahiye."
+   "13": "Same as 11. PHP 8.3+ chahiye."
   }
  },
  "errors": [
   {
    "error": "404 on /users/abc",
-   "cause": "`whereNumber('id')` ki wajah se.",
-   "fix": "Number do, ya constraint hatao."
+   "cause": "`whereNumber('id')` ki wajah se non-numeric value match nahi hui.",
+   "fix": "Number do, ya constraint hatao/badlo."
+  },
+  {
+   "error": "Missing required parameter for [Route: users.show] [URI: users/{id}] [Missing parameter: id]",
+   "cause": "`route('users.show')` call kiya par `id` nahi di.",
+   "fix": "`route('users.show', ['id' => 5])` likho."
+  },
+  {
+   "error": "Galat value mil rahi hai (user ki jagah post ki id)",
+   "cause": "Closure ya method ke arguments ka order route parameters ke order se alag hai.",
+   "fix": "Arguments ko URL ke parameters ke order mein likho."
   }
  ],
  "debug": {
-  "body": "Parameters wale routes bhi `php artisan route:list` mein dikhte hain."
+  "body": "Parameters aur constraints `route:list` mein dikhte hain.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan route:list --path=users\nphp artisan route:list --path=posts"
+   }
+  ]
  },
  "exercise": {
-  "intro": "Yeh routes banao:",
+  "intro": "Yeh routes banao aur browser mein test karo:",
   "tasks": [
-   "`/posts/{slug}` jahan slug sirf letters aur `-` ho",
-   "`/orders/{id?}` optional id ke saath"
+   "`/posts/{slug}` jahan slug sirf lowercase letters, numbers aur `-` ho",
+   "`/orders/{id?}` optional id ke saath",
+   "`/users/{user}/posts/{post}` jahan dono numeric hon",
+   "`/status/{type}` jahan type sirf `active` ya `inactive` ho"
   ]
  },
  "quiz": [
@@ -64,21 +146,62 @@
    "options": [
     "{id!}",
     "{id?}",
-    "{?id}",
-    "[id]"
+    "[id]",
+    "{?id}"
    ],
    "answer": 1,
    "why": "Naam ke baad `?` lagate hain aur function mein default value dete hain."
+  },
+  {
+   "q": "Route parameters function mein kaise inject hote hain?",
+   "options": [
+    "Naam ke hisaab se",
+    "Order ke hisaab se",
+    "Alphabetical order mein",
+    "Random"
+   ],
+   "answer": 1,
+   "why": "Parameters URL ke order mein arguments ban jaate hain."
+  },
+  {
+   "q": "`whereNumber('id')` galat value par kya hota hai?",
+   "options": [
+    "500 error",
+    "404",
+    "Redirect",
+    "Value 0 ho jaati hai"
+   ],
+   "answer": 1,
+   "why": "Constraint match na ho to route match hi nahi hota, isliye 404."
   }
  ],
  "interview": [
   {
    "q": "Route constraint kya hai?",
-   "a": "Parameter ki allowed format, jaise `where('id', '[0-9]+')`."
+   "a": "Parameter ke liye allowed format, jaise `where('id', '[0-9]+')` ya `whereNumber('id')`."
+  },
+  {
+   "q": "Optional parameter ke saath kya dhyan rakhna chahiye?",
+   "a": "Function mein default value dena zaroori hai aur optional parameter last mein hona chahiye."
+  },
+  {
+   "q": "`Route::pattern()` kya karta hai?",
+   "a": "Ek parameter naam ke liye global constraint set karta hai, jo sab routes par lagta hai."
+  },
+  {
+   "q": "Route parameters ka order kyun matter karta hai?",
+   "a": "Laravel parameters ko naam se nahi, URL ke order se closure/controller ke arguments mein bharta hai."
+  },
+  {
+   "q": "Parameter mein `/` kaise allow karte hain?",
+   "a": "`->where('search', '.*')` se, par sirf last parameter mein."
   }
  ],
  "summary": [
-  "`{id}` required, `{id?}` optional hota hai.",
-  "`where*` methods format restrict karte hain."
+  "`{id}` required, `{id?}` optional.",
+  "Parameters order se inject hote hain.",
+  "`where`, `whereNumber`, `whereIn`, `whereUuid` format restrict karte hain.",
+  "`Route::pattern()` global constraint deta hai.",
+  "Controller mein dependencies pehle, route parameters baad mein."
  ]
 }

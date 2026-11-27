@@ -1,0 +1,202 @@
+{
+ "id": "m06-l05",
+ "title": "Seeders aur Factories: Test Data banana",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Seeder aur factory ka farak samajhna",
+  "`make:factory` aur `make:seeder` use karna",
+  "`db:seed` aur `migrate:fresh --seed` chalana",
+  "`DatabaseSeeder` se kai seeders call karna"
+ ],
+ "prerequisites": [
+  "Foreign Keys aur Table Relationships (m06-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "Seeder aur Factory kya hain?",
+   "body": "Development mein khali tables ke saath kaam karna mushkil hai. **Seeder** database mein data bharta hai. **Factory** ek blueprint hai jo fake (lekin asli jaisa) data bana deta hai.\n\nModel ko Eloquent module mein detail se seekhenge. Abhi `php artisan make:model Product` se model bana lo, taaki factory use ho sake."
+  },
+  {
+   "heading": "Real-world example: 20 fake products",
+   "body": "Factory mein har column ke liye fake value likhte hain. `fake()` helper naam, price, text jaisa data deta hai.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:model Product\nphp artisan make:factory ProductFactory --model=Product"
+    },
+    {
+     "file": "database/factories/ProductFactory.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace Database\\Factories;\n\nuse Illuminate\\Database\\Eloquent\\Factories\\Factory;\n\nclass ProductFactory extends Factory\n{\n    public function definition(): array\n    {\n        return [\n            'name' => fake()->words(3, true),\n            'price' => fake()->randomFloat(2, 99, 9999),\n            'stock' => fake()->numberBetween(0, 100),\n        ];\n    }\n}\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`definition()` ek row ke liye fake values ka array deta hai.",
+    "`fake()->words(3, true)` – 3 shabdon ka text. `randomFloat(2, 99, 9999)` – 2 decimal wala price.",
+    "Model mein `use HasFactory;` hona chahiye (`make:model` khud lagata hai)."
+   ]
+  },
+  {
+   "heading": "Seeder se data bharna",
+   "body": "Seeder factory ko call karke rows banata hai. `DatabaseSeeder` main seeder hai jo baaki seeders ko call karta hai.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:seeder ProductSeeder"
+    },
+    {
+     "file": "database/seeders/ProductSeeder.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace Database\\Seeders;\n\nuse App\\Models\\Product;\nuse Illuminate\\Database\\Seeder;\n\nclass ProductSeeder extends Seeder\n{\n    public function run(): void\n    {\n        Product::factory()->count(20)->create();\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "database/seeders/DatabaseSeeder.php",
+     "lang": "php",
+     "code": "public function run(): void\n{\n    $this->call([\n        ProductSeeder::class,\n    ]);\n}\n"
+    }
+   ],
+   "explain": [
+    "`Product::factory()->count(20)->create()` – 20 rows database mein bana deta hai.",
+    "`DatabaseSeeder::run()` mein `$this->call([...])` – order se seeders chalte hain (parent tables pehle)."
+   ]
+  },
+  {
+   "heading": "Seed chalana",
+   "body": "Seed ko migrations ke saath ya alag se chala sakte ho:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan db:seed\nphp artisan db:seed --class=ProductSeeder\nphp artisan migrate:fresh --seed"
+    }
+   ],
+   "explain": [
+    "`db:seed` – `DatabaseSeeder` chalata hai.",
+    "`--class=...` – sirf ek seeder.",
+    "`migrate:fresh --seed` – database reset karke naya data (sirf development mein)."
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Seeders mein asli users ka password ya production data mat daalo. Fake data hi rakho, aur production par `migrate:fresh --seed` kabhi mat chalao."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Seeders aur factories: Laravel 11, 12, 13",
+  "intro": "Factories aur seeders ka syntax teeno versions mein same hai.",
+  "items": {
+   "11": "Class-based factories, `fake()` helper aur `HasFactory` trait standard hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11."
+  }
+ },
+ "errors": [
+  {
+   "error": "Class \"App\\Models\\Product\" not found",
+   "cause": "Model banaya nahi ya import galat hai.",
+   "fix": "`php artisan make:model Product` chalao aur seeder mein `use App\\Models\\Product;`."
+  },
+  {
+   "error": "Call to undefined method App\\Models\\Product::factory()",
+   "cause": "Model mein `HasFactory` trait nahi hai.",
+   "fix": "Model mein `use Illuminate\\Database\\Eloquent\\Factories\\HasFactory;` aur class ke andar `use HasFactory;` likho."
+  },
+  {
+   "error": "SQLSTATE[HY000]: no such column / table products has no column",
+   "cause": "Factory ke columns table se match nahi karte, ya migration chali nahi.",
+   "fix": "Pehle `migrate` chalao aur factory ke keys ko column naamon se milao."
+  }
+ ],
+ "debug": {
+  "body": "Data bhara ya nahi, Tinker se dekho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan db:seed\nphp artisan tinker\n>>> App\\Models\\Product::count()"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Data se bharo:",
+  "tasks": [
+   "`ProductFactory` banao aur `definition()` bharo",
+   "`ProductSeeder` se 20 products banao",
+   "`DatabaseSeeder` se seeder call karo aur `migrate:fresh --seed` chalao",
+   "Tinker mein `Product::count()` check karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Factory ka kaam kya hai?",
+   "options": [
+    "Tables banana",
+    "Fake data ka blueprint dena",
+    "Routes banana",
+    "Cache clear karna"
+   ],
+   "answer": 1,
+   "why": "Factory model ke liye fake data generate karta hai."
+  },
+  {
+   "q": "Saare seeders chalane ki command?",
+   "options": [
+    "php artisan seed",
+    "php artisan db:seed",
+    "php artisan migrate:seed",
+    "php artisan make:seed"
+   ],
+   "answer": 1,
+   "why": "`php artisan db:seed` `DatabaseSeeder` chalata hai."
+  },
+  {
+   "q": "Database reset karke seed karne ki command?",
+   "options": [
+    "migrate:rollback --seed",
+    "migrate:fresh --seed",
+    "db:reset",
+    "seed:fresh"
+   ],
+   "answer": 1,
+   "why": "`php artisan migrate:fresh --seed`."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Seeder aur factory mein farak?",
+   "a": "Seeder database mein data bharta hai. Factory ek model ka fake data blueprint hai jise seeder ya tests use karte hain."
+  },
+  {
+   "q": "`fake()` kya hai?",
+   "a": "Faker library ka helper jo naam, email, text jaise fake data deta hai."
+  },
+  {
+   "q": "`DatabaseSeeder` ka kya role hai?",
+   "a": "Main seeder jo `db:seed` chalane par chalta hai aur `call()` se baaki seeders ko order mein chalata hai."
+  },
+  {
+   "q": "Seeding ka fayda?",
+   "a": "Development aur testing ke liye turant realistic data milta hai, aur team ka data same rehta hai."
+  },
+  {
+   "q": "Production mein seed kab chalate hain?",
+   "a": "Sirf zaroori reference data (jaise countries, roles) ke liye, fake data ke liye kabhi nahi."
+  }
+ ],
+ "summary": [
+  "Factory fake data ka blueprint, seeder data bharta hai.",
+  "`Model::factory()->count(n)->create()` rows banata hai.",
+  "`DatabaseSeeder` baaki seeders ko `call()` karta hai.",
+  "`db:seed`, `--class`, `migrate:fresh --seed` commands.",
+  "Production par fake data nahi."
+ ]
+}

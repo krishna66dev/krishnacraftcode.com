@@ -1,0 +1,218 @@
+{
+ "id": "m06-l02",
+ "title": "Migrations: Tables banana aur Chalana",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Migration kya hai aur kyun zaroori hai samajhna",
+  "`make:migration` aur `Schema::create` se table banana",
+  "`migrate`, `migrate:status`, `rollback`, `fresh`, `refresh` commands jaanna",
+  "Existing table mein column jodna (`Schema::table`)",
+  "Migration likhne ke rules samajhna"
+ ],
+ "prerequisites": [
+  "Database Configuration (m06-l01)"
+ ],
+ "sections": [
+  {
+   "heading": "Migration kya hai?",
+   "body": "Migration database ka **version control** hai. Table kaise banti hai, yeh PHP code mein likhte ho, aur poori team ek command se same schema bana leti hai. Kisi teammate se manually column jodne ko nahi kehna padta.\n\nMigration files `database/migrations` mein hoti hain, aur file ke naam ke timestamp se Laravel unka order samajhta hai."
+  },
+  {
+   "heading": "Real-world example: products table",
+   "body": "Store ke liye `products` table banate hain. Pehle migration file generate karo:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:migration create_products_table"
+    },
+    {
+     "file": "database/migrations/xxxx_create_products_table.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Database\\Migrations\\Migration;\nuse Illuminate\\Database\\Schema\\Blueprint;\nuse Illuminate\\Support\\Facades\\Schema;\n\nreturn new class extends Migration\n{\n    public function up(): void\n    {\n        Schema::create('products', function (Blueprint $table) {\n            $table->id();\n            $table->string('name');\n            $table->text('description')->nullable();\n            $table->decimal('price', 8, 2);\n            $table->unsignedInteger('stock')->default(0);\n            $table->timestamps();\n        });\n    }\n\n    public function down(): void\n    {\n        Schema::dropIfExists('products');\n    }\n};\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`create_products_table` naam se Laravel samajh jaata hai ki `products` table banani hai aur stub pehle se bhar deta hai.",
+    "`up()` – migration chalane par kya hoga. `down()` – rollback par kya hoga.",
+    "`return new class extends Migration` – anonymous class, naam takraav nahi hota.",
+    "`$table->id()` – auto-increment primary key. `timestamps()` – `created_at` aur `updated_at`."
+   ]
+  },
+  {
+   "heading": "Migrations chalana",
+   "body": "Yeh commands rozana kaam aati hain:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan migrate\nphp artisan migrate:status\nphp artisan migrate --pretend\nphp artisan migrate:rollback\nphp artisan migrate:rollback --step=1\nphp artisan migrate:fresh\nphp artisan migrate:fresh --seed\nphp artisan migrate:refresh"
+    }
+   ],
+   "explain": [
+    "`migrate` – saari pending migrations chalata hai.",
+    "`migrate:status` – kaunsi chal chuki hain.",
+    "`--pretend` – SQL dikhata hai, chalata nahi.",
+    "`rollback` – aakhri batch undo. `--step=1` se sirf ek migration.",
+    "`migrate:fresh` – saari tables **drop** karke dobara migrate. Production mein kabhi nahi!",
+    "`migrate:refresh` – rollback karke dobara migrate."
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "`migrate:fresh` aur `migrate:refresh` data mita dete hain. Sirf development mein chalao."
+   }
+  },
+  {
+   "heading": "Existing table mein column jodna",
+   "body": "Kal tumhe `sku` column chahiye. Purani migration edit mat karo, **nayi migration** banao. Naam `add_..._to_..._table` rakhoge to Laravel table pehchan leta hai.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:migration add_sku_to_products_table"
+    },
+    {
+     "file": "database/migrations/xxxx_add_sku_to_products_table.php",
+     "lang": "php",
+     "code": "return new class extends Migration\n{\n    public function up(): void\n    {\n        Schema::table('products', function (Blueprint $table) {\n            $table->string('sku', 50)->nullable();\n        });\n    }\n\n    public function down(): void\n    {\n        Schema::table('products', function (Blueprint $table) {\n            $table->dropColumn('sku');\n        });\n    }\n};\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`Schema::table()` – existing table badalne ke liye.",
+    "`down()` mein exactly undo karo jo `up()` ne kiya.",
+    "Rename: `renameColumn('old', 'new')`. Table drop: `Schema::dropIfExists('x')`."
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Rule: jo migration kisi aur ke paas ya production par chal chuki hai, use kabhi edit mat karo. Naya badlaav hamesha nayi migration mein."
+   }
+  },
+  {
+   "heading": "Schema dump (jab migrations bahut ho jayein)",
+   "body": "Hazaaron migrations ho jaayein to `schema:dump` se unhe ek SQL file mein squash kar sakte ho:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan schema:dump\nphp artisan schema:dump --prune"
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Migrations: Laravel 11, 12, 13",
+  "intro": "Migration syntax (anonymous class, `up()`, `down()`) aur commands teeno versions mein same hain.",
+  "items": {
+   "11": "Anonymous migration classes aur `up(): void` style standard hai. Naye project mein users, cache, jobs migrations pehle se hoti hain.",
+   "12": "Same as 11. `migrate --isolated`, `--pretend`, `schema:dump` available hain.",
+   "13": "Same. Official docs ke migrations page par commands aur options ki latest list dekh lo."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE[HY000]: General error: 1 table \"products\" already exists",
+   "cause": "Table pehle se database mein hai (migration dobara ya manually chali).",
+   "fix": "Development mein `php artisan migrate:fresh`. Production mein conflict hata ke sahi migration chalao."
+  },
+  {
+   "error": "Nothing to migrate.",
+   "cause": "Saari migrations pehle hi chal chuki hain, ya nayi file banayi nahi.",
+   "fix": "`migrate:status` dekho aur nayi migration banao."
+  },
+  {
+   "error": "Class ... not found / Target class does not exist (migration)",
+   "cause": "Migration file ka naam ya class conflict hua.",
+   "fix": "Anonymous class (`return new class extends Migration`) use karo."
+  }
+ ],
+ "debug": {
+  "body": "Kya chala aur kya baaki hai `migrate:status` batata hai. SQL dekhna ho to `--pretend`.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan migrate:status\nphp artisan migrate --pretend"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Pehli migrations likho:",
+  "tasks": [
+   "`create_products_table` banao (name, description nullable, price, stock) aur chalao",
+   "`migrate:status` se dekho ki chali ya nahi",
+   "`add_sku_to_products_table` migration banao aur chalao",
+   "`migrate:rollback --step=1` se sku wali migration undo karo aur dobara chalao"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Table banane ke liye kaunsa method use hota hai?",
+   "options": [
+    "Schema::new()",
+    "Schema::create()",
+    "Schema::make()",
+    "Schema::table()"
+   ],
+   "answer": 1,
+   "why": "`Schema::create()` nayi table banata hai. `Schema::table()` existing table badalta hai."
+  },
+  {
+   "q": "Chali hui migration mein naya column chahiye to?",
+   "options": [
+    "Purani migration edit karo",
+    "Nayi migration banao",
+    "Table manually badlo",
+    "migrate:fresh chalao"
+   ],
+   "answer": 1,
+   "why": "Chali hui migration edit nahi karte, nayi migration banate hain."
+  },
+  {
+   "q": "Saari tables drop karke dobara migrate karne ki command?",
+   "options": [
+    "migrate:rollback",
+    "migrate:fresh",
+    "migrate:status",
+    "migrate:reset"
+   ],
+   "answer": 1,
+   "why": "`migrate:fresh` saari tables drop karke migrate chalata hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Migration kya hoti hai?",
+   "a": "Database schema ka version control. Table aur column badlaav PHP code mein likhe jaate hain, jo team ke saath share hote hain."
+  },
+  {
+   "q": "`up()` aur `down()` mein farak?",
+   "a": "`up()` migration chalane par, `down()` rollback par chalta hai aur `up()` ka ulta karta hai."
+  },
+  {
+   "q": "`migrate:fresh` aur `migrate:refresh` mein farak?",
+   "a": "`fresh` saari tables drop karta hai. `refresh` migrations ko `down()` se rollback karke dobara chalata hai."
+  },
+  {
+   "q": "Chali hui migration ko edit kyun nahi karte?",
+   "a": "Doosre environments par woh pehle chal chuki hoti hai, to edit wahan apply nahi hoti. Nayi migration se badlaav sabko milta hai."
+  },
+  {
+   "q": "Migration ka order kaise decide hota hai?",
+   "a": "File ke naam ke timestamp se."
+  }
+ ],
+ "summary": [
+  "Migration = database ka version control.",
+  "`make:migration`, `Schema::create`, `up()` aur `down()`.",
+  "`migrate`, `status`, `rollback`, `fresh`, `refresh` commands.",
+  "Badlaav ke liye nayi migration, purani edit nahi.",
+  "`migrate:fresh` development mein hi."
+ ]
+}

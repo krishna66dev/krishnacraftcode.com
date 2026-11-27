@@ -1,0 +1,151 @@
+{
+ "mcq": [
+  {
+   "q": "Naye Laravel project ka default database kaunsa hai?",
+   "options": [
+    "MySQL",
+    "PostgreSQL",
+    "SQLite",
+    "MongoDB"
+   ],
+   "answer": 2,
+   "why": "Naye project mein `.env` SQLite use karta hai aur `database/database.sqlite` ban jaati hai."
+  },
+  {
+   "q": "Laravel installer se naya project banane ki command?",
+   "options": [
+    "laravel create app",
+    "laravel new example-app",
+    "php artisan new app",
+    "composer new app"
+   ],
+   "answer": 1,
+   "why": "`laravel new example-app` naya project banata hai."
+  },
+  {
+   "q": "Web server ka document root kaunsa folder hona chahiye?",
+   "options": [
+    "app",
+    "public",
+    "storage",
+    "bootstrap"
+   ],
+   "answer": 1,
+   "why": "Sirf `public` web se accessible hona chahiye."
+  },
+  {
+   "q": "Naya `APP_KEY` banane ki command?",
+   "options": [
+    "php artisan key:make",
+    "php artisan key:generate",
+    "php artisan app:key",
+    "php artisan generate"
+   ],
+   "answer": 1,
+   "why": "`php artisan key:generate` naya key set karta hai."
+  },
+  {
+   "q": "Application code mein config value kaise padhni chahiye?",
+   "options": [
+    "env('KEY') seedha",
+    "config('file.key')",
+    "$_ENV['KEY']",
+    "getenv('KEY')"
+   ],
+   "answer": 1,
+   "why": "Config cache ke saath safe rehne ke liye `config()` use karo."
+  },
+  {
+   "q": "Laravel 13 chalane ke liye minimum PHP kaunsa hai?",
+   "options": [
+    "8.1",
+    "8.2",
+    "8.3",
+    "8.4"
+   ],
+   "answer": 2,
+   "why": "Laravel 13 ke liye PHP 8.3 ya upar chahiye."
+  }
+ ],
+ "assignments": [
+  {
+   "title": "Pehla page: /hello",
+   "level": "Beginner",
+   "brief": "Naya project banao aur apna pehla route aur view banao.",
+   "tasks": [
+    "`laravel new example-app` se project banao aur server chalao",
+    "`/hello` route banao jo view return kare",
+    "`resources/views/hello.blade.php` mein apna naam dikhao",
+    "Server ko `--port=8001` par chalao aur wahi page kholo"
+   ],
+   "explain": "Route `view()` ko data deta hai aur Blade `{{ $name }}` se print karta hai.",
+   "solution": [
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/hello', fn () => view('hello', ['name' => 'Asha']));\n"
+    },
+    {
+     "file": "resources/views/hello.blade.php",
+     "lang": "html",
+     "code": "<h1>Namaste, {{ $name }}!</h1>\n"
+    }
+   ]
+  },
+  {
+   "title": "Config aur Artisan command",
+   "level": "Intermediate",
+   "brief": "`.env` se value config mein lao aur ek Artisan command banao.",
+   "tasks": [
+    "`.env` mein `GREETING_MESSAGE=Namaste` jodo",
+    "`config/greeting.php` banao jo `env()` se value padhe",
+    "`routes/console.php` mein `hello` command banao jo `config('greeting.message')` dikhaye",
+    "`php artisan config:clear` chalao aur command run karo"
+   ],
+   "explain": "`env()` sirf config file mein, aur baaki code mein `config()` use karo.",
+   "solution": [
+    {
+     "file": ".env",
+     "lang": "ini",
+     "code": "GREETING_MESSAGE=Namaste"
+    },
+    {
+     "file": "config/greeting.php",
+     "lang": "php",
+     "code": "<?php\n\nreturn [\n    'message' => env('GREETING_MESSAGE', 'Hello'),\n];\n"
+    },
+    {
+     "file": "routes/console.php",
+     "lang": "php",
+     "code": "<?php\n\nuse Illuminate\\Support\\Facades\\Artisan;\n\nArtisan::command('hello', function () {\n    $this->info(config('greeting.message'));\n})->purpose('Greeting dikhao');\n"
+    }
+   ]
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is Laravel?",
+   "a": "Open-source PHP web framework jo routing, database access, templating, queues aur testing jaise features structured tareeke se deta hai."
+  },
+  {
+   "q": "Why do we serve Laravel from the public folder?",
+   "a": "Taaki `.env`, `app` aur `vendor` jaisi private files web se access na ho sakein."
+  },
+  {
+   "q": "Difference between env() and config()?",
+   "a": "`env()` `.env` se raw value padhta hai. `config()` config files se padhta hai jo cache ho sakti hain, isliye code mein `config()` use karte hain."
+  },
+  {
+   "q": "What does composer run dev do?",
+   "a": "`composer.json` ki `dev` script chalata hai jo development server, queue worker aur Vite ek saath start karti hai."
+  },
+  {
+   "q": "What changed in the Laravel 11 structure?",
+   "a": "Skeleton slim hua: Kernel files, Exception Handler aur RouteServiceProvider hataye gaye aur configuration `bootstrap/app.php` mein aayi."
+  },
+  {
+   "q": "What is Artisan?",
+   "a": "Laravel ka command line tool jo code generate karta hai aur routine kaam (migrate, route:list, tinker) chalata hai."
+  }
+ ]
+}

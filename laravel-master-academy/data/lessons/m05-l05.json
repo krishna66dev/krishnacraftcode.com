@@ -1,0 +1,239 @@
+{
+ "id": "m05-l05",
+ "title": "Includes, Stacks, Custom Directives aur Vite Assets",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`@include` aur `@each` se partial views use karna",
+  "`@push`, `@stack`, `@once` ka use jaanna",
+  "Apna custom Blade directive banana",
+  "Vite se CSS/JS load karna (`@vite`, `npm run dev/build`)",
+  "View cache commands jaanna"
+ ],
+ "prerequisites": [
+  "Blade Components, Slots aur Attributes (m05-l04)",
+  "Local Setup (m02-l02)"
+ ],
+ "sections": [
+  {
+   "heading": "Include aur partial views",
+   "body": "Chhote reusable tukde (navbar, footer, product card) ko `partials` folder mein rakho aur `@include` se lagao. Components zyada powerful hain, par simple tukdon ke liye include kaafi hai.",
+   "code": [
+    {
+     "file": "resources/views/partials/nav.blade.php",
+     "lang": "html",
+     "code": "<nav>\n    <a href=\"/\" @class(['active' => $active === 'home'])>Home</a>\n    <a href=\"/products\" @class(['active' => $active === 'products'])>Products</a>\n</nav>\n"
+    },
+    {
+     "file": "resources/views/products/index.blade.php",
+     "lang": "html",
+     "code": "@include('partials.nav', ['active' => 'products'])\n\n@includeIf('partials.promo')\n@includeWhen($showBanner, 'partials.banner')\n\n@each('products.card', $products, 'product', 'products.empty')\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`@include('partials.nav', [...])` – `resources/views/partials/nav.blade.php`, extra data ke saath.",
+    "`@includeIf` – view na ho to error nahi aata. `@includeWhen(condition, view)` – condition true par.",
+    "`@each('view', $list, 'item', 'empty-view')` – list ke har item ke liye view render karta hai, khali ho to doosra view."
+   ]
+  },
+  {
+   "heading": "Stacks aur @once",
+   "body": "Page ka koi child apna script/style layout ke sahi jagah daalna chahe to stack use hota hai. `@once` bar-bar include hone wale partial se code sirf ek baar daalta hai.",
+   "code": [
+    {
+     "file": "layout mein",
+     "lang": "html",
+     "code": "<head>\n    @stack('styles')\n</head>\n<body>\n    ...\n    @stack('scripts')\n</body>\n",
+     "editable": true
+    },
+    {
+     "file": "partial ya page mein",
+     "lang": "html",
+     "code": "@once\n    @push('scripts')\n        <script src=\"/js/map.js\"></script>\n    @endpush\n@endonce\n"
+    }
+   ]
+  },
+  {
+   "heading": "Custom directive",
+   "body": "Agar koi kaam template mein baar-baar aata hai, to apna directive bana sakte ho. `AppServiceProvider::boot()` mein register karo.",
+   "code": [
+    {
+     "file": "app/Providers/AppServiceProvider.php",
+     "lang": "php",
+     "code": "use Illuminate\\Support\\Facades\\Blade;\n\npublic function boot(): void\n{\n    Blade::directive('money', function (string $expression) {\n        return \"<?php echo 'Rs. ' . number_format({$expression}, 2); ?>\";\n    });\n}\n",
+     "editable": true
+    },
+    {
+     "file": "view mein",
+     "lang": "html",
+     "code": "<p>Price: @money($product['price'])</p>"
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan view:clear"
+    }
+   ],
+   "explain": [
+    "Directive ka callback ek **PHP code ka string** return karta hai jo compile hoke view mein chalta hai.",
+    "Directive badalne ke baad `php artisan view:clear` chalao, warna purani compiled view chalti rahegi.",
+    "Chhote kaam ke liye component ya helper function aksar saaf rehta hai."
+   ]
+  },
+  {
+   "heading": "Vite: CSS aur JS load karna",
+   "body": "Laravel assets (CSS/JS) Vite se bundle hote hain. Layout ke `<head>` mein `@vite` likhte ho. Development mein `npm run dev` (ya `composer run dev`) chalta hai, aur production ke liye `npm run build`.",
+   "code": [
+    {
+     "file": "layout ke <head> mein",
+     "lang": "html",
+     "code": "@vite(['resources/css/app.css', 'resources/js/app.js'])"
+    },
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "npm install\nnpm run dev      # development: hot reload\nnpm run build    # production: public/build mein files"
+    },
+    {
+     "file": "images ke liye",
+     "lang": "html",
+     "code": "<img src=\"{{ asset('images/logo.png') }}\" alt=\"Logo\">"
+    }
+   ],
+   "explain": [
+    "`@vite([...])` – dev mein Vite server se, production mein `public/build` se files lagata hai.",
+    "`public/images/logo.png` ko `asset('images/logo.png')` se link karte hain.",
+    "Naye project ka CSS setup (jaise Tailwind) skeleton ke hisaab se aata hai. Apne project ki `package.json` aur `vite.config.js` dekho."
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "`@vite` lagaya par `npm run dev` ya `npm run build` nahi chalaya to 'Vite manifest not found' error aata hai."
+   }
+  },
+  {
+   "heading": "View cache",
+   "body": "Blade views compile hokar `storage/framework/views` mein cache hoti hain. Production deploy par `view:cache` chalate hain, aur development mein koi gadbad lage to `view:clear`.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan view:cache\nphp artisan view:clear"
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Vite aur assets: Laravel 11, 12 aur 13",
+  "intro": "Blade ke includes, stacks aur directives teeno versions mein same hain. Assets ka tooling skeleton ke saath aata hai.",
+  "items": {
+   "11": "`@vite` aur `npm run dev/build`. Skeleton mein Vite pehle se configured hai.",
+   "12": "Same as 11.",
+   "13": "Same. Server, queue aur Vite ek saath chalane ke liye `composer run dev` bhi hai (13 installation docs ke hisaab se)."
+  }
+ },
+ "errors": [
+  {
+   "error": "Vite manifest not found at: public/build/manifest.json",
+   "cause": "Assets build nahi hue ya Vite server nahi chal raha.",
+   "fix": "`npm install && npm run build` chalao, ya development mein `npm run dev` / `composer run dev` chalu rakho."
+  },
+  {
+   "error": "View [partials.nav] not found",
+   "cause": "Include ka path galat hai.",
+   "fix": "`partials.nav` ka matlab `resources/views/partials/nav.blade.php`."
+  },
+  {
+   "error": "Custom directive ka purana behaviour chal raha hai",
+   "cause": "Compiled view cache purani hai.",
+   "fix": "`php artisan view:clear` chalao."
+  }
+ ],
+ "debug": {
+  "body": "Assets aur views ki problem mein pehle caches saaf karo, phir Vite ka status dekho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan view:clear\nnpm run build\nphp artisan about"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Poora products page assemble karo:",
+  "tasks": [
+   "`partials/nav.blade.php` banao aur `@include` se `active` data bhejo",
+   "`@each` se products ke cards dikhao (`products/card.blade.php`) aur khali list ke liye `products/empty.blade.php`",
+   "`@money` custom directive banao aur price dikhao",
+   "Layout mein `@vite` lagao aur `npm run build` chalakar page kholo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`@each` kis kaam aata hai?",
+   "options": [
+    "Database loop",
+    "List ke har item ke liye view render karne",
+    "Route banane",
+    "Cache karne"
+   ],
+   "answer": 1,
+   "why": "`@each('view', $list, 'item', 'empty')` list ke har item ke liye view render karta hai."
+  },
+  {
+   "q": "Custom directive badalne ke baad kya chalana chahiye?",
+   "options": [
+    "php artisan serve",
+    "php artisan view:clear",
+    "php artisan migrate",
+    "composer update"
+   ],
+   "answer": 1,
+   "why": "Compiled views cache hoti hain, isliye `view:clear`."
+  },
+  {
+   "q": "Production ke liye assets kaise build karte hain?",
+   "options": [
+    "npm run dev",
+    "npm run build",
+    "php artisan build",
+    "composer build"
+   ],
+   "answer": 1,
+   "why": "`npm run build` production files `public/build` mein banata hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "`@include` aur component mein kab kya?",
+   "a": "Simple static tukde ke liye include, jab props/slots/attributes ya logic chahiye to component."
+  },
+  {
+   "q": "`@push` aur `@stack` kaise kaam karte hain?",
+   "a": "Child view `@push('name')` se content bhejta hai aur layout `@stack('name')` par use dikhata hai."
+  },
+  {
+   "q": "Custom Blade directive kaise banate hain?",
+   "a": "`Blade::directive('name', fn ($expression) => \"<?php ... ?>\")` ko service provider ke `boot()` mein register karke."
+  },
+  {
+   "q": "`@vite` kya karta hai?",
+   "a": "Development mein Vite dev server se, production mein built manifest se CSS/JS ke tags lagata hai."
+  },
+  {
+   "q": "`view:cache` kab chalate hain?",
+   "a": "Production deployment par, saari Blade views pehle se compile karne ke liye."
+  }
+ ],
+ "summary": [
+  "`@include`/`@each` partial views ke liye, components zyada flexible.",
+  "`@push`/`@stack`/`@once` se scripts aur styles sahi jagah jaate hain.",
+  "Custom directive ke baad `view:clear`.",
+  "`@vite` ke saath `npm run dev` ya `npm run build` zaroori hai.",
+  "`view:cache` production mein, `view:clear` gadbad hone par."
+ ]
+}

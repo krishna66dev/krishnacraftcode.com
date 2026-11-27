@@ -1,0 +1,264 @@
+{
+ "id": "m04-l04",
+ "title": "Controllers: Basic, Invokable aur Resource",
+ "minutes": 45,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`make:controller` se controller banana",
+  "Basic, invokable aur resource controllers ka farak samajhna",
+  "`Route::resource` ke 7 routes aur `only`/`except`/`apiResource` jaanna",
+  "Controller mein `Request` aur response (view, JSON, redirect) use karna",
+  "Controller middleware ke tareeke jaanna"
+ ],
+ "prerequisites": [
+  "Named Routes, Route Groups aur Special Routes (m04-l03)",
+  "Dependency Injection (m03-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "Basic controller",
+   "body": "Closure ki jagah controller class use karne se related logic ek jagah rehta hai. Controller `app/Http/Controllers` mein hote hain.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:controller UserController"
+    },
+    {
+     "file": "app/Http/Controllers/UserController.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Http\\Controllers;\n\nuse App\\Models\\User;\nuse Illuminate\\View\\View;\n\nclass UserController extends Controller\n{\n    public function show(string $id): View\n    {\n        return view('user.profile', [\n            'user' => User::findOrFail($id),\n        ]);\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Http\\Controllers\\UserController;\n\nRoute::get('/user/{id}', [UserController::class, 'show']);\n"
+    }
+   ],
+   "explain": [
+    "Controller ke saare public methods requests handle kar sakte hain.",
+    "Route par `[UserController::class, 'show']` likhte hain.",
+    "Controller ko base class extend karna zaroori nahi hai, par shared methods ke liye convenient hota hai."
+   ]
+  },
+  {
+   "heading": "Invokable controller",
+   "body": "Agar controller sirf ek kaam karta hai, to ek `__invoke` method wali class banao.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:controller ProvisionServer --invokable"
+    },
+    {
+     "file": "app/Http/Controllers/ProvisionServer.php",
+     "lang": "php",
+     "code": "class ProvisionServer extends Controller\n{\n    public function __invoke()\n    {\n        return 'Server ban raha hai';\n    }\n}\n"
+    },
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "Route::post('/server', ProvisionServer::class);"
+    }
+   ],
+   "explain": [
+    "Route par method ka naam nahi dena padta, sirf class ka naam."
+   ]
+  },
+  {
+   "heading": "Real-world example: Resource controller",
+   "body": "Products ke liye create, read, update, delete sab chahiye. Ek command aur ek route line 7 routes bana deti hai.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:controller ProductController --resource"
+    },
+    {
+     "file": "routes/web.php",
+     "lang": "php",
+     "code": "use App\\Http\\Controllers\\ProductController;\n\nRoute::resource('products', ProductController::class);\n\n// Sirf kuch actions:\n// Route::resource('products', ProductController::class)->only(['index', 'show']);\n// Route::resource('products', ProductController::class)->except(['destroy']);\n\n// API ke liye (create aur edit nahi):\n// Route::apiResource('products', ProductController::class);\n",
+     "editable": true
+    },
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "class ProductController extends Controller\n{\n    public function index()   { return 'List'; }\n    public function create()  { return 'Form'; }\n    public function store(Request $request)  { return 'Save'; }\n    public function show(string $id)  { return \"Show {$id}\"; }\n    public function edit(string $id)  { return \"Edit {$id}\"; }\n    public function update(Request $request, string $id)  { return \"Update {$id}\"; }\n    public function destroy(string $id)  { return \"Delete {$id}\"; }\n}\n"
+    }
+   ],
+   "explain": [
+    "`GET /products` -> `index` (`products.index`)",
+    "`GET /products/create` -> `create` (`products.create`)",
+    "`POST /products` -> `store` (`products.store`)",
+    "`GET /products/{product}` -> `show` (`products.show`)",
+    "`GET /products/{product}/edit` -> `edit` (`products.edit`)",
+    "`PUT/PATCH /products/{product}` -> `update` (`products.update`)",
+    "`DELETE /products/{product}` -> `destroy` (`products.destroy`)",
+    "`make:controller ... --api` API resource controller banata hai jisme `create` aur `edit` nahi hote."
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Resource route ke saath koi extra route chahiye (jaise `/products/popular`), to use `Route::resource` se **pehle** likho, warna `{product}` use pakad lega."
+   }
+  },
+  {
+   "heading": "Request aur Response basics",
+   "body": "Controller method mein `Request` type-hint karo aur input lo. Response ke kai roop ho sakte hain.",
+   "code": [
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "use Illuminate\\Http\\Request;\n\npublic function store(Request $request)\n{\n    $name = $request->input('name');          // form ya JSON se\n    $page = $request->query('page', 1);       // ?page=2 se, default 1\n\n    // Response ke kuch tareeke:\n    // return view('products.index');\n    // return ['id' => 1, 'name' => $name];                  // array -> JSON\n    // return response()->json(['ok' => true], 201);\n    // return redirect()->route('products.index');\n    // abort(404);\n    return redirect()->route('products.index');\n}\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`$request->input('name')` – POST body ya query dono se.",
+    "`$request->query('page')` – sirf query string se.",
+    "Array return karo to Laravel use JSON bana deta hai.",
+    "`abort(404)` – seedha 404 response."
+   ]
+  },
+  {
+   "heading": "Controller middleware",
+   "body": "Middleware route par ya controller ke andar lagaya ja sakta hai. Controller mein `HasMiddleware` interface use hota hai.",
+   "code": [
+    {
+     "file": "app/Http/Controllers/UserController.php",
+     "lang": "php",
+     "code": "use Illuminate\\Routing\\Controllers\\HasMiddleware;\nuse Illuminate\\Routing\\Controllers\\Middleware;\n\nclass UserController implements HasMiddleware\n{\n    public static function middleware(): array\n    {\n        return [\n            'auth',\n            new Middleware('log', only: ['index']),\n            new Middleware('subscribed', except: ['store']),\n        ];\n    }\n}\n"
+    }
+   ],
+   "explain": [
+    "`auth`, `log`, `subscribed` middleware ke naam hain (Module 13 mein detail).",
+    "`only` / `except` se kuch methods tak limit karte hain."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Controller middleware: Laravel 11, 12 aur 13",
+  "intro": "Resource aur invokable controllers teeno versions mein same hain. Laravel 13 mein controller middleware ke liye PHP attributes bhi milte hain.",
+  "items": {
+   "11": "`HasMiddleware` interface se controller middleware. Base `Controller` mein `$this->middleware()` nahi hota.",
+   "12": "Same as 11.",
+   "13": "`HasMiddleware` ab bhi chalta hai. Saath mein attributes: `#[Middleware('auth')]`, `#[WithoutMiddleware(...)]` aur policies ke liye `#[Authorize(...)]` (13 docs ke hisaab se)."
+  },
+  "code": [
+   {
+    "file": "UserController.php",
+    "lang": "php",
+    "code": "public static function middleware(): array\n{\n    return ['auth', new Middleware('log', only: ['index'])];\n}",
+    "variants": {
+     "11": "use Illuminate\\Routing\\Controllers\\HasMiddleware;\nuse Illuminate\\Routing\\Controllers\\Middleware;\n\nclass UserController implements HasMiddleware\n{\n    public static function middleware(): array\n    {\n        return ['auth', new Middleware('log', only: ['index'])];\n    }\n}",
+     "12": "use Illuminate\\Routing\\Controllers\\HasMiddleware;\nuse Illuminate\\Routing\\Controllers\\Middleware;\n\nclass UserController implements HasMiddleware\n{\n    public static function middleware(): array\n    {\n        return ['auth', new Middleware('log', only: ['index'])];\n    }\n}",
+     "13": "use Illuminate\\Routing\\Attributes\\Controllers\\Middleware;\n\n#[Middleware('auth')]\n#[Middleware('log', only: ['index'])]\nclass UserController\n{\n    // ...\n}"
+    }
+   }
+  ]
+ },
+ "errors": [
+  {
+   "error": "The POST method is not supported for route products. Supported methods: GET, HEAD",
+   "cause": "Form POST kar raha hai par us URL ka POST route nahi hai.",
+   "fix": "`Route::post(...)` ya `Route::resource` jodo aur form ka `action` check karo."
+  },
+  {
+   "error": "419 Page Expired",
+   "cause": "POST/PUT/DELETE form mein `@csrf` nahi hai.",
+   "fix": "Form ke andar `@csrf` likho (aur PUT/DELETE ke liye `@method('PUT')`)."
+  },
+  {
+   "error": "Method App\\Http\\Controllers\\ProductController::show does not exist",
+   "cause": "Route mein method ka naam galat hai, ya controller mein method banaya nahi.",
+   "fix": "Naam ka spelling check karo aur method banao."
+  }
+ ],
+ "debug": {
+  "body": "Resource routes ke naam, methods aur controller actions `route:list` mein dikhte hain.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan route:list --path=products\nphp artisan route:list --name=products"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Products ka resource banao:",
+  "tasks": [
+   "`php artisan make:controller ProductController --resource` chalao",
+   "`Route::resource('products', ProductController::class)` jodo aur `route:list` dekho",
+   "Har method se ek chhota text return karo aur browser mein `GET` routes test karo",
+   "Resource ko `only(['index', 'show'])` tak limit karo aur `route:list` dobara dekho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`Route::resource` kitne routes banata hai?",
+   "options": [
+    "3",
+    "5",
+    "7",
+    "9"
+   ],
+   "answer": 2,
+   "why": "index, create, store, show, edit, update, destroy: kul 7 routes."
+  },
+  {
+   "q": "`apiResource` mein kaunse methods nahi hote?",
+   "options": [
+    "index aur show",
+    "create aur edit",
+    "store aur update",
+    "destroy"
+   ],
+   "answer": 1,
+   "why": "API ke liye HTML form wale `create` aur `edit` routes nahi bante."
+  },
+  {
+   "q": "Invokable controller mein kaunsa method hota hai?",
+   "options": [
+    "index",
+    "handle",
+    "__invoke",
+    "run"
+   ],
+   "answer": 2,
+   "why": "Single action controller mein `__invoke` method hota hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Resource controller kya hai?",
+   "a": "Aisa controller jisme CRUD ke standard 7 methods hote hain, aur `Route::resource` ek line mein unke routes bana deta hai."
+  },
+  {
+   "q": "Invokable controller kab use karte hain?",
+   "a": "Jab controller sirf ek kaam karta ho, `__invoke` method ke saath."
+  },
+  {
+   "q": "`only` aur `except` kya karte hain?",
+   "a": "Resource routes mein se chune hue actions hi register karte hain ya kuch hata dete hain."
+  },
+  {
+   "q": "Controller mein middleware kaise lagate hain?",
+   "a": "Route par `->middleware()`, `HasMiddleware` interface se, ya Laravel 13 mein `#[Middleware]` attribute se."
+  },
+  {
+   "q": "Method injection kya hai?",
+   "a": "Controller method mein `Request $request` jaisi dependency type-hint karna, jise container inject karta hai. Route parameters uske baad likhte hain."
+  }
+ ],
+ "summary": [
+  "`make:controller` se controller banta hai; `--invokable` aur `--resource` variants hain.",
+  "Resource route 7 routes deta hai, `only`/`except` se kam kar sakte ho.",
+  "`apiResource` create/edit hata deta hai.",
+  "Controller mein `Request` inject karke input lo, view/JSON/redirect return karo.",
+  "Middleware ke liye `HasMiddleware`, aur Laravel 13 mein attributes bhi."
+ ]
+}

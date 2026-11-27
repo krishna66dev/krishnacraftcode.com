@@ -1,0 +1,198 @@
+{
+ "id": "m05-l02",
+ "title": "Blade Directives: Conditions, Loops aur $loop",
+ "minutes": 35,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`@if`, `@unless`, `@isset`, `@empty` use karna",
+  "`@foreach`, `@forelse`, `@for`, `@while` likhna",
+  "`$loop` variable ki properties jaanna",
+  "`@class`, `@checked`, `@selected`, `@error`, `@csrf`, `@method` samajhna",
+  "`@auth`, `@guest`, `@env` jaise directives pehchanna"
+ ],
+ "prerequisites": [
+  "Blade Basics: Echo, Escaping aur Data (m05-l01)"
+ ],
+ "sections": [
+  {
+   "heading": "Conditions",
+   "body": "Blade directives PHP ke control structures ke chhote aur saaf roop hain.",
+   "code": [
+    {
+     "file": "resources/views/products/index.blade.php",
+     "lang": "html",
+     "code": "@if (count($products) === 0)\n    <p>Koi product nahi.</p>\n@elseif (count($products) === 1)\n    <p>Sirf ek product.</p>\n@else\n    <p>{{ count($products) }} products hain.</p>\n@endif\n\n@unless ($isAdmin)\n    <p>Aap admin nahi ho.</p>\n@endunless\n\n@isset($discount)\n    <p>Discount: {{ $discount }}%</p>\n@endisset\n\n@empty($products)\n    <p>List khali hai.</p>\n@endempty\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`@if / @elseif / @else / @endif` PHP ke jaise hi kaam karte hain.",
+    "`@unless` – condition false ho to chalta hai.",
+    "`@isset` – variable defined aur null nahi hai.",
+    "`@empty` – variable PHP ke hisaab se 'empty' hai."
+   ]
+  },
+  {
+   "heading": "Real-world example: Product list loop",
+   "body": "Products ki list dikhane ke liye `@forelse` sabse kaam ka hai: list khali ho to `@empty` wala hissa dikhta hai. Loop ke andar `$loop` variable milta hai.",
+   "code": [
+    {
+     "file": "resources/views/products/index.blade.php",
+     "lang": "html",
+     "code": "<ul>\n@forelse ($products as $product)\n    <li class=\"{{ $loop->even ? 'even' : 'odd' }}\">\n        {{ $loop->iteration }}. {{ $product['name'] }} - Rs. {{ $product['price'] }}\n        @if ($loop->last) (aakhri) @endif\n    </li>\n@empty\n    <li>Koi product nahi mila.</li>\n@endforelse\n</ul>\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`$loop->iteration` – 1 se shuru hone wala number. `$loop->index` – 0 se.",
+    "`$loop->first`, `$loop->last` – pehla aur aakhri item.",
+    "`$loop->even`, `$loop->odd` – paar/bepaar item.",
+    "`$loop->count`, `$loop->remaining` – kul aur bache hue items.",
+    "Doosre loops: `@foreach`, `@for`, `@while`. `@continue` aur `@break` se loop control kar sakte ho."
+   ]
+  },
+  {
+   "heading": "Helper directives: class, checked, error",
+   "body": "Form aur HTML attributes ke liye chhote helpers hain:",
+   "code": [
+    {
+     "file": "resources/views/products/form.blade.php",
+     "lang": "html",
+     "code": "<span @class(['badge', 'bg-success' => $inStock, 'bg-danger' => ! $inStock])>\n    {{ $inStock ? 'In stock' : 'Out of stock' }}\n</span>\n\n<form method=\"POST\" action=\"{{ route('products.update', $product) }}\">\n    @csrf\n    @method('PUT')\n\n    <input type=\"text\" name=\"name\" value=\"{{ old('name', $product->name) }}\">\n    @error('name')\n        <div class=\"text-danger\">{{ $message }}</div>\n    @enderror\n\n    <input type=\"checkbox\" name=\"active\" @checked(old('active', $product->active))>\n\n    <select name=\"category\">\n        <option value=\"1\" @selected(old('category') == 1)>Electronics</option>\n    </select>\n\n    <button type=\"submit\" @disabled($product->locked)>Save</button>\n</form>\n"
+    }
+   ],
+   "explain": [
+    "`@class([...])` – condition ke hisaab se CSS classes jodta hai.",
+    "`@csrf` – CSRF token. Har POST/PUT/DELETE form mein zaroori.",
+    "`@method('PUT')` – HTML form se PUT/PATCH/DELETE spoof karta hai.",
+    "`old('name')` – validation fail hone ke baad purani value wapas bharta hai.",
+    "`@error('name')` – us field ka error message (`$message`).",
+    "`@checked`, `@selected`, `@disabled` – condition true hone par attribute lagate hain."
+   ]
+  },
+  {
+   "heading": "User aur environment directives",
+   "body": "Kuch directives login aur environment ke liye bhi hain (Authentication module mein detail):",
+   "code": [
+    {
+     "file": "example.blade.php",
+     "lang": "html",
+     "code": "@auth\n    <p>Aap login ho.</p>\n@endauth\n\n@guest\n    <p>Aap guest ho.</p>\n@endguest\n\n@production\n    {{-- Sirf production mein --}}\n@endproduction\n\n@env('local')\n    <p>Local environment</p>\n@endenv\n"
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Directives: Laravel 11, 12 aur 13",
+  "intro": "Upar ke saare directives teeno versions mein same kaam karte hain.",
+  "items": {
+   "11": "Sab directives available hain (`@class`, `@checked`, `@selected`, `@disabled`, `@error`).",
+   "12": "Same as 11.",
+   "13": "Same. Latest docs mein `@session`, `@hasSection`, `@sectionMissing` jaise kuch aur helper directives bhi listed hain."
+  }
+ },
+ "errors": [
+  {
+   "error": "syntax error, unexpected end of file (compiled view mein)",
+   "cause": "Koi `@if`, `@foreach` ya `@section` band nahi kiya (`@endif`, `@endforeach` missing).",
+   "fix": "Har opening directive ka matching closing directive likho."
+  },
+  {
+   "error": "Undefined variable $loop",
+   "cause": "`$loop` sirf `@foreach`/`@forelse` ke andar milta hai, normal PHP `foreach` ya bahar nahi.",
+   "fix": "`@foreach`/`@forelse` use karo aur `$loop` loop ke andar hi rakho."
+  },
+  {
+   "error": "419 Page Expired",
+   "cause": "Form mein `@csrf` nahi hai.",
+   "fix": "Form ke andar `@csrf` likho."
+  }
+ ],
+ "debug": {
+  "body": "Compiled output dekhna ho to `storage/framework/views` mein jao. Template mein turant value dekhne ke liye `@dump($var)`.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan view:clear\nls storage/framework/views"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Products ki list banao:",
+  "tasks": [
+   "Controller se 4 products ka array (name, price) view ko bhejo",
+   "`@forelse` se list dikhao aur `@empty` mein message do",
+   "Har row mein `$loop->iteration` dikhao aur aakhri row par `(aakhri)` likho",
+   "Even/odd rows ko alag CSS class do (`@class` ya `$loop->even`)"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "List khali ho to message dikhane ke liye kaunsa directive best hai?",
+   "options": [
+    "@foreach",
+    "@forelse ... @empty",
+    "@while",
+    "@isset"
+   ],
+   "answer": 1,
+   "why": "`@forelse` ke saath `@empty` khali list ka case handle karta hai."
+  },
+  {
+   "q": "`$loop->iteration` kahan se shuru hota hai?",
+   "options": [
+    "0",
+    "1",
+    "-1",
+    "Random"
+   ],
+   "answer": 1,
+   "why": "`iteration` 1 se shuru hota hai, `index` 0 se."
+  },
+  {
+   "q": "Form mein PUT request ke liye kya likhte hain?",
+   "options": [
+    "@put",
+    "@method('PUT')",
+    "@verb('PUT')",
+    "method=\"PUT\""
+   ],
+   "answer": 1,
+   "why": "`@method('PUT')` HTML form se PUT spoof karta hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "`@forelse` kya hai?",
+   "a": "`@foreach` jaisa loop jisme `@empty` section hota hai jo collection khali hone par chalta hai."
+  },
+  {
+   "q": "`$loop` variable kya deta hai?",
+   "a": "Loop ke andar iteration, index, first, last, even, odd, count, remaining, depth, parent jaisi properties."
+  },
+  {
+   "q": "`@csrf` kyun zaroori hai?",
+   "a": "Laravel POST/PUT/DELETE requests par CSRF token check karta hai. Token na ho to 419 error aata hai."
+  },
+  {
+   "q": "`old()` helper kya karta hai?",
+   "a": "Validation fail hone par form ki pichhli bheji hui value wapas bharta hai."
+  },
+  {
+   "q": "`@isset` aur `@empty` mein farak?",
+   "a": "`@isset` check karta hai ki variable defined hai aur null nahi. `@empty` PHP ke `empty()` ki tarah false-jaisi values (khali array, 0, '') ko pakadta hai."
+  }
+ ],
+ "summary": [
+  "`@if`, `@unless`, `@isset`, `@empty` conditions ke liye.",
+  "`@forelse` khali list ka case handle karta hai.",
+  "`$loop` se iteration, first, last, even/odd milta hai.",
+  "Forms ke liye `@csrf`, `@method`, `old()`, `@error`.",
+  "`@class`, `@checked`, `@selected`, `@disabled` HTML attributes ke liye."
+ ]
+}
