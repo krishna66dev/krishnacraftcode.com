@@ -360,7 +360,68 @@
    "title": "Eloquent ORM",
    "level": "intermediate",
    "icon": "table",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "m07-l01",
+     "title": "Eloquent Models: Conventions aur Setup",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m07-l02",
+     "title": "Retrieving Data: Queries, Collections aur Pagination",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m07-l03",
+     "title": "Create, Update, Delete aur Mass Assignment",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m07-l04",
+     "title": "Query Scopes: Local aur Global",
+     "minutes": 30,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m07-l05",
+     "title": "Accessors, Mutators, Casts aur Enums",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m07-l06",
+     "title": "Soft Deletes, Model Events aur Observers",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    }
+   ]
   },
   {
    "id": "m08",
@@ -368,7 +429,68 @@
    "title": "Eloquent Relationships",
    "level": "intermediate",
    "icon": "link-45deg",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "m08-l01",
+     "title": "One to One aur One to Many Relationships",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m08-l02",
+     "title": "Many to Many aur Pivot Data",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m08-l03",
+     "title": "Has Many Through aur Polymorphic Relations",
+     "minutes": 45,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m08-l04",
+     "title": "Eager Loading aur N+1 Problem",
+     "minutes": 45,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m08-l05",
+     "title": "Relationship Queries: has, whereHas aur withCount",
+     "minutes": 40,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    },
+    {
+     "id": "m08-l06",
+     "title": "Mini Project: Online Store ke Relationships",
+     "minutes": 50,
+     "versions": [
+      "11",
+      "12",
+      "13"
+     ]
+    }
+   ]
   },
   {
    "id": "m09",

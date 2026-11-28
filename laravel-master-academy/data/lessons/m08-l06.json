@@ -1,0 +1,209 @@
+{
+ "id": "m08-l06",
+ "title": "Mini Project: Online Store ke Relationships",
+ "minutes": 50,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Poore store ka schema relationships ke saath design karna",
+  "Models mein relationships likhna",
+  "Seed aur eager loading ke saath data dikhana",
+  "Transaction ke saath order banana"
+ ],
+ "prerequisites": [
+  "Relationship Queries (m08-l05)",
+  "Seeders aur Factories (m06-l05)"
+ ],
+ "sections": [
+  {
+   "heading": "Store ka naksha",
+   "body": "Hum ek chhota online store bana rahe hain jisme yeh relationships hain:\n\n- `Category` **hasMany** `Product`; `Product` **belongsTo** `Category`\n- `User` **hasMany** `Order`; `Order` **belongsTo** `User`\n- `Order` **belongsToMany** `Product` (pivot `order_product`: quantity, price)\n\nIs lesson mein yeh sab ek saath jodte hain."
+  },
+  {
+   "heading": "Migrations",
+   "body": "Order of migrations: categories, products, orders, order_product (parent pehle).",
+   "code": [
+    {
+     "file": "migrations (up methods ka chhota roop)",
+     "lang": "php",
+     "code": "// categories\n$table->id(); $table->string('name'); $table->timestamps();\n\n// products\n$table->id();\n$table->foreignId('category_id')->constrained()->cascadeOnDelete();\n$table->string('name');\n$table->decimal('price', 8, 2);\n$table->unsignedInteger('stock')->default(0);\n$table->timestamps();\n\n// orders\n$table->id();\n$table->foreignId('user_id')->constrained()->cascadeOnDelete();\n$table->string('status')->default('pending');\n$table->timestamps();\n\n// order_product\n$table->foreignId('order_id')->constrained()->cascadeOnDelete();\n$table->foreignId('product_id')->constrained()->cascadeOnDelete();\n$table->unsignedInteger('quantity');\n$table->decimal('price', 8, 2);\n$table->primary(['order_id', 'product_id']);\n"
+    }
+   ]
+  },
+  {
+   "heading": "Models",
+   "body": "Har model mein apne relationships:",
+   "code": [
+    {
+     "file": "app/Models/Category.php",
+     "lang": "php",
+     "code": "public function products(): HasMany\n{\n    return $this->hasMany(Product::class);\n}\n"
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "protected $fillable = ['category_id', 'name', 'price', 'stock'];\n\npublic function category(): BelongsTo\n{\n    return $this->belongsTo(Category::class);\n}\n"
+    },
+    {
+     "file": "app/Models/Order.php",
+     "lang": "php",
+     "code": "protected $fillable = ['status'];\n\npublic function user(): BelongsTo\n{\n    return $this->belongsTo(User::class);\n}\n\npublic function products(): BelongsToMany\n{\n    return $this->belongsToMany(Product::class)->withPivot('quantity', 'price');\n}\n\nprotected function total(): Attribute\n{\n    return Attribute::make(\n        get: fn () => $this->products->sum(fn ($p) => $p->pivot->quantity * $p->pivot->price),\n    );\n}\n"
+    },
+    {
+     "file": "app/Models/User.php",
+     "lang": "php",
+     "code": "public function orders(): HasMany\n{\n    return $this->hasMany(Order::class);\n}\n"
+    }
+   ],
+   "explain": [
+    "`total` accessor order ke products se total nikalta hai. Isse pehle `with('products')` ho to koi extra query nahi chalegi."
+   ]
+  },
+  {
+   "heading": "Real-world example: Products page (eager loading + count)",
+   "body": "Category ke saath products aur har category ke products ki ginti:",
+   "code": [
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "public function index()\n{\n    $products = Product::with('category')\n        ->latest()\n        ->paginate(10);\n\n    $categories = Category::withCount('products')->get();\n\n    return view('products.index', compact('products', 'categories'));\n}\n",
+     "editable": true
+    },
+    {
+     "file": "resources/views/products/index.blade.php",
+     "lang": "html",
+     "code": "@foreach ($categories as $category)\n    <span>{{ $category->name }} ({{ $category->products_count }})</span>\n@endforeach\n\n@foreach ($products as $product)\n    <p>{{ $product->name }} - {{ $product->category->name }} - Rs. {{ $product->price }}</p>\n@endforeach\n\n{{ $products->links() }}\n"
+    }
+   ]
+  },
+  {
+   "heading": "Order banana (transaction ke saath)",
+   "body": "Order banate waqt order row, pivot rows aur stock ghatna ek saath hona chahiye, nahi to adhura order ban jaata hai. Isliye `DB::transaction`.",
+   "code": [
+    {
+     "file": "app/Http/Controllers/OrderController.php",
+     "lang": "php",
+     "code": "use Illuminate\\Support\\Facades\\DB;\n\npublic function store(Request $request)\n{\n    $items = $request->validate([\n        'items' => ['required', 'array', 'min:1'],\n        'items.*.id' => ['required', 'exists:products,id'],\n        'items.*.qty' => ['required', 'integer', 'min:1'],\n    ])['items'];\n\n    $order = DB::transaction(function () use ($request, $items) {\n        $order = $request->user()->orders()->create(['status' => 'pending']);\n\n        foreach ($items as $item) {\n            $product = Product::findOrFail($item['id']);\n\n            $order->products()->attach($product->id, [\n                'quantity' => $item['qty'],\n                'price'    => $product->price,\n            ]);\n\n            $product->decrement('stock', $item['qty']);\n        }\n\n        return $order;\n    });\n\n    return redirect()->route('orders.show', $order);\n}\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`DB::transaction` ke andar koi bhi step fail ho to sab undo ho jaata hai.",
+    "Pivot mein `price` us waqt ka price store hota hai, taaki baad mein product ka price badalne par purane order ka total na badle.",
+    "`$request->user()` login hua user (Authentication module mein detail). Validation Module 10 mein."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Mini project: Laravel 11, 12 aur 13",
+  "intro": "Is lesson ka sab code teeno versions mein same chalta hai.",
+  "items": {
+   "11": "Relationships, `withCount`, transactions sab available hain. Naye project mein users table pehle se hoti hai.",
+   "12": "Same as 11.",
+   "13": "Same as 11. PHP 8.3+ chahiye."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row",
+   "cause": "Foreign key ki value (jaise `category_id`) ka parent record maujood nahi.",
+   "fix": "Pehle parent (category) banao, ya seeder ke order ko theek karo."
+  },
+  {
+   "error": "Order ka total galat aa raha hai",
+   "cause": "`withPivot('quantity','price')` nahi likha ya pivot mein asli price store nahi kiya.",
+   "fix": "Relationship mein `withPivot` jodo aur attach karte waqt price do."
+  },
+  {
+   "error": "Order adhura ban gaya (products nahi jude par stock kam hua)",
+   "cause": "Transaction nahi lagaya, beech mein error aaya.",
+   "fix": "Poora kaam `DB::transaction()` mein rakho."
+  }
+ ],
+ "debug": {
+  "body": "Poore store ka relationship check Tinker se:",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "Order::with('products', 'user')->first()->total;\nCategory::withCount('products')->get()->pluck('products_count', 'name');\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Poora store banao:",
+  "tasks": [
+   "Charo tables ki migrations banao aur `migrate:fresh` chalao",
+   "Models mein sab relationships likho",
+   "Factories/seeders se categories, products aur users banao",
+   "`store` method transaction ke saath likho aur Tinker mein ek order banake `total` check karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Order ke products ke beech pivot table ka naam?",
+   "options": [
+    "orders_products",
+    "order_product",
+    "product_orders",
+    "order_has_product"
+   ],
+   "answer": 1,
+   "why": "Alphabetical, singular: `order_product`."
+  },
+  {
+   "q": "Order banate waqt transaction kyun?",
+   "options": [
+    "Query tez hoti hai",
+    "Beech mein fail hone par sab undo ho jaaye",
+    "Index banta hai",
+    "Cache clear hota hai"
+   ],
+   "answer": 1,
+   "why": "Transaction se kaam ya poora hota hai ya bilkul nahi."
+  },
+  {
+   "q": "Pivot mein `price` kyun store karte hain?",
+   "options": [
+    "Space bharne ke liye",
+    "Order ke waqt ka price safe rakhne ke liye",
+    "Index ke liye",
+    "Zaroori nahi"
+   ],
+   "answer": 1,
+   "why": "Product ka price badalne par purane orders ka total na badle."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Online store ka relationship design samjhao.",
+   "a": "Category hasMany Product, User hasMany Order, Order belongsToMany Product pivot (quantity, price) ke saath."
+  },
+  {
+   "q": "Order ke saath price pivot mein kyun?",
+   "a": "Order ke waqt ka price safe rakhne ke liye, taaki baad mein price badalne par history na badle."
+  },
+  {
+   "q": "Order banate waqt transaction kyun zaroori hai?",
+   "a": "Order, pivot rows aur stock update ek saath hone chahiye, warna data inconsistent ho sakta hai."
+  },
+  {
+   "q": "`withCount` aur `with` ko page par kaise use karte hain?",
+   "a": "`with('category')` N+1 se bachata hai, `withCount('products')` ginti ek query mein deta hai."
+  },
+  {
+   "q": "`total` ko accessor mein kyun rakhte hain?",
+   "a": "Business logic model mein rehti hai, controller patla rehta hai, aur `with('products')` ke saath extra query nahi chalti."
+  }
+ ],
+ "summary": [
+  "Schema: categories, products, orders, order_product (parent pehle).",
+  "Relationships: hasMany, belongsTo, belongsToMany + `withPivot`.",
+  "Page par `with()` aur `withCount()` use karo.",
+  "Order banate waqt `DB::transaction()`.",
+  "Pivot mein order ke waqt ka price store karo."
+ ]
+}

@@ -1,0 +1,218 @@
+{
+ "id": "m08-l01",
+ "title": "One to One aur One to Many Relationships",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Relationship methods (`hasOne`, `hasMany`, `belongsTo`) likhna",
+  "Foreign key conventions samajhna",
+  "Relationship ko property aur method dono tarah use karna",
+  "Related records banana (`create`, `associate`)",
+  "`withDefault()` aur `chaperone()` ka idea jaanna"
+ ],
+ "prerequisites": [
+  "Eloquent Models (m07-l01)",
+  "Foreign Keys (m06-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "Relationships kya hain?",
+   "body": "Database tables aksar ek doosre se jude hote hain: ek user ke kai posts, ek post ke kai comments, ek user ka ek phone. Eloquent mein relationships **model ke methods** hote hain. Jab method ek relationship return karta hai, to tum `$user->posts` jaisa seedha likh sakte ho.",
+   "callout": {
+    "kind": "tip",
+    "text": "Relationship = foreign key ka object-oriented roop. Table mein `posts.user_id`, model mein `$user->posts`."
+   }
+  },
+  {
+   "heading": "One to One: hasOne aur belongsTo",
+   "body": "Ek user ka ek phone. Foreign key `phones.user_id` mein hogi. `hasOne` parent model (`User`) mein aur `belongsTo` (inverse) child model (`Phone`) mein likhte hain.",
+   "code": [
+    {
+     "file": "migration: create_phones_table",
+     "lang": "php",
+     "code": "Schema::create('phones', function (Blueprint $table) {\n    $table->id();\n    $table->foreignId('user_id')->constrained()->cascadeOnDelete();\n    $table->string('number');\n    $table->timestamps();\n});\n"
+    },
+    {
+     "file": "app/Models/User.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Relations\\HasMany;\nuse Illuminate\\Database\\Eloquent\\Relations\\HasOne;\n\npublic function phone(): HasOne\n{\n    return $this->hasOne(Phone::class);\n}\n\npublic function posts(): HasMany\n{\n    return $this->hasMany(Post::class);\n}\n",
+     "editable": true
+    },
+    {
+     "file": "app/Models/Phone.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Relations\\BelongsTo;\n\npublic function user(): BelongsTo\n{\n    return $this->belongsTo(User::class);\n}\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "Eloquent maan leta hai ki `phones` table mein `user_id` hai (parent model ka snake_case naam + `_id`).",
+    "`hasOne` / `hasMany` – foreign key child table mein hai (`phones.user_id`, `posts.user_id`).",
+    "`belongsTo` – yeh model foreign key rakhta hai (`phones.user_id`), is liye wo 'belongs to' user.",
+    "Return type (`HasOne`, `HasMany`, `BelongsTo`) likhna achhi aadat hai."
+   ]
+  },
+  {
+   "heading": "Property aur method: bada farak",
+   "body": "Relationship ko do tarah se likh sakte ho aur dono ka matlab alag hai:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$user = User::find(1);\n\n$phone = $user->phone;        // property: related model (ya null)\n$posts = $user->posts;        // property: posts ka Collection (query chal gayi)\n\n$active = $user->posts()      // method: abhi query builder hai\n    ->where('is_active', true)\n    ->latest()\n    ->get();\n\n$owner = Phone::find(1)->user;   // inverse\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`$user->posts` (bina brackets) – data le aata hai.",
+    "`$user->posts()` (brackets ke saath) – query builder deta hai jisme aur conditions jod sakte ho.",
+    "Property se pehli baar data aane par query chalti hai (lazy loading), aage lesson 04 mein dekhenge isse kya dikkat hoti hai."
+   ]
+  },
+  {
+   "heading": "Real-world example: User ke posts banana",
+   "body": "Related record banate waqt `user_id` khud nahi likhna padta:",
+   "code": [
+    {
+     "file": "Tinker ya controller",
+     "lang": "php",
+     "code": "$user = User::find(1);\n\n// user_id automatically set hoti hai\n$post = $user->posts()->create([\n    'title' => 'Laravel seekh raha hoon',\n    'body'  => 'Relationships mast hain.',\n]);\n\n// Post ka owner badalna\n$post->user()->associate(User::find(2));\n$post->save();\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`create()` ke liye `Post` model mein `$fillable` chahiye (`title`, `body`).",
+    "`associate()` belongsTo relation mein foreign key set karta hai, `save()` ke baad database mein jaata hai.",
+    "`dissociate()` foreign key ko null karta hai (column nullable ho)."
+   ]
+  },
+  {
+   "heading": "withDefault aur chaperone",
+   "body": "Agar post ka author hata diya gaya ho (null), to `$post->user->name` error dega. `withDefault()` ek khali ya default model deta hai:",
+   "code": [
+    {
+     "file": "app/Models/Post.php",
+     "lang": "php",
+     "code": "public function user(): BelongsTo\n{\n    return $this->belongsTo(User::class)->withDefault([\n        'name' => 'Guest Author',\n    ]);\n}\n\npublic function comments(): HasMany\n{\n    return $this->hasMany(Comment::class)->chaperone();\n}\n"
+    }
+   ],
+   "explain": [
+    "`withDefault([...])` – relation null ho to default attributes wala naya model.",
+    "`chaperone()` – parent post ko children (comments) par automatically load kar deta hai, taaki `$comment->post` ke liye extra query na chale (13 docs mein hai)."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Relationships: Laravel 11, 12 aur 13",
+  "intro": "`hasOne`, `hasMany`, `belongsTo` ka syntax teeno versions mein same hai.",
+  "items": {
+   "11": "Relationship methods return types ke saath (`HasOne`, `HasMany`, `BelongsTo`). `chaperone()` naye 11.x releases mein; apne patch ke docs dekho.",
+   "12": "Same as 11. `chaperone()` available hai.",
+   "13": "Same as 12. 13 docs mein `chaperone()` aur `withDefault()` dono documented hain."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE: Column not found: 1054 Unknown column 'user_id' in 'where clause'",
+   "cause": "Table mein foreign key column nahi hai, ya naam convention se alag hai.",
+   "fix": "Migration mein `foreignId('user_id')` rakho, ya relationship mein custom key do: `hasMany(Post::class, 'author_id')`."
+  },
+  {
+   "error": "Attempt to read property \"name\" on null",
+   "cause": "Relationship null hai (jaise phone nahi hai) aur tumne seedha property padhi.",
+   "fix": "`$user->phone?->number` ya `withDefault()` use karo."
+  },
+  {
+   "error": "Add [title] to fillable property to allow mass assignment on [App\\Models\\Post]",
+   "cause": "`$user->posts()->create([...])` ke liye Post ke `$fillable` mein columns nahi hain.",
+   "fix": "Post model mein `$fillable` jodo."
+  }
+ ],
+ "debug": {
+  "body": "Relationship ki SQL aur data dekhne ke liye Tinker mein method (brackets) se `toSql()` chalao.",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "User::find(1)->posts()->toSql();\nUser::find(1)->posts;\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "User, Phone aur Post ke relationships banao:",
+  "tasks": [
+   "`phones` migration (user_id foreign key) banao aur `User::phone()` / `Phone::user()` likho",
+   "`posts` table aur `User::posts()` / `Post::user()` likho",
+   "Tinker mein `$user->posts()->create([...])` se 2 posts banao",
+   "`$user->posts` aur `$user->posts()->where(...)->get()` ka farak dekho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`$user->posts` aur `$user->posts()` mein kya farak hai?",
+   "options": [
+    "Koi farak nahi",
+    "Pehla data deta hai, doosra query builder",
+    "Pehla query builder, doosra data",
+    "Dono error dete hain"
+   ],
+   "answer": 1,
+   "why": "Bina brackets ke data (Collection), brackets ke saath relationship query builder."
+  },
+  {
+   "q": "Foreign key kis table mein hoti hai: `User hasMany Post`?",
+   "options": [
+    "users",
+    "posts",
+    "Dono",
+    "Alag pivot table"
+   ],
+   "answer": 1,
+   "why": "`hasMany` mein child table (`posts`) mein `user_id` hoti hai."
+  },
+  {
+   "q": "`associate()` kis relationship par chalta hai?",
+   "options": [
+    "hasMany",
+    "belongsTo",
+    "belongsToMany",
+    "morphMany"
+   ],
+   "answer": 1,
+   "why": "`associate()` `belongsTo` ki foreign key set karta hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "hasOne aur belongsTo mein farak?",
+   "a": "`hasOne` parent par hota hai (jisme foreign key nahi hoti), `belongsTo` child par (jis table mein foreign key hai)."
+  },
+  {
+   "q": "Relationship property aur method mein farak?",
+   "a": "Property related data load karti hai. Method relationship query builder deta hai jisme aur constraints jod sakte ho."
+  },
+  {
+   "q": "Eloquent foreign key ka naam kaise guess karta hai?",
+   "a": "Parent model ke naam ko snake_case mein badal kar `_id` jodta hai, jaise `user_id`."
+  },
+  {
+   "q": "`withDefault()` kya karta hai?",
+   "a": "Relation null ho to default attributes wala khali model deta hai, taaki null error na aaye."
+  },
+  {
+   "q": "`$user->posts()->create([...])` ka fayda?",
+   "a": "`user_id` automatically set ho jaati hai."
+  }
+ ],
+ "summary": [
+  "Relationships model ke methods hain.",
+  "`hasOne`/`hasMany` parent mein, `belongsTo` child mein.",
+  "Foreign key convention: parent naam + `_id`.",
+  "Property data deti hai, method query builder.",
+  "`create()` aur `associate()` related records banate hain; `withDefault()` null se bachata hai."
+ ]
+}

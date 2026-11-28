@@ -53,5 +53,7 @@ Open http://localhost:8000. An internet connection is needed for the CDN librari
 - [x] Batch 1 complete (Modules 01 to 04, 19 lessons) with practice sets for each module
 - [x] Module 05: Blade Template Engine (5 lessons, with practice set)
 - [x] Module 06: Database and Migrations (6 lessons, with practice set)
-- [ ] Batch 2 remaining: Modules 07 to 09, then Batches 3 to 6
+- [x] Module 07: Eloquent ORM (6 lessons, with practice set)
+- [x] Module 08: Eloquent Relationships (6 lessons, with practice set)
+- [ ] Batch 2 remaining: Module 09, then Batches 3 to 6
 - After adding lessons: add them to `data/modules.json`, then run `python tools/build_search_index.py`.

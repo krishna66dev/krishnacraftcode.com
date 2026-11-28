@@ -1,0 +1,225 @@
+{
+ "id": "m07-l05",
+ "title": "Accessors, Mutators, Casts aur Enums",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Accessor aur mutator (`Attribute::make`) likhna",
+  "`casts()` se column ke types badalna",
+  "Computed attribute banana aur `$appends` se JSON mein dikhana",
+  "`$hidden` se sensitive columns chhupana",
+  "Backed Enum ko cast karna"
+ ],
+ "prerequisites": [
+  "Query Scopes (m07-l04)",
+  "PHP OOP aur Enums basics (Module 01)"
+ ],
+ "sections": [
+  {
+   "heading": "Accessor aur mutator",
+   "body": "**Accessor** model se value padhte waqt use badal deta hai. **Mutator** database mein save karte waqt. Laravel mein dono ek `Attribute` method mein likhte hain.",
+   "code": [
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Casts\\Attribute;\n\nprotected function name(): Attribute\n{\n    return Attribute::make(\n        get: fn (string $value) => ucfirst($value),\n        set: fn (string $value) => strtolower($value),\n    );\n}\n",
+     "editable": true
+    },
+    {
+     "file": "use karna",
+     "lang": "php",
+     "code": "$product = Product::create(['name' => 'WIRELESS MOUSE', 'price' => 799]);\n\n// Database mein: \"wireless mouse\" (mutator ne chhota kiya)\necho $product->name;   // \"Wireless mouse\" (accessor ne pehla akshar bada kiya)\n"
+    }
+   ],
+   "explain": [
+    "Method ka naam column ke naam jaisa (camelCase), `protected` aur return type `Attribute`.",
+    "`get` – padhne par. `set` – likhne par.",
+    "Sirf `get:` ya sirf `set:` bhi de sakte ho."
+   ]
+  },
+  {
+   "heading": "Computed attribute aur $appends",
+   "body": "Aisi value jo database mein hai hi nahi, par model par chahiye:",
+   "code": [
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "protected $appends = ['price_with_gst'];\nprotected $hidden = ['cost_price'];\n\nprotected function priceWithGst(): Attribute\n{\n    return Attribute::make(\n        get: fn () => round($this->price * 1.18, 2),\n    );\n}\n",
+     "editable": true
+    },
+    {
+     "file": "use karna",
+     "lang": "php",
+     "code": "$product->price_with_gst;       // snake_case mein padho\n$product->toArray();            // price_with_gst bhi aayega, cost_price nahi\n"
+    }
+   ],
+   "explain": [
+    "`priceWithGst` ko `price_with_gst` likhte ho.",
+    "`$appends` – `toArray()`/JSON mein computed attribute bhi jode.",
+    "`$hidden` – JSON/array mein kuch columns chhupao (jaise password, cost_price)."
+   ]
+  },
+  {
+   "heading": "Casts: column ka type badalna",
+   "body": "Database se aksar sab strings aate hain. Cast se Eloquent value ko sahi PHP type mein badal deta hai.",
+   "code": [
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "protected function casts(): array\n{\n    return [\n        'is_active'   => 'boolean',\n        'launch_date' => 'date',\n        'meta'        => 'array',\n        'price'       => 'decimal:2',\n    ];\n}\n",
+     "editable": true
+    },
+    {
+     "file": "use karna",
+     "lang": "php",
+     "code": "$product->is_active;                 // true / false\n$product->launch_date->format('d M Y'); // Carbon date object\n$product->meta['color'] = 'black';   // JSON column array ki tarah\n$product->save();\n"
+    }
+   ],
+   "explain": [
+    "`boolean`, `date`, `datetime`, `array`, `integer`, `decimal:2` aam casts hain.",
+    "`'password' => 'hashed'` password ko save karte waqt hash kar deta hai.",
+    "`casts()` method Laravel 11 se hai. Purana `protected $casts = [...]` bhi chalta hai."
+   ]
+  },
+  {
+   "heading": "Real-world example: Enum cast",
+   "body": "Product ka status (draft ya published) strings mein likhne se typo ka khatra rehta hai. PHP Enum aur cast se safe aur readable ban jaata hai.",
+   "code": [
+    {
+     "file": "app/Enums/ProductStatus.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Enums;\n\nenum ProductStatus: string\n{\n    case Draft = 'draft';\n    case Published = 'published';\n\n    public function label(): string\n    {\n        return match ($this) {\n            self::Draft => 'Draft',\n            self::Published => 'Live',\n        };\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "use App\\Enums\\ProductStatus;\n\nprotected function casts(): array\n{\n    return [\n        'status' => ProductStatus::class,\n    ];\n}\n"
+    },
+    {
+     "file": "use karna",
+     "lang": "php",
+     "code": "$product->status = ProductStatus::Published;\n$product->save();\n\n$product->status === ProductStatus::Published;  // true\n$product->status->label();                      // \"Live\"\n$product->status->value;                        // \"published\"\n\nProduct::where('status', ProductStatus::Published)->get();\n"
+    }
+   ],
+   "explain": [
+    "Migration mein `status` ek string column hota hai (`$table->string('status')->default('draft')`).",
+    "Cast ki wajah se `$product->status` string nahi, Enum object milta hai.",
+    "Query mein bhi Enum seedha de sakte ho."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Casts: Laravel 11, 12 aur 13",
+  "intro": "Accessors, mutators aur casts teeno versions mein kaam karte hain. Casts define karne ka tareeka 11 se badla.",
+  "items": {
+   "11": "`casts()` method (naya tareeka) aur `$casts` property dono chalte hain. `Attribute::make()` standard hai.",
+   "12": "Same as 11.",
+   "13": "Same. Model config ke liye naye attributes (`#[Fillable]`, `#[Hidden]`) hain, par casts ke liye `casts()` method hi hai (maine koi alag cast attribute docs mein confirm nahi kiya)."
+  }
+ },
+ "errors": [
+  {
+   "error": "Value \"xyz\" is not a valid backing value for enum ProductStatus",
+   "cause": "Database mein ya input mein aisi value hai jo Enum ke cases mein nahi.",
+   "fix": "Sahi value daalo, ya Enum mein case jodo."
+  },
+  {
+   "error": "Accessor ka computed field JSON/array mein nahi aa raha",
+   "cause": "`$appends` mein naam nahi jodha.",
+   "fix": "`protected $appends = ['price_with_gst'];` likho."
+  },
+  {
+   "error": "Cast ke baad bhi value string aa rahi hai",
+   "cause": "`casts()` mein column ka naam galat hai ya cache purani hai.",
+   "fix": "Naam check karo aur `php artisan optimize:clear` chalao."
+  }
+ ],
+ "debug": {
+  "body": "Cast ke baad type dekhne ke liye Tinker mein `var_dump` karo.",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "$p = Product::first();\nvar_dump($p->is_active, $p->status);\n$p->toArray();\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Model ko smart banao:",
+  "tasks": [
+   "`name` par accessor lagao jo title-case kare",
+   "`price_with_gst` computed attribute banao aur `$appends` mein jodo",
+   "`is_active` ko boolean aur `meta` ko array cast karo",
+   "`ProductStatus` Enum banao aur `status` ko cast karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Accessor kab chalta hai?",
+   "options": [
+    "Save karte waqt",
+    "Value padhte waqt",
+    "Delete karte waqt",
+    "Migrate karte waqt"
+   ],
+   "answer": 1,
+   "why": "Accessor model se value padhte waqt chalta hai, mutator save karte waqt."
+  },
+  {
+   "q": "`$appends` kya karta hai?",
+   "options": [
+    "Table mein column jodta hai",
+    "Computed attribute ko JSON/array mein shaamil karta hai",
+    "Index banata hai",
+    "Cache karta hai"
+   ],
+   "answer": 1,
+   "why": "`$appends` accessors ko `toArray()`/JSON mein include karta hai."
+  },
+  {
+   "q": "Enum ko model mein kaise use karte hain?",
+   "options": [
+    "Index se",
+    "`casts()` mein `'status' => ProductStatus::class`",
+    "Migration mein enum type se hi",
+    "Controller mein manually"
+   ],
+   "answer": 1,
+   "why": "Cast se `$product->status` Enum object ban jaata hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Accessor aur mutator kya hain?",
+   "a": "Accessor value padhte waqt badalta hai, mutator save karte waqt. Dono `Attribute::make(get:, set:)` se banate hain."
+  },
+  {
+   "q": "Eloquent casts kya hain?",
+   "a": "Column ki value ko sahi PHP type (bool, array, date, Enum) mein automatically badalne ka tareeka."
+  },
+  {
+   "q": "`$hidden` aur `$appends` mein farak?",
+   "a": "`$hidden` JSON/array se columns chhupata hai. `$appends` computed attributes jodta hai."
+  },
+  {
+   "q": "Enum cast ka fayda?",
+   "a": "Typos se bachav, readable code aur type safety."
+  },
+  {
+   "q": "`casts()` method aur `$casts` property mein farak?",
+   "a": "Dono kaam karte hain. `casts()` method Laravel 11 se naya tareeka hai jisme PHP code (jaise Enum class) saaf likhta hai."
+  }
+ ],
+ "summary": [
+  "`Attribute::make(get:, set:)` se accessor aur mutator.",
+  "`$appends` computed attributes ko JSON mein jodta hai, `$hidden` chhupata hai.",
+  "`casts()` se column ko bool, date, array, Enum jaise types milte hain.",
+  "Enum cast typos se bachata hai.",
+  "Casts ke liye `casts()` method, Laravel 13 mein bhi."
+ ]
+}

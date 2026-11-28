@@ -1,0 +1,196 @@
+{
+ "id": "m08-l02",
+ "title": "Many to Many aur Pivot Data",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`belongsToMany` aur pivot table ka rishta samajhna",
+  "`attach`, `detach`, `sync`, `toggle` use karna",
+  "Pivot table ke extra columns (`withPivot`) padhna",
+  "`wherePivot` aur `withTimestamps` jaanna"
+ ],
+ "prerequisites": [
+  "One to One aur One to Many (m08-l01)",
+  "Foreign Keys aur Pivot tables (m06-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "Many to Many kya hai?",
+   "body": "Ek order mein kai products ho sakte hain, aur ek product kai orders mein. Dono tables ke beech ek **pivot table** hoti hai (`order_product`). Dono models mein `belongsToMany` likhte hain. Pivot table ka naam dono models ke naam alphabetical order mein, singular: `order_product`.",
+   "code": [
+    {
+     "file": "migration: create_order_product_table",
+     "lang": "php",
+     "code": "Schema::create('order_product', function (Blueprint $table) {\n    $table->foreignId('order_id')->constrained()->cascadeOnDelete();\n    $table->foreignId('product_id')->constrained()->cascadeOnDelete();\n    $table->unsignedInteger('quantity')->default(1);\n    $table->decimal('price', 8, 2);\n    $table->timestamps();\n\n    $table->primary(['order_id', 'product_id']);\n});\n"
+    },
+    {
+     "file": "app/Models/Order.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany;\n\npublic function products(): BelongsToMany\n{\n    return $this->belongsToMany(Product::class)\n        ->withPivot('quantity', 'price')\n        ->withTimestamps();\n}\n",
+     "editable": true
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "public function orders(): BelongsToMany\n{\n    return $this->belongsToMany(Order::class);\n}\n"
+    }
+   ],
+   "explain": [
+    "Eloquent pivot table ka naam `order_product` aur keys `order_id`, `product_id` khud guess karta hai.",
+    "`withPivot('quantity', 'price')` – pivot ke extra columns ko `pivot` object mein laata hai.",
+    "`withTimestamps()` – pivot ke `created_at`/`updated_at` automatically bharta hai (pivot mein ye columns chahiye)."
+   ]
+  },
+  {
+   "heading": "Real-world example: Order mein products jodna",
+   "body": "`attach`, `detach`, `sync` aur `toggle` pivot rows ko manage karte hain:",
+   "code": [
+    {
+     "file": "Tinker ya controller",
+     "lang": "php",
+     "code": "$order = Order::find(1);\n\n// products jodo (pivot ke extra data ke saath)\n$order->products()->attach(5, ['quantity' => 2, 'price' => 799]);\n$order->products()->attach([\n    6 => ['quantity' => 1, 'price' => 1499],\n    7 => ['quantity' => 3, 'price' => 150],\n]);\n\n$order->products()->detach(7);          // ek hatao\n$order->products()->detach();           // saare hatao\n\n$order->products()->sync([5, 6]);       // bas yahi do rahein, baaki hat jaayein\n$order->products()->syncWithoutDetaching([8]);  // jodo, hatao mat\n$order->products()->toggle([5, 9]);     // jo hai wo hatao, jo nahi wo jodo\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`attach(id, [pivot data])` – naya pivot row.",
+    "`sync([...])` – exactly di hui ids hi rahengi. Form ke checkboxes (jaise tags) ke liye perfect.",
+    "`syncWithoutDetaching` – sirf jodta hai.",
+    "`toggle` – on/off jaisa."
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "`sync` ke saath pivot data dena ho to: `sync([5 => ['quantity' => 2], 6 => ['quantity' => 1]])`."
+   }
+  },
+  {
+   "heading": "Pivot data padhna aur filter karna",
+   "body": "Har related model par `pivot` property milti hai:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "foreach ($order->products as $product) {\n    echo $product->name . ' x ' . $product->pivot->quantity\n       . ' @ Rs. ' . $product->pivot->price;\n}\n\n$total = $order->products->sum(fn ($p) => $p->pivot->quantity * $p->pivot->price);\n\n$bulk = $order->products()->wherePivot('quantity', '>', 1)->get();\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`$product->pivot->quantity` – tabhi milega jab relationship mein `withPivot('quantity')` likha ho.",
+    "`wherePivot(...)` – pivot columns par filter."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Many to many: Laravel 11, 12 aur 13",
+  "intro": "`belongsToMany` aur `attach`/`sync` teeno versions mein same hain.",
+  "items": {
+   "11": "`belongsToMany`, `withPivot`, `withTimestamps`, `attach`, `detach`, `sync`, `toggle` available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11. Custom pivot model (`using(...)`) bhi supported hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE: Base table or view not found: Table 'order_products' doesn't exist",
+   "cause": "Pivot table ka naam convention (`order_product`) se alag hai.",
+   "fix": "Table ka naam alphabetical singular rakho, ya `belongsToMany(Product::class, 'order_products')` mein naam do."
+  },
+  {
+   "error": "Pivot ke extra column (quantity) null / undefined aa raha hai",
+   "cause": "Relationship mein `withPivot('quantity')` nahi likha.",
+   "fix": "`->withPivot('quantity', 'price')` jodo."
+  },
+  {
+   "error": "SQLSTATE[23000]: Integrity constraint violation (duplicate entry) on attach",
+   "cause": "Wahi product dobara attach kiya jab composite primary key hai.",
+   "fix": "`syncWithoutDetaching([id])` ya `sync()` use karo."
+  }
+ ],
+ "debug": {
+  "body": "Pivot table mein asli rows `db:table` ya Tinker se dekho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan db:table order_product\nphp artisan tinker\n>>> App\\Models\\Order::find(1)->products"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Orders aur Products jodo:",
+  "tasks": [
+   "`order_product` pivot (quantity, price) ki migration banao",
+   "`Order::products()` aur `Product::orders()` likho",
+   "Tinker mein `attach` se 2 products jodo aur `sync` se ek hatao",
+   "Order ka total `pivot->quantity * pivot->price` se nikalo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Many-to-many ke liye kya chahiye?",
+   "options": [
+    "Ek extra column",
+    "Pivot table",
+    "Sirf index",
+    "Soft delete"
+   ],
+   "answer": 1,
+   "why": "Dono tables ke beech pivot table chahiye."
+  },
+  {
+   "q": "`sync([1, 2])` kya karta hai?",
+   "options": [
+    "Sirf 1 aur 2 jodta hai, baaki rehte hain",
+    "Exactly 1 aur 2 rakhta hai, baaki hata deta hai",
+    "Sab hata deta hai",
+    "1 aur 2 delete karta hai"
+   ],
+   "answer": 1,
+   "why": "`sync` di hui ids hi rakhta hai."
+  },
+  {
+   "q": "Pivot ke extra column padhne ke liye relationship mein kya likhna padta hai?",
+   "options": [
+    "withPivot('col')",
+    "withColumns('col')",
+    "pivot('col')",
+    "include('col')"
+   ],
+   "answer": 0,
+   "why": "`withPivot('col')` se column `pivot` object mein aata hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Pivot table kya hoti hai?",
+   "a": "Many-to-many relation ke liye beech ki table jisme dono tables ke foreign keys (aur kabhi extra data) hote hain."
+  },
+  {
+   "q": "`attach`, `detach` aur `sync` mein farak?",
+   "a": "`attach` jodta hai, `detach` hatata hai, `sync` poora set di hui ids ke barabar kar deta hai."
+  },
+  {
+   "q": "Pivot table ka default naam kaise guess hota hai?",
+   "a": "Do model naam alphabetical order mein, singular, underscore se jude: `order_product`."
+  },
+  {
+   "q": "Pivot ke extra columns kaise access karte hain?",
+   "a": "`withPivot('col')` ke baad `$model->pivot->col`."
+  },
+  {
+   "q": "`toggle` kab useful hai?",
+   "a": "On/off jaisa selection, jaise product ko wishlist mein jodna ya hatana."
+  }
+ ],
+ "summary": [
+  "Many-to-many ke liye pivot table (`a_b` alphabetical, singular).",
+  "`belongsToMany` dono models mein likhte hain.",
+  "`attach`, `detach`, `sync`, `syncWithoutDetaching`, `toggle`.",
+  "Extra pivot columns ke liye `withPivot()` aur `->pivot`.",
+  "`withTimestamps()` pivot ke timestamps bharta hai."
+ ]
+}

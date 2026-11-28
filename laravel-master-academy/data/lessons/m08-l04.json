@@ -1,0 +1,207 @@
+{
+ "id": "m08-l04",
+ "title": "Eager Loading aur N+1 Problem",
+ "minutes": 45,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "N+1 query problem samajhna aur pehchanna",
+  "`with()` se eager loading karna",
+  "Nested aur constrained eager loading likhna",
+  "`load()`, `loadMissing()` aur `$with` jaanna",
+  "`preventLazyLoading` se N+1 pakadna"
+ ],
+ "prerequisites": [
+  "Has Many Through aur Polymorphic Relations (m08-l03)",
+  "Service Providers (m03-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "N+1 problem kya hai?",
+   "body": "Maan lo 50 posts ki list dikhani hai, har post ke saath author ka naam. Agar tum seedha `$post->user->name` likhte ho, to Laravel 1 query posts ke liye aur **har post ke liye alag query** user ke liye chalata hai: kul 1 + 50 = 51 queries. Isko **N+1 problem** kehte hain, aur ye project ko dheema bana deta hai.",
+   "code": [
+    {
+     "file": "N+1 (galat tareeka)",
+     "lang": "php",
+     "code": "$posts = Post::all();                 // 1 query\n\nforeach ($posts as $post) {\n    echo $post->user->name;           // har baar ek nayi query!\n}\n",
+     "editable": true
+    }
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Relationship ko property se pehli baar padhne par query chalti hai (lazy loading). Loop ke andar yeh mehenga padta hai."
+   }
+  },
+  {
+   "heading": "Eager loading: with()",
+   "body": "`with()` ek saath saare related records laa deta hai: sirf 2 queries.",
+   "code": [
+    {
+     "file": "Sahi tareeka",
+     "lang": "php",
+     "code": "$posts = Post::with('user')->get();        // 2 queries\n\nforeach ($posts as $post) {\n    echo $post->user->name;                // koi naya query nahi\n}\n\n// Kai relationships aur nested:\nPost::with(['user', 'tags', 'comments.user'])->get();\n\n// Condition ke saath:\nPost::with(['comments' => fn ($q) => $q->where('approved', true)->latest()])->get();\n\n// Sirf kuch columns (id zaroor rakho):\nPost::with('user:id,name')->get();\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`with('user')` – 1 query posts, 1 query users (`WHERE id IN (...)`).",
+    "`'comments.user'` – comments aur har comment ka user bhi.",
+    "`with('user:id,name')` mein foreign/primary key (`id`) hona zaroori hai, warna relation match nahi hoga."
+   ]
+  },
+  {
+   "heading": "Real-world example: Posts page ki queries naapna",
+   "body": "Kitni queries chali yeh dekhne ke liye query log use karo:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "use Illuminate\\Support\\Facades\\DB;\n\nDB::enableQueryLog();\n\nPost::with('user')->limit(10)->get()->each(fn ($p) => $p->user->name);\n\ncount(DB::getQueryLog());   // 2, agar with() na ho to 11\n",
+     "editable": true
+    }
+   ]
+  },
+  {
+   "heading": "load, loadMissing aur $with",
+   "body": "Model/collection pehle se mil chuka ho to baad mein bhi eager load kar sakte ho. Hamesha chahiye ho to model par default set karo.",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$posts = Post::all();\n$posts->load('user');            // abhi load karo\n$posts->loadMissing('tags');     // jo load nahi hua sirf wahi\n\n// Model mein default:\nprotected $with = ['user'];\n"
+    }
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "`$with` har query mein relation load karta hai, to sirf wahi rakho jo hamesha chahiye."
+   }
+  },
+  {
+   "heading": "N+1 ko development mein pakadna",
+   "body": "Development mein lazy loading par error do, taaki N+1 galti turant dikhe:",
+   "code": [
+    {
+     "file": "app/Providers/AppServiceProvider.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Model;\n\npublic function boot(): void\n{\n    Model::preventLazyLoading(! $this->app->isProduction());\n}\n"
+    }
+   ],
+   "explain": [
+    "Ab lazy load par `LazyLoadingViolationException` aayega, development mein hi (production mein nahi).",
+    "Naye Laravel versions mein optional 'automatic eager loading' bhi hai. Official relationships docs mein us section ko dekho, par pehle `with()` achhe se seekho."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Eager loading: Laravel 11, 12 aur 13",
+  "intro": "`with()`, `load()`, `loadMissing()` aur `preventLazyLoading` teeno versions mein kaam karte hain.",
+  "items": {
+   "11": "`with`, `load`, `loadMissing`, `withWhereHas`, `Model::preventLazyLoading()` available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11. 13 ke API docs mein relationship auto-loading ka support bhi dikhta hai (optional feature, docs dekho)."
+  }
+ },
+ "errors": [
+  {
+   "error": "Attempted to lazy load [user] on model [App\\Models\\Post] but lazy loading is disabled.",
+   "cause": "`preventLazyLoading` on hai aur relation `with()` ke bina padha gaya.",
+   "fix": "Query mein `with('user')` jodo (yeh sahi tarah ki chetawani hai)."
+  },
+  {
+   "error": "Eager load karne ke baad bhi relation null aa raha hai",
+   "cause": "`with('user:name')` jaise column list mein `id` nahi rakha.",
+   "fix": "`with('user:id,name')` likho."
+  },
+  {
+   "error": "Page bahut dheema hai (queries ki sankhya zyada)",
+   "cause": "N+1: loop ke andar relation lazy load ho raha hai.",
+   "fix": "`with()`/`load()` lagao aur query log se queries gino."
+  }
+ ],
+ "debug": {
+  "body": "Queries ginne ke liye query log, ya development mein Laravel Telescope/Debugbar jaise tools. Sabse seedha: `DB::enableQueryLog()`.",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "DB::enableQueryLog();\n// apna code chalao\nDB::getQueryLog();\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "N+1 pakdo aur hatao:",
+  "tasks": [
+   "Seeder se 50 posts aur users banao",
+   "Loop mein `$post->user->name` print karo aur `DB::getQueryLog()` se queries gino",
+   "`with('user')` lagao aur dobara gino",
+   "`Model::preventLazyLoading()` on karke galat code par error dekho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "N+1 problem kya hai?",
+   "options": [
+    "1 query ki jagah N+1 queries chalna",
+    "Database band hona",
+    "Index missing hona",
+    "Cache full hona"
+   ],
+   "answer": 0,
+   "why": "Loop mein har item ke liye alag relation query chalti hai."
+  },
+  {
+   "q": "Eager loading ke liye kya use karte hain?",
+   "options": [
+    "load only",
+    "with()",
+    "find()",
+    "chunk()"
+   ],
+   "answer": 1,
+   "why": "`with('relation')` saath mein relation laa deta hai."
+  },
+  {
+   "q": "`with('user:id,name')` mein `id` kyun zaroori hai?",
+   "options": [
+    "Style ke liye",
+    "Relation match karne ke liye",
+    "Index ke liye",
+    "Zaroori nahi"
+   ],
+   "answer": 1,
+   "why": "Relation ko foreign/primary key se match kiya jaata hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "N+1 problem kya hai aur kaise solve karte hain?",
+   "a": "Loop mein har record ke liye alag relation query chalti hai. `with()` se eager loading karke 2 queries mein kaam hota hai."
+  },
+  {
+   "q": "`with()` aur `load()` mein farak?",
+   "a": "`with()` query ke saath relation laata hai. `load()` model/collection milne ke baad laata hai."
+  },
+  {
+   "q": "`$with` property kya karti hai?",
+   "a": "Model ki har query mein diye gaye relationships automatically eager load karti hai."
+  },
+  {
+   "q": "`preventLazyLoading` ka fayda?",
+   "a": "Development mein lazy load par exception deta hai, jisse N+1 galtiyan jaldi pakdi jaati hain."
+  },
+  {
+   "q": "Nested eager loading kaise karte hain?",
+   "a": "Dot se: `with('comments.user')`."
+  }
+ ],
+ "summary": [
+  "Loop mein relation property = N+1 queries.",
+  "`with()` se 2 queries mein kaam.",
+  "Nested: `comments.user`, columns: `user:id,name`, constraint: closure.",
+  "`load`/`loadMissing` baad mein eager load karte hain.",
+  "`Model::preventLazyLoading()` development mein N+1 pakadta hai."
+ ]
+}

@@ -1,0 +1,196 @@
+{
+ "id": "m08-l05",
+ "title": "Relationship Queries: has, whereHas aur withCount",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`has`, `doesntHave` se existence par filter karna",
+  "`whereHas` se relation ki condition par filter karna",
+  "`withCount`, `withSum`, `withExists` se aggregates lena",
+  "`whereBelongsTo` aur `latestOfMany` jaanna"
+ ],
+ "prerequisites": [
+  "Eager Loading aur N+1 Problem (m08-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "Relation ke basis par filter",
+   "body": "Aksar sawaal aise hote hain: 'kin posts ke comments hain?', 'kin users ne order kiya?'. Iske liye `has` aur `whereHas`.",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Builder;\n\nPost::has('comments')->get();                      // kam se kam 1 comment\nPost::has('comments', '>=', 3)->get();             // 3 ya zyada\nPost::doesntHave('comments')->get();               // koi comment nahi\n\nPost::whereHas('comments', function (Builder $query) {\n    $query->where('body', 'like', '%laravel%');\n})->get();                                         // laravel wale comments waali posts\n\nPost::whereDoesntHave('comments', fn (Builder $q) => $q->where('approved', false))->get();\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`has('comments')` – relation ki existence check.",
+    "`whereHas('rel', fn)` – relation par condition lagake filter.",
+    "`doesntHave` / `whereDoesntHave` – ulta."
+   ]
+  },
+  {
+   "heading": "Real-world example: Top posts page",
+   "body": "Har post ke saath comments ki ginti chahiye, aur sabse zyada comments wali posts upar. `withCount` ek extra query ya N+1 ke bina ginti laata hai.",
+   "code": [
+    {
+     "file": "Tinker ya controller",
+     "lang": "php",
+     "code": "$posts = Post::withCount('comments')\n    ->orderByDesc('comments_count')\n    ->limit(10)\n    ->get();\n\nforeach ($posts as $post) {\n    echo \"{$post->title}: {$post->comments_count} comments\";\n}\n\n// Kai counts aur condition ke saath:\nPost::withCount([\n    'comments',\n    'comments as approved_comments_count' => fn ($q) => $q->where('approved', true),\n])->get();\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`withCount('comments')` – `comments_count` naam ka attribute jodta hai.",
+    "Alias (`as approved_comments_count`) se condition wala count alag naam se milta hai.",
+    "`orderByDesc('comments_count')` se count par sort."
+   ]
+  },
+  {
+   "heading": "Sum, average aur exists",
+   "body": "Count ke alawa aur aggregates bhi relation se lete hain:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$orders = Order::withSum('products', 'price')   // products_sum_price\n    ->withCount('products')                  // products_count\n    ->get();\n\n$posts = Post::withExists('comments')->get(); // comments_exists (true/false)\n\n$post->loadCount('comments');                // already loaded model par\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`withSum('relation', 'column')` -> `relation_sum_column`.",
+    "`withAvg`, `withMin`, `withMax` bhi hain.",
+    "`withExists('comments')` -> `comments_exists`."
+   ]
+  },
+  {
+   "heading": "whereBelongsTo aur latestOfMany",
+   "body": "Kisi parent ke related records aur 'sabse naya/purana related' ke liye chhote helpers:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$user = User::find(1);\n\nPost::whereBelongsTo($user)->get();       // is user ke posts\n\n// User model mein: sabse naya order\npublic function latestOrder(): HasOne\n{\n    return $this->hasOne(Order::class)->latestOfMany();\n}\n"
+    }
+   ],
+   "explain": [
+    "`whereBelongsTo($user)` – `where('user_id', $user->id)` ka saaf roop.",
+    "`latestOfMany()` / `oldestOfMany()` – hasOne se 'sabse naya/purana' wala ek record."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Relationship queries: Laravel 11, 12 aur 13",
+  "intro": "`has`, `whereHas`, `withCount`, `withSum`, `withExists` teeno versions mein same hain.",
+  "items": {
+   "11": "`has`, `whereHas`, `withCount`, `withSum`, `withExists`, `whereBelongsTo`, `latestOfMany` available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11."
+  }
+ },
+ "errors": [
+  {
+   "error": "Call to undefined relationship [comment] on model [App\\Models\\Post]",
+   "cause": "`has()`/`with()` mein relationship method ka naam galat hai (singular/plural).",
+   "fix": "Model mein method ka sahi naam dekho: `comments`."
+  },
+  {
+   "error": "`comments_count` null/undefined hai",
+   "cause": "`withCount('comments')` lagaya nahi (ya naam alag).",
+   "fix": "Query mein `withCount('comments')` jodo."
+  },
+  {
+   "error": "whereHas se query dheemi hai",
+   "cause": "Bade tables par `whereHas` sub-query chalata hai aur foreign key par index nahi hai.",
+   "fix": "Foreign key column par index lagao, aur zarurat ho to `withCount`/join dekho."
+  }
+ ],
+ "debug": {
+  "body": "Generated SQL dekhne ke liye `toSql()`:",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "Post::whereHas('comments', fn ($q) => $q->where('approved', true))->toSql();"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Relation queries practice:",
+  "tasks": [
+   "`Post::has('comments', '>=', 2)` chalao",
+   "`whereHas` se 'laravel' wale comments ki posts nikalo",
+   "`withCount('comments')` se top 5 posts nikalo",
+   "`Order::withSum('products', 'price')` se order totals nikalo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`withCount('comments')` kaunsa attribute jodta hai?",
+   "options": [
+    "count_comments",
+    "comments_count",
+    "comments_total",
+    "total"
+   ],
+   "answer": 1,
+   "why": "Naam `relation_count` hota hai: `comments_count`."
+  },
+  {
+   "q": "Relation ki condition par filter ke liye?",
+   "options": [
+    "has",
+    "whereHas",
+    "withCount",
+    "load"
+   ],
+   "answer": 1,
+   "why": "`whereHas('relation', fn)` relation par condition lagata hai."
+  },
+  {
+   "q": "`doesntHave('comments')` kya deta hai?",
+   "options": [
+    "Comments wali posts",
+    "Bina comments wali posts",
+    "Sab posts",
+    "Error"
+   ],
+   "answer": 1,
+   "why": "Jinke koi comment nahi."
+  }
+ ],
+ "interview": [
+  {
+   "q": "`has` aur `whereHas` mein farak?",
+   "a": "`has` sirf relation ki existence/ginti check karta hai. `whereHas` relation par custom condition bhi lagata hai."
+  },
+  {
+   "q": "`withCount` ka fayda?",
+   "a": "Related records ki ginti ek hi query mein milti hai, N+1 aur extra loading ke bina."
+  },
+  {
+   "q": "`with` aur `withCount` mein farak?",
+   "a": "`with` poore related models laata hai. `withCount` sirf ginti (`relation_count`) jodta hai."
+  },
+  {
+   "q": "`latestOfMany` kya karta hai?",
+   "a": "`hasOne` relationship ko 'sabse naya related record' bana deta hai."
+  },
+  {
+   "q": "`whereBelongsTo` ka fayda?",
+   "a": "Parent model dekar `where('parent_id', ...)` saaf tarah se likhne ke liye."
+  }
+ ],
+ "summary": [
+  "`has`/`doesntHave` existence, `whereHas` condition ke saath.",
+  "`withCount` -> `relation_count`, `withSum` -> `relation_sum_column`.",
+  "`withExists` boolean deta hai.",
+  "`whereBelongsTo` parent ke records, `latestOfMany` sabse naya related record.",
+  "Bade tables par foreign keys par index lagao."
+ ]
+}

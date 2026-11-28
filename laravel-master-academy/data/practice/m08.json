@@ -1,0 +1,136 @@
+{
+ "mcq": [
+  {
+   "q": "`$user->posts` aur `$user->posts()` mein kya farak hai?",
+   "options": [
+    "Koi nahi",
+    "Pehla data deta hai, doosra query builder",
+    "Pehla query builder",
+    "Dono error"
+   ],
+   "answer": 1,
+   "why": "Bina brackets ke data, brackets ke saath relationship query builder."
+  },
+  {
+   "q": "`User hasMany Post` mein foreign key kis table mein hoti hai?",
+   "options": [
+    "users",
+    "posts",
+    "Dono",
+    "Pivot"
+   ],
+   "answer": 1,
+   "why": "Child table `posts` mein `user_id`."
+  },
+  {
+   "q": "`sync([1, 2])` kya karta hai?",
+   "options": [
+    "Sirf jodta hai",
+    "Exactly 1 aur 2 rakhta hai, baaki hata deta hai",
+    "Sab hata deta hai",
+    "Delete karta hai"
+   ],
+   "answer": 1,
+   "why": "`sync` set ko di hui ids ke barabar kar deta hai."
+  },
+  {
+   "q": "N+1 problem ko kaise solve karte hain?",
+   "options": [
+    "`all()` se",
+    "`with()` se eager loading",
+    "`first()` se",
+    "`chunk()` se"
+   ],
+   "answer": 1,
+   "why": "`with('relation')` 2 queries mein kaam kar deta hai."
+  },
+  {
+   "q": "`withCount('comments')` kaunsa attribute jodta hai?",
+   "options": [
+    "count_comments",
+    "comments_count",
+    "comments_total",
+    "total"
+   ],
+   "answer": 1,
+   "why": "`relation_count`."
+  },
+  {
+   "q": "Polymorphic relation ke liye `morphs('commentable')` kitne columns banata hai?",
+   "options": [
+    "1",
+    "2",
+    "3",
+    "0"
+   ],
+   "answer": 1,
+   "why": "`commentable_id` aur `commentable_type`."
+  }
+ ],
+ "assignments": [
+  {
+   "title": "Blog relationships",
+   "level": "Intermediate",
+   "brief": "User, Post aur Comment ke relationships banao.",
+   "tasks": [
+    "`User hasMany Post` aur `Post belongsTo User` likho",
+    "`Post hasMany Comment` aur `Comment belongsTo Post` likho",
+    "Tinker mein `$user->posts()->create([...])` se posts banao",
+    "`Post::with('user', 'comments')->get()` chalao aur `DB::getQueryLog()` se queries gino"
+   ],
+   "explain": "Relationship methods ke return types (`HasMany`, `BelongsTo`) likhna achhi aadat hai.",
+   "solution": [
+    {
+     "file": "app/Models/Post.php",
+     "lang": "php",
+     "code": "public function user(): BelongsTo\n{\n    return $this->belongsTo(User::class);\n}\n\npublic function comments(): HasMany\n{\n    return $this->hasMany(Comment::class);\n}\n"
+    }
+   ]
+  },
+  {
+   "title": "Orders aur Products (pivot)",
+   "level": "Intermediate",
+   "brief": "Many-to-many pivot ke saath order total nikalo.",
+   "tasks": [
+    "`order_product` pivot (quantity, price) banao",
+    "`Order::products()` mein `withPivot('quantity','price')` lagao",
+    "`attach` se 2 products jodo",
+    "`total` accessor likho jo `quantity * price` ka sum de"
+   ],
+   "explain": "Pivot data `->pivot->quantity` se milta hai, tabhi jab `withPivot` likha ho.",
+   "solution": [
+    {
+     "file": "app/Models/Order.php",
+     "lang": "php",
+     "code": "public function products(): BelongsToMany\n{\n    return $this->belongsToMany(Product::class)->withPivot('quantity', 'price');\n}\n\nprotected function total(): Attribute\n{\n    return Attribute::make(\n        get: fn () => $this->products->sum(fn ($p) => $p->pivot->quantity * $p->pivot->price),\n    );\n}\n"
+    }
+   ]
+  }
+ ],
+ "interview": [
+  {
+   "q": "What are the relationship types in Eloquent?",
+   "a": "One to one, one to many, many to many, has-many-through, aur polymorphic (one to many, many to many)."
+  },
+  {
+   "q": "What is the N+1 problem?",
+   "a": "Loop mein har record ke liye alag relation query chalna. `with()` se eager loading karke solve karte hain."
+  },
+  {
+   "q": "Difference between has() and whereHas()?",
+   "a": "`has` existence/ginti check karta hai. `whereHas` relation par custom condition lagata hai."
+  },
+  {
+   "q": "What is a pivot table?",
+   "a": "Many-to-many ke liye beech ki table jisme dono tables ke foreign keys (aur extra data) hote hain."
+  },
+  {
+   "q": "What is a polymorphic relationship?",
+   "a": "Ek child model jo kai alag parent model types se `_id` aur `_type` columns se jud sakta hai."
+  },
+  {
+   "q": "How do you prevent N+1 during development?",
+   "a": "`Model::preventLazyLoading(! app()->isProduction())` se lazy loading par exception, aur `with()` se eager loading."
+  }
+ ]
+}

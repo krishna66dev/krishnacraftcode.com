@@ -1,0 +1,141 @@
+{
+ "mcq": [
+  {
+   "q": "`Product` model kaunsi table use karta hai?",
+   "options": [
+    "product",
+    "products",
+    "Products",
+    "tbl_product"
+   ],
+   "answer": 1,
+   "why": "Convention: snake_case plural."
+  },
+  {
+   "q": "`findOrFail()` id na mile to kya hota hai?",
+   "options": [
+    "null",
+    "404 (exception)",
+    "Naya record",
+    "0"
+   ],
+   "answer": 1,
+   "why": "`ModelNotFoundException` -> 404."
+  },
+  {
+   "q": "`Product::create($request->all())` kyun khatarnak hai?",
+   "options": [
+    "Slow",
+    "Mass assignment vulnerability",
+    "Syntax galat",
+    "Cache bharta"
+   ],
+   "answer": 1,
+   "why": "User extra fields bhej kar unhe bhi set kar sakta hai."
+  },
+  {
+   "q": "Local scope `scopeActive` ko kaise call karte hain?",
+   "options": [
+    "Product::scopeActive()",
+    "Product::active()",
+    "Product::getActive()",
+    "Product::scope('active')"
+   ],
+   "answer": 1,
+   "why": "`scope` prefix hata ke call karte hain."
+  },
+  {
+   "q": "Enum ko model mein kaise use karte hain?",
+   "options": [
+    "Index se",
+    "`casts()` mein `'status' => ProductStatus::class`",
+    "Sirf migration",
+    "Manually"
+   ],
+   "answer": 1,
+   "why": "Cast se Enum object milta hai."
+  },
+  {
+   "q": "Soft deleted records bhi laane ke liye?",
+   "options": [
+    "withTrashed()",
+    "withDeleted()",
+    "all(true)",
+    "trashed()"
+   ],
+   "answer": 0,
+   "why": "`withTrashed()`."
+  }
+ ],
+ "assignments": [
+  {
+   "title": "Product model ko poora banao",
+   "level": "Intermediate",
+   "brief": "Model mein fillable, scope aur casts lagao.",
+   "tasks": [
+    "`$fillable` mein name, price, stock, is_active rakho",
+    "`scopeActive` aur `scopePriceAbove` likho",
+    "`casts()` mein `is_active` boolean aur `price` decimal:2 karo",
+    "Tinker mein `Product::active()->priceAbove(500)->get()` chalao"
+   ],
+   "explain": "Scope query ko naam deta hai aur casts values ko sahi type mein badalte hain.",
+   "solution": [
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Models;\n\nuse Illuminate\\Database\\Eloquent\\Builder;\nuse Illuminate\\Database\\Eloquent\\Factories\\HasFactory;\nuse Illuminate\\Database\\Eloquent\\Model;\n\nclass Product extends Model\n{\n    use HasFactory;\n\n    protected $fillable = ['name', 'price', 'stock', 'is_active'];\n\n    protected function casts(): array\n    {\n        return [\n            'is_active' => 'boolean',\n            'price' => 'decimal:2',\n        ];\n    }\n\n    public function scopeActive(Builder $query): void\n    {\n        $query->where('is_active', true);\n    }\n\n    public function scopePriceAbove(Builder $query, float $price): void\n    {\n        $query->where('price', '>', $price);\n    }\n}\n"
+    }
+   ]
+  },
+  {
+   "title": "Soft delete aur observer",
+   "level": "Intermediate",
+   "brief": "Safe delete aur automatic slug banao.",
+   "tasks": [
+    "Migration mein `softDeletes()` aur `slug` jodo, model mein `SoftDeletes` lagao",
+    "`ProductObserver` banao jo `creating` mein slug bhare",
+    "Observer ko `#[ObservedBy]` se register karo",
+    "Product delete karke `withTrashed()` aur `restore()` try karo"
+   ],
+   "explain": "Observer ko register karna zaroori hai, aur mass update events nahi chalata.",
+   "solution": [
+    {
+     "file": "app/Observers/ProductObserver.php",
+     "lang": "php",
+     "code": "public function creating(Product $product): void\n{\n    $product->slug = Str::slug($product->name);\n}\n"
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "use App\\Observers\\ProductObserver;\nuse Illuminate\\Database\\Eloquent\\Attributes\\ObservedBy;\nuse Illuminate\\Database\\Eloquent\\SoftDeletes;\n\n#[ObservedBy([ProductObserver::class])]\nclass Product extends Model\n{\n    use SoftDeletes;\n}\n"
+    }
+   ]
+  }
+ ],
+ "interview": [
+  {
+   "q": "What is Eloquent?",
+   "a": "Laravel ka ORM: har table ka model, har row ek object."
+  },
+  {
+   "q": "What is mass assignment and how do you prevent it?",
+   "a": "`create()`/`fill()` mein user input se unwanted columns set ho sakte hain. `$fillable` allow-list aur validated data se bachav."
+  },
+  {
+   "q": "What is a query scope?",
+   "a": "Model mein reusable query condition, jaise `scopeActive` -> `Product::active()`."
+  },
+  {
+   "q": "What are accessors and mutators?",
+   "a": "Value padhte/likhte waqt badalne wale methods, `Attribute::make(get:, set:)` se."
+  },
+  {
+   "q": "What are Eloquent casts?",
+   "a": "Columns ko sahi PHP types (bool, array, date, Enum) mein badalne ka tareeka."
+  },
+  {
+   "q": "What is an observer?",
+   "a": "Ek class jisme model events (creating, deleted...) ka handling rehta hai, aur jo model se register hoti hai."
+  }
+ ]
+}

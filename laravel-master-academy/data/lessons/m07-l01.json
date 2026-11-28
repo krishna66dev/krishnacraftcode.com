@@ -1,0 +1,194 @@
+{
+ "id": "m07-l01",
+ "title": "Eloquent Models: Conventions aur Setup",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Eloquent ORM kya hai samajhna",
+  "`make:model` aur uske flags (`-mfs`) use karna",
+  "Table, primary key aur timestamps ki conventions jaanna",
+  "Conventions ko customize karna",
+  "Tinker se model try karna"
+ ],
+ "prerequisites": [
+  "Query Builder Basics (m06-l06)",
+  "Seeders aur Factories (m06-l05)"
+ ],
+ "sections": [
+  {
+   "heading": "Eloquent ORM kya hai?",
+   "body": "ORM matlab Object-Relational Mapper. Eloquent mein database ki har table ke liye ek **Model** class hoti hai, aur table ki har row ek **object** hoti hai. Tum SQL ki jagah `Product::where(...)->get()` jaise PHP code se kaam karte ho. Query builder ke saare methods yahan bhi milte hain, upar se timestamps, relationships, casts jaise features.",
+   "callout": {
+    "kind": "tip",
+    "text": "Query builder row ko `stdClass` deta hai. Eloquent `Product` object deta hai jisme apne methods aur behaviour ho sakte hain."
+   }
+  },
+  {
+   "heading": "Model banana",
+   "body": "`make:model` model banata hai. Flags se saath mein migration, factory aur seeder bhi ban jaate hain.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:model Product\nphp artisan make:model Product -mfs   # migration, factory, seeder bhi\nphp artisan model:show Product"
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Models;\n\nuse Illuminate\\Database\\Eloquent\\Factories\\HasFactory;\nuse Illuminate\\Database\\Eloquent\\Model;\n\nclass Product extends Model\n{\n    use HasFactory;\n}\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`Product` model automatically `products` table se baat karta hai.",
+    "`-m` migration, `-f` factory, `-s` seeder. `-a` sab kuch.",
+    "`model:show Product` table ke columns aur model ki details dikhata hai."
+   ]
+  },
+  {
+   "heading": "Real-world example: Conventions",
+   "body": "Eloquent convention follow karta hai, isliye bahut kuch likhna nahi padta:\n\n- Model `Product` -> table `products` (snake_case, plural)\n- Primary key `id` (auto-increment)\n- `created_at` aur `updated_at` columns apne aap bharte hain\n\nIsse bina config ke yeh kaam karta hai:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "use App\\Models\\Product;\n\nProduct::count();\nProduct::first();\nProduct::find(1)?->name;\nProduct::first()->toArray();\n",
+     "editable": true
+    }
+   ]
+  },
+  {
+   "heading": "Conventions customize karna",
+   "body": "Legacy table ya alag naming ho to model mein batao:",
+   "code": [
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "protected $table = 'shop_products';\nprotected $primaryKey = 'product_id';\npublic $timestamps = false;\n\n// Sirf tab jab key auto-increment integer nahi hai:\n// public $incrementing = false;\n// protected $keyType = 'string';\n",
+     "variants": {
+      "11": "protected $table = 'shop_products';\nprotected $primaryKey = 'product_id';\npublic $timestamps = false;\n",
+      "12": "protected $table = 'shop_products';\nprotected $primaryKey = 'product_id';\npublic $timestamps = false;\n",
+      "13": "use Illuminate\\Database\\Eloquent\\Attributes\\Table;\n\n#[Table('shop_products', key: 'product_id', timestamps: false)]\nclass Product extends Model\n{\n    use HasFactory;\n}\n"
+     }
+    }
+   ],
+   "explain": [
+    "Properties (`$table`, `$primaryKey`, `$timestamps`) sab versions mein chalti hain.",
+    "Laravel 13 docs mein yahi config class attributes (`#[Table]`) se bhi likh sakte ho. `#[Table]` table naam ke saath key, keyType, incrementing, timestamps, dateFormat jaise named arguments leta hai."
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Model configuration: Laravel 11, 12 aur 13",
+  "intro": "Model ka core behaviour teeno versions mein same hai. Laravel 13 mein configuration ke liye optional PHP attributes aaye hain.",
+  "items": {
+   "11": "Properties se config: `$table`, `$primaryKey`, `$timestamps`, `$fillable`.",
+   "12": "Same as 11.",
+   "13": "Properties abhi bhi chalti hain. Saath mein `Illuminate\\Database\\Eloquent\\Attributes` ke attributes (`#[Table]`, `#[Fillable]`, `#[Hidden]`, `#[Visible]`) optional tareeka hain. Purane code ko badalna zaroori nahi."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE[HY000]: General error: 1 no such table: products",
+   "cause": "`products` table bani hi nahi (migration chali nahi) ya model ka table naam galat hai.",
+   "fix": "`php artisan migrate` chalao ya `$table` sahi karo."
+  },
+  {
+   "error": "Class \"App\\Models\\Product\" not found",
+   "cause": "Model file nahi bani ya namespace galat hai.",
+   "fix": "`make:model Product` chalao aur `use App\\Models\\Product;` check karo."
+  },
+  {
+   "error": "Attempt to read property \"name\" on null",
+   "cause": "`find(1)` ya `first()` ne null diya (row nahi mili).",
+   "fix": "Null check karo (`?->`), ya `findOrFail()` use karo."
+  }
+ ],
+ "debug": {
+  "body": "Model aur table ka match dekhne ke liye `model:show` aur Tinker sabse aasan hain.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan model:show Product\nphp artisan tinker\n>>> App\\Models\\Product::first()"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Pehla model banao:",
+  "tasks": [
+   "`php artisan make:model Product -mf` chalao aur migration mein columns bharo",
+   "`migrate` chalao aur `model:show Product` dekho",
+   "Tinker mein `Product::count()` chalao",
+   "Model mein `$table` ko galat naam do aur error dekho, phir theek karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`Product` model kaunsi table use karta hai?",
+   "options": [
+    "product",
+    "products",
+    "Products",
+    "tbl_product"
+   ],
+   "answer": 1,
+   "why": "Convention: snake_case aur plural: `products`."
+  },
+  {
+   "q": "`make:model Product -mfs` kya banata hai?",
+   "options": [
+    "Sirf model",
+    "Model, migration, factory aur seeder",
+    "Model aur controller",
+    "Model aur route"
+   ],
+   "answer": 1,
+   "why": "`-m` migration, `-f` factory, `-s` seeder."
+  },
+  {
+   "q": "Timestamps band karne ke liye kya karte hain?",
+   "options": [
+    "`public $timestamps = false;`",
+    "`$table->noTimestamps()`",
+    "`.env` badalte hain",
+    "Kuch nahi ho sakta"
+   ],
+   "answer": 0,
+   "why": "Model mein `$timestamps = false` (ya Laravel 13 attributes)."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Eloquent ORM kya hai?",
+   "a": "Database tables ko PHP model classes se map karne wala Laravel ka ORM, jahan har row ek object hoti hai."
+  },
+  {
+   "q": "Model aur table ka naam kaise map hota hai?",
+   "a": "Convention se: `Product` -> `products`. Alag ho to `$table` property."
+  },
+  {
+   "q": "Eloquent aur Query Builder mein farak?",
+   "a": "Eloquent models, timestamps, relationships, casts jaise features deta hai. Query builder seedha table par SQL-jaisi chaining hai."
+  },
+  {
+   "q": "`$timestamps = false` kab?",
+   "a": "Jab table mein `created_at`/`updated_at` columns nahi hote."
+  },
+  {
+   "q": "`model:show` kya karta hai?",
+   "a": "Model ke table, columns, relationships ki summary dikhata hai."
+  }
+ ],
+ "summary": [
+  "Eloquent: har table ka model, har row ek object.",
+  "Convention: `Product` -> `products`, `id`, timestamps.",
+  "`make:model -mfs` model ke saath migration, factory, seeder.",
+  "Conventions properties se (ya Laravel 13 attributes se) badal sakte ho.",
+  "Tinker se model ko turant try karo."
+ ]
+}

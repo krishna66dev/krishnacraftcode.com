@@ -1,0 +1,207 @@
+{
+ "id": "m07-l03",
+ "title": "Create, Update, Delete aur Mass Assignment",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Naya record banane ke tareeke (`save`, `create`) jaanna",
+  "`update`, `delete`, `destroy` use karna",
+  "`firstOrCreate` aur `updateOrCreate` samajhna",
+  "Mass assignment vulnerability aur `$fillable` samajhna",
+  "Controller mein safe store/update likhna"
+ ],
+ "prerequisites": [
+  "Retrieving Data (m07-l02)"
+ ],
+ "sections": [
+  {
+   "heading": "Create",
+   "body": "Do tareeke: object banake `save()`, ya `create()` jo ek line mein banata aur save karta hai.",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "use App\\Models\\Product;\n\n$product = new Product();\n$product->name = 'Wireless Mouse';\n$product->price = 799;\n$product->save();\n\n$product = Product::create([\n    'name' => 'Keyboard',\n    'price' => 1499,\n    'stock' => 5,\n]);\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`create()` ko model mein `$fillable` chahiye (neeche dekho).",
+    "`save()` insert ya update dono karta hai, model ki state ke hisaab se.",
+    "`created_at`/`updated_at` apne aap bharte hain."
+   ]
+  },
+  {
+   "heading": "Update aur delete",
+   "body": "Model utha ke badlo ya seedha update/delete karo:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$product = Product::findOrFail(1);\n\n$product->update(['stock' => 4]);        // fill + save\n\n$product->name = 'Mouse Pro';\n$product->save();\n\n$product->delete();\nProduct::destroy([2, 3, 4]);             // ids se\n",
+     "editable": true
+    }
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "`Product::where('is_active', false)->delete()` jaise mass update/delete Eloquent model events nahi chalate. Events chahiye to models load karke ek-ek delete karo."
+   }
+  },
+  {
+   "heading": "Real-world example: Mass assignment aur $fillable",
+   "body": "`Product::create($request->all())` likhna khatarnak hai. Agar user form mein chhupa `is_admin=1` ya `price=0` bhej de to? **Mass assignment vulnerability**. Isliye model mein batao ki kaunse columns bharna allowed hain:",
+   "code": [
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "protected $fillable = ['name', 'price', 'stock'];\n",
+     "variants": {
+      "11": "protected $fillable = ['name', 'price', 'stock'];\n",
+      "12": "protected $fillable = ['name', 'price', 'stock'];\n",
+      "13": "use Illuminate\\Database\\Eloquent\\Attributes\\Fillable;\n\n#[Fillable(['name', 'price', 'stock'])]\nclass Product extends Model\n{\n    use HasFactory;\n}\n"
+     }
+    },
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "public function store(Request $request)\n{\n    $data = $request->validate([\n        'name'  => ['required', 'string', 'max:150'],\n        'price' => ['required', 'numeric', 'min:0'],\n        'stock' => ['integer', 'min:0'],\n    ]);\n\n    $product = Product::create($data);\n\n    return redirect()->route('products.show', $product);\n}\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`$fillable` allow-list hai: sirf yahi columns mass assign hote hain.",
+    "`$request->validate()` sirf validated keys return karta hai, isliye `create($data)` safe hai (validation Module 10 mein).",
+    "`$guarded = []` mat use karo, woh sab kuch allow kar deta hai."
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Kabhi `Product::create($request->all())` mat likho. Hamesha validated data (`validate()`/`validated()`) ya `$request->only([...])` use karo."
+   }
+  },
+  {
+   "heading": "firstOrCreate, updateOrCreate aur dirty check",
+   "body": "Duplicate se bachne ke liye:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "// SKU se dhundo, na mile to banao\n$p = Product::firstOrCreate(\n    ['sku' => 'M-1'],\n    ['name' => 'Mouse', 'price' => 799]\n);\n\n// Mile to update karo, warna banao\n$p = Product::updateOrCreate(\n    ['sku' => 'M-1'],\n    ['price' => 699]\n);\n\n$p->price = 650;\n$p->isDirty();        // true: badla hai par save nahi hua\n$p->save();\n$p->wasChanged('price'); // true: abhi save mein badla\n",
+     "editable": true
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Mass assignment: Laravel 11, 12 aur 13",
+  "intro": "`create`, `update`, `delete` aur mass assignment ke rules teeno versions mein same hain.",
+  "items": {
+   "11": "`protected $fillable` allow-list. `$request->validate()` ke saath `create()`.",
+   "12": "Same as 11.",
+   "13": "`$fillable` abhi bhi chalta hai. Optional `#[Fillable([...])]` attribute bhi hai (13 docs ke hisaab se)."
+  }
+ },
+ "errors": [
+  {
+   "error": "Add [name] to fillable property to allow mass assignment on [App\\Models\\Product]",
+   "cause": "`create()`/`fill()` mein ek aisi key hai jo `$fillable` mein nahi.",
+   "fix": "Model ke `$fillable` mein column jodo (sirf safe columns)."
+  },
+  {
+   "error": "SQLSTATE[23000]: NOT NULL constraint failed: products.price (ya Field 'price' doesn't have a default value)",
+   "cause": "Required column ki value nahi di.",
+   "fix": "Value do, ya migration mein `default()`/`nullable()` lagao."
+  },
+  {
+   "error": "`update()`/`delete()` ke baad event nahi chala",
+   "cause": "Mass update/delete (`Model::where()->update()`) events nahi chalata.",
+   "fix": "Models ko load karke instance par `update()`/`delete()` karo."
+  }
+ ],
+ "debug": {
+  "body": "Save hua ya nahi, aur kya badla, Tinker mein dekho.",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "$p = Product::first();\n$p->price = 1;\n$p->getDirty();\n$p->save();\n$p->getChanges();\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "CRUD practice:",
+  "tasks": [
+   "Tinker mein `create`, `update`, `delete` chalao",
+   "`$fillable` hata ke `create()` chalao aur error padho, phir wapas lagao",
+   "`firstOrCreate` do baar chalao aur dekho duplicate nahi bana",
+   "`store` method likho jo `validate()` ke baad `create()` kare"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`Product::create($request->all())` kyun khatarnak hai?",
+   "options": [
+    "Slow hai",
+    "User kisi bhi column ko mass assign kar sakta hai",
+    "Syntax galat hai",
+    "Cache bharta hai"
+   ],
+   "answer": 1,
+   "why": "Mass assignment: user extra fields bhej kar unhe bhi set kar sakta hai."
+  },
+  {
+   "q": "`$fillable` kya hai?",
+   "options": [
+    "Block-list",
+    "Allow-list jo columns mass assign ho sakte hain",
+    "Validation rule",
+    "Index"
+   ],
+   "answer": 1,
+   "why": "`$fillable` batata hai kaunse columns mass assign ho sakte hain."
+  },
+  {
+   "q": "`updateOrCreate` kya karta hai?",
+   "options": [
+    "Hamesha naya record",
+    "Mile to update, warna create",
+    "Sirf delete",
+    "Sirf read"
+   ],
+   "answer": 1,
+   "why": "Pehla array dhundta hai, mile to update, na mile to create."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Mass assignment vulnerability kya hai?",
+   "a": "Jab `create()`/`fill()` mein user ka poora input jaata hai aur woh koi bhi column (jaise `is_admin`) set kar deta hai. `$fillable` allow-list se bachav."
+  },
+  {
+   "q": "`save()` aur `create()` mein farak?",
+   "a": "`save()` ek model object ko save karta hai. `create()` array se model banata aur save karta hai (fillable chahiye)."
+  },
+  {
+   "q": "`$fillable` aur `$guarded` mein farak?",
+   "a": "`$fillable` allow-list, `$guarded` block-list. Behtar practice `$fillable`."
+  },
+  {
+   "q": "`firstOrCreate` kab use karte hain?",
+   "a": "Duplicate bachane ke liye: pehle dhundo, na mile to banao."
+  },
+  {
+   "q": "`isDirty()` aur `wasChanged()` mein farak?",
+   "a": "`isDirty()` save se pehle check karta hai, `wasChanged()` save ke baad."
+  }
+ ],
+ "summary": [
+  "`create()` ke liye `$fillable` zaroori hai.",
+  "Kabhi `$request->all()` se create/update mat karo.",
+  "`update`, `delete`, `destroy` aur `firstOrCreate`/`updateOrCreate` common tools hain.",
+  "Mass update/delete events nahi chalate.",
+  "Laravel 13 mein `#[Fillable]` optional attribute hai."
+ ]
+}

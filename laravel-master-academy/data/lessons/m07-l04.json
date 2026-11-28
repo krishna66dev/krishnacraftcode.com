@@ -1,0 +1,196 @@
+{
+ "id": "m07-l04",
+ "title": "Query Scopes: Local aur Global",
+ "minutes": 30,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "Local scope se reusable query conditions banana",
+  "Parameters wale scopes likhna",
+  "Global scope ka idea samajhna aur use hata sakna",
+  "`when()` ke saath scopes milana"
+ ],
+ "prerequisites": [
+  "Create, Update, Delete aur Mass Assignment (m07-l03)"
+ ],
+ "sections": [
+  {
+   "heading": "Scope kya hota hai?",
+   "body": "Agar `where('is_active', true)` jaisi condition har jagah dohrani pad rahi hai, to use model mein ek naam do. Is naam ko **scope** kehte hain. Isse code saaf aur ek hi jagah badalne layak hota hai."
+  },
+  {
+   "heading": "Real-world example: Local scope",
+   "body": "Model mein `scope` prefix ke saath method likho. Use karte waqt prefix hata do.",
+   "code": [
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Builder;\n\npublic function scopeActive(Builder $query): void\n{\n    $query->where('is_active', true);\n}\n\npublic function scopePriceAbove(Builder $query, float $price): void\n{\n    $query->where('price', '>', $price);\n}\n",
+     "editable": true
+    },
+    {
+     "file": "use karna",
+     "lang": "php",
+     "code": "$products = Product::active()\n    ->priceAbove(500)\n    ->latest()\n    ->paginate(10);\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`scopeActive` ko `Product::active()` likhte ho (prefix `scope` hat jaata hai).",
+    "Scopes chain ho sakte hain aur baaki query methods ke saath mil sakte hain.",
+    "Scope ka pehla argument `Builder $query` Laravel khud deta hai, baaki parameters tum dete ho."
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Naye Laravel docs mein local scope ke liye ek `#[Scope]` attribute wala tareeka bhi dikhta hai. `scopeXxx` prefix wala tareeka sab versions mein chalta hai, isliye hum wahi seekh rahe hain."
+   }
+  },
+  {
+   "heading": "Global scope",
+   "body": "Global scope har query mein apne aap lagta hai. Jaise soft deletes ka `deleted_at IS NULL`. Apna global scope bhi bana sakte ho.",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:scope ActiveScope"
+    },
+    {
+     "file": "app/Models/Scopes/ActiveScope.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Models\\Scopes;\n\nuse Illuminate\\Database\\Eloquent\\Builder;\nuse Illuminate\\Database\\Eloquent\\Model;\nuse Illuminate\\Database\\Eloquent\\Scope;\n\nclass ActiveScope implements Scope\n{\n    public function apply(Builder $builder, Model $model): void\n    {\n        $builder->where('is_active', true);\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "use App\\Models\\Scopes\\ActiveScope;\nuse Illuminate\\Database\\Eloquent\\Attributes\\ScopedBy;\n\n#[ScopedBy([ActiveScope::class])]\nclass Product extends Model\n{\n    // ...\n}\n"
+    },
+    {
+     "file": "scope hatana",
+     "lang": "php",
+     "code": "Product::withoutGlobalScope(ActiveScope::class)->get();"
+    }
+   ],
+   "explain": [
+    "`#[ScopedBy([...])]` model par global scope lagata hai. Isi ka purana tareeka `booted()` mein `static::addGlobalScope(new ActiveScope)` hai.",
+    "Admin panel jaisi jagah par `withoutGlobalScope()` se hata sakte ho."
+   ],
+   "callout": {
+    "kind": "warn",
+    "text": "Global scopes dikhte nahi, isliye 'record kahan gaya?' wala confusion ho sakta hai. Zarurat ho tabhi lagao, aur zyada tar kaam ke liye local scope kaafi hai."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Scopes: Laravel 11, 12 aur 13",
+  "intro": "Local aur global scopes teeno versions mein kaam karte hain.",
+  "items": {
+   "11": "`scopeXxx` methods, `Scope` interface, `#[ScopedBy]` aur `addGlobalScope()` available hain.",
+   "12": "Same as 11. Naye docs mein `#[Scope]` attribute bhi dikhta hai.",
+   "13": "Same as 12. Official Eloquent docs mein scope ke latest tareeke dekh lo."
+  }
+ },
+ "errors": [
+  {
+   "error": "Call to undefined method App\\Models\\Product::active()",
+   "cause": "Scope method ka naam `scopeActive` nahi hai, ya model mein bana hi nahi.",
+   "fix": "Method ka naam `scope` + Naam (`scopeActive`) rakho."
+  },
+  {
+   "error": "Records gayab hain (query khali aa rahi hai)",
+   "cause": "Koi global scope (jaise ActiveScope ya SoftDeletes) filter laga raha hai.",
+   "fix": "`withoutGlobalScopes()` ya `withoutGlobalScope(...)` se check karo."
+  },
+  {
+   "error": "Class \"Illuminate\\Database\\Eloquent\\Builder\" not found",
+   "cause": "`use Illuminate\\Database\\Eloquent\\Builder;` likhna bhool gaye.",
+   "fix": "Scope file/model ke upar sahi `use` jodo."
+  }
+ ],
+ "debug": {
+  "body": "Scope ke baad asli SQL dekhne ke liye:",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "Product::active()->priceAbove(500)->toSql();"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Scopes banao:",
+  "tasks": [
+   "`scopeActive` aur `scopePriceAbove` banao",
+   "`Product::active()->priceAbove(500)->get()` Tinker mein chalao",
+   "`scopeInStock` banao (`stock > 0`)",
+   "Ek `ActiveScope` global scope banao aur `withoutGlobalScope` se hata ke dekho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`scopeActive` ko kaise call karte hain?",
+   "options": [
+    "Product::scopeActive()",
+    "Product::active()",
+    "Product::getActive()",
+    "Product::scope('active')"
+   ],
+   "answer": 1,
+   "why": "`scope` prefix hata ke call karte hain: `Product::active()`."
+  },
+  {
+   "q": "Global scope kya karta hai?",
+   "options": [
+    "Sirf ek query par lagta hai",
+    "Model ki har query mein apne aap lagta hai",
+    "Table banata hai",
+    "Cache karta hai"
+   ],
+   "answer": 1,
+   "why": "Global scope har query mein automatically lagta hai."
+  },
+  {
+   "q": "Global scope ko hatane ke liye?",
+   "options": [
+    "delete()",
+    "withoutGlobalScope(...)",
+    "remove()",
+    "Kuch nahi ho sakta"
+   ],
+   "answer": 1,
+   "why": "`withoutGlobalScope(ActiveScope::class)`."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Local scope kya hai?",
+   "a": "Model ke andar reusable query condition, jise `Model::scopeName()` se call karte hain."
+  },
+  {
+   "q": "Local aur global scope mein farak?",
+   "a": "Local scope tum khud chain karte ho. Global scope har query mein automatically lagta hai."
+  },
+  {
+   "q": "Soft deletes kaise kaam karta hai?",
+   "a": "`SoftDeletes` ek global scope jodta hai jo `deleted_at IS NULL` wali rows hi laata hai."
+  },
+  {
+   "q": "Scope ka fayda?",
+   "a": "Query logic ek jagah rehta hai, code padhne mein saaf hota hai aur dohrana nahi padta."
+  },
+  {
+   "q": "Global scope kab avoid karein?",
+   "a": "Jab behaviour chhupa hua confusion paida kare. Wahan local scope behtar hai."
+  }
+ ],
+ "summary": [
+  "Local scope: `scopeName(Builder $query)` -> `Model::name()`.",
+  "Scopes chain ho jaate hain.",
+  "Global scope har query mein lagta hai, `withoutGlobalScope` se hat jaata hai.",
+  "`#[ScopedBy]` ya `addGlobalScope()` se global scope lagate hain.",
+  "Zyada tar kaam ke liye local scope kaafi hai."
+ ]
+}

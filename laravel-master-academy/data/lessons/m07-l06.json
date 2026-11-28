@@ -1,0 +1,211 @@
+{
+ "id": "m07-l06",
+ "title": "Soft Deletes, Model Events aur Observers",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`SoftDeletes` se records ko recover-able banana",
+  "`withTrashed`, `onlyTrashed`, `restore`, `forceDelete` use karna",
+  "Model events (`creating`, `updated`, `deleted`...) jaanna",
+  "Observer banana aur register karna",
+  "Mass update par events na chalne ka rule samajhna"
+ ],
+ "prerequisites": [
+  "Accessors, Mutators, Casts aur Enums (m07-l05)",
+  "Service Providers (m03-l04)"
+ ],
+ "sections": [
+  {
+   "heading": "Soft deletes",
+   "body": "Kabhi record delete karna final nahi hona chahiye (jaise order ya product). **Soft delete** mein row hat nahi jaati, bas `deleted_at` bhar jaata hai, aur normal queries use dikhati nahi.",
+   "code": [
+    {
+     "file": "migration",
+     "lang": "php",
+     "code": "$table->softDeletes();   // deleted_at column"
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\SoftDeletes;\n\nclass Product extends Model\n{\n    use SoftDeletes;\n}\n",
+     "editable": true
+    },
+    {
+     "file": "use karna",
+     "lang": "php",
+     "code": "$product->delete();                      // soft delete: deleted_at bhara\n\nProduct::all();                         // deleted wale nahi aate\nProduct::withTrashed()->get();          // sab, deleted bhi\nProduct::onlyTrashed()->get();          // sirf deleted\n\n$product->trashed();                    // true/false\n$product->restore();                    // wapas laao\n$product->forceDelete();                // hamesha ke liye delete\n"
+    }
+   ],
+   "explain": [
+    "Pehle migration mein `softDeletes()` aur model mein `SoftDeletes` trait dono chahiye.",
+    "Piche `SoftDeletes` ek global scope lagata hai (pichhle lesson jaisa).",
+    "Route model binding mein soft deleted model 404 deta hai (`->withTrashed()` se badal sakte ho)."
+   ]
+  },
+  {
+   "heading": "Model events",
+   "body": "Eloquent model ke lifecycle ke har step par event bhejta hai: `retrieved`, `creating`, `created`, `updating`, `updated`, `saving`, `saved`, `deleting`, `deleted`, `restoring`, `restored`. `-ing` events kaam hone se pehle chalte hain, `-ed` baad mein.",
+   "callout": {
+    "kind": "warn",
+    "text": "Mass update/delete (`Product::where(...)->update(...)`) events nahi chalate, kyunki models load hi nahi hote. Events chahiye to models load karke instance par update/delete karo."
+   }
+  },
+  {
+   "heading": "Real-world example: Observer",
+   "body": "Event ka code model ko bhari bana deta hai. Observer ek alag class hai jisme tum in events par kaam rakhte ho. Product banate waqt slug banana aur delete hone par log likhna:",
+   "code": [
+    {
+     "file": "terminal",
+     "lang": "bash",
+     "code": "php artisan make:observer ProductObserver --model=Product"
+    },
+    {
+     "file": "app/Observers/ProductObserver.php",
+     "lang": "php",
+     "code": "<?php\n\nnamespace App\\Observers;\n\nuse App\\Models\\Product;\nuse Illuminate\\Support\\Str;\n\nclass ProductObserver\n{\n    public function creating(Product $product): void\n    {\n        $product->slug = Str::slug($product->name);\n    }\n\n    public function deleted(Product $product): void\n    {\n        logger(\"Product {$product->id} delete hua\");\n    }\n}\n",
+     "editable": true
+    },
+    {
+     "file": "app/Models/Product.php",
+     "lang": "php",
+     "code": "use App\\Observers\\ProductObserver;\nuse Illuminate\\Database\\Eloquent\\Attributes\\ObservedBy;\n\n#[ObservedBy([ProductObserver::class])]\nclass Product extends Model\n{\n    // ...\n}\n"
+    },
+    {
+     "file": "ya AppServiceProvider::boot() mein",
+     "lang": "php",
+     "code": "use App\\Models\\Product;\nuse App\\Observers\\ProductObserver;\n\npublic function boot(): void\n{\n    Product::observe(ProductObserver::class);\n}\n"
+    }
+   ],
+   "explain": [
+    "Observer ke method ka naam event ka naam hota hai (`creating`, `deleted`...).",
+    "Observer ko register karna padta hai: model par `#[ObservedBy]` ya `AppServiceProvider::boot()` mein `observe()`. `make:observer` khud register nahi karta.",
+    "`Str::slug('Wireless Mouse')` -> `wireless-mouse`.",
+    "Migration mein `slug` column hona chahiye."
+   ]
+  },
+  {
+   "heading": "Events band karna",
+   "body": "Kabhi seeding ya import mein events nahi chahiye:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$product->saveQuietly();                    // events ke bina save\n\nProduct::withoutEvents(function () {\n    Product::create(['name' => 'Silent', 'price' => 1]);\n});\n"
+    }
+   ]
+  }
+ ],
+ "versionDiff": {
+  "heading": "Soft deletes aur observers: Laravel 11, 12, 13",
+  "intro": "`SoftDeletes`, model events aur observers teeno versions mein same kaam karte hain.",
+  "items": {
+   "11": "`#[ObservedBy]` ya `Model::observe()` se observer register hota hai. `make:observer` register nahi karta.",
+   "12": "Same as 11.",
+   "13": "Same as 11. Model par attribute-based config (jaise `#[ObservedBy]`) 13 ke naye style ke saath achhi tarah baithta hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "SQLSTATE[42S22]: Column not found: 1054 Unknown column 'products.deleted_at'",
+   "cause": "Model mein `SoftDeletes` hai par table mein `deleted_at` column nahi.",
+   "fix": "Migration mein `$table->softDeletes()` jodo aur `migrate` chalao."
+  },
+  {
+   "error": "Observer ka method chal hi nahi raha",
+   "cause": "Observer register nahi kiya, ya mass update use kiya (events nahi chalte).",
+   "fix": "`#[ObservedBy]` ya `observe()` jodo; instance par `save()`/`delete()` use karo."
+  },
+  {
+   "error": "Deleted record dikh nahi raha (404)",
+   "cause": "Soft deleted model normal queries aur route binding mein skip hota hai.",
+   "fix": "`withTrashed()` ya `onlyTrashed()` use karo."
+  }
+ ],
+ "debug": {
+  "body": "Observer chal raha hai ya nahi, log se dekho.",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "tail -f storage/logs/laravel.log\nphp artisan tinker\n>>> App\\Models\\Product::first()->delete()"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Product ko safe aur smart banao:",
+  "tasks": [
+   "Migration mein `softDeletes()` jodo aur model mein `SoftDeletes` trait lagao",
+   "`delete`, `withTrashed`, `onlyTrashed`, `restore` Tinker mein try karo",
+   "`ProductObserver` banao jo `creating` mein slug bhare",
+   "Observer ko register karo aur ek product banakar slug check karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "Soft delete mein row ka kya hota hai?",
+   "options": [
+    "Table se hat jaati hai",
+    "`deleted_at` bhar jaata hai",
+    "Table drop hoti hai",
+    "Kuch nahi"
+   ],
+   "answer": 1,
+   "why": "Row rehti hai, bas `deleted_at` timestamp set hota hai."
+  },
+  {
+   "q": "Deleted records bhi laane ke liye?",
+   "options": [
+    "withTrashed()",
+    "withDeleted()",
+    "all(true)",
+    "trashed()"
+   ],
+   "answer": 0,
+   "why": "`withTrashed()` soft deleted rows bhi laata hai."
+  },
+  {
+   "q": "Observer kaise register karte hain?",
+   "options": [
+    "Apne aap hota hai",
+    "`#[ObservedBy]` ya `Model::observe()`",
+    "routes/web.php mein",
+    "`.env` mein"
+   ],
+   "answer": 1,
+   "why": "Model par `#[ObservedBy]` ya `AppServiceProvider::boot()` mein `observe()`."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Soft delete kya hai?",
+   "a": "Record asli mein delete nahi hota, `deleted_at` set hota hai aur normal queries use skip karti hain, to restore kar sakte hain."
+  },
+  {
+   "q": "`delete()` aur `forceDelete()` mein farak?",
+   "a": "SoftDeletes ke saath `delete()` soft delete karta hai. `forceDelete()` row hamesha ke liye hata deta hai."
+  },
+  {
+   "q": "Model events kya hote hain?",
+   "a": "Eloquent ke lifecycle ke events: creating, created, updating, updated, saving, saved, deleting, deleted, restoring, restored."
+  },
+  {
+   "q": "Observer ka fayda?",
+   "a": "Event handling ka code model se alag, ek jagah rehta hai, to model patla rehta hai."
+  },
+  {
+   "q": "Mass update par events kyun nahi chalte?",
+   "a": "Kyunki model instances load hi nahi hote, seedha SQL chalta hai."
+  }
+ ],
+ "summary": [
+  "`softDeletes()` migration aur `SoftDeletes` trait dono chahiye.",
+  "`withTrashed`, `onlyTrashed`, `restore`, `forceDelete`.",
+  "`-ing` events pehle, `-ed` events baad mein chalte hain.",
+  "Observer register karna padta hai: `#[ObservedBy]` ya `observe()`.",
+  "Mass update/delete events nahi chalate."
+ ]
+}

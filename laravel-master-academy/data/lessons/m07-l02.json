@@ -1,0 +1,202 @@
+{
+ "id": "m07-l02",
+ "title": "Retrieving Data: Queries, Collections aur Pagination",
+ "minutes": 40,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`all`, `find`, `findOrFail`, `first`, `get` ka farak samajhna",
+  "`where`, `orderBy`, `latest`, `take`, aggregates use karna",
+  "Eloquent Collection ke useful methods jaanna",
+  "`when()` se optional filters lagana",
+  "`paginate()` aur `chunk()` ka use jaanna"
+ ],
+ "prerequisites": [
+  "Eloquent Models: Conventions aur Setup (m07-l01)"
+ ],
+ "sections": [
+  {
+   "heading": "Basic retrieval",
+   "body": "Query builder ke saare methods Eloquent par bhi chalte hain, par rows ki jagah model objects milte hain.",
+   "code": [
+    {
+     "file": "Tinker ya controller",
+     "lang": "php",
+     "code": "use App\\Models\\Product;\n\n$all     = Product::all();                              // saari rows\n$one     = Product::find(1);                            // id se, na mile to null\n$must    = Product::findOrFail(1);                      // na mile to 404\n$cheap   = Product::where('price', '<', 500)->orderBy('name')->get();\n$first   = Product::where('is_active', true)->first();\n$latest  = Product::latest()->take(5)->get();           // created_at ke hisaab se naye 5\n$names   = Product::pluck('name');                      // sirf names ka collection\n$count   = Product::count();\n$max     = Product::max('price');\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`all()` bahut badi table par mat chalao, saari rows memory mein aayengi.",
+    "`find` null de sakta hai, `findOrFail` 404 deta hai (controllers mein behtar).",
+    "`latest()` / `oldest()` – `created_at` se sort. `take(5)` / `limit(5)`.",
+    "`count`, `sum`, `avg`, `max`, `min` aggregates."
+   ]
+  },
+  {
+   "heading": "Collections",
+   "body": "`get()` aur `all()` ek **Eloquent Collection** dete hain, jisme array se zyada powerful methods hote hain.",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$products = Product::all();\n\n$names   = $products->pluck('name');                  // names\n$byId    = $products->pluck('name', 'id');            // [id => name]\n$active  = $products->filter(fn ($p) => $p->is_active);\n$total   = $products->sum('price');\n$groups  = $products->groupBy('category_id');\n$labels  = $products->map(fn ($p) => \"{$p->name} (Rs. {$p->price})\");\n\n$products->first();\n$products->toArray();\n",
+     "editable": true
+    }
+   ],
+   "explain": [
+    "`pluck`, `filter`, `map`, `sum`, `groupBy` roz kaam aate hain.",
+    "Agar filter database mein ho sakta hai, to `where()` use karo (tez). Collection ka `filter` sab rows memory mein laane ke baad chalta hai."
+   ]
+  },
+  {
+   "heading": "Real-world example: Search aur filter page",
+   "body": "Products page par optional search aur min price filter. `when()` condition true ho tabhi query mein clause jodta hai, to `if` ke jhanjhat se bachte ho.",
+   "code": [
+    {
+     "file": "app/Http/Controllers/ProductController.php",
+     "lang": "php",
+     "code": "use App\\Models\\Product;\nuse Illuminate\\Http\\Request;\n\npublic function index(Request $request)\n{\n    $products = Product::query()\n        ->when($request->filled('q'), fn ($query) =>\n            $query->where('name', 'like', '%'.$request->q.'%'))\n        ->when($request->filled('min'), fn ($query) =>\n            $query->where('price', '>=', $request->min))\n        ->latest()\n        ->paginate(10)\n        ->withQueryString();\n\n    return view('products.index', compact('products'));\n}\n",
+     "editable": true
+    },
+    {
+     "file": "resources/views/products/index.blade.php",
+     "lang": "html",
+     "code": "@foreach ($products as $product)\n    <p>{{ $product->name }} - Rs. {{ $product->price }}</p>\n@endforeach\n\n{{ $products->links() }}\n"
+    }
+   ],
+   "explain": [
+    "`filled('q')` – input maujood aur khali nahi hai.",
+    "`paginate(10)` – 10 per page. `withQueryString()` – page badalne par `?q=...` filters bane rehte hain.",
+    "`{{ $products->links() }}` – page numbers."
+   ]
+  },
+  {
+   "heading": "Badi tables: chunk aur lazy",
+   "body": "Lakhon rows par loop chalana ho to saari rows ek saath mat lao:",
+   "code": [
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "Product::chunk(200, function ($products) {\n    foreach ($products as $product) {\n        // har product par kaam\n    }\n});\n\nforeach (Product::lazy() as $product) {\n    // ek-ek karke stream hota hai\n}\n"
+    }
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Rule: pehle `where` se database mein filter karo, phir `paginate`/`chunk`. Collection mein laakar filter karna aakhri raasta hai."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Retrieval: Laravel 11, 12, 13",
+  "intro": "Retrieval methods, collections aur pagination teeno versions mein same hain.",
+  "items": {
+   "11": "`find`, `findOrFail`, `when`, `paginate`, `chunk`, `lazy` sab available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11. PHP 8.3+ guaranteed hai."
+  }
+ },
+ "errors": [
+  {
+   "error": "Call to a member function update() on null",
+   "cause": "`find()` ne null diya (id nahi mili) aur tumne seedha method call kiya.",
+   "fix": "`findOrFail()` use karo ya null check karo."
+  },
+  {
+   "error": "Allowed memory size exhausted",
+   "cause": "`all()` ya `get()` se bahut saari rows memory mein aa gayi.",
+   "fix": "`paginate()`, `chunk()` ya `lazy()` use karo."
+  },
+  {
+   "error": "Pagination links page badalne par filter hata deti hain",
+   "cause": "`withQueryString()` nahi lagaya.",
+   "fix": "`->paginate(10)->withQueryString()` likho."
+  }
+ ],
+ "debug": {
+  "body": "Query ki SQL dekhne ke liye `toSql()`, `dd()` ya Tinker mein result seedha dekho.",
+  "code": [
+   {
+    "file": "Tinker",
+    "lang": "php",
+    "code": "Product::where('price', '>', 500)->toSql();\nProduct::where('price', '>', 500)->dd();\n"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Products page banao:",
+  "tasks": [
+   "Tinker mein `find`, `findOrFail`, `first`, `pluck` try karo",
+   "`/products` route banao jo `paginate(10)` se products dikhaye",
+   "`q` (naam search) aur `min` (price) filters `when()` se lagao",
+   "Collection ke `sum('price')` aur `groupBy('is_active')` try karo"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`findOrFail()` id na mile to kya karta hai?",
+   "options": [
+    "null deta hai",
+    "404 (exception) deta hai",
+    "Naya record banata hai",
+    "0 deta hai"
+   ],
+   "answer": 1,
+   "why": "`findOrFail` `ModelNotFoundException` throw karta hai jo 404 banta hai."
+  },
+  {
+   "q": "`when()` ka fayda?",
+   "options": [
+    "Query cache karta hai",
+    "Condition true ho to hi clause jodta hai",
+    "Table banata hai",
+    "Rows delete karta hai"
+   ],
+   "answer": 1,
+   "why": "`when(condition, callback)` optional filters ke liye."
+  },
+  {
+   "q": "Bahut badi table par loop ke liye kya better hai?",
+   "options": [
+    "all()",
+    "chunk() ya lazy()",
+    "find()",
+    "first()"
+   ],
+   "answer": 1,
+   "why": "`chunk()`/`lazy()` rows ko hisson mein laate hain."
+  }
+ ],
+ "interview": [
+  {
+   "q": "`find()` aur `findOrFail()` mein farak?",
+   "a": "`find` null deta hai. `findOrFail` na milne par exception (404)."
+  },
+  {
+   "q": "`get()` aur `first()` mein farak?",
+   "a": "`get()` collection, `first()` sirf pehla model ya null."
+  },
+  {
+   "q": "`paginate()` aur `simplePaginate()` mein farak?",
+   "a": "`paginate` total count aur page numbers deta hai. `simplePaginate` sirf next/previous, ek COUNT query bachti hai."
+  },
+  {
+   "q": "Collection filter aur `where` mein kya better?",
+   "a": "`where` database mein filter karta hai (tez, kam memory). Collection filter sab rows laane ke baad chalta hai."
+  },
+  {
+   "q": "`chunk()` kab use karte hain?",
+   "a": "Bahut saari rows par kaam karna ho aur memory bachani ho."
+  }
+ ],
+ "summary": [
+  "`find`, `findOrFail`, `first`, `get` alag cheezein dete hain.",
+  "Pehle `where` se filter, phir `paginate`/`chunk`.",
+  "`when()` optional filters ka saaf tareeka hai.",
+  "Collections: `pluck`, `filter`, `map`, `sum`, `groupBy`.",
+  "`withQueryString()` se pagination filters yaad rakhti hai."
+ ]
+}

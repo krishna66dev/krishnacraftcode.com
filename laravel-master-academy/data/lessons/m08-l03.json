@@ -1,0 +1,225 @@
+{
+ "id": "m08-l03",
+ "title": "Has Many Through aur Polymorphic Relations",
+ "minutes": 45,
+ "versions": [
+  "11",
+  "12",
+  "13"
+ ],
+ "objectives": [
+  "`hasManyThrough` ka use samajhna",
+  "Polymorphic relation kab chahiye jaanna",
+  "`morphMany` aur `morphTo` likhna",
+  "`morphs()` migration aur morph map samajhna",
+  "Polymorphic many-to-many (tags) ka idea jaanna"
+ ],
+ "prerequisites": [
+  "Many to Many aur Pivot Data (m08-l02)"
+ ],
+ "sections": [
+  {
+   "heading": "Has Many Through",
+   "body": "Country -> User -> Post: ek country ke saare posts, beech ke users ke through. Direct `posts` table mein `country_id` nahi hai, par `hasManyThrough` beech ki table se jod deta hai.",
+   "code": [
+    {
+     "file": "app/Models/Country.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough;\n\npublic function posts(): HasManyThrough\n{\n    return $this->hasManyThrough(Post::class, User::class);\n}\n",
+     "editable": true
+    },
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "Country::find(1)->posts;   // is country ke users ke saare posts"
+    }
+   ],
+   "explain": [
+    "Table structure: `countries(id)`, `users(id, country_id)`, `posts(id, user_id)`.",
+    "Pehla argument final model (`Post`), doosra beech wala (`User`).",
+    "`hasOneThrough` isi ka ek-result wala roop hai."
+   ]
+  },
+  {
+   "heading": "Polymorphic kya hai? (Real-world example: comments)",
+   "body": "Maan lo Comments Posts par bhi aate hain aur Videos par bhi. Do alag tables (`post_comments`, `video_comments`) banane ki jagah ek `comments` table banao jo batati hai ki wo kis type ki aur kaunsi row ka comment hai. Isko **polymorphic relation** kehte hain.",
+   "code": [
+    {
+     "file": "migration: create_comments_table",
+     "lang": "php",
+     "code": "Schema::create('comments', function (Blueprint $table) {\n    $table->id();\n    $table->text('body');\n    $table->morphs('commentable');   // commentable_id + commentable_type\n    $table->timestamps();\n});\n"
+    },
+    {
+     "file": "app/Models/Comment.php",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Relations\\MorphTo;\n\npublic function commentable(): MorphTo\n{\n    return $this->morphTo();\n}\n"
+    },
+    {
+     "file": "app/Models/Post.php (Video mein bhi aise hi)",
+     "lang": "php",
+     "code": "use Illuminate\\Database\\Eloquent\\Relations\\MorphMany;\n\npublic function comments(): MorphMany\n{\n    return $this->morphMany(Comment::class, 'commentable');\n}\n",
+     "editable": true
+    },
+    {
+     "file": "Tinker",
+     "lang": "php",
+     "code": "$post->comments()->create(['body' => 'Mast post!']);\n$video->comments()->create(['body' => 'Achha video']);\n\n$comment = Comment::find(1);\n$comment->commentable;   // Post ya Video, jo bhi owner hai\n"
+    }
+   ],
+   "explain": [
+    "`morphs('commentable')` do columns banata hai: `commentable_id` aur `commentable_type` (model ka class naam).",
+    "`morphMany(Comment::class, 'commentable')` – parent side. `morphTo()` – child side jo owner ko pehchanta hai.",
+    "Isse ek hi table kai models ke liye kaam karti hai."
+   ]
+  },
+  {
+   "heading": "Morph map: class naam database mein mat rakho",
+   "body": "By default `commentable_type` mein poora class naam (`App\\Models\\Post`) jaata hai. Kal class ka naam/namespace badla to purana data toot jaata hai. Isliye chhote alias use karo:",
+   "code": [
+    {
+     "file": "app/Providers/AppServiceProvider.php",
+     "lang": "php",
+     "code": "use App\\Models\\Post;\nuse App\\Models\\Video;\nuse Illuminate\\Database\\Eloquent\\Relations\\Relation;\n\npublic function boot(): void\n{\n    Relation::enforceMorphMap([\n        'post'  => Post::class,\n        'video' => Video::class,\n    ]);\n}\n"
+    }
+   ],
+   "explain": [
+    "Ab database mein `commentable_type` = `post` ya `video` jaayega.",
+    "`enforceMorphMap` ke baad map mein na hone wala model use karne par error aayega, jo galti jaldi pakadta hai."
+   ]
+  },
+  {
+   "heading": "Polymorphic many-to-many: tags",
+   "body": "Ek tag posts par bhi aur videos par bhi lag sakta hai. Iske liye `taggables` pivot hoti hai aur `morphToMany`/`morphedByMany` use hote hain.",
+   "code": [
+    {
+     "file": "migration: create_taggables_table",
+     "lang": "php",
+     "code": "Schema::create('taggables', function (Blueprint $table) {\n    $table->foreignId('tag_id')->constrained()->cascadeOnDelete();\n    $table->morphs('taggable');\n});\n"
+    },
+    {
+     "file": "app/Models/Post.php",
+     "lang": "php",
+     "code": "public function tags(): MorphToMany\n{\n    return $this->morphToMany(Tag::class, 'taggable');\n}\n"
+    },
+    {
+     "file": "app/Models/Tag.php",
+     "lang": "php",
+     "code": "public function posts(): MorphToMany\n{\n    return $this->morphedByMany(Post::class, 'taggable');\n}\n"
+    }
+   ],
+   "callout": {
+    "kind": "tip",
+    "text": "Polymorphic tab use karo jab ek hi child table (comments, images, tags) kai alag parent models se jude. Ek hi parent ho to normal `hasMany` kaafi hai."
+   }
+  }
+ ],
+ "versionDiff": {
+  "heading": "Through aur polymorphic: Laravel 11, 12 aur 13",
+  "intro": "`hasManyThrough`, `morphMany`, `morphTo`, `morphToMany` teeno versions mein same hain.",
+  "items": {
+   "11": "`hasManyThrough`, `morphMany`, `morphTo`, `morphToMany`, `Relation::enforceMorphMap` available hain.",
+   "12": "Same as 11.",
+   "13": "Same as 11. Naye fluent through-helpers ke liye official relationships docs dekho."
+  }
+ },
+ "errors": [
+  {
+   "error": "No morph map defined for model [App\\Models\\Post]",
+   "cause": "`enforceMorphMap` laga hai par us model ka alias map mein nahi.",
+   "fix": "Map mein model jodo (`'post' => Post::class`)."
+  },
+  {
+   "error": "Polymorphic relation se galat ya null model aa raha hai",
+   "cause": "`commentable_type` ki value (class naam ya alias) aur morph map match nahi karte.",
+   "fix": "Database mein `commentable_type` check karo aur morph map ke saath milao."
+  },
+  {
+   "error": "Column not found: commentable_id",
+   "cause": "`morphs()` migration chali nahi ya naam alag hai.",
+   "fix": "`$table->morphs('commentable')` rakho aur `migrate` chalao."
+  }
+ ],
+ "debug": {
+  "body": "Polymorphic rows ko database mein seedha dekho:",
+  "code": [
+   {
+    "file": "terminal",
+    "lang": "bash",
+    "code": "php artisan db:table comments\nphp artisan tinker\n>>> App\\Models\\Comment::first()->commentable"
+   }
+  ]
+ },
+ "exercise": {
+  "intro": "Comments aur tags banao:",
+  "tasks": [
+   "`comments` table `morphs('commentable')` ke saath banao",
+   "`Post::comments()` aur `Video::comments()` (`morphMany`) aur `Comment::commentable()` (`morphTo`) likho",
+   "Morph map set karo aur database mein `commentable_type` dekho",
+   "`Country -> User -> Post` ke liye `hasManyThrough` likho"
+  ]
+ },
+ "quiz": [
+  {
+   "q": "`morphs('commentable')` kitne columns banata hai?",
+   "options": [
+    "1",
+    "2 (id aur type)",
+    "3",
+    "0"
+   ],
+   "answer": 1,
+   "why": "`commentable_id` aur `commentable_type`."
+  },
+  {
+   "q": "Polymorphic relation kab chahiye?",
+   "options": [
+    "Ek parent, ek child",
+    "Ek child table kai alag parent models se jude",
+    "Sirf soft deletes",
+    "Sirf pivot data"
+   ],
+   "answer": 1,
+   "why": "Jab ek table (comments, images) kai models ke liye ho."
+  },
+  {
+   "q": "Morph map ka fayda?",
+   "options": [
+    "Query tez hoti hai",
+    "Database mein class naam ki jagah chhota alias jaata hai",
+    "Soft delete hota hai",
+    "Index banta hai"
+   ],
+   "answer": 1,
+   "why": "Class rename hone par data na toote isliye alias use hota hai."
+  }
+ ],
+ "interview": [
+  {
+   "q": "Polymorphic relationship kya hai?",
+   "a": "Ek child model jo kai alag parent model types se jud sakta hai, `_id` aur `_type` columns se."
+  },
+  {
+   "q": "`hasManyThrough` kab use karte hain?",
+   "a": "Jab do table ke beech ek beech ki table se related records chahiye, jaise Country -> User -> Post."
+  },
+  {
+   "q": "Morph map kyun use karte hain?",
+   "a": "`_type` mein class ke poore naam ki jagah alias store karne ke liye, taaki rename safe ho."
+  },
+  {
+   "q": "`morphTo` aur `morphMany` mein farak?",
+   "a": "`morphMany` parent side (post ke comments), `morphTo` child side (comment ka owner)."
+  },
+  {
+   "q": "Polymorphic many-to-many ka example?",
+   "a": "Tags jo posts aur videos dono par lag sakte hain: `morphToMany` aur `morphedByMany`, `taggables` pivot ke saath."
+  }
+ ],
+ "summary": [
+  "`hasManyThrough` beech ki table se far related data deta hai.",
+  "Polymorphic mein child table `_id` + `_type` rakhti hai.",
+  "`morphs()` migration, `morphMany` (parent), `morphTo` (child).",
+  "Morph map se class naam ki jagah alias store karo.",
+  "`morphToMany`/`morphedByMany` polymorphic many-to-many ke liye."
+ ]
+}
